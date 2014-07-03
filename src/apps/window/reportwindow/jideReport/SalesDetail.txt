@@ -1,0 +1,28 @@
+Date,Desc,Qty,Sales Price,Amount,Item Type,Item Name
+java.util.Date,java.lang.String,java.lang.Double,java.lang.Double,java.lang.Double,java.lang.String,java.lang.String
+Thu Dec 03 19:00:00 CDT 2009,Interior wood door - 6' Louvered doors,1,92,92,Inventory,Wood Door:Interior
+Thu Dec 03 19:00:00 CDT 2009,Plumbing fixtures,1,350,350,Parts,Plumb Fixtrs
+Thu Dec 03 19:00:00 CDT 2009,Cabinet Pulls,4,56.95,227.8,Inventory,Cabinets:Cabinet Pulls
+Thu Dec 03 19:00:00 CDT 2009,Light pine kitchen cabinet wall unit,1,3500,3500,Inventory,Cabinets:Light Pine
+Thu Nov 26 19:00:00 CDT 2009,Framing labor,2,55,110,Services,Framing
+Thu Nov 26 19:00:00 CDT 2009,Installation labor - Plumbing,6,35,210,Services,Installation
+Thu Nov 26 19:00:00 CDT 2009,Installation labor - drywall and trim,2.5,35,87.5,Services,Installation
+Thu Dec 03 18:00:00 CDT 2009,Refrigerator/freezer,1,577.5,577.5,Parts,Appliance
+Fri Dec 04 18:00:00 CDT 2009,Double oven,1,423.5,423.5,Parts,Appliance
+Fri Dec 04 18:00:00 CDT 2009,"Gas rangetop\, professional style",1,610.5,610.5,Parts,Appliance
+Fri Dec 04 18:00:00 CDT 2009,Trash compactor,1,214.5,214.5,Parts,Appliance
+Wed Oct 14 18:00:00 CDT 2009,Garbage disposal,1,104.5,104.5,Parts,Appliance
+Wed Oct 14 18:00:00 CDT 2009,Cabinet Pulls,0,2.035,0,Inventory,Cabinets:Cabinet Pulls
+Fri Dec 04 18:00:00 CDT 2009,Interior wood door,0,126.5,0,Inventory,Wood Door:Interior
+Fri Dec 04 18:00:00 CDT 2009,"Exterior wood door\, French",0,599.5,0,Inventory,Wood Door:Exterior
+Wed Oct 14 18:00:00 CDT 2009,Standard Doorknobs,0,30,0,Inventory,Hardware:Doorknobs Std
+Wed Oct 14 18:00:00 CDT 2009,Greenhouse Window,0,495,0,Parts,Window
+Fri Dec 04 18:00:00 CDT 2009,Rough lumber,0,550,0,Parts,Lumber:Rough
+Fri Dec 04 18:00:00 CDT 2009,Trim lumber,0,165,0,Parts,Lumber:Trim
+Wed Oct 14 18:00:00 CDT 2009,Plumbing fixtures,0,319,0,Parts,Plumb Fixtrs
+Wed Oct 14 18:00:00 CDT 2009,Bar sink w/faucet,0,126.5,0,Parts,Plumb Fixtrs
+Wed Oct 14 18:00:00 CDT 2009,Install tile or counter,0,1650,0,Services,Subs:Tile &Counter
+Fri Dec 04 18:00:00 CDT 2009,Building permit,0,300,0,Other Charges,Permit
+Fri Dec 04 18:00:00 CDT 2009,Removal labor,0,45.5,0,Services,Removal
+Fri Dec 04 18:00:00 CDT 2009,Framing labor,0,66,0,Services,Framing
+Fri Dec 04 18:00:00 CDT 2009,Plumbing,0,660,0,Services,Subs:Plumbing
