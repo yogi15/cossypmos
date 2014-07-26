@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Vector;
 
 import beans.Attribute;
+import beans.Book;
 import util.commonUTIL;
 
 
@@ -26,11 +27,19 @@ public class AttributSQL {
 	final static private String SELECT =
 		"SELECT id,attributeName ,type,attributeValue FROM ATTRIBUTE where id =  ?";
 	final static private String SELECTONE =
-		"SELECT id,attributeName ,type,attributeValueFROM ATTRIBUTE where id =  " ;
+		"SELECT id,attributeName ,type,attributeValue FROM ATTRIBUTE where id =  " ;
 	 
 	final static private String SELECTWHERE =
 		"SELECT id,attributeName ,type,attributeValue FROM ATTRIBUTE where    " ;
-	 
+	 private static String getUpdateSQL(Attribute attribute) {
+	      String updateSQL = "UPDATE ATTRIBUTE  set " +
+	      		" id= " + attribute.getId() + 
+	      		" ,type= '" + attribute.getType() + 	      		
+	      		"' ,attributeName= " + attribute.getName() + 	      		
+	      		" ,attributeValue= '" + attribute.getValue() + 	      		
+	      		"'  where id= " + attribute.getId() +" and type = '"+attribute.getType()+"'";
+	      return updateSQL;
+	     }
 	 
 	 public static boolean save(Attribute insertAttribute, Connection con) {
 		 try {
@@ -85,21 +94,17 @@ public class AttributSQL {
 	 
 	 protected static  boolean edit(Attribute updateAttribute, Connection con ) {
 		 
-	        PreparedStatement stmt = null;
+		 PreparedStatement stmt = null;
+	        String sql = getUpdateSQL(updateAttribute);
 		 try {
+			 con.setAutoCommit(false);
 			 int j = 1;
-			 stmt = dsSQL.newPreparedStatement(con, UPDATE_FROM_ATTRIBUTE);
-	            
-			
-	           
-	            
-	            stmt.setInt(1, updateAttribute.getId());
-	            stmt.setString(2, updateAttribute.getName());
-	            stmt.setString(3, updateAttribute.getType());
-	            stmt.executeUpdate();
-			 
+			 stmt = dsSQL.newPreparedStatement(con, sql);
+	            stmt.executeUpdate(sql);
+			 con.commit();
+			 commonUTIL.display("AttributeSQL ::  edit", sql);
 		 } catch (Exception e) {
-			 commonUTIL.displayError("AttributeSQL","edit",e);
+			 commonUTIL.displayError("AttributeSQL","edit  " + sql,e);
 			 return false;
 	           
 	        }
@@ -172,7 +177,7 @@ protected static int selectMax(Connection con ) {
 			
 	        PreparedStatement stmt = null;
 		 try {
-			 int id = selectMax(con);
+			// int id = selectMax(con);
 			 int j = 1;
 			 con.setAutoCommit(false);
 			 stmt = dsSQL.newPreparedStatement(con, INSERT_FROM_ATTRIBUTE);
