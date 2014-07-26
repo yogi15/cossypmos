@@ -891,7 +891,12 @@ try {
     }
     public void processFXPosition(Trade trade,int i,boolean isUpdated) {
     	try {
-			LiquidationConfig liqConfig = (LiquidationConfig)remoteRef.getLiquidationConfigOn(trade.getBookId(),trade.getProductType(),trade.getTradedesc1());
+			LiquidationConfig liqConfig = (LiquidationConfig)remoteRef.getLiquidationConfigOn(trade.getBookId(),trade.getProductType(),trade.getTradedesc1().toUpperCase());
+			if(liqConfig == null) {
+				
+				commonUTIL.display("PositionEngine " , "Missing LiquidationConfig for " + trade.getProductType() + "  " +trade.getTradedesc1() );
+				return;
+			}
 			if(liqConfig.isAvaliableLiquidation()) {
 				 Position oldPosition = (Position) remoteMO.getPositionOnTrade(trade);
 				 processFXPosition(oldPosition,trade,i,isUpdated,liqConfig,false);
