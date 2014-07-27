@@ -153,8 +153,17 @@ public class MOImp implements RemoteMO {
 	@Override
 	public void saveOpenPosition(Openpos newpos) throws RemoteException {
 		OpenPosSQL.save(newpos, dsSQL.getConn());
+		Trade trade = null;
 		if(newpos.getProductType().equalsIgnoreCase("FX")) {
-			 Vector<CashPosition> cashPs = 	createCashPosition(newpos);
+			 if(remoteTrade == null) {
+				 de =ServerConnectionUtil.connect("localhost", 1099,commonUTIL.getServerIP() );
+					remoteTrade = (RemoteTrade)  de.getRMIService("Trade");
+					trade = remoteTrade.selectTrade(newpos.getTradeId());
+			 } else {
+				 trade = remoteTrade.selectTrade(newpos.getTradeId());
+			 }
+			 Vector<CashPosition> cashPs = 	createCashPosition(newpos,trade);
+			
 			 for(int i=0;i < cashPs.size();i++) {
 				 CashPosition cashPosition1  =  cashPs.get(i);
 				 CashPositionSQL.save(cashPosition1, dsSQL.getConn());
@@ -167,9 +176,10 @@ public class MOImp implements RemoteMO {
 
 	
 	
-	public Vector<CashPosition> createCashPosition(Openpos newpos) {
+	public Vector<CashPosition> createCashPosition(Openpos newpos,Trade trade) {
 		Vector<CashPosition> cashPositions = new Vector<CashPosition>();
 		CashPosition cashPosition1 = new CashPosition();
+		cashPosition1.setCpID(trade.getCpID());
 		cashPosition1.setBookId(newpos.getBookId());
 		cashPosition1.setOpenpositionDate(newpos.getOpenpositionDate());
 		cashPosition1.setQuantity(newpos.getQuantity());
@@ -201,7 +211,7 @@ public class MOImp implements RemoteMO {
 			cashPosition2.setTradeId(newpos.getTradeId());
 			cashPosition2.setPrice(newpos.getPrice());
 			cashPosition2.setProductType(newpos.getProductType());
-			
+			cashPosition2.setCpID(trade.getCpID());
 				cashPosition2.setProductSubType(newpos.getTradedesc1());
 			
 			//	cashPosition2.setType(getTradeType(newpos.getSign()));
