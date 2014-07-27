@@ -40,11 +40,11 @@ final static private String DELETE_FROM_openpos =
 			"	originalTradeAmt,	" +			
 			"	tradedesc1," +
 			"	fxSwapLegType," +
-			"	tradedesc,primaryCurr,QuotingCurr,Currency,actualAmt," +
+			"	tradedesc,primaryCurr,QuotingCurr,Currency,actualAmt,cpid," +
 			"    id" +
 			" )" +
 			" VALUES" +
-			"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; 
+			"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; 
 			
 	final static private String distinctProductType = "  select sum(quotingamt) quotingCurr ,sum(openNominal) PrimaryCurr, productsubtype,  concat(concat(productsubtype,'_'),settledate) productsubtype1 from cashposition ";
 	
@@ -441,7 +441,8 @@ final static private String DELETE_FROM_openpos =
             stmt.setString(23, 	inserOpenpos.getQuotingCurr());
             stmt.setString(24, 	inserOpenpos.getCurrency());
             stmt.setDouble(25, 	inserOpenpos.getActualAmt());
-            stmt.setInt(26, 	inserOpenpos.getId());
+            stmt.setDouble(26, 	inserOpenpos.getCpID());
+            stmt.setInt(27, 	inserOpenpos.getId());
             stmt.executeUpdate();
             con.commit();
 			
