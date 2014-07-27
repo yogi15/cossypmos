@@ -233,8 +233,10 @@ Vector v1 =null;
     	displagflag = true;
     	Users user = new Users();
     	user.setUser_groups(jComboBox1.getSelectedItem().toString());
-    	user.setUser_name(jTextField1.getText());
-    	user.setPassword(jTextField2.getText());
+    	System.out.println(jTextField1.getText());
+    	System.out.println(jTextField2.getText());
+    	user.setUser_name(jTextField2.getText());
+    	user.setPassword(jTextField1.getText());
      try {
     	
     	user = remoteBORef.validateUser(user);
