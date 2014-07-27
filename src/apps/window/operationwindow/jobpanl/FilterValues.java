@@ -28,7 +28,7 @@ import dsServices.RemoteTrade;
 public class FilterValues {
 	
 	 Hashtable<String,Vector> dataValues = null; 
-	 String starupData [] = {"SearchCriteria","TaskColumn","Status","ProductType","Currency","EventType","WFType","BUY/SELL","TransferType","FEEType","accEvent","TaskType","TradeAttribute"};
+	 String starupData [] = {"SearchCriteria","TaskColumn","Status","ProductType","Currency","EventType","WFType","BUY/SELL","TransferType","FEEType","accEvent","TaskType","TradeAttribute","QuotingCurr","PrimaryCurr"};
 	 String referenceData [] = {"Book" };
 	 String datesSearch [] = {"between",">=",">","<=","<"};
 	 Hashtable<Integer,Book> bookValues = new Hashtable<Integer,Book>(); 
@@ -114,6 +114,9 @@ public class FilterValues {
 		}
 		dataValues.put("Book", getBooks(remote));
 		dataValues.put("CounterParty", getCounterParty(remote));
+		dataValues.put("QuotingCurr", dataValues.get("Currency"));
+		dataValues.put("PrimaryCurr", dataValues.get("Currency"));
+		
 		
 	}
 	
