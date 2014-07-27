@@ -221,5 +221,14 @@ public class CashPosition
 		public void setProductSubType(String productSubType) {
 			this.productSubType = productSubType;
 		}
+		int cpID =0;
+		public void setCpID(int cpID) {
+			// TODO Auto-generated method stub
+			this.cpID = cpID;
+			
+		}
+		public int getCpID() {
+			return cpID;
+		}
 		
 	}
