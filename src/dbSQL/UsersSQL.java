@@ -352,10 +352,11 @@ protected static Users select(String  username,String password,String groupname,
        PreparedStatement stmt = null;
        Vector userss = new Vector();
        Users users = null;
+       String sql="";
 	 try {
 		//String sql = SELECTUSERPASSWORD + " user_name = '" + username.trim() + "' and password = " + "'"  + password.trim() + "' and user_groups = '" + groupname + "'";
-		 String sql = SELECTUSERPASSWORD + " user_name = '" + username.trim() + "' and user_groups = '" + groupname + "'";
-		 System.out.println(sql);
+		  sql = SELECTUSERPASSWORD + " user_name = '" + username.trim() + "' and user_groups = '" + groupname + "'";
+		 //System.out.println(sql);
 		 stmt = dsSQL.newPreparedStatement(con, sql);
         
         ResultSet rs = stmt.executeQuery();
@@ -381,6 +382,7 @@ protected static Users select(String  username,String password,String groupname,
        finally {
           try {
 			stmt.close();
+			System.out.println(sql);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			commonUTIL.displayError("usersSQL","selectMax",e);
