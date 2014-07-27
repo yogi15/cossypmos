@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 public class CashPositionPanel  extends ReportPanel {
-	 String mainsql = " select producttype,id ,tradedesc1,cpID,traderID,status,type,tradeDate,bookId,quantity,price,nominal  from Trade trade"; 
+	 String mainsql = " select producttype  from Trade trade"; 
 	 String searchCriteria = "";
 	 JPanel panelViewReportdata = null;
 	 private javax.swing.JPanel jPanel1 = null;
