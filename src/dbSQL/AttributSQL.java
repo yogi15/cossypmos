@@ -35,8 +35,8 @@ public class AttributSQL {
 	      String updateSQL = "UPDATE ATTRIBUTE  set " +
 	      		" id= " + attribute.getId() + 
 	      		" ,type= '" + attribute.getType() + 	      		
-	      		"' ,attributeName= " + attribute.getName() + 	      		
-	      		" ,attributeValue= '" + attribute.getValue() + 	      		
+	      		"' ,attributeName= '" + attribute.getName() + 	      		
+	      		"' ,attributeValue= '" + attribute.getValue() + 	      		
 	      		"'  where id= " + attribute.getId() +" and type = '"+attribute.getType()+"'";
 	      return updateSQL;
 	     }
