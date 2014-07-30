@@ -189,6 +189,8 @@ public class MessageConfigWindow extends JPanel {
 		               
 		                	String ss = "";
 		                  Object obj [] =  choice12.getObj();
+		                  if(obj != null && obj.length == 0) 
+		                	  return;
 		                  if(obj != null || obj.length > 0) 
 		                	jTemplateName.setText((String) obj[0]) ;
 		                  choice12.cmodList2.clear();
