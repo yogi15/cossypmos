@@ -53,7 +53,7 @@ public class ReportColumns {
 		columnsMaps.put("Posting.AccEventType","AccEventType");
 		columnsMaps.put("Posting.LinkId","LinkId");
 		columnsMaps.put("Posting.EventType","EventType");
-		columnsMaps.put("Posting.DebitAccId","DebitAccId");
+		columnsMaps.put("Posting.DebitAccId","(select accountname from account where id =Posting.DebitAccId) debitACC");
 		columnsMaps.put("Posting.CreditAccId","CreditAccId");
 		columnsMaps.put("Posting.RuleName","RuleName");
 		columnsMaps.put("Posting.Currency","Currency");
@@ -103,8 +103,8 @@ public class ReportColumns {
 		columnsMaps.put("Transfer.TransferType","TransferType");
 		columnsMaps.put("Transfer.TransferStatus","TransferStatus");
 		columnsMaps.put("Transfer.SettleCurrency","SettleCurrency");
-		columnsMaps.put("Transfer.PayerCode","PayCode");
-		columnsMaps.put("Transfer.PayerRole","PayRole");
+		columnsMaps.put("Transfer.PayerCode","PayerCode");
+		columnsMaps.put("Transfer.PayerRole","PayerRole");
 		columnsMaps.put("Transfer.ReceiverCode","ReceiverCode");
 		columnsMaps.put("Transfer.ReceiverRole","ReceiverRole");
 		columnsMaps.put("Transfer.PaymentStatus","PaymentStatus");
@@ -118,14 +118,14 @@ public class ReportColumns {
 		columnsMaps.put("Transfer.LinkID","LinkID");
 	//	columnsMaps.put("Transfer.ATTRIBUTES","Attributes");
 		columnsMaps.put("Transfer.UserID","UserID"); // to be changed
-		columnsMaps.put("Transfer.Leid","Leid");// to be changed
+		columnsMaps.put("Transfer.cpid","cpid");// to be changed
 		columnsMaps.put("Transfer.ProdcutType","ProdcutType");
 		columnsMaps.put("Transfer.NetterdTransferID","NetterdTransferID");
 		columnsMaps.put("Transfer.NettedConfigID","NettedConfigID");
 		columnsMaps.put("Transfer.SettleAmount","SettleAmount");
 		columnsMaps.put("Transfer.ProductID","ProductID");
 	//	columnsMaps.put("Transfer.TransferId","id");
-		columnsMaps.put("Transfer.TraderID","TraderID");
+		columnsMaps.put("Transfer.TradeID","TradeID");
 		
 		
 		
@@ -145,6 +145,8 @@ public class ReportColumns {
 	//	columnsMaps.put("Trade.Book","bookId ");
         columnsMaps.put("Trade.Nominal","Nominal ");
 	    columnsMaps.put("Trade.Quantity","Quantity"); 
+	    columnsMaps.put("Trade.Amount2 ","Nominal");
+	    columnsMaps.put("Trade.Amount1","Quantity"); 
 		columnsMaps.put("Trade.User","userid ");  // to be changed
 		columnsMaps.put("Trade.Price","Price");
 		columnsMaps.put("Trade.Version","Version"); 
