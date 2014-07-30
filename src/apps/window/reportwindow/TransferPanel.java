@@ -24,11 +24,11 @@ public class TransferPanel extends ReportPanel {
 	 ReportSearchPanel reportPanel;
 	public JPanel loadreport() {
 		 pReport = new PivotReport(null); 
-		
+			
 		 demo = new SwingReportDemo(pReport);
 		 jPanel1  = demo.run();
 		 jPanel1. setLayout(new BorderLayout());
-	        DatePanel datep = new DatePanel("Trade");
+	        DatePanel datep = new DatePanel("Transfer");
 	        JPanel pand = new JPanel();
 	        pand.setLayout(new BorderLayout());
 	        pand.add(demo.getControlPanel(datep), BorderLayout.WEST);
@@ -36,19 +36,8 @@ public class TransferPanel extends ReportPanel {
 	         panelViewReportdata =  demo.getView().getJidePanel();
 	        panelViewReportdata.setBorder(javax.swing.BorderFactory.createTitledBorder(" "));
 	        jPanel1. add(panelViewReportdata, BorderLayout.CENTER);
-	      //  populateReportData(mainsql,false);
-	        UserJob job = jobs.elementAt(0);
-	 		  Vector detailsJob = job.getDetailsJobs();
-	        reportPanel = new ReportSearchPanel("Transfer",searchCriteriaA,searchColumn,filterValues,job,detailsJob,remoteTask,remoteTrade,getUser(),getReferenceData());
-	        reportPanel.setRemoteRef(getReferenceData());
-	         reportPanel.addReportPanel(jPanel1);
-	         reportPanel.setColumnSQL(mainsql);
-	         reportPanel.setDatePanel(datep);
-	         reportPanel.setDemo(demo);
-	         reportPanel.setpReport(pReport);
-	         reportPanel.setReportType("transfer"); // in small case will used to create where through search criteria.
-	   //      setLayout(new BorderLayout());
-	        return reportPanel;
+	        
+	        return jPanel1;
 		
 	}
 	public void populateReportData(String sql,boolean replaceColumns) {
