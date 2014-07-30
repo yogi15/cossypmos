@@ -285,6 +285,13 @@ public class ReportSQLGenerator {
 				tableName = tableName + " Cashposition cashposition ";
 			}
 		}
+		if (tablename.contains("Posting.")) {
+			if (tableName.length() > 0) {
+				tableName = tableName + ",Posting posting ";
+			} else {
+				tableName = tableName + " Posting posting ";
+			}
+		}
 		if (tablename.contains("PNL.")) {
 			if (tableName.length() > 0) {
 				tableName = tableName + ", Liquidpos  PNL ";
