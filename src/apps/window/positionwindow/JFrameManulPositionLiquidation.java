@@ -49,7 +49,7 @@ public class JFrameManulPositionLiquidation extends DefaultDockableHolder {
 	private static final long serialVersionUID = 1L;
 	private static final String PROFILE_NAME = "ManualLiquidation";
 	private static final String PREFERRED_LOOK_AND_FEEL = null;
-	String SQL = " select t.id,t.bookid,t.cpid,t.type,t.producttype,t.tradedesc,t.tradedesc1,t.price,t.quantity,t.nominal,o.openquantity,o.opennominal,o.id,o.positionid,t.deliverydate from trade t,openpos o  	  where  t.id = o.tradeid and o.openquantity <> 0  and t.producttype = 'FX' ";
+	String SQL = " select t.id,t.bookid,t.cpid,t.type,t.producttype,t.tradedesc,t.tradedesc1,t.price,t.quantity,t.nominal,Openpos.openquantity,Openpos.opennominal,Openpos.id,Openpos.positionid,t.deliverydate from trade t,openpos Openpos  	  where  t.id = Openpos.tradeid and Openpos.openquantity <> 0  and t.producttype = 'FX' ";
 	private static JFrameManulPositionLiquidation frame;
 	DockableFrame manualframe;
 	Users user = null;
