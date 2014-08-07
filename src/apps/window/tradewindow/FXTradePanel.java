@@ -31,7 +31,9 @@ import apps.window.tradewindow.panelWindow.TaskPanel;
 import apps.window.tradewindow.panelWindow.TransferPanel;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -69,6 +71,7 @@ import apps.window.tradewindow.panelWindow.FeesPanel;
 import apps.window.tradewindow.panelWindow.SDIPanel;
 import apps.window.tradewindow.util.FXSplitUtil;
 import apps.window.utilwindow.JDialogTable;
+import beans.Attribute;
 import beans.B2BConfig;
 import beans.Book;
 import beans.CurrencySplitConfig;
@@ -92,6 +95,7 @@ public class FXTradePanel extends  TradePanel {
 
 	
 	BasicData basicData = null;
+	int instrumentType = 0;
 	 static String FXSWAP = "FXSWAP";
 	 static String FXFORWARDOPTION = "FXFORWARDOPTION";
 	 static String FXFORWARD = "FXFORWARD";
@@ -138,6 +142,7 @@ public class FXTradePanel extends  TradePanel {
 	 Product takeUPproduct = null;
 	 Users user = null;
 	 public static  ServerConnectionUtil de = null;
+	 DefaultCellEditor  startupDataInstrumentTypeDC = null;
 	 RemoteTrade remoteTrade ;
 		RemoteBOProcess boremote;
 		RemoteTask remoteTask;
@@ -431,7 +436,21 @@ public JPanel getFW() {
 		rollpanel.setVisible(false);
 		init();
 	}
-	
+	private String []  convertVectortoSringArray(Vector v) {
+    	String name [] = null;
+    	int i=0;
+    	if(v != null ) {
+    		name = new String[v.size()];
+    		Iterator its = v.iterator();
+    		while(its.hasNext()) {
+    			name [i] = ( (StartUPData) its.next()).getName();
+    			i++;
+    		}
+    	}
+		return name;                                           
+        // TODO add your handling code here:
+    } 
+
 	private JPanel getRollPanel() {
 		if (rollpanel == null) {
 			rollpanel = new rollPanel();
@@ -589,7 +608,9 @@ public JPanel getFW() {
 	   		remoteProduct = (RemoteProduct) de.getRMIService("Product");
 	   		       product = (Product) remoteProduct.selectProductOnType(productType, productSubType);     
 	   		    remoteBO = (RemoteBOProcess) de.getRMIService("BOProcess");
-	   		
+	   		    Vector startupDataInstrumentType = (Vector) remoteReference.getStartUPData("InstrumentType");
+	   		 JComboBox startupDataInstrumentTypecomboBox = new JComboBox( convertVectortoSringArray(startupDataInstrumentType) );
+	   		  startupDataInstrumentTypeDC = new DefaultCellEditor(startupDataInstrumentTypecomboBox);
 	   	//	trade = new Trade();
 			//	System.out.println(remoteTrade);
 	   		 functionality.setRemoteRef(remoteReference);
@@ -616,11 +637,11 @@ public JPanel getFW() {
 				rollpanel.jTextField0.setDateFormat(commonUTIL.getDateFormat());
 				out.jTextField4.setText("0"); // spot 
 				basicData.jTextField7.setText("0");  
-				String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
+				//String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
 	             
-		        attributeModel = new DefaultTableModel(attributeColumnName,0);
+		     //   attributeModel = new DefaultTableModel(attributeColumnName,0);
 		        processTableData(attributeDataValue,attributeModel);
-		        attributes.jTable1.setModel(attributeModel);
+		        //attributes.jTable1.setModel(attributeModel);
 		        swap.setVisible(false);
 		        basicData.jRadioButton0.setSelected(false);
 		        basicData.jRadioButton1.setSelected(false);
@@ -2674,7 +2695,28 @@ public JPanel getFW() {
 	    	while(it.hasNext()) {
 	    		
 	    		StartUPData tradeAttributes = (StartUPData) it.next();
-	    	    if(tradeAttributes.getName().equalsIgnoreCase("TradeDate")) {
+	    		Attribute attru = new Attribute();
+	    		int rowCount = this.attributes.getTableRowCount();
+	    		attru.setName(tradeAttributes.getName().toString());
+	    	//	attru.setName(tradeAttributes.getName().toString());
+	    		if(tradeAttributes.getName().equalsIgnoreCase("TradeDate")) {
+	    	    	
+	    			attru.setValue(commonUTIL.getCurrentDateTime());
+	    	    }
+	    		this.attributes.addNewRow(attru);
+	    		Vector attributeValues = (Vector) remoteReference.getStartUPData(attru.getName());
+	    		 if(!commonUTIL.isEmpty(attributeValues)) {
+	    		 String values [] = this.attributes.convertVectortoSringArray(attributeValues,tradeAttributes.getName().toString());
+	    		 this.attributes.addRowEditor(rowCount, 1, this.attributes.getJComboxBox(values),"Values");
+	    		 		     values = null;
+	    	} else {
+	    		
+	    		this.attributes.addRowEditor(rowCount, 1,this.attributes.getJTextFieldBox(), "Values");
+	    	}
+	    			
+	    	}
+	   	
+	    	   /* if(tradeAttributes.getName().equalsIgnoreCase("TradeDate")) {
 	    	    	model.insertRow(i, new Object[]{tradeAttributes.getName(),commonUTIL.getCurrentDateTime()});
 	    	    	attributes.put(tradeAttributes.getName(),(String) model.getValueAt(i, 1));
 	    	    } else {
@@ -2682,7 +2724,7 @@ public JPanel getFW() {
 	    		   attributes.put(tradeAttributes.getName(),"");
 	    	    }
 	    		i++;
-	    		}
+	    		} */
 	    		
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
