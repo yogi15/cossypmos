@@ -1,5 +1,7 @@
 package beans;
 
+import util.commonUTIL;
+
 public class HelperFXBean implements HelperBean {
 
 	@Override
@@ -20,6 +22,33 @@ public class HelperFXBean implements HelperBean {
 		dealBean.setCurrencyPair(record[11]);
 		dealBean.setSpotPrice(record[12]);
 		dealBean.setQuantity(record[13]);
+		String ispositionB = record[15];
+		if(ispositionB.equalsIgnoreCase("YES"))
+		      dealBean.setisPositionBased(true);
+		else 
+			 dealBean.setisPositionBased(false);
+		if(record.length > 16) {
+		String feesType = record[16];
+		if(!commonUTIL.isEmpty(feesType)) {
+			FeesUploader fee = new FeesUploader();
+			fee.setFeeType(feesType);
+			fee.setCurrency(record[17]);
+			fee.setAmount(commonUTIL.converStringToDouble(record[18]));
+			fee.setFeeDate(record[20]);
+			fee.setEndDate(record[20]);
+			fee.setStartDate(record[20]);
+			fee.setLeCode(record[23]);
+			fee.setLeRole("BROKER");
+			dealBean.setFees(fee);
+			String attribute = "InstrumentType="+record[21] +";";
+			attribute = attribute + "BranchName="+record[22] +";";
+			dealBean.setAttributes(attribute);
+			
+			
+		}
+		
+		}
+		
 	//	dealBean.setType(record[10]);
 		
 		return dealBean;
