@@ -27,6 +27,7 @@ public class ReferenceDataCache {
 	static public Hashtable <String,Vector<StartUPData>> startupData = new Hashtable <String,Vector<StartUPData>>();
 	static public Hashtable <String,LegalEntity> leAliasCache = new Hashtable <String,LegalEntity>();
 	static public Hashtable <String,LegalEntity> exchangeAliasCache = new Hashtable <String,LegalEntity>();
+	static public Hashtable <Integer,Vector<Book>> POBookCache = new Hashtable <Integer,Vector<Book>>();
 	public  static  ServerConnectionUtil de = null;
 	static RemoteReferenceData  remoteBORef;
 
@@ -120,6 +121,8 @@ static public  ReferenceDataCache singleTonInstance;
 			
 		
 	}
+	
+	
 	private static void cacheLE(Vector legalEntity,
 			Hashtable<Integer, LegalEntity> leCache2) {
 		// TODO Auto-generated method stub
@@ -197,6 +200,26 @@ static public  ReferenceDataCache singleTonInstance;
 	
 	}
 	
+	
+	public static Vector<Book> getALLPOBooks(int poId) {
+		if(singleTonInstance == null) 
+			   singleTonInstance = getSingleInstatnce();
+		Vector<Book> poBooks = new Vector<Book>();
+		poBooks = POBookCache.get(poId);
+		if(commonUTIL.isEmpty(poBooks)) {
+			String sql = " le_id = "+poId;
+			try {
+				poBooks = (Vector) remoteBORef.getBookWhere(sql);
+				POBookCache.put(poId,poBooks);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return poBooks;
+		
+		
+	}
 	public static String getAttribute(int poid,int cpid,String attributeType,String cpRole) {
 		return null;
 	}
