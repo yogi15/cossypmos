@@ -50,6 +50,7 @@ import beans.Task;
 import beans.Trade;
 import beans.Transfer;
 import beans.TransferRule;
+import beans.Users;
 import beans.WFConfig;
 import bo.transfer.BOTransfer;
 //import bo.transfer.BOTransfer;
@@ -108,8 +109,9 @@ public class TradeImp implements RemoteTrade {
 			throws RemoteException {
 		// TODO Auto-generated method stub
 		int i =0;
-		Vector returnStatus = new Vector();
 		
+		Vector returnStatus = new Vector();
+		Trade originalTrade = null;
 		try {
 		 	
 			if(isTradeCancel(trade))   {
@@ -128,7 +130,14 @@ public class TradeImp implements RemoteTrade {
 				
 				
 			}
+			/*if(!isAuthorisedUserAction(trade)) {
+				returnStatus.add(new String("Not an authorised User to changed Action on Trade "));
+				returnStatus.add(new Integer(-6));
+				return returnStatus;
+				
+			}*/
 			if(trade.getMirrorBookid() > 0) {
+				originalTrade = (Trade) trade.clone();
            		generateMirrorTrade(trade,false);
            	 }
 			if(trade.isB2Bflag()) {
@@ -151,6 +160,8 @@ public class TradeImp implements RemoteTrade {
 					trade.setStatus(wf.getOrgStatus());
 				i	= TradeSQL.save(trade, dsSQL.getConn());
 					if( i > 0)  {
+						if(originalTrade != null)
+							fees.clear();
 						processFees(fees,i);
 						
 						trade = (Trade) TradeSQL.select(i, dsSQL.getConn());
@@ -176,12 +187,18 @@ public class TradeImp implements RemoteTrade {
 						
 					
 						prcessAudit(trade);
+					
+						
 						//processTask(trade,wf);
 					   //publishnewTrade("NEWTRADE","Text",null);
 						if(task != null)
 						 publishnewTrade("POS_NEWTRADE","Object",getTaskEvent(task, trade));
 						
 					   publishnewTrade("POS_NEWTRADE","Object",getTradeEvent(trade));
+					   if(originalTrade != null) {
+						 //  originalTrade.setAttribute("B2BID",  Integer.valueOf(i).toString());
+						 //  prcessAudit(originalTrade);
+					   }
 					  // System.out.println("Publishing %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^    neew Event on TRADE_"+trade.getStatus() +  " for trade id " + trade.getId());
 						commonUTIL.display("TradeImpl", "Save :: Method Trade save "+i);
 					//	message.add(new String("Trade save with ID "+i));
@@ -202,6 +219,47 @@ public class TradeImp implements RemoteTrade {
 	}
 	
 	
+
+	
+
+
+
+	private boolean isAuthorisedUserAction(Trade trade) {
+		// TODO Auto-generated method stub
+		boolean flag = false;
+		String productsubtype = "";
+	  try {
+		  if(remoteRef == null) {
+				
+				remoteRef  = (RemoteReferenceData) de.getRMIService("ReferenceData");
+			
+ }
+		 if(trade.getProductType().equalsIgnoreCase("FX")) {
+			 productsubtype = trade.getTradedesc1();
+		 } else {
+			 productsubtype = trade.getTradedesc1();
+		 }
+		Users user = (Users)  remoteRef.selectUser(trade.getUserID());
+		//trade.getStatus() +  trade.getAction() + user.getUser_groups();
+		String sql = "groupname = '" + user.getUser_groups()  + "' and producttype = '"+ trade.getProductType() + "' and productsubtype = '" + productsubtype
+				 + "' and action = '"+ trade.getAction() +"' and currentstatus = '" +trade.getStatus() +"'"; 
+		
+		Collection result = remoteRef.selectWFWhere(sql);
+		
+		if (result.size() > 0) {
+			
+			flag = true;
+			
+		}
+		
+	} catch (RemoteException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+		return flag;
+	}
+
+
 
 	private void processAttribues(int tradeId, String attributes,int versionID) {
 		// TODO Auto-generated method stub
@@ -617,6 +675,7 @@ public class TradeImp implements RemoteTrade {
 	public Trade selectTrade(int tradeID) throws RemoteException {
 		// TODO Auto-generated method stub
 		Trade trade = TradeSQL.select(tradeID, dsSQL.getConn());
+		
 		if(trade != null) {
 		Vector fees = (Vector) FeesSQL.selectFeesOnTrades(tradeID, dsSQL.getConn());
 		if(fees != null)
@@ -1164,12 +1223,12 @@ return status;
 				return null;
 			 if (autoType.equalsIgnoreCase("Original") ) {
 			           trades =  (Vector) TradeSQL.getXccySplit(trade.getId(), dsSQL.getConn());
-			           trades.add(trade);
+			         //  trades.add(trade);
 			 }
 			 if (autoType.equalsIgnoreCase("Offset") ) {
 				 if(trade.getOffsetid() > 0) {
 		           trades =  (Vector) TradeSQL.getXccySplitOnOffset(trade.getOffsetid(), dsSQL.getConn());
-		           trades.add(trade);
+		          // trades.add(trade);
 				 }
 		 }  else {
 			 if(trade.getXccySPlitid() > 0) {
@@ -1241,10 +1300,21 @@ return status;
 				// TODO Auto-generated method stub
 				try {
 					Trade mirrorTrade = (Trade) b2btrade.clone();
+					String autoType = mirrorTrade.getAutoType();
+					if(!commonUTIL.isEmpty(autoType)) {
+						if(autoType.equalsIgnoreCase("INTERNAL")) {
+							int i =  saveTrade(mirrorTrade);
+							return;
+						}
+					}
+					
+					
 					mirrorTrade.setId(0);
+					mirrorTrade.setFees(null);
 					mirrorTrade.setCpID(b2btrade.getMirrorBookid());
 					mirrorTrade.setBookId(b2btrade.getBookId());
 					mirrorTrade.setMirrorBookid(b2btrade.getBookId());
+					mirrorTrade.setEconomicChanged(false);
 					if(mirrorTrade.getType().equalsIgnoreCase("BUY")) {
 						mirrorTrade.setQuantity(b2btrade.getQuantity() * -1); 
 						mirrorTrade.setNominal(b2btrade.getNominal() * -1);  
@@ -1261,8 +1331,9 @@ return status;
 					if(isFromB2B)  {
 						mirrorTrade.setAutoType("MIRROR");
 					} else {
-					   mirrorTrade.setAutoType("Original");
+					   mirrorTrade.setAutoType("INTERNAL");
 					 b2btrade.setB2bid(0);
+					 mirrorTrade.setPositionBased(false);
 				//	 b2btrade.setMirrorBookid(0);
 					}
 			        
