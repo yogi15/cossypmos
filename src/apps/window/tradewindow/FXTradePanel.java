@@ -2689,6 +2689,7 @@ public JPanel getFW() {
 		// TODO Auto-generated method stub
     	Vector vector;
 		try {
+			this.attributes.clearllCriteriaModel();
 			vector = (Vector) remoteReference.getStartUPData("TradeAttribute");
 			Iterator it = vector.iterator();
 	    	int i =0;
@@ -2828,7 +2829,7 @@ sdiPanel = (SDIPanel) panel;
 		swap.swapDate.setText("0");
 		String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
         
-        attributeModel = new DefaultTableModel(attributeColumnName,0);
+      //  attributeModel = new DefaultTableModel(attributeColumnName,0);
         processTableData(attributeDataValue,attributeModel);
         attributes.jTable1.removeAll();
         attributes.jTable1.setModel(attributeModel);
@@ -3552,7 +3553,7 @@ sdiPanel = (SDIPanel) panel;
 	private void setAttribute(String attributesV) {
     	String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
         
-        DefaultTableModel attributeModel = new DefaultTableModel(attributeColumnName,0);
+    //    DefaultTableModel attributeModel = new DefaultTableModel(attributeColumnName,0);
         
         
     		if(attributesV != null && attributesV.length() > 0) {
@@ -3715,16 +3716,22 @@ sdiPanel = (SDIPanel) panel;
 			// TODO Auto-generated method stub
 			String attributesV  = "";
 			
-				Enumeration<String> keys =  attributeDataValue.keys();
+				/*Enumeration<String> keys =  attributeDataValue.keys();
 				while(keys.hasMoreElements()) {
 					String key = (String) keys.nextElement();
 					String value = attributeDataValue.get(key);
 					if(value != null && value.length() > 0) 
 						attributesV = attributesV + key+ "=" + value + ";";
 							
-				}
+				} */
 			
-					
+					Vector<Attribute> attributesData = attributes.getData();
+					for(int i=0;i<attributesData.size();i++) {
+						Attribute att = attributesData.get(i);
+						if(!commonUTIL.isEmpty(att.getValue().trim())) {
+						    attributesV = attributesV + att.getName()+ "=" + att.getValue() + ";";
+						}
+					}
 				
 			
 			if(attributesV.trim().length() > 0)
