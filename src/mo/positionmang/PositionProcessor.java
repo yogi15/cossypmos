@@ -100,8 +100,13 @@ public class PositionProcessor extends Thread {
 	
   
   public synchronized void processPositiononTrade(Trade trade) {
-	  System.out.println(trade.getId() + "****************************** ");
+	  
 	 if(trade.getProductType().equalsIgnoreCase("FX"))  {
+		 commonUTIL.display("PositionManager Processor ", "Trade FX type "+ trade.getId() + "  positionBased **  "+trade.isPositionBased());
+		 if(!trade.isPositionBased()) {
+			 commonUTIL.display("PositionManager", "Trade FX type "+ trade.getId() + " is not Position Based");
+			 return;
+		 }
 		  if(trade.getVersion() == 1) {
 			    if(trade.getTradedesc1().equalsIgnoreCase("FXSWAP")) {
 			    	Trade swapLeg =   trade.getSwapLeg();
