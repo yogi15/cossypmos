@@ -44,7 +44,12 @@ public class TestFXData {
 				 java.util.Vector message = new  java.util.Vector();
 				message = remoteTrade.saveTrade(trade, message);
 				 int tradeid = ((Integer) message.elementAt(1)).intValue();
+				
 				System.out.println("Trade saved with id "+tradeid);
+				trade = remoteTrade.selectTrade(tradeid);
+				 trade.setAction("EXECUTE");
+				 message =  remoteTrade.saveTrade(trade, message);
+				 System.out.println("Trade saved with id "+tradeid);
 				}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
