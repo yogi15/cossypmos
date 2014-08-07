@@ -3728,9 +3728,17 @@ sdiPanel = (SDIPanel) panel;
 					Vector<Attribute> attributesData = attributes.getData();
 					for(int i=0;i<attributesData.size();i++) {
 						Attribute att = attributesData.get(i);
-						if(!commonUTIL.isEmpty(att.getValue().trim())) {
-						    attributesV = attributesV + att.getName()+ "=" + att.getValue() + ";";
+						
+						String attValue = att.getValue();
+						
+						if (attValue != null) {
+							
+							if(attValue.trim().length() > 0) {
+							    attributesV = attributesV + att.getName()+ "=" + att.getValue() + ";";
+							}
+							
 						}
+						
 					}
 				
 			
