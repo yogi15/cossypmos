@@ -54,7 +54,20 @@ public class TradeAttributesD extends JPanel {
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	
 	Vector<Attribute> data = new Vector<Attribute>();
-	 TableModelUtil mod;
+	 /**
+	 * @return the data
+	 */
+	public Vector<Attribute> getData() {
+		return data;
+	}
+
+	/**
+	 * @param data the data to set
+	 */
+	public void setData(Vector<Attribute> data) {
+		this.data = data;
+	}
+	TableModelUtil mod;
 	 String col[] = { "Attributes", "Values" };
 	 public EachRowEditor rowEditor;
 
@@ -266,6 +279,7 @@ public class TradeAttributesD extends JPanel {
 		
 		
 	}
+	
 	public void clearllCriteriaModel() {
 		mod.removeALL();
 		
