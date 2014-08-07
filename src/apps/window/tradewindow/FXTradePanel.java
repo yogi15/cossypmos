@@ -53,6 +53,7 @@ import com.standbysoft.component.date.swing.JDatePicker;
 
 import productPricing.Pricer;
 import util.NumericTextField;
+import util.ReferenceDataCache;
 import util.commonUTIL;
 import util.common.DateU;
 import apps.window.tradewindow.FXPanels.BasicData;
@@ -945,10 +946,19 @@ public JPanel getFW() {
 
 					@Override
 					public void mouseClicked(MouseEvent e) {
-						
-					    
+						if(trade != null) {
+						String autoType = trade.getAutoType();
+						if(!commonUTIL.isEmpty(autoType)) {
+							if(autoType.equalsIgnoreCase("INTERNAL")) { // internal trade can't be save as new trade
+								commonUTIL.showAlertMessage("Please click on New as this Trade is Internal Trade can't save as New");
+								return;
+							}
+						}
+						}
 					    if(validdateALLFields("NEW")) {
 					    	trade = new Trade();
+					    	mirrorBook.setBookno(0);
+					    
 					    	removeAttributeFromTrade(trade);
 				             fillTrade(trade,"NEW");
 				             if(trade.getTradedesc1() == null || trade.getTradedesc1().trim().length() == 0) {
@@ -966,8 +976,34 @@ public JPanel getFW() {
 					               	 Vector<String> message = new Vector<String>();
 					               	
 					               	trade.setAttributes(getAttributeValue());
-					              
+					               	trade.setMirrorBookid(0);
+					        		trade.setMirrorID(0);
+					        		trade.setAutoType("");
+					        		trade.setAttribute("MirrorID","");	
+					        		trade.setAttribute("B2BID","");	
+					        				trade.setAttribute("B2BFlag","");		
+					        						trade.setAttribute("XCurrSOriginalTradeID","");		
+					        								trade.setAttribute("ParitialTo","");		
+					        										trade.setAttribute("SXccySplitID","");		
+					        												trade.setAttribute("ParitialFrom","");		
+					        														trade.setAttribute("XccySplitFrom","");		
+					        																trade.setAttribute("FXccySplitID","");		
+					        																		trade.setAttribute("OffsetID","");		
+					        																				trade.setAttribute("OriginalTradeID","");		
+					        																						trade.setAttribute("MirrorFromTradeID","");	
+					        																						trade.setOffsetid(0);
+					        																					//trade.seto
+					        		trade.setParentID(0);
+					        		trade.setB2Bflag(false);
+					        		trade.setB2bid(0);
+					        		trade.setXccySPlitid(0);
+					        		trade.setMirrorID(0);
+					        		trade.setMirrorBookid(0);
 					               	 Vector tradestatus = 	remoteTrade.saveTrade(trade,message);
+					               	 if(commonUTIL.isEmpty(tradestatus)) {
+					               		commonUTIL.showAlertMessage("Error in ServerSide in saving Trade");
+					               		 return;
+					               	 }
 					               	 String statusT = (String) tradestatus.elementAt(0);
 					               	 int i = ((Integer) tradestatus.elementAt(1)).intValue();
 					               	 if(i == -4) {
@@ -1998,7 +2034,10 @@ public JPanel getFW() {
 											}
 											trade.setAttributes(getAttributeValue());
 											Vector tradestatus = remoteTrade.saveTrade(trade,mess);
-							
+											if(commonUTIL.isEmpty(tradestatus)) {
+							               		commonUTIL.showAlertMessage("Error in ServerSide in saving Trade");
+							               		 return;
+							               	 }
 											String statusT = (String) tradestatus.elementAt(0);
 											int i = ((Integer) tradestatus.elementAt(1)).intValue();
 							 
@@ -2126,6 +2165,10 @@ public JPanel getFW() {
 				               	
 				               	trade.setAttributes(getAttributeValue());
 				               	 Vector tradestatus = 	remoteTrade.saveTrade(trade,message);
+				               	if(commonUTIL.isEmpty(tradestatus)) {
+				               		commonUTIL.showAlertMessage("Error in ServerSide in saving Trade");
+				               		 return;
+				               	 }
 				               	 String statusT = (String) tradestatus.elementAt(0);
 				               	 int i = ((Integer) tradestatus.elementAt(1)).intValue();
 				               	 if(i == -10) {
@@ -2379,11 +2422,12 @@ public JPanel getFW() {
 	private Book getBook(int bookID) {
 		 int b=0;
 		 Book bo = null;
-		 Enumeration<Integer> keys = books.keys();
+		 Hashtable cloneBooks = (Hashtable<Integer,Book >) books.clone();
+		 Enumeration<Integer> keys = cloneBooks.keys();
 	    	while(keys.hasMoreElements()) {
 	    		
 	    		Integer key =	(Integer) keys.nextElement();
-	    		Book book =   books.get(key);
+	    		Book book =   (Book) cloneBooks.get(key);
 	    		if(book.getBookno() == bookID) {
 	    			bo = book;
 	    			break;
@@ -2392,7 +2436,12 @@ public JPanel getFW() {
 	    	
 	    		
 	    		b++;
-		}	
+		}	cloneBooks.clear();
+	    	cloneBooks = null;
+	    	if(bo == null) {
+	    		bo = ReferenceDataCache.getBook(bookID);
+	    		books.put(bo.getBookno(), bo);
+	    	}
 	    	return bo;
 	}
 	private void getBookDataCombo1(DefaultTableModel booktablemodel2,
@@ -2466,6 +2515,8 @@ public JPanel getFW() {
 		trade.setB2Bflag(false);
 		trade.setB2bid(0);
 		trade.setXccySPlitid(0);
+		trade.setMirrorID(0);
+		trade.setMirrorBookid(0);
 	//trade.set
 		//processActionData(actionstatus,trade.getTradedesc1()); 
 		actionController = true;
@@ -2623,7 +2674,7 @@ public JPanel getFW() {
 	    	while(it.hasNext()) {
 	    		
 	    		StartUPData tradeAttributes = (StartUPData) it.next();
-	    	    if(tradeAttributes.getName().equalsIgnoreCase("Trade Date")) {
+	    	    if(tradeAttributes.getName().equalsIgnoreCase("TradeDate")) {
 	    	    	model.insertRow(i, new Object[]{tradeAttributes.getName(),commonUTIL.getCurrentDateTime()});
 	    	    	attributes.put(tradeAttributes.getName(),(String) model.getValueAt(i, 1));
 	    	    } else {
@@ -3097,6 +3148,7 @@ sdiPanel = (SDIPanel) panel;
 	public void removeAttributeFromTrade(Trade trade) {
 		attributeDataValue.remove("rollOverTO");
 		attributeDataValue.remove("rollBackTo");
+		
 	}
 	
 	
@@ -3104,6 +3156,7 @@ sdiPanel = (SDIPanel) panel;
 	//
 		
 		//trade.setId(0);
+		
 		if(basicData.jRadioButton1.isSelected()) {
 			productSubType = FXFORWARD;
 		} 
@@ -3125,7 +3178,7 @@ sdiPanel = (SDIPanel) panel;
 		}    
 		trade.setBookId(new Integer(basicData.book.getName()).intValue());
 		if(mirrorBook.getBookno()> 0) {
-			trade.setCpID(counterPartyID);
+		//	trade.setCpID(counterPartyID);
 			trade.setMirrorBookid(mirrorBook.getBookno());
 			
 		} else {
@@ -3396,22 +3449,32 @@ sdiPanel = (SDIPanel) panel;
 	private void getBooksOnPoDataCombo1(DefaultTableModel booktablemodel ,int poID) {
 		if(books.isEmpty()) {
 			getBookDataCombo1(booktablemodel, books);
+		} 
+		Hashtable<Integer,Book> cloneBooks = (Hashtable<Integer,Book>) books.clone();
+		Vector<Book> books = ReferenceDataCache.getALLPOBooks(poID);
+		if(!commonUTIL.isEmpty(books)) {
+			for(int i=0;i<books.size();i++) {
+				Book book = books.get(i);
+				 booktablemodel.insertRow(i, new Object[]{book.getBookno(),book.getBook_name()});
+			}
 		}
-		
+	/*	ReferenceDataCache.
 	//	booktablemodel =  new DefaultTableModel(s,0);
-			Enumeration<Integer> keys =  books.keys();
+			Enumeration<Integer> keys =  cloneBooks.keys();
 			   
 	    	 int i=0;
 	    	while(keys.hasMoreElements()) {
 	    		
 	    		Integer key =	(Integer) keys.nextElement();
-	    		Book book =   books.get(key);
+	    		Book book =   cloneBooks.get(key);
 	    		if(book.getLe_id() == poID) {
 	    		  booktablemodel.insertRow(i, new Object[]{book.getBookno(),book.getBook_name()});
 	    		  i++;
 	    		}	    		
 	    		
-		}	
+		}	*/
+	    	cloneBooks.clear();
+	    	cloneBooks = null;
 		
 		
 	}
