@@ -15,6 +15,30 @@ public class Trade implements Serializable,Cloneable {
 	boolean isB2Bflag = false;
 	boolean isFXSwap = false;
 	boolean isMirrorTrade = false;
+	boolean isPositionBased = true;
+	
+	/**
+	 * @return the isPositionBased
+	 */
+	public boolean isPositionBased() {
+		return isPositionBased;
+	}
+
+
+
+
+
+	/**
+	 * @param isPositionBased the isPositionBased to set
+	 */
+	public void setPositionBased(boolean isPositionBased) {
+		this.isPositionBased = isPositionBased;
+	}
+
+
+
+
+
 	/**
 	 * @return the isMirrorTrade
 	 */
