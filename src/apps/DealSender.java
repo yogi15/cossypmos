@@ -23,6 +23,8 @@ import beans.DealBean;
 import beans.DealFXBean;
 import beans.DealMMBean;
 import beans.DealRepoBean;
+import beans.Fees;
+import beans.FeesUploader;
 import beans.HelperBean;
 import beans.LegalEntity;
 import beans.Product;
@@ -195,9 +197,28 @@ public class DealSender {
 		trade.setEffectiveDate(bean.getMaturityDate());
 		trade.setCpID(cpid);
 		trade.setTraderID(traderid);
+		trade.setAttributes(bean.getAttributes());
+		FeesUploader feeup = bean.getFees();
+		if(feeup != null) {
+			Vector<Fees> fees = new Vector<Fees>();
+			Fees fee = new Fees();
+			fee.setAmount(feeup.getAmount());
+			fee.setLeRole(feeup.getLeRole());
+			int brokerID = getLEid(feeup.getLeCode(),0);
+			fee.setLeID(brokerID);
+			fee.setFeeType(feeup.getFeeType());
+			fee.setStartDate(feeup.getStartDate());
+			fee.setEndDate(fee.getEndDate());
+			fee.setFeeDate(feeup.getStartDate());
+			fee.setCurrency(feeup.getCurrency());
+			fees.add(fee);
+			trade.setFees(fees);
+			
+		}
 		trade.setAction("NEW");
 		trade.setStatus("NONE");
 		// trade.setProductId(productid.getId());
+		
 
 		trade.setId(0);
 		return trade;
