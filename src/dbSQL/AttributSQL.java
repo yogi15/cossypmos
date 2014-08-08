@@ -37,7 +37,7 @@ public class AttributSQL {
 	      		" ,type= '" + attribute.getType() + 	      		
 	      		"' ,attributeName= '" + attribute.getName() + 	      		
 	      		"' ,attributeValue= '" + attribute.getValue() + 	      		
-	      		"'  where id= " + attribute.getId() +" and type = '"+attribute.getType()+"'";
+	      		"'  where id= " + attribute.getId() +" and type = '"+attribute.getType()+"' and attributeName= '"+attribute.getName()+"'";
 	      return updateSQL;
 	     }
 	 
