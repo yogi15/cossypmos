@@ -1247,9 +1247,11 @@ public class TradeApplication extends DefaultDockableHolder {
 
 	public void getTradeTransfers(BackOfficePanel panel) {
 		try {
+			if(trade != null) {
 			panel.setTrade(trade);
 			panel.fillJTabel((Vector) boremote.queryWhere("Transfer",
 					"tradeId = " + trade.getId()));
+			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1259,11 +1261,13 @@ public class TradeApplication extends DefaultDockableHolder {
 	private void getTradePostings(PostingPanel postingPanel) {
 		// TODO Auto-generated method stub
 		try {
+			if(trade != null ) {
 			String sql = "tradeid = " + trade.getId()
 					+ " and linkTo = 0 order by type,acceventtype  desc ";
 			postingPanel.fillJTabel((Vector) remoteAccount
 					.getPostingonWhereClause(sql));
 			postingPanel.setTrade(trade);
+			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1304,9 +1308,11 @@ public class TradeApplication extends DefaultDockableHolder {
 	public void getTradeTask(BackOfficePanel panel) {
 		try {
 			// System.out.println(trade);
+			if(trade != null) {
 			Vector data = (Vector) remoteTask.selectTaskWhere("tradeId = "
 					+ trade.getId());
 			panel.fillJTabel((data));
+			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1316,9 +1322,11 @@ public class TradeApplication extends DefaultDockableHolder {
 	public void getTradeSDI(BackOfficePanel panel) {
 		try {
 			// System.out.println(trade);
+			if(trade != null) {
 			panel.setTrade(trade);
 			Vector data = (Vector) remoteTrade.getSDisOnTrade(trade);
 			panel.fillJTabel((data));
+			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
