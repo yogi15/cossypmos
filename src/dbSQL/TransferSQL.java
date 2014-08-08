@@ -18,7 +18,7 @@ public class TransferSQL {
 	final static private String DELETE =
 		"DELETE FROM " + tableName + "   where id =? ";
 	final static private String INSERT =
-		"INSERT into " + tableName + "(id,tradeID,productId,amount,eventType,transerType,transferStatus,settlecurrency,payerCode,payerRole,receiverCode," +
+		"INSERT into " + tableName + "(id,tradeID,productId,amount,eventType,transfertype,transferStatus,settlecurrency,payerCode,payerRole,receiverCode," +
 				"receiverRole," +
 				"paymentStatus,deliveryDate,valueDate,method,receiverInst,payerInst,attributes,status,action,tradeversionid,linkid,nettedTransferID,nettedConfigID,version,settleAmount,cpID,productType,userid,bookid,quantity) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	final static private String UPDATE =
@@ -26,23 +26,23 @@ public class TransferSQL {
 	final static private String SELECT_MAX =
 		"SELECT MAX(id) DESC_ID FROM " + tableName + " ";
 	final static private String SELECTALL =
-		"SELECT id,tradeID,productId,amount,eventType,transerType,transferStatus,settlecurrency,payerCode,payerRole,receiverCode," +
+		"SELECT id,tradeID,productId,amount,eventType,transfertype,transferStatus,settlecurrency,payerCode,payerRole,receiverCode," +
 				"receiverRole," +
 				"paymentStatus,deliveryDate,valueDate,method,receiverInst,payerInst,attributes,status,action,tradeversionid,linkid,nettedTransferID,nettedConfigID,version,settleAmount,cpID,productType,userid,bookId,quantity FROM " + tableName + " ";
 	final static private String SELECT =
-		"SELECT id,tradeID,productId,amount,eventType,transerType,transferStatus,settlecurrency,payerCode,payerRole,receiverCode," +
+		"SELECT id,tradeID,productId,amount,eventType,transfertype,transferStatus,settlecurrency,payerCode,payerRole,receiverCode," +
 				"receiverRole," +
 				"paymentStatus,deliveryDate,valueDate,method,receiverInst,payerInst,attributes,status,action,tradeversionid,linkid,nettedTransferID,nettedConfigID,version,settleAmount,cpID,productType,userid,bookId,quantity FROM " + tableName + " where id =  ?";
 	 static private String SELECTONE =
-		"SELECT id,tradeID,productId,amount,eventType,transerType,transferStatus,settlecurrency,payerCode,payerRole,receiverCode," +
+		"SELECT id,tradeID,productId,amount,eventType,transfertype,transferStatus,settlecurrency,payerCode,payerRole,receiverCode," +
 				"receiverRole," +
 				"paymentStatus,deliveryDate,valueDate,method,receiverInst,payerInst,attributes,status,action,tradeversionid,linkid,nettedTransferID,nettedConfigID,version,settleAmount,cpID,productType,userid,bookId,quantity FROM " + tableName + " where id =  ";
 	  static private String SELECTWHERE =
-			"SELECT id,tradeID,productId,amount,eventType,transerType,transferStatus,settlecurrency,payerCode,payerRole,receiverCode," +
+			"SELECT id,tradeID,productId,amount,eventType,transfertype,transferStatus,settlecurrency,payerCode,payerRole,receiverCode," +
 				"receiverRole," +
 				"paymentStatus,deliveryDate,valueDate,method,receiverInst,payerInst,attributes,status,action,tradeversionid,linkid,nettedTransferID,nettedConfigID,version,settleAmount,cpID,productType,userid,bookId,quantity  FROM " + tableName + " where  ";
 	  static private String SELECTNettingTransfer =
-				"SELECT id,tradeID,productId,amount,eventType,transerType,transferStatus,settlecurrency,payerCode,payerRole,receiverCode," +
+				"SELECT id,tradeID,productId,amount,eventType,transfertype,transferStatus,settlecurrency,payerCode,payerRole,receiverCode," +
 					"receiverRole," +
 					"paymentStatus,deliveryDate,valueDate,method,receiverInst,payerInst,attributes,status,action,tradeversionid,linkid,nettedTransferID,nettedConfigID,version,settleAmount,cpID,productType,userid,bookId,quantity  FROM " + tableName + " where   ";
 	 	
@@ -53,7 +53,7 @@ public class TransferSQL {
 				            ",tradeID="+ transfer.getTradeId() + 
 				            ",amount="+ transfer.getAmount() + 
 				            ",eventType='"+ transfer.getEventType() + 
-				            "',transerType='"+ transfer.getTransferType() + 
+				            "',transfertype='"+ transfer.getTransferType() + 
 				            "',transferStatus='"+ transfer.getTransferStatus() + 
 				            "',settlecurrency='"+ transfer.getSettlecurrency() + 
 				            "',payerCode='"+ transfer.getPayerCode() + 
