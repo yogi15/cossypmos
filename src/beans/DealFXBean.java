@@ -4,6 +4,46 @@ import java.io.Serializable;
 
 public class DealFXBean implements Deal,Serializable  {
 	public String memberName;
+	public FeesUploader fees;
+	public String attributes = "";
+	
+	/**
+	 * @return the attributes
+	 */
+	public String getAttributes() {
+		return attributes;
+	}
+	/**
+	 * @param attributes the attributes to set
+	 */
+	public void setAttributes(String attributes) {
+		this.attributes = attributes;
+	}
+	public boolean isPositionBased = true;
+	/**
+	 * @return the isPosition
+	 */
+	public boolean isPositionBased() {
+		return isPositionBased;
+	}
+	/**
+	 * @param isPosition the isPosition to set
+	 */
+	public void setisPositionBased(boolean isPosition) {
+		this.isPositionBased = isPosition;
+	}
+	/**
+	 * @return the fees
+	 */
+	public FeesUploader getFees() {
+		return fees;
+	}
+	/**
+	 * @param fees the fees to set
+	 */
+	public void setFees(FeesUploader fees) {
+		this.fees = fees;
+	}
 	public String getMemberName() {
 		return memberName;
 	}
