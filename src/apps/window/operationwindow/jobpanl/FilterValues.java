@@ -28,7 +28,7 @@ import dsServices.RemoteTrade;
 public class FilterValues {
 	
 	 Hashtable<String,Vector> dataValues = null; 
-	 String starupData [] = {"SearchCriteria","TaskColumn","Status","ProductType","Currency","EventType","WFType","BUY/SELL","TransferType","FEEType","accEvent","TaskType","TradeAttribute","QuotingCurr","PrimaryCurr"};
+	 String starupData [] = {"SearchCriteria","TaskColumn","Status","ProductType","Currency","EventType","WFType","BUY/SELL","TransferType","FEEType","accEvent","TaskType","TradeAttribute","QuotingCurr","PrimaryCurr","LEAttributes"};
 	 String referenceData [] = {"Book" };
 	 String datesSearch [] = {"between",">=",">","<=","<"};
 	 Hashtable<Integer,Book> bookValues = new Hashtable<Integer,Book>(); 
@@ -37,6 +37,7 @@ public class FilterValues {
 	 static Hashtable<String,String> numberDataTypes = new Hashtable<String,String>(); 
 	 static Hashtable<String,String> matachingColumns = new   Hashtable<String,String>(); 
 	 static Hashtable<String,String> tableNames = new   Hashtable<String,String>();
+	 String attributesObject [] = {"legalEntity.Attributes","book.Attributes","transfer.attributes"};
 	 RemoteTrade remoteTrade = null;
 	 RemoteBOProcess remoteBO = null;
 	 RemoteTask remoteTask = null;
@@ -116,6 +117,7 @@ public class FilterValues {
 		dataValues.put("CounterParty", getCounterParty(remote));
 		dataValues.put("QuotingCurr", dataValues.get("Currency"));
 		dataValues.put("PrimaryCurr", dataValues.get("Currency"));
+		dataValues.put("legalEntity.Attributes", dataValues.get("LEAttributes"));
 		
 		
 	}
@@ -237,6 +239,7 @@ public class FilterValues {
 			return name;                                           
 	        // TODO add your handling code here:
 	    } 
+	 
 	 public String []  convertVectortoSringArray(Vector v,String sname) {
 		 
 	    	String name [] = null;
@@ -432,6 +435,18 @@ public class FilterValues {
 		return where.trim();
 	}
 	
+	public boolean isObjectAttribute(String objectAndAttributeName) {
+		boolean flag =false;
+		for(int i=0;i<attributesObject.length;i++) {
+			String objAttributeNme = (String) attributesObject[i];
+			if(objAttributeNme.equalsIgnoreCase(objectAndAttributeName)){
+				flag = true;
+				break;
+			}
+		}
+		return flag;
+	}
+	
 	public String createWhere(Vector<FilterBean> jobdetails,String tableName1) {
 		// TODO Auto-generated method stub
 		String where  ="";
@@ -441,7 +456,9 @@ public class FilterValues {
 		for(int i=0;i<jobdetails.size();i++) {
 			FilterBean bean = (FilterBean) jobdetails.get(i);
 			boolean isStaticRefData = true;
-			   if(bean.getColumnName().equalsIgnoreCase("Book")) {
+			if(isObjectAttribute(bean.getColumnName())) {
+				 where = where + " " + bean.getColumnName() + " "  + bean.getSearchCriteria() + " '%"  +bean.getColumnValues() + "="+bean.getAnd_or()+"%'";
+			} else 	   if(bean.getColumnName().equalsIgnoreCase("Book")) {
 				   where = where + " " + tableNames.get(tableName1).toLowerCase() +"."+ createCriteriaOnBook(dataValues.get("Book"),bean);
 				   
 			   } else    if(bean.getColumnName().equalsIgnoreCase("CounterParty")) {
