@@ -909,6 +909,7 @@ public class TradeApplication extends DefaultDockableHolder {
 		}
 		jButton1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				if(trade != null) 
 				trade.setId(0);
 				tradeId = 0;
 				tradeP.buildTrade(trade, "New");
@@ -923,6 +924,7 @@ public class TradeApplication extends DefaultDockableHolder {
 				getTradeMessages(messagePanel);
 				getLimits(limitPanel);
 				feesPanel.refreshFees();
+				
 			}
 
 		});
