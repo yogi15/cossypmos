@@ -39,7 +39,7 @@ public class FilterValues {
 	 static Hashtable<String,String> matachingColumns = new   Hashtable<String,String>(); 
 	 static Hashtable<String,String> tableNames = new   Hashtable<String,String>();
 	 static Hashtable<String,String> forwardColumnMaps = new   Hashtable<String,String>();
-	
+	 static Hashtable<String,String> replaceColumnNameOnSQL = new   Hashtable<String,String>();
 	 
 	 String attributesObject [] = {"legalEntity.Attributes","book.Attributes","transfer.attributes"};
 	 RemoteTrade remoteTrade = null;
@@ -47,6 +47,10 @@ public class FilterValues {
 	 RemoteTask remoteTask = null;
 	 RemoteReferenceData remote = null;
 	 static {
+		 replaceColumnNameOnSQL.put("Trade.DeliveryDate", "to_char(Trade.DeliveryDate,'dd/mm/yyyy') SettleMentDate");
+		 replaceColumnNameOnSQL.put("Trade.TradeDate", "to_char(Trade.TradeDate,'dd/mm/yyyy HH:MM:ss') TradeDate");
+		 replaceColumnNameOnSQL.put("Trade.BaseCurrency", "substr(Trade.tradedesc,0,3) BaseCurrency");
+		 
 		 forwardColumnMaps.put("Monthly", "TO_CHAR(settledate,'MON')");
 		 forwardColumnMaps.put("Daily", "TO_CHAR(settledate,'DD')");
 		 forwardColumnMaps.put("Weekly", "TO_CHAR(settledate,'WW')");
@@ -891,6 +895,22 @@ public class FilterValues {
 		}
 		return sql;
 		
+	}
+
+	public String changeColumnNameForNormalReport(String sqlW) {
+		// TODO Auto-generated method stub
+		String sql = sqlW;
+		Enumeration keys  = replaceColumnNameOnSQL.keys();
+		while(keys.hasMoreElements()) {
+			String key = (String) keys.nextElement();
+			if(sql.contains(key)) {
+				String value = (String) replaceColumnNameOnSQL.get(key);
+				sql = sql.replace(key, value);
+			//	break;
+				
+			}
+		}
+		return sql;
 	}
 	
 }
