@@ -1151,6 +1151,30 @@ public static Vector getXccySplitOnChild(int tradeID, Connection con) {
     		}
      
 	  
+  private static PreparedStatement selectOnwhereForwardLadder(String sqlw, Connection con) {
+	  PreparedStatement Trades = null;
+	  PreparedStatement stmt = null;
+	  try {
+		  con.setAutoCommit(false);
+		  Trades = dsSQL.newPreparedStatement(con, sqlw);
+		    
+		// = stmt.executeQuery();
+		  
+	  } catch (Exception e) {
+		    commonUTIL.displayError("TradeSQL","selectOnWherecClauseReports " + sqlw,e);
+		    return Trades;
+		        
+		      }
+		      finally {
+		       //  try {
+		 //   stmt.close();
+		 //  } catch (SQLException e) {
+		    // TODO Auto-generated catch block
+		 //   commonUTIL.displayError("TradeSQL"," selectOnWherecClauseReports " + sqlw,e);
+		 //  }
+		      }
+		      return Trades;
+			}
   
   private static Collection selectOnWherecClauseReports(String sqlw, Connection con) {
 		// TODO Auto-generated method stub
@@ -1158,18 +1182,30 @@ public static Vector getXccySplitOnChild(int tradeID, Connection con) {
       PreparedStatement stmt = null;
       Vector<Object> Trades = new Vector();
       String sql = sqlw;
+      ResultSet rs = null;
    try {
     con.setAutoCommit(false);
-   
-     commonUTIL.display("TradeSQL", "selectOnWherecClauseReports == reports SQL " + sql);
-    stmt = dsSQL.newPreparedStatement(con, sql);
+   if(sqlw.contains(";")) {
+	  String s [] = sqlw.split(";"); 
+	  for(int i=0;i<s.length;i++)
+		  Trades.add( selectOnwhereForwardLadder(s[i],con));
+	  ReportGenerator generateReport = new ReportGenerator();
+	    Trades = (Vector) generateReport.generateReportOnSQLOnStatement(Trades);
+	  
+   } else {
+	   commonUTIL.display("TradeSQL", "selectOnWherecClauseReports == reports SQL " + sql);
+	    stmt = dsSQL.newPreparedStatement(con, sql);
+	  rs = stmt.executeQuery();
+	  if(rs != null)  {
+ 	     Trades.add(rs);
+    ReportGenerator generateReport = new ReportGenerator();
+    Trades = (Vector) generateReport.generateReportOnSQL(Trades);
+    }
+   }
     
-       ResultSet rs = stmt.executeQuery();
-       if(rs != null)  {
-    	     Trades.add(rs);
-       ReportGenerator generateReport = new ReportGenerator();
-       Trades = (Vector) generateReport.generateReportOnSQL(Trades);
-       }
+    
+       
+       
      /*  ResultSetMetaData mdata = null;
        int columnDatacount = 0;
        String typeclass [] = null; 
@@ -1217,6 +1253,7 @@ public static Vector getXccySplitOnChild(int tradeID, Connection con) {
       }
       finally {
          try {
+        	 if(stmt != null)
     stmt.close();
    } catch (SQLException e) {
     // TODO Auto-generated catch block
