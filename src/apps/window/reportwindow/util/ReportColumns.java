@@ -29,6 +29,7 @@ public class ReportColumns {
 	static DefaultMutableTreeNode parentCashpositionColumns = new DefaultMutableTreeNode("Cashposition");
 	static DefaultMutableTreeNode parentTraderColumns = new DefaultMutableTreeNode("Trader");
 	static DefaultMutableTreeNode parentPNLColumns = new DefaultMutableTreeNode("PNL");
+	static DefaultMutableTreeNode parentFeesColumns = new DefaultMutableTreeNode("Fees");
 	static Hashtable<String,String> columnsMaps = new Hashtable<String, String>();
 	static Hashtable<String,Vector> childcolumnsMaps = new Hashtable<String, Vector>();
 	static Hashtable<String,String> attributecolumnsMaps = new Hashtable<String, String>();
@@ -59,7 +60,13 @@ public class ReportColumns {
 		columnsMaps.put("Posting.Currency","Currency");
 		columnsMaps.put("PNL.RealisedPNL","RealisedPNL");
 		
-		
+		columnsMaps.put("Fees.Tradeid","Tradeid");
+		columnsMaps.put("Fees.Leid","(select name from le where id = Fees.Leid ) Name");
+		reversecolumnsMaps.put("(select name from le where id = Fees.Leid ) Name", "Fees.Leid");
+		columnsMaps.put("Fees.Feetype","Feetype");
+		columnsMaps.put("Fees.Payrec","Payrec");
+		columnsMaps.put("Fees.Currency","Currency");
+		columnsMaps.put("Fees.Amount","Amount");
 		
 		columnsMaps.put("Posting.Type","Type");
 		columnsMaps.put("Posting.Status","status");
@@ -256,6 +263,7 @@ public class ReportColumns {
 		 _root.add(parentBookColumns);
 		 _root.add(parentTraderColumns);
 		 _root.add(parentLEColumns);
+		 _root.add(parentFeesColumns);
 		 if(!showOpenPosition) {
 		 _root.add(parentTransferColumns);
 		 _root.add(parentPostingColumns);
@@ -295,6 +303,12 @@ public class ReportColumns {
 			   leaf = new DefaultMutableTreeNode(key.substring("LegalEntity.".length(),key.length()));
 			   parentLEColumns.add(leaf);
 		  }
+		  else if (key.contains("Fees.")) {
+			
+			   leaf = new DefaultMutableTreeNode(key.substring("Fees.".length(),key.length()));
+			   parentFeesColumns.add(leaf);
+			  
+		  }
 		  else if (key.contains("Trader.")) {
 			   leaf = new DefaultMutableTreeNode(key.substring("Trader.".length(),key.length()));
 			   parentTraderColumns.add(leaf);
@@ -330,6 +344,7 @@ public class ReportColumns {
 			   parentPNLColumns.add(leaf);
 			  }
 		  }
+		  
 	  }
 	  
 	  
