@@ -255,7 +255,11 @@ public class JInternalReportFrame extends JInternalFrame {
 				}
 			//	String where =  getFilterValues().createWhere(searchPanel.getFilterBeanData(),getReportType());
 				String sqlW = "";
+				
 				String columnSQL = reportPanel.getColumnSQL();
+				if(getReportType().equalsIgnoreCase("ForwardLadder")) {
+					columnSQL = getFilterValues().getColumnsForForwardLadder(searchPanel.getFilterBeanData());
+				}
 				if(commonUTIL.isEmpty(columnSQL)) {
 					commonUTIL.display("Execute Button", "Column are not gettting generated");
 					return;
@@ -265,18 +269,58 @@ public class JInternalReportFrame extends JInternalFrame {
 				} else {
 					sqlW = columnSQL;
 				}
-				sqlW = getFilterValues().createWhereOnAttributes(sqlW,where);
+				
 				// + " where   " + where;
 				
 				try {
+					if(getReportType().equalsIgnoreCase("ForwardLadder")) { 
+						String [] wClause = null;
+						String [] columns = null;
+						String sqls = "";
+						if(where.contains(";")) { 
+							wClause = where.split(";"); 
+						    columns = columnSQL.split(";"); 
+						    for(int wc=0;wc<wClause.length;wc++) {
+						    	 sqls = sqls + columns[wc] + " where  " + wClause[wc] + " ; ";
+						    }
+						
+						    
+						    	data = (Vector)	 reportPanel.getRemoteTrade().getTradesforReport(sqls.substring(0,sqls.length()-1));
+						    	if(data != null && data.size() > 0) {
+									reportPanel.getpReport().setHeader((Vector) data.get(0)); 
+									reportPanel.getpReport().setdatatype((Vector) data.get(1));
+									reportPanel.getpReport().setData((Vector) data.get(2));
+									reportPanel.getDemo().setReport(reportPanel.getpReport());
+									reportPanel.getDemo().runNewPanel();
+						    	}
+						    
+						} else {
+							sqlW =  getFilterValues().changeColumnNameForForwoardReport(sqlW);
+							sqlW = getFilterValues().createWhereOnAttributes(sqlW,where);
+							//commonUTIL.showAlertMessage(sql);
+							
+								data = (Vector)	 reportPanel.getRemoteTrade().getTradesforReport(sqlW);
+								if(data != null && data.size() > 0) {
+										reportPanel.getpReport().setHeader((Vector) data.get(0)); 
+										reportPanel.getpReport().setdatatype((Vector) data.get(1));
+										reportPanel.getpReport().setData((Vector) data.get(2));
+										reportPanel.getDemo().setReport(reportPanel.getpReport());
+										reportPanel.getDemo().runNewPanel();
+								}
+						}
+						    		
+						
+					} else {
+						sqlW = getFilterValues().createWhereOnAttributes(sqlW,where);
 					//commonUTIL.showAlertMessage(sql);
-				data = (Vector)	 reportPanel.getRemoteTrade().getTradesforReport(sqlW);
-				if(data != null && data.size() > 0) {
-					reportPanel.getpReport().setHeader((Vector) data.get(0)); 
-					reportPanel.getpReport().setdatatype((Vector) data.get(1));
-					reportPanel.getpReport().setData((Vector) data.get(2));
-					reportPanel.getDemo().setReport(reportPanel.getpReport());
-					reportPanel.getDemo().runNewPanel();
+						data = (Vector)	 reportPanel.getRemoteTrade().getTradesforReport(sqlW);
+						if(data != null && data.size() > 0) {
+								reportPanel.getpReport().setHeader((Vector) data.get(0)); 
+								reportPanel.getpReport().setdatatype((Vector) data.get(1));
+								reportPanel.getpReport().setData((Vector) data.get(2));
+								reportPanel.getDemo().setReport(reportPanel.getpReport());
+								reportPanel.getDemo().runNewPanel();
+					}
 					}
 					
 				System.out.println(data.size());
@@ -758,8 +802,12 @@ public class JInternalReportFrame extends JInternalFrame {
 		job = job2;
 		Vector<UserJobsDetails> jobdetails;
 		try {
+			if(job != null) {
 			jobdetails = (Vector) reportPanel.getRemoteTask().getDetailsJob(job.getId());
 			loadJobs(jobdetails);
+			} else {
+				return;
+			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
