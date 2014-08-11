@@ -34,6 +34,8 @@ import util.commonUTIL;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
@@ -266,7 +268,7 @@ public class JFrameNewReport extends DefaultDockableHolder {
 		
 		
 		final JTreeChoice choiceColumns = new JTreeChoice(this,columnsTreeNode);
-		
+	
 		 
 		  loadTemplate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -280,7 +282,56 @@ public class JFrameNewReport extends DefaultDockableHolder {
 						tempalteframe.setTitle(templateName);
 						templateIdSelected = templatesLists.getTemplateId();
 						job = (UserJob) teamplates.get(templatesLists.getTemplateId());
+						if(job == null) {
+							templatesLists.dispose();
+							return;
+						}
+						internalFrame.setUserJob(job);
+						if(!commonUTIL.isEmpty(job.getSql())) {
+							reportPanel.setColumnSQL(job.getSql());
+						}
 						
+						templatesLists.dispose();
+						
+					}
+				});
+				templatesLists.jList0.addMouseListener(new MouseListener() {
+					
+					@Override
+					public void mouseReleased(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void mousePressed(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void mouseExited(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void mouseEntered(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void mouseClicked(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						String templateName = templatesLists.jTextField0.getText();
+						tempalteframe.setTitle(templateName);
+						templateIdSelected = templatesLists.getTemplateId();
+						job = (UserJob) teamplates.get(templatesLists.getTemplateId());
+						if(job == null) {
+							templatesLists.dispose();
+							return;
+						}
 						internalFrame.setUserJob(job);
 						if(!commonUTIL.isEmpty(job.getSql())) {
 							reportPanel.setColumnSQL(job.getSql());
@@ -347,7 +398,6 @@ public class JFrameNewReport extends DefaultDockableHolder {
 
 			}
 		});
-		
 		
 		choiceColumns.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
