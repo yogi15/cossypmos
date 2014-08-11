@@ -311,6 +311,7 @@ public class JInternalReportFrame extends JInternalFrame {
 						    		
 						
 					} else {
+						sqlW =  getFilterValues().changeColumnNameForNormalReport(sqlW);
 						sqlW = getFilterValues().createWhereOnAttributes(sqlW,where);
 					//commonUTIL.showAlertMessage(sql);
 						data = (Vector)	 reportPanel.getRemoteTrade().getTradesforReport(sqlW);
