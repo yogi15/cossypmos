@@ -22,6 +22,7 @@ public class ReportSQLGenerator {
 	 tableNames.put("Trader", "Le");
 	 tableNames.put("Cashposition", "Cashposition");
 	 tableNames.put("PNL", "Liquidpos");
+	 tableNames.put("Fees", "Fees");
 	 }
 	public String createBookProductSQL(String productType,
 			String productSubType, String bookid, String le, String traderID,
@@ -123,6 +124,14 @@ public class ReportSQLGenerator {
 						+ ".bookid = book.bookno ";
 			else
 				sqlJoins = reportType + ".bookid = book.bookno ";
+		}
+		if (tablename.contains("Fees")) {
+			attachWhere = true;
+			if (sqlJoins.length() > 0)
+				sqlJoins = sqlJoins + " and " + reportType
+						+ ".id = Fees.tradeid ";
+			else
+				sqlJoins = reportType + ".id = Fees.tradeid ";
 		}
 		if (tablename.contains("legalEntity")) {
 			attachWhere = true;
@@ -240,6 +249,15 @@ public class ReportSQLGenerator {
 
 			} else {
 				tableName = tableName + "Product product ";
+			}
+
+		}
+		if (tablename.contains("Fees.")) {
+			if (tableName.length() > 0) {
+				tableName = tableName + ", Fees fees ";
+
+			} else {
+				tableName = tableName + "Fees fees ";
 			}
 
 		}
