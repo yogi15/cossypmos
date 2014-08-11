@@ -3,6 +3,7 @@ package apps.window.operationwindow.jobpanl;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
@@ -30,19 +31,32 @@ public class FilterValues {
 	 Hashtable<String,Vector> dataValues = null; 
 	 String starupData [] = {"SearchCriteria","TaskColumn","Status","ProductType","Currency","EventType","WFType","BUY/SELL","TransferType","FEEType","accEvent","TaskType","TradeAttribute","QuotingCurr","PrimaryCurr","LEAttributes"};
 	 String referenceData [] = {"Book" };
-	 String datesSearch [] = {"between",">=",">","<=","<"};
+	 String datesSearch [] = {"between",">=",">","<=","<","="};
 	 Hashtable<Integer,Book> bookValues = new Hashtable<Integer,Book>(); 
 	 Hashtable<Integer,LegalEntity> counterPary = new Hashtable<Integer,LegalEntity>(); 
 	 static Hashtable<String,String> columnNames = new Hashtable<String,String>(); 
 	 static Hashtable<String,String> numberDataTypes = new Hashtable<String,String>(); 
 	 static Hashtable<String,String> matachingColumns = new   Hashtable<String,String>(); 
 	 static Hashtable<String,String> tableNames = new   Hashtable<String,String>();
+	 static Hashtable<String,String> forwardColumnMaps = new   Hashtable<String,String>();
+	
+	 
 	 String attributesObject [] = {"legalEntity.Attributes","book.Attributes","transfer.attributes"};
 	 RemoteTrade remoteTrade = null;
 	 RemoteBOProcess remoteBO = null;
 	 RemoteTask remoteTask = null;
 	 RemoteReferenceData remote = null;
 	 static {
+		 forwardColumnMaps.put("Monthly", "TO_CHAR(settledate,'MON')");
+		 forwardColumnMaps.put("Daily", "TO_CHAR(settledate,'DD')");
+		 forwardColumnMaps.put("Weekly", "TO_CHAR(settledate,'WW')");
+		 forwardColumnMaps.put("Yearly", "TO_CHAR(settledate,'YYYY')");
+		 forwardColumnMaps.put("Quarterly", "TO_CHAR(settledate,'Q')");
+		 
+		 forwardColumnMaps.put( "TO_CHAR(settledate,'Q')", " decode(TO_CHAR(settledate,'Q'),'1','31 MARCH','2','30 JUNE', '3','30 SEPT','4','31 DEC') Quarterly ");
+		 forwardColumnMaps.put("TO_CHAR(settledate,'MON')", "TO_CHAR(settledate,'MON') Monthly");
+		 forwardColumnMaps.put("TO_CHAR(settledate,'WW')", "TO_CHAR(settledate,'WW') Weekly");
+		 
 		 columnNames.put("Book", "Bookid");
 		 columnNames.put("LegalEntity", "id");
 		 columnNames.put("Currency", "Currency");
@@ -67,7 +81,7 @@ public class FilterValues {
 		 columnNames.put("QuotingCurr", "QuotingCurr");
 		 columnNames.put("Quantity", "Quantity");
 		 columnNames.put("TaskDate", "TaskDate");
-		 
+		 columnNames.put("Monthly", "TO_CHAR(settledate,'MON')");
 		 numberDataTypes.put("Book", "Bookid");
 		 numberDataTypes.put("LegalEntity", "id");
 		 numberDataTypes.put("Task", "id");
@@ -84,6 +98,7 @@ public class FilterValues {
 		 tableNames.put("Trade", "Trade");
 		 tableNames.put("Transfer", "Transfer");
 		 tableNames.put("CashPosition", "Cashposition");
+		 tableNames.put("ForwardLadder", "Cashposition");
 		 tableNames.put("OpenPos", "OpenPos");
 		 tableNames.put("Posting", "Posting");
 		 tableNames.put("Product", "Product");
@@ -450,11 +465,14 @@ public class FilterValues {
 	public String createWhere(Vector<FilterBean> jobdetails,String tableName1) {
 		// TODO Auto-generated method stub
 		String where  ="";
+		boolean isForwardLadder = false;
 	    int att = 0;
 		if(jobdetails == null || jobdetails.size() == 0 || jobdetails.isEmpty()) 
 			return where;
 		for(int i=0;i<jobdetails.size();i++) {
 			FilterBean bean = (FilterBean) jobdetails.get(i);
+			if(bean.getColumnName().equalsIgnoreCase("Ladder")) 
+				isForwardLadder = true;
 			boolean isStaticRefData = true;
 			if(isObjectAttribute(bean.getColumnName())) {
 				 where = where + " " + bean.getColumnName() + " "  + bean.getSearchCriteria() + " '%"  +bean.getColumnValues() + "="+bean.getAnd_or()+"%'";
@@ -491,11 +509,50 @@ public class FilterValues {
 		}
 		if(tableName1.equalsIgnoreCase("trade"))
 		    where = where + " and trade.version >= 0 ";
-		
+		if(isForwardLadder) {
+		  where = 	genearteGroupClauseForForwardLadder(where);
+		}
 		return where;
 	}
 	
 	
+	private String genearteGroupClauseForForwardLadder(String where) {
+		// TODO Auto-generated method stub
+		String whereC = where;
+		String [] whereSplit = null;
+		if(where.contains(";")) {
+			 whereSplit = whereC.split(";");
+			whereC = whereSplit[0];
+		}
+		String sql = whereC;
+		String groupClause = "";
+		String [] whereConditions = sql.split("cashposition.");
+		String whereClause = "";
+		for(int i=0;i<whereConditions.length;i++) {
+			String w = whereConditions[i];
+		  if(!w.trim().isEmpty()) {
+			if(w.contains("TO_CHAR")) {
+				groupClause = " group by currency , " + w;
+			} else {
+				whereClause = whereClause +  w ;
+			}
+		  }
+			
+		}
+		whereClause = whereClause.trim();
+		String wClause = "";
+		if(whereSplit == null) {
+				whereClause = 	 whereClause.substring(0, whereClause.length() -3) + "  " + groupClause;
+		} else  {
+			wClause =  whereClause.substring(0, whereClause.length() -3) + "  " + groupClause + ";";
+			for(int ws=1;ws<whereSplit.length;ws++) {
+				wClause = wClause + whereClause.substring(0, whereClause.length() -3) + "  " + " group by currency , " + whereSplit[ws] + ";";
+			}
+			whereClause = wClause.substring(0,wClause.length() -1);
+		}
+		return whereClause;
+	}
+
 	private String createCriteriaOnBook(Vector<Book> books,FilterBean bean) {
 		String bookCriteria  ="";
 		String ids =bean.getIdSelected();
@@ -545,6 +602,7 @@ public class FilterValues {
 	} 
 	
 	private String attachsqlTypeCrietria(String criteriaType,String values,String columnName ) {
+		
 		String typeC ="";
 		if(criteriaType.equalsIgnoreCase("in")  || criteriaType.equalsIgnoreCase("not in") ) {
 			typeC = criteriaType + " ('";
@@ -573,10 +631,27 @@ public class FilterValues {
 		return typeC;
 		
 	}
+	private String getForwardLadderWhereClause(String values) {
+		
+		// TODO Auto-generated method stub
+		if(values.contains(",")) {
+		  String  v [] = values.split(","); 
+		  String value = "";
+		  
+		  for(int i=0;i<v.length;i++) 
+			  value = value + forwardColumnMaps.get(v[i]) + ";";
+		  value = value.substring(0, value.length()-1);
+		  return value;
+		} 
+		return forwardColumnMaps.get(values.trim());
+	}
+
 	private String createCriteria(FilterBean bean,String tableName1) {
 		String criteria = "";
 		if(bean.getColumnName().endsWith("Date")) {
 			 criteria = columnNames.get(bean.getColumnName()) + " " + " "  + getDatesWhereClause(bean.getColumnValues(),bean.getAnd_or(),bean.getSearchCriteria(),tableNames.get(tableName1)+"."+columnNames.get(bean.getColumnName()));
+		} else if(bean.getColumnName().equalsIgnoreCase("Ladder")) {
+			criteria =  getForwardLadderWhereClause(bean.getColumnValues());
 		} else {
 		 criteria = columnNames.get(bean.getColumnName()) + " " + " " +attachsqlTypeCrietria(bean.getSearchCriteria().trim(),bean.getColumnValues().toUpperCase(),bean.getColumnName());
 		}
@@ -762,6 +837,59 @@ public class FilterValues {
 		}
 		return flag;
 		
+		
+	}
+
+	public String getColumnsForForwardLadder(Vector<FilterBean> filterBeanData) {
+		// TODO Auto-generated method stub
+		String sql = " select sum(actualamt) Total, Currency ,";
+		String cols []  = null;
+		for(int i=0;i<filterBeanData.size();i++) {
+			FilterBean bean = (FilterBean) filterBeanData.get(i);
+			if(bean.getColumnName().equalsIgnoreCase("Ladder")) {
+				if(bean.getColumnValues().contains(",")) {
+					cols = bean.getColumnValues().split(",");
+					sql = sql + forwardColumnMaps.get(cols[0]);
+				} else {
+				 sql = sql + forwardColumnMaps.get(bean.getColumnValues()) + ",";
+				}
+			}  else if(bean.getColumnName().equalsIgnoreCase("SettleDate"))   {
+				
+		} else if(bean.getColumnName().equalsIgnoreCase("Currency"))   {
+			
+	}   else { 
+			    sql = sql + bean.getColumnName() + ","; 
+			}
+			
+		}
+		
+		if(cols == null) {
+			sql = sql.substring(0,sql.length() - 1);
+			sql = sql + " from cashposition ";
+		} 			
+		else  {
+			sql = sql + " from cashposition ";
+			for(int c=1;c<cols.length;c++) 
+				sql = sql +";" + " select sum(actualamt) Total, Currency ," + forwardColumnMaps.get(cols[c]) +"  from cashposition ;";
+		}
+		
+		return sql;
+	}
+
+	public String changeColumnNameForForwoardReport(String sqlW) {
+		// TODO Auto-generated method stub
+		String sql = sqlW;
+		Enumeration keys  = forwardColumnMaps.keys();
+		while(keys.hasMoreElements()) {
+			String key = (String) keys.nextElement();
+			if(sqlW.contains(key)) {
+				String value = (String) forwardColumnMaps.get(key);
+				sql = sqlW.replace(key, value);
+				break;
+				
+			}
+		}
+		return sql;
 		
 	}
 	
