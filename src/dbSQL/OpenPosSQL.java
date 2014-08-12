@@ -27,7 +27,7 @@ public class OpenPosSQL {
 			"	tradedate," +
 			"	quantity," +
 			"	openquantity," +
-			"	bookId," +
+			"	bookno," +
 			"	price," +
 			"	sign," +
 			"	positionid,	" +
@@ -58,7 +58,7 @@ public class OpenPosSQL {
 				" tradedate  =to_date('"+ updateOpenpos.getTradeDate()+"', 'DD/MM/YYYY hh24:mi:ss')," +
 				" quantity  ="+ updateOpenpos.getQuantity()+"," +
 				" openquantity  ="+ updateOpenpos.getOpenQuantity()+"," +
-				" bookId  ="+ updateOpenpos.getBookId()+"," +
+				" bookno  ="+ updateOpenpos.getBookId()+"," +
 				" price	 ="+ updateOpenpos.getPrice()+"," +
 				" sign   ="+ updateOpenpos.getSign()+"," +
 				" positionid ="+ updateOpenpos.getPositionId()+"," +
@@ -99,7 +99,7 @@ public class OpenPosSQL {
 			" tradedate," +
 			" quantity," +
 			" openquantity," +
-			" bookId," +
+			" bookno," +
 			" price," +
 			" sign," +
 			" positionid," +
@@ -120,7 +120,7 @@ public class OpenPosSQL {
 			" tradedate," +
 			" quantity," +
 			" openquantity," +
-			" bookId," +
+			" bookno," +
 			" price," +
 			" sign," +
 			" positionid," +
@@ -141,7 +141,7 @@ public class OpenPosSQL {
 			" tradedate," +
 			" quantity," +
 			" openquantity," +
-			" bookId," +
+			" bookno," +
 			" price," +
 			" sign," +
 			" positionid," +
@@ -162,7 +162,7 @@ public class OpenPosSQL {
 			" tradedate," +
 			" quantity," +
 			" openquantity," +
-			" bookId," +
+			" bookno," +
 			" price," +
 			" sign," +
 			" positionid," +
@@ -183,7 +183,7 @@ public class OpenPosSQL {
 		" tradedate," +
 		" quantity," +
 		" openquantity," +
-		" bookId," +
+		" bookno," +
 		" price," +
 		" sign," +
 		" positionid," +
@@ -751,7 +751,7 @@ public class OpenPosSQL {
 	     String sql = "";
 		 try {
 			 
-			 sql = SELECTONKEYS + " bookId = " + bookid +" and productid = "+productId  +  " and productsubtype = '"+productSubtype.trim() +" and quantity > 0 ' order by tradeId desc ";
+			 sql = SELECTONKEYS + " bookno = " + bookid +" and productid = "+productId  +  " and productsubtype = '"+productSubtype.trim() +" and quantity > 0 ' order by tradeId desc ";
 			 
 			 stmt = dsSQL.newPreparedStatement(con, sql );
 	      
