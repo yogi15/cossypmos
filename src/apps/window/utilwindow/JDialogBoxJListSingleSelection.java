@@ -52,7 +52,7 @@ public class JDialogBoxJListSingleSelection extends JDialog {
 	public void setTemplateId(int templateId) {
 		this.templateId = templateId;
 	}
-	private JList jList0;
+	public JList jList0;
 	private JScrollPane jScrollPane0;
 	private JPanel jPanel0;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
