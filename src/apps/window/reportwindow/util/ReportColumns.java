@@ -158,6 +158,7 @@ public class ReportColumns {
 		columnsMaps.put("Trade.Price","Price");
 		columnsMaps.put("Trade.Version","Version"); 
 		columnsMaps.put("Trade.Attributes","Attributes");
+		columnsMaps.put("Trade.BaseCurrency","BaseCurrency");
 		columnsMaps.put("Trade.Yield","Yield ");
 		reversecolumnsMaps.put("Trade.tradedesc", "Trade.TradeProductName1");
 		columnsMaps.put("Trade.TradeProductName1","tradedesc"); // to be changed
