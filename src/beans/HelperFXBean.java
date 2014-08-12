@@ -42,9 +42,22 @@ public class HelperFXBean implements HelperBean {
 			dealBean.setFees(fee);
 			String attribute = "InstrumentType="+record[21] +";";
 			attribute = attribute + "BranchName="+record[22] +";";
+			if(record.length > 24) {
+			String UnderlyingRef = record[24];
+			if(!commonUTIL.isEmpty(UnderlyingRef)) {
+			attribute = attribute + "UnderlyingRef="+UnderlyingRef +";"; 
+			}
+			}
 			dealBean.setAttributes(attribute);
 			
 			
+		} else {
+			if(record.length > 24) {
+			String UnderlyingRef = record[24];
+			if(!commonUTIL.isEmpty(UnderlyingRef)) {
+			dealBean.setAttributes("UnderlyingRef="+UnderlyingRef +";");
+			}
+			}
 		}
 		
 		}
