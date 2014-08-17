@@ -1,1102 +1,1861 @@
 package apps.window.referencewindow;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+import org.dyno.visual.swing.layouts.Bilateral;
+import org.dyno.visual.swing.layouts.Constraints;
+import org.dyno.visual.swing.layouts.GroupLayout;
+import org.dyno.visual.swing.layouts.Leading;
+
+import util.RemoteServiceUtil;
 import util.commonUTIL;
-import apps.window.utilwindow.JDialogBoxForChoice;
 import apps.window.utilwindow.JDialogTable;
+import beans.Account;
 import beans.LegalEntity;
 import beans.Sdi;
 import beans.StartUPData;
+import dsServices.RemoteAccount;
 import dsServices.RemoteReferenceData;
-import dsServices.ServerConnectionUtil;
 
-public class SDI1Window  extends javax.swing.JPanel {
+//VS4E -- DO NOT REMOVE THIS LINE!
+public class SDI1Window extends JPanel {
 
-	public static  ServerConnectionUtil de = null;
-	 DefaultTableModel attributeModel = null;
-	 SDITab1 browseTab = null;
+	private static final long serialVersionUID = 1L;
+	private JLabel sdiIdLabel;
+	private JLabel roleLabel;
+	private JLabel leLabel;
+	private JLabel poLabel;
+	private JLabel contactLabel;
+	private JPanel jPanel0;
+	private JTabbedPane jTabbedPane0;
+	private JTextField leTextField;
+	private JTextField poTextField;
+	private JComboBox roleComboBox;
+	private JTextField sdiIdTextField;
+	private JComboBox contactComboBox;
+	private JComboBox CurrencyComboBox;
+	private JLabel currencyLabel;
+	private JLabel jLabel6;
+	private JLabel Pay;
+	private JLabel methodLabel;
+	private JComboBox methodComboBox;
+	private JComboBox payReceiveComboBox;
+	private JComboBox cashSecurityComboBox;
+	private JLabel cashSecurityLabel;
+	private JComboBox productsComboBox;
+	private JLabel productsLabel;
+	private JButton poButton;
+	private JButton leButton;
+	private JLabel codeLabel;
+	private JLabel agentContactLabel;
+	private JTextField codeTextField;
+	private JButton codeButton;
+	private JLabel acLabel;
+	private JTextField acTextField;
+	private JButton glButton;
+	private JTextField glTextField;
+	private JComboBox agentContactComboBox;
+	private JLabel glLabel;
+	private JPanel jPanel1;
+	private JTabbedPane jTabbedPane1;
+	private JButton newButton;
+	private JButton saveAsNewButton;
+	private JButton saveButton;
+	private JButton deleteButton;
+	
 	int leID = 0;
 	int poID =0;
 	int agentID =0;
-	RemoteReferenceData remoteBORef;
-	public  DefaultTableModel model = null;
-	DefaultListModel currencyList = new DefaultListModel();
-	javax.swing.DefaultComboBoxModel  payRec = new javax.swing.DefaultComboBoxModel();
-	javax.swing.DefaultComboBoxModel method = new javax.swing.DefaultComboBoxModel();
-	javax.swing.DefaultComboBoxModel cashMethod = new javax.swing.DefaultComboBoxModel();
-	javax.swing.DefaultComboBoxModel lecontacts = new javax.swing.DefaultComboBoxModel();
-	 final  JDialogTable showLE = null;
+	int accountId =0;
+	int partyId = 0;
+	
+	Vector roleVec = null;
+	Vector currencyVec = null;
+	Vector productVec = null;
+	Vector contactVec = null;
+	Vector sdiMethodVec = null;
+	Vector sdiAttributesVec = null;
+	
+	private JButton roleListButton;
+	private JList roleList;
+	
+	DefaultListModel listModel = new DefaultListModel();
+	Vector<LegalEntity> legalEntitys = new Vector<LegalEntity>();
+	//TableModelUtil modelt = null;
+	
+	
 	
 	String s [] = {"id","LegalEntityName"};
 	DefaultTableModel tradertablemodel = new DefaultTableModel(s,0);
 	String po [] = {"id","POName"};
 	DefaultTableModel potablemodel = new DefaultTableModel(po,0);
+	DefaultTableModel browserPO = new DefaultTableModel(po,0);
 	String agent [] = {"id","AgentName"};
 	DefaultTableModel agenttablemodel = new DefaultTableModel(agent,0);
-	 javax.swing.DefaultComboBoxModel productTypeCombox = new javax.swing.DefaultComboBoxModel();
-    /** Creates new form SDIFrame */
-    public SDI1Window() {
-        initComponents();
-    }
+	String gl [] = {"id","Account"};
+	DefaultTableModel glTablemodel = new DefaultTableModel(gl,0);
+	String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
+	DefaultTableModel attributeModel = null;
+	String browserCol[] = { "SDI ID", "MessageType", "Pay/Rec", "Format","Party Name", "Role", "AGent", "Key","Cash", "Product", "Currency"  };
+	DefaultTableModel browserModel = null;
+	
+	javax.swing.DefaultComboBoxModel roleVal = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel currencyVal = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel productVal = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel contactVal = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel  payRec = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel cashMethod = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel method = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel agentContactVal = new javax.swing.DefaultComboBoxModel();
+	
+	javax.swing.DefaultComboBoxModel browserRoleVal = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel browserCurrencyVal = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel browserProductVal = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel browserPartyVal = new javax.swing.DefaultComboBoxModel();
+	
+	JDialogTable showLE = null;
+	JDialogTable showAgent = null;
+	JDialogTable showPO = null;
+	JDialogTable showGLAccount = null;
+	JDialogTable showBrowserPO = null;
+	
+	
+	RemoteReferenceData remoteBORef;
+	RemoteAccount remoteAccount;
+	private JLabel sdiLabel;
+	private JLabel browserRoleLabel;
+	private JLabel browserPartyLabel;
+	private JTextField browserSdiIdTextField;
+	private JComboBox browserRoleCombobox;
+	private JLabel browserProductsLabel;
+	private JLabel browserCCYLabel;
+	private JComboBox browserProductsCombobox;
+	private JPanel jPanel2;
+	private JButton loadButton;
+	private JTable jTable1;
+	private JScrollPane jScrollPane0;
+	private JScrollPane jScrollPane2;
+	private JTable browserTable;
+	private JTable jTable0;
+	private JComboBox browserCCYComboBox;
+	private JTextField browserPartyTextField;
+	private JButton browserPartyButton;
+	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+	
+	public SDI1Window() {
+		initComponents();
+	}
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">
-    private void initComponents() {
-    	Vector roles = null;
-    	de =ServerConnectionUtil.connect("localhost", 1099,commonUTIL.getServerIP() );
-      	 try {
-      		 remoteBORef = (RemoteReferenceData) de.getRMIService("ReferenceData");
-      		  roles = (Vector) remoteBORef.getStartUPData("Roles");
-   	  	 } catch (RemoteException e) {
-   			e.printStackTrace();
-   	}
-        jTabbedPane2 = new javax.swing.JTabbedPane();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new  javax.swing.JComboBox(); 
-        jLabel3 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
-        jTextField4 = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JComboBox(); 
-        jLabel6 = new javax.swing.JLabel();
-        jTextField6 = new  javax.swing.JComboBox(); 
-        partyButton = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        jTextField7 = new  javax.swing.JComboBox(); 
-        jLabel8 = new javax.swing.JLabel();
-        jTextField8 = new javax.swing.JComboBox();
-        jLabel9 = new javax.swing.JLabel();
-        jTextField9 = new javax.swing.JTextField();
-        jLabel10 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
-        jLabel11 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel12 = new javax.swing.JLabel();
-        jTextField11 = new javax.swing.JTextField();
-        jButton7 = new javax.swing.JButton();
-        jLabel13 = new javax.swing.JLabel();
-        jTextField12 = new javax.swing.JTextField();
-        jLabel14 = new javax.swing.JLabel();
-        jTextField13 = new javax.swing.JComboBox();
-        jLabel15 = new javax.swing.JLabel();
-        jTextField14 = new javax.swing.JTextField();
-        deleteButton = new javax.swing.JButton();
-        saveButton = new javax.swing.JButton();
-        saveAsNewButton = new javax.swing.JButton();
-        newButton = new javax.swing.JButton();
-        jButton8 = new javax.swing.JButton();
+	private void initComponents() {
+		
         
-        jTextField1.setEditable(false);
-        jLabel1.setText("SD id");
-    	getMasterDataOnComboBox(productTypeCombox, "ProductType");
-    	getMasterDataOnComboBox(lecontacts,"LEContacts");
-        jComboBox1.setModel(productTypeCombox);
-       
-        jLabel2.setText("ROLE");
-        if(roles != null) {
-        	Iterator its = roles.iterator();
-        	while(its.hasNext()) {
-        		StartUPData role = (StartUPData) its.next();
-        		jTextField2.addItem(role.getName());
-        		
-        	}
-        	jTextField2.setSelectedIndex(1);
-        }
+        //processTableData(attributeModel);
         
+		remoteBORef = (RemoteReferenceData) RemoteServiceUtil
+		.getRemoteReferenceDataService();
+		
+		remoteAccount = (RemoteAccount) RemoteServiceUtil.getRemoteAccountService();
+
+		try {
+			
+			roleVec = (Vector) remoteBORef.getStartUPData("Roles");
+			sdiMethodVec = (Vector) remoteBORef.getStartUPData("SDIMethod");
+			legalEntitys = (Vector) remoteBORef.selectAllLs();
+			currencyVec = (Vector) remoteBORef.getStartUPData("Currency");
+			productVec = (Vector) remoteBORef.getStartUPData("ProductType");
+			contactVec = (Vector) remoteBORef.getStartUPData("LEContacts");
+			sdiAttributesVec = (Vector) remoteBORef.getStartUPData("SDIAttributes");
+			
+		} catch (RemoteException e) {
+		
+			e.printStackTrace();
+		
+		}
+
+		setLayout(new GroupLayout());
+		add(getJTabbedPane0(), new Constraints(new Leading(9, 784, 10, 10), new Bilateral(8, 12, 215)));
+		setSize(807, 407);
+		setVisible(true);
+		
+			    
+	    showAgent = new JDialogTable(agenttablemodel);
+        getLEDataCombo1(agenttablemodel,"Agent");
+        showAgent.setLocationRelativeTo(this);
         
-        getLEDataCombo1(tradertablemodel,"CounterParty");
-        final  JDialogTable showLE = new JDialogTable(tradertablemodel);
-        showLE.setLocationRelativeTo(this);
-        
-        
-        jTextField2.addItemListener( new ItemListener() {
-
-        	@Override
-        	public void itemStateChanged(ItemEvent e) {
-        		// TODO Auto-generated method stub
-        		
-        		for(int i=0;i<tradertablemodel.getRowCount();i++) {
-        			tradertablemodel.removeRow(i);
-        			
-        		}
-        		showLE.clearRolesTables();
-        	//	clearRolesTables();
-        		// jTextField3.setText("          ");
-        		String role = jTextField2.getSelectedItem().toString();
-        		 getLEDataCombo1(tradertablemodel,role);
-        		 if(role.equalsIgnoreCase("PO")) {
-        			// jTextField9.setText("              ");
-        			 jTextField9.setEnabled(false);
-        			 jButton8.setEnabled(false);
-        			 poID = -1;
-        			 
-        		 } else {
-        			 jTextField9.setEnabled(true);
-        			 jButton8.setEnabled(true);
-        			 poID =0;
-        			 
-        		 }
-        		
-        	}
-        	   
-           });
-       // jTextField2.setText("jTextField1");
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
-            }
-        });
-
-        jLabel3.setText("Party");
-
-      //  jTextField3.setText("            ");
-        jTextField3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField3ActionPerformed(evt);
-            }
-        });
-
-        jLabel4.setText("CCY");
-
-        jTextField4.setText("ANY          ");
-        jTextField4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField4ActionPerformed(evt);
-            }
-        });
-
-        jLabel5.setText("Pay/Rec");
-        payRec.insertElementAt("BOTH", 0);
-       // payRec.setSelectedItem(new String("BOTH"));
-        payRec.insertElementAt("PAY", 1);
-        payRec.insertElementAt("REC", 2);
-        
-        jTextField5.setModel(payRec);
-        jTextField5.setSelectedIndex(0);
-
-        jLabel6.setText("Method");
-        populateMethod(method);
-        jTextField6.setModel(method);
-
-        partyButton.setText("....");
-        partyButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                partyButtonActionPerformed(evt);
-            }
-        });
-
-        jButton1.setText("...");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        jTextField1.setText("            ");
-
-        jLabel7.setText("Cash/Security");
-        
-        cashMethod.insertElementAt("BOTH", 0);
-        cashMethod.insertElementAt("CASH", 1);
-        cashMethod.insertElementAt("SECURITY", 2);
-        cashMethod.setSelectedItem(0);
-        jTextField7.setModel(cashMethod);
-        jTextField7.setSelectedIndex(0);
-
-        jLabel8.setText("Contact");
-
-        jTextField8.setModel(lecontacts);
-      
-        jLabel9.setText("Prg Org");
-        jTextField1.setText("0    ");
-        jTextField9.setText("             ");
-        jTextField9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField9ActionPerformed(evt);
-            }
-        });
-
-        jLabel10.setText("Products");
-
-     //   jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jLabel11.setText("Attributes");
-        String sdi [] = {"Attribue Name","Value    "};
-    	DefaultTableModel sditablemodel = new DefaultTableModel(sdi,0);
-        jTable1.setModel(sditablemodel);
-        jScrollPane1.setViewportView(jTable1);
-
-        jLabel12.setText("Code");
-
-        jTextField11.setText("             ");
-        jTextField11.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField11ActionPerformed(evt);
-            }
-        });
-
-        jButton7.setText("jButton1");
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton7ActionPerformed(evt);
-            }
-        });
-
-        jLabel13.setText("A/C");
-
-        jTextField12.setText("            ");
-
-        jLabel14.setText("Contact");
-
-        jTextField13.setModel(lecontacts);
-
-        jLabel15.setText("GL");
-
-        jTextField14.setText("           ");
-        processlistchoice(currencyList,"Currency");
-       	final JDialogBoxForChoice choice12 = new JDialogBoxForChoice(currencyList);
-       	partyButton.addActionListener(new ActionListener() {
+        showAgent.jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+			public void mouseClicked(MouseEvent e) {
 				
-				choice12.jList3.setModel(currencyList);
-				choice12.setLocationRelativeTo(choice12);
-				//choice12.setSize(200,200);
-				choice12.setVisible(true);
-				
+				int id  = ((Integer)	showAgent.jTable1.getValueAt(showAgent.jTable1.getSelectedRow(),0)).intValue();
+			
+				String ss = (String)	showAgent.jTable1.getValueAt(showAgent.jTable1.getSelectedRow(),1);
+				codeTextField.setText(ss);
+				agentID = id;
+				showAgent.dispose();
+			
 			}
-   		
-   	});
-       	
-        // currency textbox
-       	choice12.addWindowListener(new WindowAdapter() {            
-               public void windowClosing(WindowEvent e) {
-                  // System.out.println("Window closing");
-                   try {
-                   	String ss = "";
-                     Object obj [] =   choice12.getObj();
-                    for(int i =0;i<obj.length;i++)
-                   	 ss = ss + (String) obj[i] + ",";
-                    if(ss.trim().length() > 0)
-                    	jTextField4.setText(ss.substring(0, ss.length()-1));
-                   } catch (Throwable t) {
-                       t.printStackTrace();
-                   }                
-               }
-       	});
-       	
-       	
-    //    processlistchoice(browseTab.currencyList,"Currency");
-       	
-      
    	
-       
-       	
-       
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	
-            
-            	
-            	showLE.setVisible(true);
-            	
-            }
-        }); 
-       	
-        final  JDialogTable showPO = new JDialogTable(potablemodel);
+        });   
+        
+        showPO = new JDialogTable(potablemodel);
         getLEDataCombo1(potablemodel,"PO");
+        
         showPO.setLocationRelativeTo(this);
-       	
-       
-        jButton8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	
-            
-            	
-            	showPO.setVisible(true);
-            	
-            }
-        }); 
+        
         showPO.jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int id  = ((Integer)	showPO.jTable1.getValueAt(showPO.jTable1.getSelectedRow(),0)).intValue();
+				
+				 int id  = ((Integer)	showPO.jTable1.getValueAt(showPO.jTable1.getSelectedRow(),0)).intValue();
 			
 				 String ss = (String)	showPO.jTable1.getValueAt(showPO.jTable1.getSelectedRow(),1);
-				 jTextField9.setText(ss);
+				 System.out.println("id " + id);
+				 System.out.println("ss " + ss);
+				 poTextField.setText(ss);
 				 poID = id;
 				 showPO.dispose();
 			}
+        });   
+        
+        showGLAccount = new JDialogTable(glTablemodel);
+        getGLDataCombo(glTablemodel);
+        showGLAccount.setLocationRelativeTo(this);
+        
+        showGLAccount.jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				
+				int id  = ((Integer)	showGLAccount.jTable1.getValueAt(showGLAccount.jTable1.getSelectedRow(),0)).intValue();
 			
-    
-    	
-    });   
-        final  JDialogTable showAgent = new JDialogTable(agenttablemodel);
-        getLEDataCombo1(agenttablemodel,"Agent");
-        showAgent.setLocationRelativeTo(this);
-       	
-       
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	
-            
+				String ss = (String)	showGLAccount.jTable1.getValueAt(showGLAccount.jTable1.getSelectedRow(),1);
+				
+				glTextField.setText(ss);
+				accountId = id;
+				showGLAccount.dispose();
+				
+			}
+        });   
+        
+        showBrowserPO = new JDialogTable(browserPO);
+        getLEDataCombo1(potablemodel,"PO");
+        showBrowserPO.setLocationRelativeTo(this);
+        
+        showBrowserPO.jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				
+				int id  = ((Integer)	showBrowserPO.jTable1.getValueAt(showBrowserPO.jTable1.getSelectedRow(),0)).intValue();
+			
+				String ss = (String)	showBrowserPO.jTable1.getValueAt(showBrowserPO.jTable1.getSelectedRow(),1);
+				
+				browserPartyTextField.setText(ss);
+				partyId = id;
+				showBrowserPO.dispose();
+				
+			}
+        });   
+        
+	}
+
+	private JButton getBrowserPartyButton() {
+		if (browserPartyButton == null) {
+			browserPartyButton = new JButton();
+			browserPartyButton.setText("browserPartyButton");
+			
+			browserPartyButton.addActionListener(new java.awt.event.ActionListener() {
+		        public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+		        	//showGLAccount.setVisible(true);
+		        	
+		        }
+		    }); 
+			
+		}
+		return browserPartyButton;
+	}
+
+	private JTextField getBrowserPartyTextField() {
+		
+		if (browserPartyTextField == null) {
+			browserPartyTextField = new JTextField();
+			browserPartyTextField.setText(" ");
+		}
+		return browserPartyTextField;
+	}
+
+	private JComboBox getBrowserCCYComboBox() {
+		
+		if (browserCCYComboBox == null) {
+			
+			browserCCYComboBox = new JComboBox();
+			browserCCYComboBox.setDoubleBuffered(false);
+			browserCCYComboBox.setBorder(null);
+			
+			processComboBox(browserCurrencyVal, "CurrencyList");
+			browserCCYComboBox.setModel(browserCurrencyVal);
+			
+		}
+		
+		return browserCCYComboBox;
+		
+	}
+
+	private JTable getJTable0() {
+		if (jTable0 == null) {
+			if (jTable0 == null) {
+				jTable0 = new JTable();
+				
+				browserModel = new DefaultTableModel(browserCol,0);
+				
+				jTable0.setAutoscrolls(true);
+
+				jTable0.setModel(browserModel);
+				
+			}
+			
+		}
+		
+		return jTable0;
+	}
+		
+
+	private JTable getBrowerTable() {
+		if (browserTable == null) {
+			browserTable = new JTable();
+			
+			browserModel = new DefaultTableModel(browserCol,0);
+			
+			browserTable.setAutoscrolls(true);
+						
+			browserTable.setModel(browserModel);
+			
+		}
+		return browserTable;
+	}
+
+	private JScrollPane getJScrollPane2() {
+		if (jScrollPane2 == null) {
+			jScrollPane2 = new JScrollPane();
+			jScrollPane2.setViewportView(getBrowerTable());
+		}
+		return jScrollPane2;
+	}
+
+	private JScrollPane getJScrollPane0() {
+		if (jScrollPane0 == null) {
+			jScrollPane0 = new JScrollPane();
+			jScrollPane0.setViewportView(getAttributesTable());
+		}
+		return jScrollPane0;
+	}
+
+	private JTable getAttributesTable() {
+		if (jTable1 == null) {
+			jTable1 = new JTable();
+			
+			attributeModel = new DefaultTableModel(attributeColumnName,0);
+			
+			jTable1.setAutoscrolls(true);
+			
+			
+			
+			if (sdiAttributesVec != null) {
+				for (int i = 0; i < sdiAttributesVec.size(); i++) {
+					StartUPData attributs = (StartUPData) sdiAttributesVec.get(i);
+					attributeModel.insertRow(i,
+							new Object[] { attributs.getName(), "" });
+				}
+			}
+			
+			jTable1.setModel(attributeModel);
+			
+		}
+		return jTable1;
+	}
+
+	private JButton getLoadButton() {
+		if (loadButton == null) {
+			loadButton = new JButton();
+			loadButton.setText("Load");
+		}
+		
+		loadButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				
+				
+				DefaultTableModel browserModel = (DefaultTableModel) browserTable.getModel();
+				browserModel.setRowCount(0);
+			    
+				String query =	getQuery();
+				
+				if (query.equals(" ")) {
+					
+					commonUTIL.showAlertMessage("Please select atleast one criteria");
+					return;
+					
+				} else {
+					
+					Vector sdis = getSDIs(query);
+				    
+					if (!sdis.isEmpty()) {
+
+						loadSDIs(sdis);
+					    
+					} else {
+						
+						commonUTIL.showAlertMessage("SDI not found");
+						return;
+					}
+					
+				    
+				}
+
+			}			
+		});
+		return loadButton;
+	}
+
+	private JPanel getJPanel2() {
+		if (jPanel2 == null) {
+			jPanel2 = new JPanel();
+			jPanel2.setLayout(new GroupLayout());
+			jPanel2.add(getSdiLabel(), new Constraints(new Leading(21, 62, 10, 10), new Leading(14, 26, 10, 10)));
+			jPanel2.add(getBrowserRoleCombobox(), new Constraints(new Leading(85, 99, 10, 10), new Leading(44, 12, 12)));
+			jPanel2.add(getBrowserProductsLabel(), new Constraints(new Leading(229, 60, 10, 10), new Leading(14, 24, 12, 12)));
+			jPanel2.add(getBrowserCCYLabel(), new Constraints(new Leading(229, 12, 12), new Leading(50, 12, 12)));
+			jPanel2.add(getBrowserProductsCombobox(), new Constraints(new Leading(297, 113, 10, 10), new Leading(12, 12, 12)));
+			jPanel2.add(getLoadButton(), new Constraints(new Leading(16, 12, 12), new Leading(321, 10, 10)));
+			jPanel2.add(getBrowserRoleLabel(), new Constraints(new Leading(19, 52, 12, 12), new Leading(46, 23, 12, 12)));
+			jPanel2.add(getBrowserPartyLabel(), new Constraints(new Leading(19, 43, 12, 12), new Leading(82, 25, 12, 12)));
+			jPanel2.add(getJScrollPane2(), new Constraints(new Leading(16, 746, 10, 10), new Leading(129, 166, 10, 10)));
+			jPanel2.add(getBrowserSdiIdTextField(), new Constraints(new Leading(86, 30, 10, 10), new Leading(12, 12, 12)));
+			jPanel2.add(getBrowserCCYComboBox(), new Constraints(new Leading(297, 70, 10, 10), new Leading(47, 12, 12)));
+			jPanel2.add(getBrowserPartyTextField(), new Constraints(new Leading(85, 98, 12, 12), new Leading(83, 18, 12, 12)));
+			jPanel2.add(getBrowserPartyButton(), new Constraints(new Leading(197, 29, 10, 10), new Leading(83, 20, 12, 12)));
+		}
+		return jPanel2;
+	}
+
+	private JComboBox getBrowserProductsCombobox() {
+		
+		if (browserProductsCombobox == null) {
+				
+			browserProductsCombobox = new JComboBox();
+			browserProductsCombobox.setDoubleBuffered(false);
+			browserProductsCombobox.setBorder(null);
+			
+			processComboBox(browserProductVal, "ProductList");
+			browserProductsCombobox.setModel(browserProductVal);
+			
+
+		}
+		
+		return browserProductsCombobox;
+	}
+
+	private JLabel getBrowserCCYLabel() {
+		if (browserCCYLabel == null) {
+			browserCCYLabel = new JLabel();
+			browserCCYLabel.setText("CCY");
+		}
+		return browserCCYLabel;
+	}
+
+	private JLabel getBrowserProductsLabel() {
+		if (browserProductsLabel == null) {
+			browserProductsLabel = new JLabel();
+			browserProductsLabel.setText("Products");
+		}
+		return browserProductsLabel;
+	}
+
+	private JComboBox getBrowserRoleCombobox() {
+		
+		if (browserRoleCombobox == null) {
+	
+			browserRoleCombobox = new JComboBox();
+			browserRoleCombobox.setDoubleBuffered(false);
+			browserRoleCombobox.setBorder(null);
+			
+			processComboBox(browserRoleVal, "RoleList");
+			browserRoleCombobox.setModel(browserRoleVal);
+				
+		}
+
+		return browserRoleCombobox;
+		
+	}
+
+	private JTextField getBrowserSdiIdTextField() {
+		if (browserSdiIdTextField == null) {
+			browserSdiIdTextField = new JTextField();
+			browserSdiIdTextField.setText("");
+		}
+		return browserSdiIdTextField;
+	}
+
+	private JLabel getBrowserPartyLabel() {
+		if (browserPartyLabel == null) {
+			browserPartyLabel = new JLabel();
+			browserPartyLabel.setText("Party");
+		}
+		return browserPartyLabel;
+	}
+
+	private JLabel getBrowserRoleLabel() {
+		if (browserRoleLabel == null) {
+			browserRoleLabel = new JLabel();
+			browserRoleLabel.setText("Role");
+		}
+		return browserRoleLabel;
+	}
+
+	private JLabel getSdiLabel() {
+		if (sdiLabel == null) {
+			sdiLabel = new JLabel();
+			sdiLabel.setText("SDI Id");
+		}
+		return sdiLabel;
+	}
+
+	private JButton getDeleteButton() {
+		if (deleteButton == null) {
+			deleteButton = new JButton();
+			deleteButton.setText("Delete");
+		}
+		
+		deleteButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+				boolean isValid = validateData();
+
+				if (isValid) {
+
+					Sdi sdi = new Sdi();
+					
+					sdi.setRole(roleComboBox.getSelectedItem().toString()); 
+					sdi.setCpId(leID);  			
+					sdi.setPoId(poID); 
+					sdi.setLeContacts(contactComboBox.getSelectedItem().toString()); 	
+					sdi.setCurrency(CurrencyComboBox.getSelectedItem().toString());
+					sdi.setPayrec(payReceiveComboBox.getSelectedItem().toString());
+					sdi.setMessageType(methodComboBox.getSelectedItem().toString()); 
+					sdi.setCash(cashSecurityComboBox.getSelectedItem().toString()); 
+					sdi.setProducts(productsComboBox.getSelectedItem().toString()); 
+					//sdi.setcodeTextField.getText().equals("")
+					sdi.setAgentContacts(agentContactComboBox.getSelectedItem().toString());
+					sdi.setAttributes(getAttributeValue());
+					
+					if ( roleComboBox.getSelectedItem().toString().equals("PO") ) {
+						
+						sdi.setAccountID(accountId);
+					
+					} 
+					
+					String key = sdi.getAgentId()+"/"+sdi.getsdiformat() +"/"+sdi.getProducts()+"/"+sdi.getCpId()+"/"+sdi.getPoId()+"/"+sdi.getCurrency();
+					sdi.setkey(key);
+					sdi.setId(Integer.parseInt(sdiIdTextField.getText().toString()));
+					
+					
+					try {
+						
+						remoteBORef.removeSDI(sdi);
+												
+												
+					} catch (Exception e){
+						
+						 commonUTIL.displayError("SDIWindow", "Update " , e);
+						 commonUTIL.showAlertMessage("SDI not deleted");
+						   
+					}
+					
+					 commonUTIL.showAlertMessage("SDI deleted");
+					 clearData();
+				} 
+
+			}
+
+		});
+		
+		return deleteButton;
+	}
+
+	private JButton getSaveButton() {
+		if (saveButton == null) {
+			saveButton = new JButton();
+			saveButton.setText("Save");
+		}
+		
+		saveButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+				boolean isValid = validateData();
+
+				if (isValid) {
+
+					Sdi sdi = new Sdi();
+					
+					 if( poID == -1) 
+						   poID =0;
+					 
+					sdi.setRole(roleComboBox.getSelectedItem().toString()); 
+					sdi.setCpId(leID);  			
+					sdi.setPoId(poID); 
+					sdi.setAgentId(agentID);
+					sdi.setLeContacts(contactComboBox.getSelectedItem().toString()); 	
+					sdi.setCurrency(CurrencyComboBox.getSelectedItem().toString());
+					sdi.setPayrec(payReceiveComboBox.getSelectedItem().toString());
+					sdi.setMessageType(methodComboBox.getSelectedItem().toString()); 
+					sdi.setCash(cashSecurityComboBox.getSelectedItem().toString()); 
+					sdi.setProducts(productsComboBox.getSelectedItem().toString()); 
+					//sdi.setcodeTextField.getText().equals("")
+					sdi.setAgentContacts(agentContactComboBox.getSelectedItem().toString());
+					sdi.setAttributes(getAttributeValue());
+					sdi.setsdiformat(acTextField.getText().toString().trim());
+					
+					if ( roleComboBox.getSelectedItem().toString().equals("PO") ) {
+						
+						sdi.setAccountID(accountId);
+					
+					} 
+					
+					String key = sdi.getAgentId()+"/"+sdi.getsdiformat() +"/"+sdi.getProducts()+"/"+sdi.getCpId()+"/"+sdi.getPoId()+"/"+sdi.getCurrency();
+					sdi.setkey(key);
+					sdi.setId(Integer.parseInt(sdiIdTextField.getText().toString()));
+					
+					try {
+						
+						sdi =	(Sdi) remoteBORef.saveSDI(sdi);
+						poID = sdi.getPoId();
+						
+						if (sdi != null) {
+							
+							commonUTIL.showAlertMessage("SDI updated with id " + sdi.getId() );
+						
+						} else {
+							
+							commonUTIL.showAlertMessage("SDI not updated" );
+							
+						}
+					    
+						
+					} catch (Exception e){
+						
+						 commonUTIL.displayError("SDIWindow", "Update " , e);
+						 commonUTIL.showAlertMessage("SDI not updated");
+						   
+					}
+					
+				} 
+
+			}
+
+		});
+		
+		return saveButton;
+	}
+
+	private JButton getSaveAsNewButton() {
+		if (saveAsNewButton == null) {
+			saveAsNewButton = new JButton();
+			saveAsNewButton.setText("Save As New");
+		}
+		
+		saveAsNewButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+				boolean isValid = validateData();
+
+				if (isValid) {
+
+					Sdi sdi = new Sdi();
+					
+					 if( poID == -1) 
+						   poID =0;
+					 
+					sdi.setRole(roleComboBox.getSelectedItem().toString()); 
+					sdi.setCpId(leID);  			
+					sdi.setPoId(poID); 
+					sdi.setAgentId(agentID);
+					sdi.setLeContacts(contactComboBox.getSelectedItem().toString()); 	
+					sdi.setCurrency(CurrencyComboBox.getSelectedItem().toString());
+					sdi.setPayrec(payReceiveComboBox.getSelectedItem().toString());
+					sdi.setMessageType(methodComboBox.getSelectedItem().toString()); 
+					sdi.setCash(cashSecurityComboBox.getSelectedItem().toString()); 
+					sdi.setProducts(productsComboBox.getSelectedItem().toString()); 
+					sdi.setAgentContacts(agentContactComboBox.getSelectedItem().toString());
+					sdi.setAttributes(getAttributeValue());
+					sdi.setsdiformat(acTextField.getText().toString().trim());
+					
+					if ( roleComboBox.getSelectedItem().toString().equals("PO") ) {
+						
+						sdi.setAccountID(accountId);
+					
+					} 
+					
+					String key = sdi.getAgentId()+"/"+sdi.getsdiformat() +"/"+sdi.getProducts()+"/"+sdi.getCpId()+"/"+sdi.getPoId()+"/"+sdi.getCurrency();
+					sdi.setkey(key);
+					sdi.setId(0);
+					
+					try {
+
+						if(!remoteBORef.checkSDIKey(sdi)) {
+							
+							sdi =	(Sdi) remoteBORef.saveSDI(sdi);	
+						
+							sdiIdTextField.setText(new Integer(sdi.getId()).toString());
+							
+							
+							if (sdi.getId() > 0) {
+								
+								commonUTIL.showAlertMessage("SDi save with id " + sdi.getId() );
+							
+							} else {
+								
+								commonUTIL.showAlertMessage("SDI not saved" );
+								
+							}
+							
+						} else {
+							
+							commonUTIL.showAlertMessage("SDI already exists" );
+							
+						}
+					
+					} catch (RemoteException e) {
+					
+					   commonUTIL.displayError("SDIWindow", "Save " , e);
+					   commonUTIL.showAlertMessage("SDI not saved");
+					   
+					}
+
+				}
+			}
+		});
+		
+		return saveAsNewButton;
+	}
+
+	private JButton getNewButton() {
+		if (newButton == null) {
+			newButton = new JButton();
+			newButton.setText("New");
+		}
+		return newButton;
+	}
+
+	private JTabbedPane getJTabbedPane1() {
+		if (jTabbedPane1 == null) {
+			jTabbedPane1 = new JTabbedPane();
+			jTabbedPane1.addTab("Agent Info", getJPanel1());
+		}
+		return jTabbedPane1;
+	}
+
+	private JPanel getJPanel1() {
+		if (jPanel1 == null) {
+			jPanel1 = new JPanel();
+			jPanel1.setLayout(new GroupLayout());
+			jPanel1.add(getCodeLabel(), new Constraints(new Leading(12, 73, 10, 10), new Leading(10, 10, 10)));
+			jPanel1.add(getAgentContactLabel(), new Constraints(new Leading(12, 12, 12), new Leading(53, 12, 12)));
+			jPanel1.add(getCodeTextField(), new Constraints(new Leading(80, 118, 12, 12), new Leading(8, 12, 12)));
+			jPanel1.add(getCodeButton(), new Constraints(new Leading(218, 29, 10, 10), new Leading(8, 20, 12, 12)));
+			jPanel1.add(getAcLabel(), new Constraints(new Leading(270, 10, 10), new Leading(10, 12, 12)));
+			jPanel1.add(getACTextField(), new Constraints(new Leading(323, 92, 10, 10), new Leading(8, 12, 12)));
+			jPanel1.add(getGLButton(), new Constraints(new Leading(455, 29, 10, 10), new Leading(49, 20, 12, 12)));
+			jPanel1.add(getGLTextField(), new Constraints(new Leading(323, 118, 12, 12), new Leading(51, 12, 12)));
+			jPanel1.add(getAgentContactComboBox(), new Constraints(new Leading(80, 119, 12, 12), new Leading(47, 22, 12, 12)));
+			jPanel1.add(getGLLabel(), new Constraints(new Leading(271, 12, 12), new Leading(53, 12, 12)));
+		}
+		return jPanel1;
+	}
+
+	private JLabel getGLLabel() {
+		if (glLabel == null) {
+			glLabel = new JLabel();
+			glLabel.setText("GL");
+		}
+		return glLabel;
+	}
+
+	private JComboBox getAgentContactComboBox() {
+		
+		if (agentContactComboBox == null) {
+			
+			agentContactComboBox = new JComboBox();
+			agentContactComboBox.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+			agentContactComboBox.setDoubleBuffered(false);
+			agentContactComboBox.setBorder(null);
+			
+			processComboBox(agentContactVal, "ContactList");
+			agentContactComboBox.setModel(agentContactVal);
+		}
+		
+		return agentContactComboBox;
+	}
+
+	private JTextField getGLTextField() {
+		if (glTextField == null) {
+			glTextField = new JTextField();
+			glTextField.setText("");
+		}
+		return glTextField;
+	}
+
+	private JButton getGLButton() {
+		if (glButton == null) {
+			glButton = new JButton();
+			glButton.setText("glButton");
+		}
+		
+		glButton.addActionListener(new java.awt.event.ActionListener() {
+	        public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+	        	showGLAccount.setVisible(true);
+	        	
+	        }
+	    }); 
+		
+		return glButton;
+	}
+
+	private JTextField getACTextField() {
+		
+		if (acTextField == null) {
+			acTextField = new JTextField();
+		}
+		return acTextField;
+	}
+
+	private JLabel getAcLabel() {
+		if (acLabel == null) {
+			acLabel = new JLabel();
+			acLabel.setText("AC");
+		}
+		return acLabel;
+	}
+
+	private JButton getCodeButton() {
+		
+		if (codeButton == null) {
+			
+			codeButton = new JButton();
+			codeButton.setText("codeButton");
+			
+		}
+		
+		codeButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	
             	showAgent.setVisible(true);
             	
             }
         }); 
-        showAgent.jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+		 
+		return codeButton;
+	}
 
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				int id  = ((Integer)	showAgent.jTable1.getValueAt(showAgent.jTable1.getSelectedRow(),0)).intValue();
+	private JTextField getCodeTextField() {
+		
+		if (codeTextField == null) {
+			codeTextField = new JTextField();
+		}
+		return codeTextField;
+	}
+
+	private JLabel getAgentContactLabel() {
+		
+		if (agentContactLabel == null) {
+			agentContactLabel = new JLabel();
+			agentContactLabel.setText("Contact");
+		}
+		return agentContactLabel;
+	}
+
+	private JLabel getCodeLabel() {
+		
+		if (codeLabel == null) {
+			codeLabel = new JLabel();
+			codeLabel.setText("Code");
+		}
+		return codeLabel;
+	}
+
+	private JButton getLeButton() {
+		
+		if (leButton == null) {
+			leButton = new JButton();
+			leButton.setText("leButton");
+		}
+		
+		leButton.addActionListener(new java.awt.event.ActionListener() {
+	        public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+	        	showLE.setVisible(true);
+	        	
+	        }
+	    }); 
+				
+		return leButton;
+	}
+	
+	
+	private JButton getPoButton() {
+		
+		if (poButton == null) {
+			poButton = new JButton();
+			poButton.setText("poButton");
 			
-				 String ss = (String)	showAgent.jTable1.getValueAt(showAgent.jTable1.getSelectedRow(),1);
-				 jTextField11.setText(ss);
-				 agentID = id;
-				 showAgent.dispose();
+			poButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent evt) {        
+		            	
+					showPO.setVisible(true);
+		            	
+		        }
+		    }); 
+			 
+		}
+		return poButton;
+	}
+
+	private JLabel getProductsLabel() {
+		if (productsLabel == null) {
+			productsLabel = new JLabel();
+			productsLabel.setText("Products");
+		}
+		return productsLabel;
+	}
+
+	private JComboBox getProductsComboBox() {
+		
+		if (productsComboBox == null) {
+			
+			productsComboBox = new JComboBox();
+			//productsComboBox.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+			productsComboBox.setDoubleBuffered(false);
+			productsComboBox.setBorder(null);
+			
+			processComboBox(productVal, "ProductList");
+			productsComboBox.setModel(productVal);
+		
+		}
+		
+		return productsComboBox;
+		
+	}
+
+	private JLabel getCashSecurityLabel() {
+		
+		if (cashSecurityLabel == null) {
+			
+			cashSecurityLabel = new JLabel();
+			cashSecurityLabel.setText("Cash/ Security");
+			
+		}
+		
+		return cashSecurityLabel;
+		
+	}
+
+	private JComboBox getCashSecurityComboBox() {
+		
+		if (cashSecurityComboBox == null) {
+			
+			cashSecurityComboBox = new JComboBox();
+			cashSecurityComboBox.setDoubleBuffered(false);
+			cashSecurityComboBox.setBorder(null);
+			
+			cashMethod.insertElementAt("BOTH", 0);
+	        cashMethod.insertElementAt("CASH", 1);
+	        cashMethod.insertElementAt("SECURITY", 2);
+	        cashMethod.setSelectedItem(0);
+	
+	        cashSecurityComboBox.setModel(cashMethod);
+	        cashSecurityComboBox.setSelectedIndex(0);
+		}
+		
+		return cashSecurityComboBox;
+	}
+
+	private JComboBox getPayReceiveComboBox() {
+		
+		if (payReceiveComboBox == null) {
+			
+			payReceiveComboBox = new JComboBox();
+			//payReceiveComboBox.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+			payReceiveComboBox.setDoubleBuffered(false);
+			payReceiveComboBox.setBorder(null);
+			
+			payRec.insertElementAt("PAY", 0);
+	        payRec.insertElementAt("REC", 1);
+	        payRec.insertElementAt("BOTH", 1);
+	        
+	        payReceiveComboBox.setModel(payRec);
+		
+		}
+		
+		return payReceiveComboBox;
+	}
+
+	private JComboBox getMethodComboBox() {
+		
+		if (methodComboBox == null) {
+			
+			methodComboBox = new JComboBox();
+			//methodComboBox.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+			methodComboBox.setDoubleBuffered(false);
+			methodComboBox.setBorder(null);
+			
+			processComboBox(method, "MethodList");
+			methodComboBox.setModel(method);
+			
+		}
+		
+		return methodComboBox;
+	}
+
+	private JLabel getPay() {
+		if (Pay == null) {
+			
+			Pay = new JLabel();
+			Pay.setText("Pay/ Receive");
+			
+		}
+		return Pay;
+	}
+
+	private JLabel getMethodLabel() {
+		if (methodLabel == null) {
+			
+			methodLabel = new JLabel();
+			methodLabel.setText("Method");
+			
+		}
+		return methodLabel;
+	}
+
+	private JLabel getJLabel6() {
+		if (jLabel6 == null) {
+			
+			jLabel6 = new JLabel();
+			
+		}
+		return jLabel6;
+	}
+
+	private JLabel getCurrencyLabel() {
+		
+		if (currencyLabel == null) {
+			
+			currencyLabel = new JLabel();
+			currencyLabel.setText("Currency");
+			
+		}
+		
+		return currencyLabel;
+	}
+
+	private JComboBox getCurrencyComboBox() {
+		
+		if (CurrencyComboBox == null) {
+			
+			CurrencyComboBox = new JComboBox();
+			//CurrencyComboBox.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+			CurrencyComboBox.setDoubleBuffered(false);
+			CurrencyComboBox.setBorder(null);
+			
+			processComboBox(currencyVal, "CurrencyList");
+			CurrencyComboBox.setModel(currencyVal);
+			
+		}
+		
+		return CurrencyComboBox;
+		
+	}
+
+	private JComboBox getContactComboBox() {
+		
+		if (contactComboBox == null) {
+			
+			contactComboBox = new JComboBox();
+			//contactComboBox.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+			contactComboBox.setDoubleBuffered(false);
+			contactComboBox.setBorder(null);
+			
+			processComboBox(contactVal, "ContactList");
+			contactComboBox.setModel(contactVal);
+			
+		}
+		
+		return contactComboBox;
+		
+	}
+
+	private JTextField getSdiIdTextField() {
+		
+		if (sdiIdTextField == null) {
+			
+			sdiIdTextField = new JTextField();
+			sdiIdTextField.setText("0");
+			sdiIdTextField.setEditable(false);
+			
+		}
+		
+		return sdiIdTextField;
+	}
+
+	private JComboBox getRoleComboBox() {
+		
+		if (roleComboBox == null) {
+			
+			roleComboBox = new JComboBox();
+			//roleComboBox.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+			roleComboBox.setDoubleBuffered(false);
+			roleComboBox.setBorder(null);
+			
+			processComboBox(roleVal, "RoleList");
+			roleComboBox.setModel(roleVal);
+			
+			roleComboBox.addItemListener( new ItemListener() {
+
+	        	@Override
+	        	public void itemStateChanged(ItemEvent e) {
+	        	
+	        		for(int i=0;i<tradertablemodel.getRowCount();i++) {
+	        			
+	        			tradertablemodel.removeRow(i);
+	        			
+	        		}
+	        		//showLE.clearRolesTables();
+	        	
+	        		String role = roleComboBox.getSelectedItem().toString();
+	        		getLEDataCombo1(tradertablemodel,role);
+	        		
+	        		if (!leTextField.getText().toString().equals("")) {
+	        			
+	        			leTextField.setText("");
+	        			
+	        		}
+	        		
+	        		setLE(role);
+	        		
+	        		if(role.equalsIgnoreCase("PO")) {
+	        		
+	        			 poTextField.setEnabled(false);
+	        			 poButton.setEnabled(false);
+	        			 poID = -1;
+	        			 
+	        		 } else {
+	        			 
+	        			 poTextField.setEnabled(true);
+	        			 poButton.setEnabled(true);
+	        			 poID =0;
+	        			 
+	        		 }
+	        		
+	        	}
+	        	   
+	         });
+		}
+		
+		return roleComboBox;
+	}
+
+	private JTextField getPoTextField() {
+		
+		if (poTextField == null) {
+			
+			poTextField = new JTextField();
+			poTextField.setText("");
+			
+		}
+		
+		return poTextField;
+	}
+
+	private JTextField getLeTextField() {
+		
+		if (leTextField == null) {
+			
+			leTextField = new JTextField();
+			leTextField.setText("");
+			
+		}
+		
+		return leTextField;
+	}
+
+	private JTabbedPane getJTabbedPane0() {
+		if (jTabbedPane0 == null) {
+			jTabbedPane0 = new JTabbedPane();
+			jTabbedPane0.addTab("SDI Main", getJPanel0());
+			jTabbedPane0.addTab("SDI Browser", getJPanel2());
+		}
+		return jTabbedPane0;
+	}
+
+	private JPanel getJPanel0() {
+		if (jPanel0 == null) {
+			jPanel0 = new JPanel();
+			jPanel0.setLayout(new GroupLayout());
+			jPanel0.add(getLeTextField(), new Constraints(new Leading(94, 129, 10, 10), new Leading(83, 21, 12, 12)));
+			jPanel0.add(getPoLabel(), new Constraints(new Leading(6, 12, 12), new Leading(125, 12, 12)));
+			jPanel0.add(getPoTextField(), new Constraints(new Leading(94, 128, 12, 12), new Leading(117, 22, 10, 10)));
+			jPanel0.add(getRoleComboBox(), new Constraints(new Leading(94, 128, 12, 12), new Leading(49, 22, 12, 12)));
+			jPanel0.add(getRoleLabel(), new Constraints(new Leading(6, 53, 12, 12), new Leading(55, 21, 12, 12)));
+			jPanel0.add(getLeLabel(), new Constraints(new Leading(6, 76, 12, 12), new Leading(88, 19, 12, 12)));
+			jPanel0.add(getContactComboBox(), new Constraints(new Leading(94, 119, 10, 10), new Leading(153, 22, 12, 12)));
+			jPanel0.add(getContactLabel(), new Constraints(new Leading(6, 12, 12), new Leading(159, 12, 12)));
+			jPanel0.add(getSdiIdTextField(), new Constraints(new Leading(94, 71, 12, 12), new Leading(16, 12, 12)));
+			jPanel0.add(getSdiIdLabel(), new Constraints(new Leading(6, 65, 12, 12), new Leading(21, 12, 12)));
+			jPanel0.add(getJLabel6(), new Constraints(new Leading(264, 86, 10, 10), new Leading(57, 12, 12)));
+			jPanel0.add(getPoButton(), new Constraints(new Leading(231, 29, 10, 10), new Leading(119, 20, 12, 12)));
+			jPanel0.add(getLeButton(), new Constraints(new Leading(229, 29, 12, 12), new Leading(84, 20, 12, 12)));
+			jPanel0.add(getPay(), new Constraints(new Leading(278, 73, 12, 12), new Leading(55, 12, 12)));
+			jPanel0.add(getCurrencyComboBox(), new Constraints(new Leading(375, 106, 10, 10), new Leading(14, 20, 12, 12)));
+			jPanel0.add(getPayReceiveComboBox(), new Constraints(new Leading(375, 106, 12, 12), new Leading(46, 22, 12, 12)));
+			jPanel0.add(getMethodComboBox(), new Constraints(new Leading(377, 106, 12, 12), new Leading(80, 21, 12, 12)));
+			jPanel0.add(getCashSecurityComboBox(), new Constraints(new Leading(377, 107, 12, 12), new Leading(116, 21, 12, 12)));
+			jPanel0.add(getCurrencyLabel(), new Constraints(new Leading(278, 81, 12, 12), new Leading(21, 12, 12)));
+			jPanel0.add(getMethodLabel(), new Constraints(new Leading(279, 72, 12, 12), new Leading(86, 12, 12)));
+			jPanel0.add(getCashSecurityLabel(), new Constraints(new Leading(281, 90, 12, 12), new Leading(120, 12, 12)));
+			jPanel0.add(getProductsLabel(), new Constraints(new Leading(278, 86, 12, 12), new Leading(157, 12, 12)));
+			jPanel0.add(getJTabbedPane1(), new Constraints(new Bilateral(8, 12, 5), new Leading(197, 116, 10, 10)));
+			jPanel0.add(getNewButton(), new Constraints(new Leading(60, 95, 10, 10), new Leading(327, 22, 12, 12)));
+			jPanel0.add(getSaveAsNewButton(), new Constraints(new Leading(194, 119, 10, 10), new Leading(327, 22, 12, 12)));
+			jPanel0.add(getSaveButton(), new Constraints(new Leading(344, 96, 10, 10), new Leading(327, 22, 12, 12)));
+			jPanel0.add(getDeleteButton(), new Constraints(new Leading(472, 98, 10, 10), new Leading(327, 22, 12, 12)));
+			jPanel0.add(getProductsComboBox(), new Constraints(new Leading(379, 107, 12, 12), new Leading(151, 19, 10, 10)));
+			jPanel0.add(getJScrollPane0(), new Constraints(new Leading(507, 264, 10, 10), new Leading(18, 150, 10, 10)));
+		}
+		return jPanel0;
+	}
+
+	private JLabel getContactLabel() {
+		if (contactLabel == null) {
+			contactLabel = new JLabel();
+			contactLabel.setText("Contact");
+		}
+		return contactLabel;
+	}
+
+	private JLabel getPoLabel() {
+		if (poLabel == null) {
+			poLabel = new JLabel();
+			poLabel.setText("Pro Org.");
+		}
+		return poLabel;
+	}
+
+	private JLabel getLeLabel() {
+		if (leLabel == null) {
+			leLabel = new JLabel();
+			leLabel.setText("Legal Entity");
+		}
+		return leLabel;
+	}
+
+	private JLabel getRoleLabel() {
+		if (roleLabel == null) {
+			roleLabel = new JLabel();
+			roleLabel.setText("Role");
+		}
+		return roleLabel;
+	}
+
+	private JLabel getSdiIdLabel() {
+		if (sdiIdLabel == null) {
+			sdiIdLabel = new JLabel();
+			sdiIdLabel.setText("SDI Id");
+		}
+		return sdiIdLabel;
+	}
+	
+	private void processComboBox(javax.swing.DefaultComboBoxModel combodata, String criteria) {
+		
+		if (criteria.equals("RoleList")) {
+			
+			for (int i = 0; i < roleVec.size(); i++) {
+
+				StartUPData roles = (StartUPData) roleVec.get(i);
+
+				combodata.insertElementAt(roles.getName(), i);
+				
 			}
 			
-    
-    	
-    });   
-        showLE.jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				int id  = ((Integer)	showLE.jTable1.getValueAt(showLE.jTable1.getSelectedRow(),0)).intValue();
+		} else if (criteria.equals("CurrencyList")) {
 			
-				 String ss = (String)	showLE.jTable1.getValueAt(showLE.jTable1.getSelectedRow(),1);
-				 jTextField3.setText(ss);
-				 leID = id;
-				 showLE.dispose();
+			for (int i = 0; i < currencyVec.size(); i++) {
+
+				StartUPData currency = (StartUPData) currencyVec.get(i);
+
+				combodata.insertElementAt(currency.getName(), i);
+				
 			}
 			
-    
-    	
-    });   
-        
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel14)
-                    .addComponent(jLabel12))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel13)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel15)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField14, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(384, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel12)
-                    .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton7)
-                    .addComponent(jLabel13)
-                    .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel14)
-                    .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel15)
-                    .addComponent(jTextField14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(52, Short.MAX_VALUE))
-        );
+		} else if (criteria.equals("ProductList")) {
+			
+			for (int i = 0; i < productVec.size(); i++) {
 
-        jTabbedPane1.addTab("Agent Info", jPanel1);
+				StartUPData product = (StartUPData) productVec.get(i);
 
-        deleteButton.setText("DELETE");
-        deleteButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
-            }
-        });
+				combodata.insertElementAt(product.getName(), i);
+				
+			}
+			
+		} else if (criteria.equals("ContactList")) {
+			
+			for (int i = 0; i < contactVec.size(); i++) {
 
-        saveButton.setText("SAVE");
-        saveButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	int id =0;
-            	String ss = jTextField1.getText().trim();
-            	if(commonUTIL.isNumeric(ss)) {
-            		id = new Integer(ss).intValue();
-            		  save(id);
-            	}
-               
-            }
-        });
+				StartUPData contact = (StartUPData) contactVec.get(i);
 
-        saveAsNewButton.setText("SAVE AS NEW");
-        saveAsNewButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	
-            	 save(0);
-            }
-        });
+				combodata.insertElementAt(contact.getName(), i);
+				
+			}
+			
+		}  else if (criteria.equals("MethodList")) {
+			
+			for (int i = 0; i < sdiMethodVec.size(); i++) {
 
-        newButton.setText("NEW");
-        newButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
+				StartUPData sdiMethod = (StartUPData) sdiMethodVec.get(i);
 
-        jButton8.setText("...");
-        jButton8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton8ActionPerformed(evt);
-            }
-        });
-        String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
-        
-        attributeModel = new DefaultTableModel(attributeColumnName,0);
-        processTableData(attributeModel);
-       jTable1.setModel(attributeModel);
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addComponent(jLabel1)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(6, 6, 6)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(partyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                                .addGap(1, 1, 1)
-                                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(10, 10, 10)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jTextField7)
-                            .addComponent(jTextField8)
-                            .addComponent(jTextField9, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(22, 22, 22))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 793, Short.MAX_VALUE)
-                        .addGap(10, 10, 10))))
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(109, 109, 109)
-                .addComponent(newButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(saveAsNewButton)
-                .addGap(1, 1, 1)
-                .addComponent(saveButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(deleteButton)
-                .addContainerGap(399, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(11, 11, 11)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton1))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel5)
-                            .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel7))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel8))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jButton8)
-                                    .addComponent(jTextField9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel9))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel10)
-                                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(partyButton)))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel11)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(saveAsNewButton)
-                    .addComponent(saveButton)
-                    .addComponent(deleteButton)
-                    .addComponent(newButton))
-                .addGap(85, 85, 85))
-        );
+				combodata.insertElementAt(sdiMethod.getName(), i);
+				
+			}
+			
+		} else if (criteria.equals("LegalEntity")) {
+			
+			for (int i = 0; i < legalEntitys.size(); i++) {
 
-        jTabbedPane2.addTab("SDIMain", jPanel2);
-        browseTab = new SDITab1( remoteBORef ,roles);
-        browseTab.setSdi1w(this);
-       // browseTab.setInitC( currencyList, remoteBORef,productTypeCombox );
-        jTabbedPane2.addTab("Browse", browseTab);
+				LegalEntity le = (LegalEntity) legalEntitys.get(i);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jTabbedPane2)
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 420, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-    }// </editor-fold>
-
-private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
-// TODO add your handling code here:
-	newEvent();
-}
-
-private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {
-// TODO add your handling code here:
-}
-
-private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {
-// TODO add your handling code here:
-}
-
-private void partyButtonActionPerformed(java.awt.event.ActionEvent evt) {
-// TODO add your handling code here:
-}
-
-private void jTextField4ActionPerformed(java.awt.event.ActionEvent evt) {
-// TODO add your handling code here:
-}
-
-private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
-// TODO add your handling code here:
-}
-
-private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {
-// TODO add your handling code here:
-}
-
-private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {
-// TODO add your handling code here:
-}
-
-private void jTextField9ActionPerformed(java.awt.event.ActionEvent evt) {
-// TODO add your handling code here:
-}
-
-private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {
-// TODO add your handling code here:
-}
-
-private void jTextField11ActionPerformed(java.awt.event.ActionEvent evt) {
-// TODO add your handling code here:
-}
-
-private void processTableData(DefaultTableModel model) {
-	// TODO Auto-generated method stub
-	Vector vector;
-	try {
+				combodata.insertElementAt(le.getName(), i);
+				
+			}
+			
+		}
+		
+	}
+	
+	private void getLEDataCombo1(DefaultTableModel model,String leRole) {
+		
+		Vector vector;
+		
+		try {
+			
+			vector = (Vector) remoteBORef.selectLEonWhereClause(" role like '%"+leRole + "%'");
+			Iterator it = vector.iterator();
+	    	int i =0;
+	    	
+	    	while(it.hasNext()) {
+	    		
+	    		LegalEntity le =	(LegalEntity) it.next();
+	    		model.insertRow(i, new Object[]{le.getId(),le.getName()});
+	    		i++;
+	    	
+	    	}	
+		
+		} catch (RemoteException e) {
+		
+			//commonUTIL.displayError("JFrameReportApplicatoin","getLEDataCombo1", e);
+		
+		}
+		
+		
+	}
+	
+	private void getGLDataCombo(DefaultTableModel model) {
+		
+		Vector vector;
+		
+		try {
+			
+			vector = (Vector) remoteAccount.getAllAccounts();
+			Iterator it = vector.iterator();
+	    	int i =0;
+	    	
+	    	while(it.hasNext()) {
+	    		
+	    		Account account =	(Account) it.next();
+	    		model.insertRow(i, new Object[]{account.getId(),account.getAccountName()});
+	    		i++;
+	    	
+	    	}	
+		
+		} catch (RemoteException e) {
+		
+			//commonUTIL.displayError("JFrameReportApplicatoin","getLEDataCombo1", e);
+			
+		}
+				
+	}
+	
+	private boolean validateData(){
+		
+		boolean isValid = true;
+		
+		if((roleComboBox.getSelectedItem() == null) ) {
+			
+			commonUTIL.showAlertMessage("Please select Role");
+			return false;
+		
+		} 
+		
+		if (leTextField.getText().equals("") ) {
+			
+			commonUTIL.showAlertMessage("Please select Legal Entity");
+			return false;
+			
+		} 
+		
+		if (!roleComboBox.getSelectedItem().equals("PO") && poTextField.getText().equals("") ) {
+			
+			commonUTIL.showAlertMessage("Please select Processing Organization");
+			return false;
+			
+		} 
+		
+		if (contactComboBox.getSelectedItem() == null) {
+			
+			commonUTIL.showAlertMessage("Please select Contact");
+			return false;
+			
+		} 
+		
+		if (CurrencyComboBox.getSelectedItem() == null ) {
+			
+			commonUTIL.showAlertMessage("Please select Currency");
+			return false;
+			
+		} 
+		
+		if (payReceiveComboBox.getSelectedItem() == null) {
+			
+			commonUTIL.showAlertMessage("Please select Pay/ Receive");
+			return false;
+			
+		} 
+		
+		if (methodComboBox.getSelectedItem() == null) {
+			
+			commonUTIL.showAlertMessage("Please select Method");
+			return false;
+			
+		} 
+		
+		if (cashSecurityComboBox.getSelectedItem() == null) {
+			
+			commonUTIL.showAlertMessage("Please select Cash/ Security");
+			return false;
+			
+		} 
+		
+		if (productsComboBox.getSelectedItem() == null) {
+			
+			commonUTIL.showAlertMessage("Please select a Product");
+			return false;
+			
+		} 
+		
+		if (codeTextField.getText().equals("")) {
+			
+			commonUTIL.showAlertMessage("Please select a Code");
+			return false;
+			
+		} 
+		
+		if (agentContactComboBox.getSelectedItem() == null) {
+			
+			commonUTIL.showAlertMessage("Please select a Contact for an Agent");
+			return false;
+			
+		} 
+		
+		if (roleComboBox.getSelectedItem().toString().equals("PO") && glTextField.getText().equals("")) {
+			
+			commonUTIL.showAlertMessage("Please select a GL Account");
+			return false;
+			
+		}
+		
+		return isValid;
+	}
+	
+	private String getAttributeValue() {
+		
+		String attributesV  = "";
+		
+		for(int i=0;i<  jTable1.getRowCount();i++ ) {
+			
+			String attributename = ((String)  jTable1.getValueAt(i, 0)).trim();
+			String attributeValue = ((String)  jTable1.getValueAt(i, 1)).trim();
+			
+			if(attributeValue != null && attributeValue.length() > 0)
+				attributesV = attributesV.trim() + attributename+ "=" + attributeValue + ";";
+			
+		}
+		
+		if(attributesV.trim().length() > 0)
+		return attributesV.substring(0, attributesV.length()-1);
+		return attributesV;
+	
+	}
+	
+	private void setAttribute(String attributesV) {
+		String attributeColumnName [] =    {"Attribute Name ", "Attribute Value "};
+	    
+	    DefaultTableModel attributeModel = new DefaultTableModel(attributeColumnName,0);
+	    
+	    
+			if(attributesV != null && attributesV.length() > 0) {
+			String atttoken [] = attributesV.trim().split(";"); 
+			
+			
+			for(int i =0;i<atttoken.length;i++) {
+				String att = (String) atttoken[i];
+				
+				if(att.contains("=")) {
+				String attvalue = att.substring(att.indexOf('=')+1, att.length());
+				String attnameName = att.substring(0, att.indexOf('='));
+				attributeModel.insertRow(i, new Object[]{attnameName.trim(),attvalue.trim()});
+				}
+			}
+			jTable1.removeAll();
+			jTable1.setModel(attributeModel);
+			}
+		
+	    
+		
+	}
+	
+	private void clearData() {
+		
+		sdiIdTextField.setText("0");
+		roleComboBox.setSelectedIndex(0); 
+		leTextField.setText("");  			
+		poTextField.setText("");
+		contactComboBox.setSelectedIndex(0);
+		CurrencyComboBox.setSelectedIndex(0);
+		payReceiveComboBox.setSelectedIndex(0);
+		methodComboBox.setSelectedIndex(0);
+		cashSecurityComboBox.setSelectedIndex(0);
+		productsComboBox.setSelectedIndex(0);
+		agentContactComboBox.setSelectedIndex(0);
+		
+		
+		//sdi.setAgentContacts(agentContactComboBox.getSelectedItem().toString());
+		//sdi.setAttributes(getAttributeValue());
+	}
+	
+	
+	 public void openSDI(Sdi sdi) {
+	
+			sdi.setAttributes(getAttributeValue());
+			
+			/*if ( browserRoleCombobox.getSelectedItem().toString().equals("PO") ) {
+				
+				sdi.setAccountID(accountId);
+			
+			} */
+			
+			String key = sdi.getAgentId()+"/"+sdi.getsdiformat() +"/"+sdi.getProducts()+"/"+sdi.getCpId()+"/"+sdi.getPoId()+"/"+sdi.getCurrency();
+			sdi.setkey(key);
+			
+			String role = (String)sdi.getRole();
+						
+			sdiIdTextField.setText(new Integer(sdi.getId()).toString());
+  	   	 	roleComboBox.setSelectedItem(role);
+  	   	 	methodComboBox.setSelectedItem((String) sdi.getMessageType());
+  	   	 	agentContactComboBox.setSelectedItem((String) sdi.getAgentContacts());
+  	   	 	contactComboBox.setSelectedItem((String) sdi.getLeContacts());
+  	   	 	productsComboBox.setSelectedItem((String) sdi.getProducts());
+  	   	 	cashSecurityComboBox.setSelectedItem((String) sdi.getCash());
+  	   	 	CurrencyComboBox.setSelectedItem((String) sdi.getCurrency());
+  	   	 	payReceiveComboBox.setSelectedItem((String) sdi.getPayrec());
+  	   	 	//codeTextField.setText((String) sdi.getC
+  	   	 	acTextField.setText((String) sdi.getSdiformat());
+  	   	 	glTextField.setText(getAccountName(sdi.getAccountID()));
+  	   	 	leID = sdi.getCpId();
+     	   	poID = sdi.getPoId();
+  	   	 	agentID = sdi.getAgentId();
+  	   	 	
+  	   	 	leTextField.setText(getLEName(sdi.getCpId())); 	   	 	
+  	   	 	poTextField.setText(getLEName(sdi.getPoId()));
+  	   	 	codeTextField.setText(getLEName(sdi.getAgentId()));
+  	   	 	
+  	   	
+  	   	 	jTabbedPane0.setSelectedIndex(0);
+  	   	 	if(poID ==0) {
+  	   	 		
+  	   	 		poTextField.setEnabled(false);
+  	   	 		poButton.setEnabled(false);
+  	   	 		poID = -1; 
+  	   	 	
+  	   	 	} else {
+  	   	 		
+  	   	 		poTextField.setEnabled(true);
+  	   	 		poButton.setEnabled(true);
+  	   	 	}
+	 }
+	 
+	 
+	 private String getAccountName(int id) {
+		 
+		 String name = "";
+		 
+		 try {
+		
+			 if(id ==0)
+				   return name;
+			
+			 
+			 Account account = (Account) remoteAccount.getAccount(id);
+			 name = account.getAccountName();
+			 
+		} catch (RemoteException e) {
+			
+			e.printStackTrace();
+			
+		}
+		
+		
+		return name;
 	   
-		vector = (Vector) remoteBORef.getStartUPData("SDIAttributes");
-		Iterator it = vector.iterator();
-    	int i =0;
-    	while(it.hasNext()) {
-    		
-    		StartUPData sdiAttributes = (StartUPData) it.next();
-    	   
-    		   model.insertRow(i, new Object[]{sdiAttributes.getName(),"0"});
-    	    
-    		i++;
-    		}
-    		
-	} catch (RemoteException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-}
-
-private final void getMasterDataOnComboBox( javax.swing.DefaultComboBoxModel combodata,String name) {
-	Vector vector = null;
-	try {
-		vector = (Vector) remoteBORef.getStartUPData(name);
+	 }
+	 
+	 private String getLEName(int id) {
+		 
+		 String name = "";
+		 
+		 try {
 		
-		if(vector.size() > 0) {
-		Iterator it = vector.iterator();
-    	int i =0;
-    	//combodata.insertElementAt(" ", 0);
-    	
-    	while(it.hasNext()) {
-    		
-    		StartUPData data = (StartUPData) it.next();
-    	
-		
+			 if(id ==0)
+				   return name;
 			
-		combodata.insertElementAt(data.getName(), i);
-		i++;
-	}	
-    	
+			 LegalEntity le = (LegalEntity )remoteBORef.selectLE(id);
+			 name = le.getName();
+			 
+		} catch (RemoteException e) {
+			
+			e.printStackTrace();
+			
 		}
-	}catch (RemoteException e) {
-				// TODO Auto-generated catch block
-			
-	commonUTIL.displayError("SDIWIndow","getMasterDataOnComboBox", e);
-	}
-}
-
-public void processlistchoice(DefaultListModel list,String name ) {
-	Vector vector;
-	try {
-		vector = (Vector) remoteBORef.getStartUPData(name);
 		
-		if(vector.size() > 0) {
-		Iterator it = vector.iterator();
-    	int i =0;
-    	while(it.hasNext()) {
-    		
-    		StartUPData data = (StartUPData) it.next();
-    	
 		
-			
-    		list.addElement(data.getName());
-
-		i++;
-	}	
-		}
-	}catch (RemoteException e) {
+		return name;
+	   
+	 }
+	 
+	 private void processTableData(DefaultTableModel model) {
+			// TODO Auto-generated method stub
+			Vector vector;
+			try {
+			   
+				vector = (Vector) remoteBORef.getStartUPData("SDIAttributes");
+				Iterator it = vector.iterator();
+		    	int i =0;
+		    	while(it.hasNext()) {
+		    		
+		    		StartUPData sdiAttributes = (StartUPData) it.next();
+		    	   
+		    		   model.insertRow(i, new Object[]{sdiAttributes.getName(),"0"});
+		    	    
+		    		i++;
+		    		}
+		    		
+			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			
-}catch(Exception e) {
-	commonUTIL.displayError("SDIWINDOW","getMasterDataOnComboBox", e);
-}
-	
-}
-public void getLEDataCombo1(DefaultTableModel model,String leRole) {
-	Vector vector;
-	try {
-		
-			vector = (Vector) remoteBORef.selectLEonWhereClause(" role like '%"+leRole + "%'");
-		   Iterator it = vector.iterator();
-    	   int i =0;
-    	while(it.hasNext()) {
-    		
-    		LegalEntity le =	(LegalEntity) it.next();
-    		model.insertRow(i, new Object[]{le.getId(),le.getName()});
-    		i++;
-	}	
-	}catch (RemoteException e) {
-				// TODO Auto-generated catch block
-		commonUTIL.displayError("JFrameReportApplicatoin","getLEDataCombo1", e);
-			}
-	
-	
-}
-		
-
-public void populateMethod(javax.swing.DefaultComboBoxModel combodata) {
-	Vector vector;
-	try {
-		vector = (Vector) remoteBORef.getStartUPData("SDIMethod");
-		if(vector.size() > 0) {
-			Iterator it = vector.iterator();
-			int i =0;
-			while(it.hasNext()) {
-    	    		StartUPData data = (StartUPData) it.next();
-    	    		combodata.insertElementAt(data.getName(),i);
-
-    	    		i++;
-			}	
-		
-		}
-			
-		}catch(Exception e) {
-	       commonUTIL.displayError("SDIWINDOW","getMasterDataOnComboBox", e);
-		}
-}
-
-
-private void setAttribute(String attributesV) {
-	String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
-    
-    DefaultTableModel attributeModel = new DefaultTableModel(attributeColumnName,0);
-    
-    
-		if(attributesV != null && attributesV.length() > 0) {
-		String atttoken [] = attributesV.trim().split(";"); 
-		
-		
-		for(int i =0;i<atttoken.length;i++) {
-			String att = (String) atttoken[i];
-			
-			if(att.contains("=")) {
-			String attvalue = att.substring(att.indexOf('=')+1, att.length());
-			String attnameName = att.substring(0, att.indexOf('='));
-			attributeModel.insertRow(i, new Object[]{attnameName.trim(),attvalue.trim()});
 			}
 		}
-		jTable1.removeAll();
-		jTable1.setModel(attributeModel);
-		}
-	
-    
-	
-}
-
-
-private String getAttributeValue() {
-	// TODO Auto-generated method stub
-	String attributesV  = "";
-	for(int i=0;i<  jTable1.getRowCount();i++ ) {
-		String attributename = ((String)  jTable1.getValueAt(i, 0)).trim();
-		String attributeValue = ((String)  jTable1.getValueAt(i, 1)).trim();
-		//attributeValue.trim();
-		if(attributeValue != null && attributeValue.length() > 0)
-			attributesV = attributesV.trim() + attributename+ "=" + attributeValue + ";";
-		
-	}
-	if(attributesV.trim().length() > 0)
-	return attributesV.substring(0, attributesV.length()-1);
-	return attributesV;
-}
-    public void openSDI(Sdi sdi) {
-    	   jTextField1.setText(new Integer(sdi.getId()).toString());
-    	   jTextField4.setText(sdi.getCurrency());
-    	   jTextField6.setSelectedItem((String) sdi.getMessageType());
-    	   jTextField13.setSelectedItem((String) sdi.getAgentContacts());
-    	   jTextField8.setSelectedItem((String) sdi.getLeContacts());
-    	   jComboBox1.setSelectedItem((String) sdi.getProducts());
-    	   jTextField7.setSelectedItem((String) sdi.getCash());
-    	   
-    	   
-    	   agentID = sdi.getAgentId();
-    	   jTextField11.setText(getLEName(sdi.getAgentId()));
-    	   
-    	   jTextField9.setText(getLEName(sdi.getPoId()));
-    	   jTextField12.setText(sdi.getsdiformat());
-    	   jTabbedPane2.setSelectedIndex(0);
-    	   jTextField2.setSelectedItem(sdi.getRole());
-    	   String name = getLEName(sdi.getCpId());
-    	   jTextField3.setText(name);
-    	   leID = sdi.getCpId();
-     	  
-    	   poID = sdi.getPoId();
-    	   if(poID ==0) {
-    		   jTextField9.setEnabled(false);
-			   jButton8.setEnabled(false);
-			   poID = -1; 
-    	   } else {
-    		   jTextField9.setEnabled(true);
-			   jButton8.setEnabled(true);
-    	   }
-    }
-
-  public void newEvent() {
-	  jTextField1.setText("0");
-	  jComboBox1.setSelectedIndex(0);
-	  jTextField4.setText("ANY            ");
-	  jTextField6.setSelectedIndex(0);
-	  jTextField13.setSelectedIndex(0);
-	  jTextField8.setSelectedIndex(0);
-	  jTextField12.setText("");
-	  jTextField9.setText("              ");
-	  jTextField3.setText("            ");
-	  jTextField11.setText("             ");
-	  
-	  agentID =0;
-	  poID =0;
-	  leID =0;
-	  jTextField7.setSelectedIndex(0);
-	  jTextField2.setSelectedIndex(0);
-	  jTable1.removeAll();
-	  for(int i=0;i < attributeModel.getRowCount();i++)
-		  attributeModel.removeRow(i);
-	  processTableData(attributeModel);
-	//  set
-	  
-	  
-  }
-
-
-   public void save(int id) {
-	   Sdi sdi = new Sdi();
-	  if((jComboBox1.getSelectedItem() == null) ) {
-		  showAlert("Select Product");
-		  return;
-	  }
-		  
-	  if(! showAlert(jComboBox1.getSelectedItem().toString(),"Select Product")) 
-		  return;
-	    
-	   if(! showAlert(jTextField4.getText().trim(),"Select  Currency")) 
-			  return;
-	   if((jTextField6.getSelectedItem() == null) ) {
-			  showAlert("Select Method");
-			  return;
-		  }
-	   if((jTextField13.getSelectedItem() == null) ) {
-			  showAlert("Select Agent Contact");
-			  return;
-		  }
-	   if((jTextField8.getSelectedItem() == null) ) {
-			  showAlert("Select LE Contact");
-			  return;
-		  }
-	   
-	   if(! showAlert(jTextField6.getSelectedItem().toString(),"Select  METHOD")) 
-			  return;
-	   
-	  
-	   if(! showAlert(jTextField13.getSelectedItem().toString(),"Select Agent Contact  ")) 
-			  return;
-	   if(! showAlert(jTextField8.getSelectedItem().toString()," Select LE Contact  ")) 
-			  return;
-	   if(! showAlert(jTextField12.getText().trim()," Select Account   ")) 
-			  return;
-	   if(agentID == 0)  {
-		   commonUTIL.showAlertMessage("Select Agent " );
-	       return;
-	   }
-	   if(poID == 0 && (!jTextField2.getSelectedItem().toString().equalsIgnoreCase("PO")))   {
-		   commonUTIL.showAlertMessage("Select PO " );
-		   return;
-	   }
-	   if(leID == 0)  {
-		   commonUTIL.showAlertMessage("Select CounterParty " );
-		   return;
-	   }
-	   
-	   sdi.setAgentId(agentID);
-	   if( poID == -1) 
-		   poID =0;
-	   sdi.setPoId(poID);
-	   sdi.setCpId(leID);
-	   sdi.setCash(jTextField7.getSelectedItem().toString().trim());
-	   sdi.setPayrec(jTextField5.getSelectedItem().toString().trim());
-	   sdi.setProducts(jComboBox1.getSelectedItem().toString().trim());
-	   sdi.setAccountID(0);
-	   sdi.setCurrency(jTextField4.getText().trim());
-	   sdi.setMessageType(jTextField6.getSelectedItem().toString().trim());
-	   sdi.setLeContacts(jTextField8.getSelectedItem().toString().trim());
-	   sdi.setAgentContacts(jTextField13.getSelectedItem().toString().trim());
-	   sdi.setAttributes(getAttributeValue());
-	   sdi.setsdiformat(jTextField12.getText().trim());
-	   sdi.setRole(jTextField2.getSelectedItem().toString());
-	   
-	   String key = sdi.getAgentId()+"/"+sdi.getsdiformat() +"/"+sdi.getProducts()+"/"+sdi.getCpId()+"/"+sdi.getPoId()+"/"+sdi.getCurrency();
-	   sdi.setkey(key);
-	   sdi.setId(id);
-	   try {
-	
-	if(id == 0) {
-		if(!remoteBORef.checkSDIKey(sdi)) {
-			sdi =	(Sdi) remoteBORef.saveSDI(sdi);	
-		
-			jTextField1.setText(new Integer(sdi.getId()).toString());
-			commonUTIL.showAlertMessage("SDi save with id " + sdi.getId() );
-		} 
-	} else {
-		sdi =	(Sdi) remoteBORef.saveSDI(sdi);
-		poID = sdi.getPoId();
-		
-	    commonUTIL.showAlertMessage("SDi updated with id " + sdi.getId() );
-	}
-	} catch (RemoteException e) {
-		// TODO Auto-generated catch block
-	   commonUTIL.displayError("SDIWindow", "Save " , e);
-	}
-   }
-
-   public boolean showAlert(String value,String message) {
-	   if(commonUTIL.isEmpty(value)) {
-		   commonUTIL.showAlertMessage(message );
-		   return false;
-   }
-   return true;
-   }
-   
-   public String getLEName(int id) {
-	   String name = "";
-	   try {
-		   if(id ==0)
-			   return name;
-		LegalEntity le = (LegalEntity )remoteBORef.selectLE(id);
-		name = le.getName();
-	} catch (RemoteException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	   return name;
-   }
-
-   public void showAlert(String message) {
-	
-		   commonUTIL.showAlertMessage(message );
+	 
+	 private String getQuery(){
 		 
-  
-   }
- 
-   
-    // Variables declaration - do not modify
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton partyButton;
-    private javax.swing.JButton newButton;
-    private javax.swing.JButton saveAsNewButton;
-    private javax.swing.JButton saveButton;
-    private javax.swing.JButton deleteButton;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
-    private javax.swing.JComboBox jComboBox1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTabbedPane jTabbedPane2;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField11;
-    private javax.swing.JTextField jTextField12;
-    private javax.swing.JComboBox jTextField13;
-    private javax.swing.JTextField jTextField14;
-    private javax.swing.JComboBox jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JComboBox jTextField5;
-    private javax.swing.JComboBox jTextField6;
-    private javax.swing.JComboBox jTextField7;
-    private javax.swing.JComboBox jTextField8;
-    private javax.swing.JTextField jTextField9;
-    // End of variables declaration
+		 int i = 0;
+		 
+		 StringBuffer query = new StringBuffer();
+		 
+		 Hashtable<String, String> criteriaTable = new Hashtable<String, String>();
+				 
+		 if (!browserSdiIdTextField.getText().toString().equals("")) {
+			 
+			criteriaTable.put("id", browserSdiIdTextField.getText().toString());
+		 
+		 }
+		 
+		 if(browserRoleCombobox.getSelectedItem() != null) {
+			 
+			 criteriaTable.put("Role", browserRoleCombobox.getSelectedItem().toString());
+			 
+		 } 
+		 
+		 if (browserPartyTextField.getText().toString().equals("")) {
+			 
+			 String leRole = browserRoleCombobox.getSelectedItem().toString();
+			 int id = 0;
+			 
+			 if (leRole.equals("CounterParty")) {
+				 
+				 leRole  = "CPID";
+				 
+			 } else if  (leRole.equals("PO")) {
+				 
+				 leRole  = "POID";
+				 
+			 } else if (leRole.equals("Agent")) {
+				 
+				 leRole  = "AgentId";
+				 
+			 }
+			 
+			 criteriaTable.put(leRole, partyId+"");
+		 
+		 }
+		 
+		 if (browserProductsCombobox.getSelectedItem() != null) {
+			 
+			 			 
+			 criteriaTable.put("products", browserProductsCombobox.getSelectedItem().toString());
+		 
+		 } 
+		 
+		 if (browserCCYComboBox.getSelectedItem() != null) {
+			 	
+			  criteriaTable.put("currency", browserCCYComboBox.getSelectedItem().toString());
+		 
+		 }
+		 
+		 int size = criteriaTable.size();
+		 
+		 if ( size != 0 ) {
+			 
+			 Set<String> keys = criteriaTable.keySet();
+		     
+			 for(String key: keys){
+		        
+				 if ( i == 0) { 
+					 
+					 query
+					 .append(key)
+					 .append(" = ")
+					 .append("'")
+					 .append(criteriaTable.get(key))
+					 .append("'");
+				 
+					 i =+1;
+				
+				 } else {
+					 
+					 query
+					 .append(" and ")
+					 .append(key)
+					 .append(" = ")
+					 .append("'")
+					 .append(criteriaTable.get(key))
+					 .append("'");
+				 }
+			 }
+			 
+		 } 
+		 
+		 return query.toString();
+		 
+	 }
+	 
+	 private Vector getSDIs(String sql) {
+	    	// remoteBORef.SDIWhere
+	    	 Vector sdis = null;
+	    	 try {
+	    		 sdis = (Vector) remoteBORef.SDIWhere(sql);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	 return sdis;
+	     }
+	 
+	 private void loadSDIs(final Vector<Sdi> sdis) {
+		 
+		browserModel = new DefaultTableModel(browserCol,0);
+			
+		browserTable.setAutoscrolls(true);
+		
+		Sdi sdi = null;
+
+		Iterator it = sdis.iterator();
+  	   	
+		int i =0;
+  	   	
+  	   	while(it.hasNext()) {
+  	   		
+  	   		sdi = (Sdi) it.next();
+  	   		browserModel.insertRow(i,
+				new Object[] { sdi.getId(), sdi.getMessageType(), sdi.getPayrec(), sdi.getSdiformat(), getLEName(sdi.getCpId()),
+				sdi.getRole(), getLEName(sdi.getAgentId()),	sdi.getkey(), sdi.getCash(), sdi.getProducts(), sdi.getCurrency()});		
+  	   		
+  	   		i++;
+	
+  	   	}
+  	   	
+  	   	
+		browserTable.setModel(browserModel);
+		browserTable.addMouseListener(new java.awt.event.MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+				openSDI(sdis.get(browserTable.getSelectedRow()));
+			}
+
+		});
+					 
+	 }
+	 
+	 private void setLE(String role){
+		 
+			showLE = new JDialogTable(tradertablemodel);
+			getLEDataCombo1(tradertablemodel, role);
+    	    showLE.setLocationRelativeTo(this);
+    	    showLE.jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+
+    			@Override
+    			public void mouseClicked(MouseEvent e) {
+    				
+    				int id  = ((Integer) showLE.jTable1.getValueAt(showLE.jTable1.getSelectedRow(),0)).intValue();
+    				
+    				String ss = (String) showLE.jTable1.getValueAt(showLE.jTable1.getSelectedRow(),1);
+    				
+    				leTextField.setText(ss);
+    				leID = id;
+    				showLE.dispose();
+    				
+    			}
+       	
+    	    });  
+	 }
 }
+
