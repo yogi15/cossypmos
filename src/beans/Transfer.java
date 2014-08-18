@@ -376,8 +376,8 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 		String value = null;
 		if(attributesData.size() == 0)
 			setAttributesData(attributes);
-		attributesData.get(key);
-		return value;
+		
+		return attributesData.get(key);
 	}
 	
 	public void setAttributesData(String attributesFromTransfer) {
@@ -428,9 +428,41 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 	}
 	@Override
 	public int compareTo(Transfer transfer) {
-		// TODO Auto-generated method stub
-		String oldTransfer = this.getDeliveryDate()+this.getEventType()+this.getTransferType()+this.getAmount()+this.getSettlecurrency()+this.getValueDate()+this.getMethod()+this.getRec_pay()+this.getReceiverCode()+this.getReceiverInst()+this.getReceiverRole()+this.payerCode+this.getPayerInst()+this.getPayerRole()+this.getProductId();
-		String newTransfer = transfer.getDeliveryDate()+transfer.getEventType()+transfer.getTransferType()+transfer.getAmount()+transfer.getSettlecurrency()+transfer.getValueDate()+transfer.getMethod()+transfer.getRec_pay()+transfer.getReceiverCode()+transfer.getReceiverInst()+transfer.getReceiverRole()+transfer.payerCode+transfer.getPayerInst()+transfer.getPayerRole()+transfer.getProductId();
+				
+		//String oldTransfer = this.getDeliveryDate()+this.getEventType()+this.getTransferType()+this.getAmount()+this.getSettlecurrency()+this.getValueDate()+this.getMethod()+this.getRec_pay()+this.getReceiverCode()+this.getReceiverInst()+this.getReceiverRole()+this.payerCode+this.getPayerInst()+this.getPayerRole()+this.getProductId();
+		//String newTransfer = transfer.getDeliveryDate()+transfer.getEventType()+transfer.getTransferType()+transfer.getAmount()+transfer.getSettlecurrency()+transfer.getValueDate()+transfer.getMethod()+transfer.getRec_pay()+transfer.getReceiverCode()+transfer.getReceiverInst()+transfer.getReceiverRole()+transfer.payerCode+transfer.getPayerInst()+transfer.getPayerRole()+transfer.getProductId();
+		
+		String oldTransfer = new StringBuffer(this.getDeliveryDate())
+								 .append(this.getEventType())
+								 .append(this.getTransferType())
+								 .append(this.getAmount())
+								 .append(this.getSettlecurrency())
+								 .append(this.getValueDate())
+								 .append(this.getMethod())
+								 .append(this.getRec_pay())
+								 .append(this.getReceiverCode())
+								 .append(this.getReceiverRole())
+								 .append(this.payerCode)
+								 .append(this.getPayerRole())
+								 .append(this.getProductId())
+								 .toString();
+		
+		String newTransfer = new StringBuffer(transfer.getDeliveryDate())
+								 .append(transfer.getEventType())
+								 .append(transfer.getTransferType())
+								 .append(transfer.getAmount())
+								 .append(transfer.getSettlecurrency())
+								 .append(transfer.getValueDate())
+								 .append(transfer.getMethod())
+								 .append(transfer.getRec_pay())
+								 .append(transfer.getReceiverCode())
+								 .append(transfer.getReceiverRole())
+								 .append(transfer.payerCode)
+								 .append(transfer.getPayerRole())
+								 .append(transfer.getProductId())
+								 .toString();
+		
+		
 		System.out.println(oldTransfer);
 		System.out.println(newTransfer);
 		int i = oldTransfer.compareTo(newTransfer);
