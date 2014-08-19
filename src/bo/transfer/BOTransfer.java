@@ -77,7 +77,7 @@ public abstract class BOTransfer {
 				}
 			}
 		} else {
-						for(int i=0;i<oldTransfers.size();i++) {
+						/*for(int i=0;i<oldTransfers.size();i++) {
 								boolean found = false;
 								Transfer oldTransfer = oldTransfers.get(i);
 								if(!oldTransfer.getStatus().equalsIgnoreCase("CANCELLED")) {
@@ -131,17 +131,62 @@ public abstract class BOTransfer {
 											if(!found)
 												insertTransfer.addElement(newTransfer);
 						}
-				}
-		transferData.put("insert", insertTransfer);
-		transferData.put("update", updateTransfer);
-		transferData.put("delete", deleteTransfer);
+				}*/
+			
+			
+			if (trade.isEconomicChanged()) {
+				
+				String status = trade.getStatus();
+				
+				for(int i=0;i<oldTransfers.size();i++) {
+					
+					Transfer oldTransfer = oldTransfers.get(i);
+					
+					if(!oldTransfer.getStatus().equalsIgnoreCase("CANCELLED")) {
+						
+						Hashtable attributes = oldTransfer.getAttributesData();
+						Enumeration<String> keys = attributes.keys();
+						while(keys.hasMoreElements()) {
+							String key = keys.nextElement();
+							String ovalue = (String) attributes.get(key);
+								
+							for(int n=0;n<newTransfers.size();n++) {
+								
+								Transfer newTransfer = newTransfers.get(n);
+								String nvalue = newTransfer.getAttributeValue(key);
+								
+								if(ovalue.equalsIgnoreCase(nvalue)) {
+									
+									if(status.equalsIgnoreCase("APPROVED")) {
+										
+										oldTransfer.setAction("CANCEL");
+										newTransfer.setId(0);
+										
+									}
+									
+									updateTransfer.addElement(oldTransfer);
+									newTransfer.setLinkid(oldTransfer.getId());
+									insertTransfer.addElement(newTransfer);
+									
+								}
+								
+							}							
+						}							
+					}								
+				}			
+			}
+			
+			transferData.put("insert", insertTransfer);
+			transferData.put("update", updateTransfer);
+			transferData.put("delete", deleteTransfer);
+			
+			commonUTIL.display("TransferProcessor", "In filterTransfer method new Transfer "+ insertTransfer.size());
+			commonUTIL.display("TransferProcessor", "In filterTransfer method old Transfer "+ updateTransfer.size());
+			commonUTIL.display("TransferProcessor", "In filterTransfer method dold Transfer "+ deleteTransfer.size());
 		
-		commonUTIL.display("TransferProcessor", "In filterTransfer method new Transfer "+ insertTransfer.size());
-		commonUTIL.display("TransferProcessor", "In filterTransfer method old Transfer "+ updateTransfer.size());
-		commonUTIL.display("TransferProcessor", "In filterTransfer method dold Transfer "+ deleteTransfer.size());
-		
-		    
+		}		
 	}
+
 
 	private int compareTransfer(Transfer oldTransfer, Transfer newTransfer,
 			String status) {
