@@ -350,7 +350,12 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 	
 	public WFConfig getStatusOnTransferAction(Transfer transfer,String status,Vector<String> statusMessages,Trade trade) {
 		Product product = ProductSQL.selectProduct(transfer.getProductId(), dsSQL.getConn());
-		String whereClause = "productType ='" + product.getProductType() + "' and productSubType = '"+ product.getProdcutShortName() + "' and currentstatus = '" + transfer.getStatus() + "' and action = '" + transfer.getAction() + "' and type ='TRANSFER'";
+		String whereClause = "productType ='" + product.getProductType() 
+								+ "' and productSubType = '"+ product.getProdcutShortName() 
+								+ "' and currentstatus = '" + transfer.getStatus() 
+								+ "' and action = '" + transfer.getAction() 
+								+ "' and type ='TRANSFER'";
+		
 		Vector  wfs = (Vector) WFConfigSQL.selectWhere(whereClause, dsSQL.getConn());// this must alway retunr one transition which is unique .
 		WFConfig wf = (WFConfig) wfs.elementAt(0);
 		if(!commonUTIL.isEmpty(wf.getRule())) {
