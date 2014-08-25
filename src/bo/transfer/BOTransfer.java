@@ -157,9 +157,15 @@ public abstract class BOTransfer {
 								
 								if(ovalue.equalsIgnoreCase(nvalue)) {
 									
-									if(status.equalsIgnoreCase("APPROVED")) {
+									if(status.equalsIgnoreCase("APPROVED") && 
+											!oldTransfer.getStatus().equals("SETTLED")) {
 										
 										oldTransfer.setAction("CANCEL");
+										newTransfer.setId(0);
+										
+									} else if  ( oldTransfer.getStatus().equals("SETTLED") ){
+										
+										oldTransfer.setAction("REVERSE");
 										newTransfer.setId(0);
 										
 									}
