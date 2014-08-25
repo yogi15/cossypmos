@@ -231,7 +231,7 @@ protected static int selectMax(Connection con ) {
 	        Attributes.add(Attribute);
 	         
 	         }
-	         commonUTIL.display("AttributeSQL","selectWhereClause "+SELECTONE);
+	         commonUTIL.display("AttributeSQL","SELECTONE "+SELECTONE);
 	         return  Attributes;
 	        
 		 } catch (Exception e) {
@@ -289,7 +289,7 @@ protected static int selectMax(Connection con ) {
 	     }
 	     return Attributes;
 	 }
-	 public static Collection selectWhereClaus(String sqlw,Connection con ) {
+	 public static Collection selectWhereClause(String sqlw,Connection con ) {
 		 int j = 0;
 	     PreparedStatement stmt = null;
 	     Vector Attributes = new Vector();
@@ -309,10 +309,13 @@ protected static int selectMax(Connection con ) {
 	        	 Attribute.setValue(rs.getString(4));
 	        
 	    	  Attributes.add(Attribute);
-	    	  commonUTIL.display("AttributeSQL","selectWhereClause ");
+	    	 
 	      }
+	      
+	      commonUTIL.display("AttributeSQL","selectWhereClause " + sql);
+	      
 		 } catch (Exception e) {
-			 commonUTIL.displayError("AttributeSQL","selectWhereClause " + SELECTWHERE ,e);
+			 commonUTIL.displayError("AttributeSQL","selectWhereClause " + sql ,e);
 			 return Attributes;
 	        
 	     }
