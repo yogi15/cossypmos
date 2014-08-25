@@ -3,10 +3,71 @@ package beans;
 import java.io.Serializable;
 
 public class DealFXBean implements Deal,Serializable  {
+	
+	public String member;
+	public String DEALERname;
+	public String Dealer;
+	public String  Market;
+	public String OrderNumber;
+	public String TradeDate;
+	public String TradeTime;
+	public String TradeNumber;
+	public String TradeType;
+	public String Type;
+	public String Settlement;
+	public String Date;
+	public String MaturityDate;
+	public String Amount;
+	public String SpotPrice;
+	public String quantity;
+	public String currency;
+	public String currencyPair;
 	public String memberName;
 	public FeesUploader fees;
 	public String attributes = "";
+	public String externalParentID = "";
 	
+	/* FXSWAP */
+	
+	public String farLegAmt1;
+	public String farLegAmt2;
+	public String farLegRate;
+	public String farDate;
+		
+	
+	public String getFarLegAmt1() {
+		return farLegAmt1;
+	}
+	public void setFarLegAmt1(String farLegAmt1) {
+		this.farLegAmt1 = farLegAmt1;
+	}
+	public String getFarLegAmt2() {
+		return farLegAmt2;
+	}
+	public void setFarLegAmt2(String farLegAmt2) {
+		this.farLegAmt2 = farLegAmt2;
+	}
+	public String getFarLegRate() {
+		return farLegRate;
+	}
+	public void setFarLegRate(String farLegRate) {
+		this.farLegRate = farLegRate;
+	}
+	public String getFarDate() {
+		return farDate;
+	}
+	public void setFarDate(String farDate) {
+		this.farDate = farDate;
+	}
+	public String getExternalParentID() {
+		return externalParentID;
+	}
+	public void setExternalParentID(String externalParentID) {
+		this.externalParentID = externalParentID;
+	}
+	public void setPositionBased(boolean isPositionBased) {
+		this.isPositionBased = isPositionBased;
+	}
 	/**
 	 * @return the attributes
 	 */
@@ -158,26 +219,5 @@ public class DealFXBean implements Deal,Serializable  {
 	public void setCurrencyPair(String currencyPair) {
 		this.currencyPair = currencyPair;
 	}
-	public String member;
-	public String DEALERname;
-	public String Dealer;
-	public String  Market;
-	public String OrderNumber;
-	public String TradeDate;
-	public String TradeTime;
-	public String TradeNumber;
-	public String TradeType;
-	public String Type;
-	public String Settlement;
-	public String Date;
-	public String MaturityDate;
-	public String Amount;
-	public String SpotPrice;
-	public String quantity;
-	public String currency;
-	public String currencyPair;
 	
-	
-	
-
 }
