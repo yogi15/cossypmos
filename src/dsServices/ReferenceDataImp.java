@@ -394,7 +394,7 @@ public class ReferenceDataImp implements RemoteReferenceData {
 	@Override
 	public Collection selectWhereAttribute(String sql) throws RemoteException {
 		// TODO Auto-generated method stub
-		return AttributSQL.selectWhereClaus(sql, dsSQL.getConn());
+		return AttributSQL.selectWhereClause(sql, dsSQL.getConn());
 	}
 
 	@Override
