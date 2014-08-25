@@ -68,6 +68,8 @@ public class CSVFileHandler implements Runnable {
 		String currentLine = null;
 		String[] record = null;
 		
+		 ArrayList<String> columnNames = new ArrayList<String>();
+		
 		Vector<Deal> beans = new Vector<Deal>();
 		try {
 			int  i =0;
@@ -83,20 +85,35 @@ public class CSVFileHandler implements Runnable {
 					
 					record = currentLine.split(delim);
 							
-					System.out.println(record);
-			
-					bean = (Deal) helper.getBean(record);			// Creates the Bean.
+					//System.out.println(record);
 					
-					if (bean != null) {
+					if (record.length != 0) {
 						
-						beans.add(bean);						// Adding each Bean to BeanList.
-					
-					} else {
-					
-						return null;
-					
-					}
+						bean = (Deal) helper.getBean(record);			// Creates the Bean.
+						
+						if (bean != null) {
+							
+							beans.add(bean);						// Adding each Bean to BeanList.
+						
+						} else {
+						
+							return null;
+						
+						}
+					}					
 			
+				} else {
+					
+					record = currentLine.split(delim);
+					
+					for( int j =0; j < record.length; j++ ) {
+						
+						columnNames.add(record[j]);						
+						
+					}
+					
+					helper.setColumnNames(columnNames);
+					
 				}
 				i++;
 				
