@@ -166,18 +166,19 @@ public class DealSender {
 			return null;
 		}
 		trade.setProductId(productid);
-		setAttributes("Market", bean.getMarket());
+		//-setAttributes("Market", bean.getMarket());
 		// setAttributes("SubMarket", bean.getSubMarket());
-		setAttributes("External ID", bean.getTradeNumber());
+		//-setAttributes("External ID", bean.getTradeNumber());
 		// setAttributes("External ID",bean.getTradeNumber());
 		// setAttributes("Genspec", bean.getGenspec());
 		// setAttributes("Late PaymentInterest",bean.getPaymentDate());
 		// setAttributes("ISIN",bean.getISIN());
-		setAttributes("Trade Date", bean.getTradeDate() + bean.getTradeTime());
+		//-setAttributes("Trade Date", bean.getTradeDate() + bean.getTradeTime());
 		// setAttributes("Sett Consideration (Rs)",
 		// bean.getSettConsiderationRs());
 		trade.setBookId(bookid);
-		trade.setAttributes(getAttributes());
+		//-trade.setAttributes(getAttributes());
+		trade.setAttributes(bean.getAttributes());
 		trade.setPrice(Double.valueOf(bean.getSpotPrice()).doubleValue());
 
 		trade.setType(bean.getType());
@@ -194,10 +195,24 @@ public class DealSender {
 		trade.setTradedesc1(bean.getTradeType());
 		trade.setTradeDate(bean.getTradeDate() + " " + bean.getTradeTime());
 		trade.setDelivertyDate(bean.getMaturityDate());
-		trade.setEffectiveDate(bean.getMaturityDate());
+		
 		trade.setCpID(cpid);
 		trade.setTraderID(traderid);
 		trade.setAttributes(bean.getAttributes());
+		
+		if (trade.getTradedesc1().equals("FXSWAP")) {
+			
+			trade.setTradeAmount(Double.parseDouble(bean.getFarLegAmt1()));
+			trade.setYield(Double.parseDouble(bean.getFarLegAmt2()));
+			trade.setSecondTradePrice(Double.parseDouble(bean.getFarLegRate()));
+			trade.setEffectiveDate(bean.getFarDate());
+		
+		} else {
+			
+			trade.setEffectiveDate(bean.getMaturityDate());
+			
+		}
+		
 		FeesUploader feeup = bean.getFees();
 		if(feeup != null) {
 			Vector<Fees> fees = new Vector<Fees>();
@@ -205,6 +220,13 @@ public class DealSender {
 			fee.setAmount(feeup.getAmount());
 			fee.setLeRole(feeup.getLeRole());
 			int brokerID = getLEid(feeup.getLeCode(),0);
+			
+			if (brokerID == 0) {
+				commonUTIL.display("DealSender",
+						"Broker Not found " + feeup.getLeCode());
+				return null;
+			}
+			
 			fee.setLeID(brokerID);
 			fee.setFeeType(feeup.getFeeType());
 			fee.setStartDate(feeup.getStartDate());
