@@ -1,13 +1,27 @@
 package beans;
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Vector;
+
+import dsServices.RemoteReferenceData;
+
+import util.RemoteServiceUtil;
 import util.commonUTIL;
 
 public class HelperFXBean implements HelperBean {
 
+	ArrayList<String> columnNames = new ArrayList<String>();
+	ArrayList<String> tradeAttributes = new ArrayList<String>();
+	
 	@Override
 	public Deal getBean(String[] record) {
-		// TODO Auto-generated method stub
+		
+		String attribute = "";
 		DealFXBean dealBean = new DealFXBean();
+		
 		dealBean.setMemberName(record[0]);
 		dealBean.setMember(record[1]);
 		dealBean.setDEALERname(record[2]);
@@ -27,9 +41,10 @@ public class HelperFXBean implements HelperBean {
 		      dealBean.setisPositionBased(true);
 		else 
 			 dealBean.setisPositionBased(false);
-		if(record.length > 16) {
+		
 		String feesType = record[16];
 		if(!commonUTIL.isEmpty(feesType)) {
+			
 			FeesUploader fee = new FeesUploader();
 			fee.setFeeType(feesType);
 			fee.setCurrency(record[17]);
@@ -40,31 +55,100 @@ public class HelperFXBean implements HelperBean {
 			fee.setLeCode(record[23]);
 			fee.setLeRole("BROKER");
 			dealBean.setFees(fee);
-			String attribute = "InstrumentType="+record[21] +";";
-			attribute = attribute + "BranchName="+record[22] +";";
-			if(record.length > 24) {
-			String UnderlyingRef = record[24];
-			if(!commonUTIL.isEmpty(UnderlyingRef)) {
-			attribute = attribute + "UnderlyingRef="+UnderlyingRef +";"; 
-			}
-			}
-			dealBean.setAttributes(attribute);
-			
-			
-		} else {
-			if(record.length > 24) {
-			String UnderlyingRef = record[24];
-			if(!commonUTIL.isEmpty(UnderlyingRef)) {
-			dealBean.setAttributes("UnderlyingRef="+UnderlyingRef +";");
-			}
-			}
-		}
 		
 		}
 		
-	//	dealBean.setType(record[10]);
+		if (record[7].equals("FXSWAP")) {
+			
+			dealBean.setFarLegAmt1(record[26]);
+			dealBean.setFarLegAmt2(record[27]);
+			dealBean.setFarLegRate(record[28]);
+			dealBean.setFarDate(record[29]);
+			
+		}
+		
+		if (dealBean.TradeType.equals("FXTAKEUP")) {
+			
+			dealBean.setExternalParentID(record[25]);
+		}
+		
+		for ( int i = 0; i < record.length; i++) {
+			
+			if (tradeAttributes.contains(columnNames.get(i))) {
+								
+				if ( attribute.length() != 0 ) {
+					
+					if (!record[i].equals("")) {
+					
+						attribute = new StringBuffer(attribute)
+						   .append(columnNames.get(i))
+						  .append("=")
+						  .append(record[i])
+						  .append(";")
+						  .toString();
+						
+					}
+									
+				} else {
+					
+					if (!record[i].equals("")) {
+						
+						attribute =  new StringBuffer(columnNames.get(i))
+						  .append("=")
+						  .append(record[i])
+						  .append(";")
+						  .toString();
+						
+					}
+					
+						
+				}
+			
+			}
+		}
+		
+		dealBean.setAttributes(attribute);
 		
 		return dealBean;
+		
+	}
+
+
+	@Override
+	public void setColumnNames(ArrayList<String> columnNames) {
+		
+		Collection startUPData = null;
+		
+		this.columnNames = columnNames;
+		
+		if ( tradeAttributes.isEmpty() ) {
+			
+			RemoteReferenceData remoteRef = RemoteServiceUtil.getRemoteReferenceDataService();
+			
+			try {
+				
+				startUPData = remoteRef.getStartUPData("TradeAttribute");
+			
+			} catch (RemoteException e) {
+				
+				e.printStackTrace();
+				
+			}
+			
+			Iterator<StartUPData> it = startUPData.iterator();
+			
+			StartUPData data = null;
+			
+			while(it.hasNext()) {
+			
+				data = (StartUPData) it.next();
+				tradeAttributes.add(data.getName());
+			}
+			
+		}
+		
+		
+		
 	}
 
 }
