@@ -120,7 +120,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			 Vector<TransferRule>  mmRules = new Vector<TransferRule>();
+			 Vector<TransferRule>  fxRules = new Vector<TransferRule>();
 			 LegalEntity po = null;
 			 if(trade.getType().equalsIgnoreCase(tradeTypeBUY)) {
 				
@@ -167,7 +167,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleB.set_receiverLegalEntityRole(recSdi.getRole());
 				 ruleB.set_receiverSDId(recSdi.getId());
 				 ruleB.set_payReceive(PAY);
-				 mmRules.addElement(ruleB);
+				 fxRules.addElement(ruleB);
 				
 				 TransferRule ruleS = new TransferRule();
 				 ruleS.setBookId(trade.getBookId());
@@ -199,7 +199,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleS.set_payerLegalEntityRole(ruleB.get_receiverLegalEntityRole());
 				 paySdi = getSdiOnEntity(ruleB.get_receiverLegalEntityId());
 					ruleS.set_payerSDId(paySdi.getId());
-					mmRules.addElement(ruleS);
+					fxRules.addElement(ruleS);
 				 
 				 
 				 
@@ -246,7 +246,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 
 				 
 				 
-				 mmRules.addElement(ruleB);
+				 fxRules.addElement(ruleB);
 				
 				 TransferRule ruleS = new TransferRule();
 				 ruleS.set_tradeId(trade.getId());
@@ -276,12 +276,12 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleS.set_receiverSDId(recSdi.getId());
 				 ruleS.set_payerSDId(paySdi.getId());
 				 ruleS.set__sMethod(paySdi);
-				 mmRules.addElement(ruleS);
+				 fxRules.addElement(ruleS);
 			 }
 				 
 			 if((fees != null)  && (!fees.isEmpty())) 
-					 addFeesRule(fees,mmRules,po,trade);
-			 return mmRules;
+					 addFeesRule(fees,fxRules,po,trade);
+			 return fxRules;
 		}
 			 
 		 }
@@ -297,7 +297,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 			Trade primaryTrade = swaptrade.getSwapPrimaryLeg();
 			swapTrades.add(swapTrade);
 			swapTrades.add(primaryTrade);
-			 Vector<TransferRule>  mmRules = new Vector<TransferRule>();
+			 Vector<TransferRule>  fxRules = new Vector<TransferRule>();
 			for(int i=0;i<swapTrades.size();i++) {
 				Trade trade = swapTrades.get(i)	;
 				try {
@@ -341,7 +341,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 						 ruleB.set_receiverLegalEntityRole(recSdi.getRole());
 						 ruleB.set_receiverSDId(recSdi.getId());
 						 ruleB.set_payReceive(PAY);
-						 mmRules.addElement(ruleB);
+						 fxRules.addElement(ruleB);
 						
 						 TransferRule ruleS = new TransferRule();
 						 ruleS.setBookId(trade.getBookId());
@@ -368,7 +368,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 						 paySdi = getSdiOnEntity(ruleB.get_receiverLegalEntityId());
 						 
 							ruleS.set_payerSDId(paySdi.getId());
-							mmRules.addElement(ruleS);
+							fxRules.addElement(ruleS);
 						 
 						 
 						 
@@ -409,7 +409,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 						 
 						 
 						 
-						 mmRules.addElement(ruleB);
+						 fxRules.addElement(ruleB);
 						
 						 TransferRule ruleS = new TransferRule();
 						 ruleS.set_tradeId(trade.getId());
@@ -432,7 +432,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 						 ruleS.set_receiverSDId(recSdi.getId());
 						 ruleS.set_payerSDId(paySdi.getId());
 						 ruleS.set__sMethod(paySdi);
-						 mmRules.addElement(ruleS);
+						 fxRules.addElement(ruleS);
 					 }
 				}
 			 LegalEntity po = null;
@@ -440,8 +440,8 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				po = (LegalEntity) getLegalEntity(book.getLe_id());
 			
 			 if((fees != null)  && (!fees.isEmpty())) 
-				 addFeesRule(fees,mmRules,po,swaptrade);  // this is temperory adjustment we need understand how fees will get adjust in swap trade. 
-		     return mmRules;
+				 addFeesRule(fees,fxRules,po,swaptrade);  // this is temperory adjustment we need understand how fees will get adjust in swap trade. 
+		     return fxRules;
 	}
 		 
 			
@@ -449,7 +449,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 		
 	
 
-		private void addFeesRule(Vector<Fees> fees, Vector<TransferRule> bondRules,LegalEntity po,Trade trade) {
+		private void addFeesRule(Vector<Fees> fees, Vector<TransferRule> fxRules,LegalEntity po,Trade trade) {
 			// TODO Auto-generated method stub
 			if(fees == null ) {
 				 commonUTIL.display("GenerateFXTransferRule", " No Fees Attached for Trade " + trade.getId());
@@ -524,7 +524,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 					  
 				}
 				  
-				bondRules.addElement(rulef);
+				fxRules.addElement(rulef);
 				 commonUTIL.display("GenerateFXTransferRule", " End of  Processing transfers for Fees on " + trade.getId() + " attached ");
 			}
 			
