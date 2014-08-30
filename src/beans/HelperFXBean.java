@@ -42,9 +42,9 @@ public class HelperFXBean implements HelperBean {
 		else 
 			 dealBean.setisPositionBased(false);
 		
-		String feesType = record[16];
-		if(!commonUTIL.isEmpty(feesType)) {
-			
+		String feesType = "";
+		if(!commonUTIL.isEmpty(record[16])) {
+			feesType = record[16];
 			FeesUploader fee = new FeesUploader();
 			fee.setFeeType(feesType);
 			fee.setCurrency(record[17]);
