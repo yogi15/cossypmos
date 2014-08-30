@@ -241,7 +241,8 @@ public class DealSender {
 		trade.setStatus("NONE");
 		// trade.setProductId(productid.getId());
 		
-
+		
+		trade.setUserID(5);
 		trade.setId(0);
 		return trade;
 	}
