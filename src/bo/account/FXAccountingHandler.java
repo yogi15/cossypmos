@@ -82,6 +82,7 @@ public class FXAccountingHandler extends AccountingHandler {
 			accEvent.setBookingDate(tradeDate);
 			accEvent.setCurrency(splittedCurrency.get(0));
 			accountingEvents.addElement(accEvent);
+			
 			BOPosting accEventSell = new BOPosting(eventConfig);
 
 			accEventSell.setAmount(trade.getNominal());
@@ -100,16 +101,26 @@ public class FXAccountingHandler extends AccountingHandler {
 		
 		if ( !trade.getTradedesc1().equals(FXConstants.FXFORWARDOPTION) ) {
 			
+			Vector<String> splittedCurrency = splitCurrency(trade
+					.getTradedesc());
+			
 			String tradeDate = trade.getTradeDate().substring(0, 10);
+			
 			BOPosting accEvent = new BOPosting(eventConfig);
 
 			accEvent.setAmount(trade.getQuantity());
 			accEvent.setEffectiveDate(tradeDate);
 			accEvent.setBookingDate(tradeDate);
-			accEvent.setCurrency(trade.getCurrency());
-
+			accEvent.setCurrency(splittedCurrency.get(0));
 			accountingEvents.addElement(accEvent);
+			
+			BOPosting accEventSell = new BOPosting(eventConfig);
 
+			accEventSell.setAmount(trade.getNominal());
+			accEventSell.setEffectiveDate(tradeDate);
+			accEventSell.setBookingDate(tradeDate);
+			accEventSell.setCurrency(splittedCurrency.get(1));
+			accountingEvents.addElement(accEventSell);
 			
 		}
 		
