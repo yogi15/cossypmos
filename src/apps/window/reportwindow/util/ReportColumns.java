@@ -54,7 +54,7 @@ public class ReportColumns {
 		columnsMaps.put("Posting.AccEventType","AccEventType");
 		columnsMaps.put("Posting.LinkId","LinkId");
 		columnsMaps.put("Posting.EventType","EventType");
-		columnsMaps.put("Posting.DebitAccId","(select accountname from account where id =Posting.DebitAccId) debitACC");
+		columnsMaps.put("Posting.DebitAccId","DebitAccId");
 		columnsMaps.put("Posting.CreditAccId","CreditAccId");
 		columnsMaps.put("Posting.RuleName","RuleName");
 		columnsMaps.put("Posting.Currency","Currency");
@@ -143,17 +143,19 @@ public class ReportColumns {
 	//	columnsMaps.put("Trade.CounterParty","cpID");
 		columnsMaps.put("Trade.Status","Status");
 	//	columnsMaps.put("Trade.Trader","traderid");
-		columnsMaps.put("Trade.Type","Type");
+		columnsMaps.put("Trade.Direction","Type");
 		columnsMaps.put("Trade.TradeDate","TradeDate"); 
 	    columnsMaps.put("Trade.Broker","BrokerID");
 		columnsMaps.put("Trade.TradeAmount","TradeAmount"); 
 		columnsMaps.put("Trade.EffectiveDate","EffectiveDate");
-		columnsMaps.put("Trade.DeliveryDate","DeliveryDate");
+		columnsMaps.put("Trade.EndDate","DeliveryDate");
 	//	columnsMaps.put("Trade.Book","bookId ");
         columnsMaps.put("Trade.Nominal","Nominal ");
 	    columnsMaps.put("Trade.Quantity","Quantity"); 
-	    columnsMaps.put("Trade.Amount2 ","Nominal");
-	    columnsMaps.put("Trade.Amount1","Quantity"); 
+	   
+	    columnsMaps.put("Trade.AMT2 ","Amount2");
+	    columnsMaps.put("Trade.AMT1","Amount1"); 
+	    columnsMaps.put("Trade.currPair","CurrencyPair"); 
 		columnsMaps.put("Trade.User","userid ");  // to be changed
 		columnsMaps.put("Trade.Price","Price");
 		columnsMaps.put("Trade.Version","Version"); 
@@ -164,9 +166,13 @@ public class ReportColumns {
 		columnsMaps.put("Trade.TradeProductName1","tradedesc"); // to be changed
 		columnsMaps.put("Trade.TradeProductName2","tradedesc1");// to be changed
 		reversecolumnsMaps.put("Trade.tradedesc1", "Trade.TradeProductName2");
+		reversecolumnsMaps.put("Trade.Type", "Trade.Direction");
+		reversecolumnsMaps.put("Trade.DeliveryDate","Trade.EndDate");
+		
 	//	columnsMaps.put("Trade.Trader","traderID ");
 		columnsMaps.put("Trade.Action","Action ");
 		columnsMaps.put("Trade.ProductType","ProductType");
+		
 	//	columnsMaps.put("Product.ID","id");
 				columnsMaps.put("Product.productType ","productType");
 						columnsMaps.put("Product.productname","productname");
