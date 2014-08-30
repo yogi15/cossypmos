@@ -20,7 +20,7 @@ public class TradeSQL {
  final static private String DELETE =
   "update  " + tableName + " set version = -1  where id =? ";
  final static private String INSERT =
-  "INSERT into " + tableName + "(id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,deliverydate ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  "INSERT into " + tableName + "(id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,deliverydate ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased,currencypair,amount1,amount2) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
  final static private String UPDATE =
   "UPDATE " + tableName + " set productId=?,cpID=?,status=?,type=?,tradeDate=?,brokerID=?,TradeAmount=?,effectiveDate=?,deliverydate=?,bookId=?,quantity=?  where id = ? ";
   
@@ -82,6 +82,10 @@ public class TradeSQL {
     	 updateSQL = updateSQL + "  ,isparitial = 1 ";
      else    
     	 updateSQL = updateSQL + "  ,isparitial = 0 ";
+     if(trade.getProductType().equalsIgnoreCase("FX")) {
+    	 updateSQL = updateSQL + "  ,currencyPair='"+ trade.getTradedesc() +"' , amount1 = "+ trade.getQuantity() + " , amount2 = " + trade.getNominal();
+    	
+    }
      updateSQL = updateSQL + "  where id = "+ trade.getId();
       return updateSQL;
      }
@@ -318,6 +322,11 @@ protected static int selectMax(Connection con ) {
     	 stmt.setString(40, "Y");
     } else {
     	 stmt.setString(40, "N");
+    }
+    if(inserTrade.getProductType().equalsIgnoreCase("FX")) {
+    	 stmt.setString(41, inserTrade.getTradedesc());
+    	 stmt.setDouble(42, inserTrade.getQuantity());
+    	 stmt.setDouble(43, inserTrade.getNominal());
     }
 
              stmt.executeUpdate();
