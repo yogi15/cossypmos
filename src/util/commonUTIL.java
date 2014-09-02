@@ -1307,5 +1307,17 @@ public class commonUTIL {
 	        }
 	    }
 
-	
+	 /**
+	  * Returns date part as string from date Time string
+	  *
+	  *	@author yogesh
+	  * 
+	  *  @String
+	  * @param dateTime
+	  * @return String
+	  */
+	static public String separteDateTime(String dateTime) {
+		
+		return dateTime.substring(0, 10);
+	}
 }
