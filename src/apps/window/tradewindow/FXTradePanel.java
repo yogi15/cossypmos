@@ -52,6 +52,8 @@
 	import org.dyno.visual.swing.layouts.Leading;
 	
 	import com.standbysoft.component.date.swing.JDatePicker;
+
+import constants.CommonConstants;
 	
 	import productPricing.Pricer;
 	import util.NumericTextField;
@@ -87,7 +89,7 @@
 	import dsServices.RemoteReferenceData;
 	import dsServices.RemoteTask;
 	import dsServices.RemoteTrade;
-	import dsServices.ServerConnectionUtil;
+import dsServices.ServerConnectionUtil;
 	
 	
 	//VS4E -- DO NOT REMOVE THIS LINE!
@@ -689,7 +691,8 @@
 								takeupW.jLabel4.setText(basicData.currencyPair.getText().substring(0, 3));
 							//	takeupW.jTextField4.setDateFormat(commonUTIL.getDateTimeFormat());
 			                  //   takeupW.jTextField7.setDateFormat(commonUTIL.getDateTimeFormat());
-			                     takeupW.jTextField5.setDateFormat(commonUTIL.getDateTimeFormat());
+			                     takeupW.jTextField5.setText(commonUTIL.getCurrentDateInString());
+			                     takeupW.jTextField5.setEditable(false);
 			                     takeupW.jTextField6.setDateFormat(commonUTIL.getDateTimeFormat());
 			                     takeupW.jTextField4.setText(trade.getTradeDate());
 			                     takeupW.jTextField7.setText(trade.getDelivertyDate());
@@ -826,7 +829,7 @@
 										   
 									DateU tradedate = DateU.valueOf(commonUTIL.stringToDate(trade.getTradeDate(),true));
 									DateU tradeDeliverydate = DateU.valueOf(commonUTIL.stringToDate(trade.getDelivertyDate(),true));
-									DateU takeUPTradeDate = DateU.valueOf(takeupW.jTextField5.getSelectedDate());
+									DateU takeUPTradeDate = DateU.valueOf(commonUTIL.stringToDate(takeupW.jTextField5.getText(), true));
 									DateU takeUPSettleDate = DateU.valueOf(takeupW.jTextField6.getSelectedDate());
 									if(!commonUTIL.between2dates(tradedate.getDate(), tradeDeliverydate.getDate(), takeUPTradeDate.getDate())) {
 										commonUTIL.showAlertMessage("Take-up Trade date(s) has to be within the Start and End dates of the FX Time Option");
@@ -866,11 +869,13 @@
 										    	return;
 										    }
 										}
+										
+									
 										tradeTakeUp.setQuantity(amt1);
 										tradeTakeUp.setNominal(amt2);
-										tradeTakeUp.setTradeDate(takeupW.jTextField5.getSelectedDateAsText());
+										tradeTakeUp.setTradeDate(takeupW.jTextField5.getText());
 										tradeTakeUp.setDelivertyDate(commonUTIL.getOnlyDateFromStringDate(takeupW.jTextField6.getSelectedDateAsText()));
-										tradeTakeUp.setEffectiveDate(commonUTIL.getOnlyDateFromStringDate(takeupW.jTextField5.getSelectedDateAsText()));
+										tradeTakeUp.setEffectiveDate(commonUTIL.getOnlyDateFromStringDate(takeupW.jTextField5.getText()));
 										tradeTakeUp.setAttribute("Trade Date",tradeTakeUp.getTradeDate());
 										tradeTakeUp.setProductId(takeUPproduct.getId());
 										Vector tradestatus = new Vector();
@@ -1442,9 +1447,9 @@
 			        });
 			        
 			        
-			        out.jTextField1.addActionListener(new java.awt.event.ActionListener() {
+			        out.jTextField4.addActionListener(new java.awt.event.ActionListener() {
 					    public void actionPerformed(java.awt.event.ActionEvent e) {
-					    	 if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
+					    	 if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL") || basicData.buysell.getText().equalsIgnoreCase("BUY")) {
 									
 									double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) * -1;
@@ -1453,17 +1458,38 @@
 									double amt2 = Math.abs(amt1);								
 									out.jTextField2.setText(new Double(amt2/spot).toString());
 									
+									 double farAmt1 = amt1 * -1;
+							    	 swap.jTextField1.setText(new Double(farAmt1/spot).toString());
+							    	 System.out.println("farAmt1 " + farAmt1);
+							    	 if (!swap.jTextField4.equals(CommonConstants.BLANKSTRING)) {
+							    		 
+							    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
+							    		 double farAmt2 = Math.abs(farAmt1) * -1;								
+							    		 swap.jTextField2.setText(new Double(farAmt2/farRate).toString());
+							    	 }
+									
 					    	 } else {
 					    		 
-					    		 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+					    		 	double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) ;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
 									out.jTextField1.setText(new Double(amt1).toString());
 									double amt2 = Math.abs(amt1) * -1;								
 									out.jTextField2.setText(new Double(amt2/spot).toString());
-					    		 
+									
+									 double farAmt1 = amt1 * -1;
+							    	 swap.jTextField1.setText(String.valueOf(farAmt1));
+							    	 
+							    	 if (!swap.jTextField4.equals(CommonConstants.BLANKSTRING)) {
+							    		 
+							    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
+							    		 double farAmt2 = Math.abs(farAmt1) * -1;								
+							    		 swap.jTextField2.setText(new Double(farAmt2/farRate).toString());
+							    	 }
+					    		 																
 					    	 }
-	
+					    	 
+					    	
 						
 					 }
 				 });
@@ -1928,7 +1954,7 @@
 								functionality.jTabbedPane1.removeAll();
 							functionality.jTabbedPane1.add("CurrencyPair",__table);
 							__rows = getRows("Tenor");
-							__table = fillFavourites(__rows,out.outRightDate,swap.swapDate,null,true);
+							__table = fillFavourites(__rows,swap.swapDate,null,true);
 							functionality.jTabbedPane1.add("Tenor",__table);
 							__rows = getRows("CounterParty");
 							
@@ -2286,6 +2312,9 @@
 							fwdOp.setVisible(false);
 							productSubType = "FXSWAP";
 							swap.setVisible(true);
+							
+							out.outRightDate.setSelectedDate(commonUTIL.addSubtractDate(commonUTIL.getCurrentDate(), 2));
+									
 							if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
 								basicData.buysell.setText("SELL/BUY");
 								
@@ -3235,6 +3264,8 @@
 			trade.setCpID(new Integer(basicData.counterPary.getName()).intValue());
 			}
 			trade.setTraderID(new Integer(basicData.jTextField7.getName()).intValue());
+			
+			//tradeDate will always be currentDate. The actual TradeDate will be in attributes
 			trade.setTradeDate(commonUTIL.getCurrentDateTime());
 		    trade.setDelivertyDate(out.outRightDate.getSelectedDateAsText());
 		    trade.setStatus(out.jTextField6.getText());
@@ -3350,7 +3381,11 @@
 			    
 			}
 			getDataFromTrade(trade.getBookId(),"Book");
-		
+			
+			//always first setAttribute because in this method a hashtable is set with all attributes and ite values. This hastable is used to get 
+			//values ahead.
+			setAttribute(trade.getAttributes());
+			  
 			if(trade.isMirrorTrade()) {
 				mirrorBook = getBook(trade.getMirrorBookid());
 				Book book = getBook(trade.getCpID());
@@ -3371,7 +3406,7 @@
 		    trade.setStatus(out.jTextField6.getText());
 		    trade.setProductType(productType);
 		   
-		    setAttribute(trade.getAttributes());
+		  
 		   
 		    out.jTextField4.setText(new Double(trade.getPrice()).toString());
 		    if(trade.getType().equalsIgnoreCase("BUY")) {
@@ -3431,7 +3466,11 @@
 		    	String currP = trade.getTradedesc();
 		    	 fwdOp.jLabel2.setText(currP.substring(0, 3));
 				 fwdOp.jLabel3.setText(currP.substring(4, 7));
-				 fwdOp.startDate.setText(trade.getTradeDate());
+				 
+				 // attributeDataValue is set in setAttributes method
+				 fwdOp.startDate.setText(
+						commonUTIL.separteDateTime(attributeDataValue.get("Trade Date")));
+				 
 				 functionality.jButton0.setEnabled(true);
 				 fwdOp.primaryC.setValue(trade.getQuantity());
 				 fwdOp.quotingC.setValue(trade.getNominal());
@@ -3632,7 +3671,7 @@
 			    return __table;
 			
 		}
-		private JTable fillFavourites(Object __rows12 [][],JDatePicker textField,JDatePicker textField2,JLabel label,boolean dateField) {
+		private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JLabel label,boolean dateField) {
 			
 			Color colr = new Color(239,239,242);
 			 __table = new JTable(new JTableButtonModel(__rows12));
@@ -3646,7 +3685,7 @@
 			    __table.setDefaultRenderer(JButton.class,
 						       new JTableButtonRenderer(defaultRenderer));
 			    __table.setPreferredScrollableViewportSize(new Dimension(400, 200));
-			    __table.addMouseListener(new JTableButtonMouseListener(__table,textField,textField2,label,dateField));
+			    __table.addMouseListener(new JTableButtonMouseListener(__table,textField2,label,dateField));
 			    if(label  != null) {
 			    //	currencyPair = textField.getText();
 			    	//functionality.refreshPositionTable(currencyPair,new Integer(basicData.book.getName()).intValue());
@@ -3726,18 +3765,42 @@
 							attributesV = attributesV + key+ "=" + value + ";";
 								
 					} */
-				
+						int tradeDateRowno = -1;
+						String strTradeDate = "Trade Date";
+						String tradeDateVal="";
+						boolean tradeDateFilled = false;
 						Vector<Attribute> attributesData = attributes.getData();
 						for(int i=0;i<attributesData.size();i++) {
 							Attribute att = attributesData.get(i);
 							String value = att.getValue();
+							
+							if (att.equals(strTradeDate)) {
+								
+								tradeDateRowno = i;
+							}
 							if(value != null ) {
+								
+								if (tradeDateRowno >= 0) {
+									
+									tradeDateFilled = true;
+									tradeDateVal = value;
+								}
+								
 								if(value.trim().length() > 0)
 							    attributesV = attributesV + att.getName()+ "=" + att.getValue() + ";";
 							}
+							
+						}
+						
+						if (!tradeDateFilled) {
+							
+							tradeDateVal = commonUTIL.getCurrentDateTime();
+							attributesV = attributesV + strTradeDate+ "=" + tradeDateVal + ";";
+							attributes.jTable1.setValueAt(tradeDateVal, tradeDateRowno, 1);
+							
 						}
 					
-				
+						
 				if(attributesV.trim().length() > 0)
 				return attributesV.substring(0, attributesV.length()-1);
 				return attributesV;
@@ -3782,11 +3845,13 @@
 		  //  buttonEvent.
 		 //  System.out.println( button.getText() + " " + button.getName());
 		   if(dateF) {
-			   generateDeliveryDate(datefield,button.getName());
+			  //As we dont need to calculate near date based on tenor we have commented below method
+			   // generateDeliveryDate(datefield,button.getName());
 			   String swapTenor = button.getName();
 			   
-			   int t = (new Integer(swapTenor.substring(0, swapTenor.length()-1)).intValue() * 2);
-			   swapTenor = t + swapTenor.substring(swapTenor.length()-1, swapTenor.length());
+			   //commented below  far date is currentdate + tenor
+			   /*int t = (new Integer(swapTenor.substring(0, swapTenor.length()-1)).intValue() * 2);
+			   swapTenor = t + swapTenor.substring(swapTenor.length()-1, swapTenor.length());*/
 			   generateDeliveryDate(swapField,swapTenor);
 			   
 			   
@@ -3822,14 +3887,20 @@
 			   // swapField = textField2;
 			   // mirrorBook = mirrorBook;
 			  }
-		  public JTableButtonMouseListener(JTable table,JDatePicker  textField,JDatePicker  textField2,JLabel labeln,boolean dateField) {
+		  public JTableButtonMouseListener(JTable table,JDatePicker  textField2,JLabel labeln,boolean dateField) {
+			    __table = table;
+			    //datefield = textField;
+			    label = labeln;
+			    dateF = dateField;
+			    swapField = textField2;
+			  }
+		  public JTableButtonMouseListener(JTable table, JDatePicker textField,JDatePicker  textField2,JLabel labeln,boolean dateField) {
 			    __table = table;
 			    datefield = textField;
 			    label = labeln;
 			    dateF = dateField;
 			    swapField = textField2;
 			  }
-		  
 	   
 		  public void mouseClicked(MouseEvent e) {
 		    __forwardEventToButton(e);
