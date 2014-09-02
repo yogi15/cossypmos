@@ -41,7 +41,7 @@ public class TakeUPWindow extends JFrame {
 	public NumericTextField jTextField3;
 	private JLabel jLabel12;
 	private JLabel jLabel13;
-	public JDatePicker jTextField5;
+	public JTextField jTextField5;
 	public JTextField jTextField4;
 	public JLabel jLabel14;
 	public JDatePicker jTextField6;
@@ -144,9 +144,9 @@ public TakeUPWindow() {
 		return jTextField4;
 	}
 
-	private JDatePicker getJTextField5() {
+	private JTextField getJTextField5() {
 		if (jTextField5 == null) {
-			jTextField5 = new com.standbysoft.component.date.swing.JDatePicker(); 
+			jTextField5 = new JTextField(); 
 		//	jTextField5.setText("Trade Date");
 			//jTextField5.setEditable(false);
 			//jTextField5.setEnabled(false);
