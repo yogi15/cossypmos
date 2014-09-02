@@ -26,16 +26,47 @@ public class BONDAccountingHandler extends AccountingHandler {
 	public void getTRADE_AMOUNT(Trade trade, EventProcessor event,
 			AccEventConfig eventConfig, Vector accountingEvents,
 			AccConfigRule rule, Pricer pricer) {
+		
+		Product product = null;
+		Vector couponV = null;
 
 		BOPosting accEvent = new BOPosting(eventConfig);
+		
 		String tradeDate = trade.getTradeDate().substring(0, 10);
 		
-		double tradeAmount = trade.getTradeAmount();
+		RemoteProduct remoteProduct = RemoteServiceUtil
+				.getRemoteProductService();
+
+		try {
+			product = remoteProduct.selectProduct(trade.getProductId());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			couponV = (Vector) remoteProduct.getCoupon(product.getId());
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Coupon coupon = (Coupon) couponV.elementAt(0);
+
+		if (coupon.getCouponFrequency().equalsIgnoreCase("ZC"))
+			pricer = new BONDZCPricing();
+		else
+			pricer = new BONDPricing();
+
+		pricer.price(trade, product, coupon);
+		BondCashFlow bondCashflow = (BondCashFlow) pricer.genearteCashFlow();
+
+		pricer.setTradeData(bondCashflow);
+		
+		double tradeAmount = pricer.getCleanPrice();
 		
 		if (trade.getType().equals(TradeConstants.BUY)) {
 			
-			tradeAmount = tradeAmount * -1;
-			
+			tradeAmount = tradeAmount * -1;			
 			
 		}
 		
@@ -54,10 +85,12 @@ public class BONDAccountingHandler extends AccountingHandler {
 		BOPosting accEvent = new BOPosting(eventConfig);
 	
 		LiquidationEventProcessor liquidationEvent = (LiquidationEventProcessor)event;
-
+		
+		String liquidationDate = liquidationEvent.getLiquidation().getLidDate().substring(0, 10);
+		
 		accEvent.setAmount(liquidationEvent.getLiquidation().getRealisedPNL());
-		accEvent.setEffectiveDate(trade.getDelivertyDate());
-		accEvent.setBookingDate(trade.getTradeDate());
+		accEvent.setEffectiveDate(liquidationDate);
+		accEvent.setBookingDate(liquidationDate);
 		accEvent.setCurrency(trade.getCurrency());
 
 		accountingEvents.addElement(accEvent);
