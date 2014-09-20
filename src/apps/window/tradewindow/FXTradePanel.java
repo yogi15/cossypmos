@@ -3230,17 +3230,15 @@ import dsServices.ServerConnectionUtil;
 		//
 			
 			//trade.setId(0);
-			
-			if(basicData.jRadioButton1.isSelected()) {
+			if(basicData.jRadioButton0.isSelected()) {
+				productSubType = FXTAKEUP;
+			} else if(basicData.jRadioButton1.isSelected()) {
 				productSubType = FXFORWARD;
-			} 
-			if(basicData.jRadioButton2.isSelected()) {
+			} else if(basicData.jRadioButton2.isSelected()) {
 				productSubType = FXSWAP;
-			}
-			if(basicData.jRadioButton5.isSelected()) {
+			} else if(basicData.jRadioButton5.isSelected()) {
 				productSubType = FXFORWARDOPTION;
-			}
-			if(productSubType.isEmpty()) {
+			} else if(productSubType.isEmpty()) {
 				commonUTIL.showAlertMessage("Select ProductType");
 				return;
 			}
@@ -3514,6 +3512,7 @@ import dsServices.ServerConnectionUtil;
 		    	basicData.jRadioButton5.setEnabled(false);
 		    	basicData.jRadioButton2.setEnabled(false);
 		    	basicData.jRadioButton2.setSelected(false);
+		    	basicData.jRadioButton5.setSelected(false);
 		    	basicData.jRadioButton5.setEnabled(false);
 		    	basicData.jRadioButton0.setEnabled(true);
 		    	basicData.jRadioButton0.setSelected(true);
