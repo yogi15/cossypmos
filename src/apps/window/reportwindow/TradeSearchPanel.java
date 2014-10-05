@@ -566,6 +566,36 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			bean.setSearchCriteria("in");
 			filterBeans.add(bean);
 		}
+		if(!commonUTIL.isEmpty(TradeKeyWordValue.getText())) {
+			bean = new FilterBean();
+			if(TradeKeyWordName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(TradeKeyWordName.getSelectedItem().toString()))) {
+			bean.setColumnName("TradeKeyword");
+			bean.setColumnValues(TradeKeyWordName.getSelectedItem().toString()+"="+TradeKeyWordValue.getText());
+			bean.setAnd_or("And");
+			bean.setSearchCriteria("in");
+			filterBeans.add(bean);
+			}
+		}
+		if(!commonUTIL.isEmpty(LeAttributesValues.getText())) {
+			bean = new FilterBean();
+			if(LeAttributes.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(LeAttributes.getSelectedItem().toString()))) {
+			bean.setColumnName("LeKeyword");
+			bean.setColumnValues(LeAttributes.getSelectedItem().toString()+"="+LeAttributesValues.getText());
+			bean.setAnd_or("And");
+			bean.setSearchCriteria("in");
+			filterBeans.add(bean);
+			}
+		}
+		if(!commonUTIL.isEmpty(BookAttributeValue.getText())) {
+			bean = new FilterBean();
+			if(LeAttributes.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BookAttributeName.getSelectedItem().toString()))) {
+			bean.setColumnName("BookKeyword");
+			bean.setColumnValues(BookAttributeName.getSelectedItem().toString()+"="+BookAttributeValue.getText());
+			bean.setAnd_or("And");
+			bean.setSearchCriteria("in");
+			filterBeans.add(bean);
+			}
+		}
 		if(!commonUTIL.isEmpty(TradeDateFrom.getText())) {
 			bean = new FilterBean();
 			bean.setColumnName("TradeDate");
@@ -587,6 +617,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			bean = new FilterBean();
 			bean.setColumnName("Type");
 			bean.setColumnValues(BUYSELL.getSelectedItem().toString());
+			bean.setSearchCriteria("in");
 			bean.setAnd_or("And");
 		
 			filterBeans.add(bean);
@@ -597,7 +628,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			bean.setColumnName("Status");
 			bean.setColumnValues(Status.getSelectedItem().toString());
 			bean.setAnd_or("And");
-		
+			bean.setSearchCriteria("in");
 			filterBeans.add(bean);
 		}
 		if(Action.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Action.getSelectedItem().toString()))) {
@@ -605,6 +636,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			bean = new FilterBean();
 			bean.setColumnName("Action");
 			bean.setColumnValues(Action.getSelectedItem().toString());
+			bean.setSearchCriteria("in");
 			bean.setAnd_or("And");
 		
 			filterBeans.add(bean);
@@ -615,7 +647,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			bean.setColumnName("ProductType");
 			bean.setColumnValues(ProductType.getSelectedItem().toString());
 			bean.setAnd_or("And");
-		
+			bean.setSearchCriteria("in");
 			filterBeans.add(bean);
 		}
 		if(ProductSubType.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(ProductSubType.getSelectedItem().toString()))) {
@@ -623,6 +655,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			bean = new FilterBean();
 			bean.setColumnName("ProductSubType");
 			bean.setColumnValues(ProductSubType.getSelectedItem().toString());
+			bean.setSearchCriteria("in");
 			bean.setAnd_or("And");
 		
 			filterBeans.add(bean);
@@ -630,7 +663,8 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		if(BookName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BookName.getSelectedItem().toString()))) {
 			
 			bean = new FilterBean();
-			bean.setColumnName("BookID");
+			bean.setColumnName("Book");
+			bean.setSearchCriteria("in");
 			
 			bean.setColumnValues(new Integer(getBookID(BookName.getSelectedIndex())).toString());
 			bean.setAnd_or("And");
@@ -644,7 +678,7 @@ if(LegalEntityName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(LegalEntityN
 			
 			bean.setColumnValues(new Integer(getCPid(LegalEntityName.getSelectedIndex())).toString());
 			bean.setAnd_or("And");
-		
+			bean.setSearchCriteria("in");
 			filterBeans.add(bean);
 		}
 if(Currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Currency.getSelectedItem().toString()))) {
@@ -654,7 +688,7 @@ if(Currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Currency.getSelecte
 	
 	bean.setColumnValues(Currency.getSelectedItem().toString());
 	bean.setAnd_or("And");
-
+	bean.setSearchCriteria("in");
 	filterBeans.add(bean);
 }
 		return filterBeans;
@@ -768,7 +802,7 @@ private void processLEDataCombo1(javax.swing.DefaultComboBoxModel combodata, Has
 
 			Iterator it = ledata.iterator();
 			int p = 0;
-			
+			combodata.addElement("");
 			while (it.hasNext()) {
 
 				LegalEntity le = (LegalEntity) it.next();
