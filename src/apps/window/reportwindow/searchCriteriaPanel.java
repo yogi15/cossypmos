@@ -31,6 +31,7 @@ import util.commonUTIL;
 
 
 import beans.FilterBean;
+import beans.UserJobsDetails;
 
 import com.jidesoft.combobox.MultiSelectListExComboBox;
 import com.jidesoft.grid.DateCellEditor;
@@ -39,10 +40,11 @@ public class searchCriteriaPanel extends JPanel {
 	Vector<FilterBean> data = new Vector<FilterBean>();
 	 TableModelUtil mod;
 	 String col[] = { "Name", "Criteria", "Values", "And/Or" };
+	 SearchCriteriaType searchType = null;
 	 public EachRowEditor rowEditor;
 
 	 public Vector<FilterBean> getFilterBeanData() {
-		 return data;
+		 return searchType.searchCriteria();///data;
 	 }
 
 	public JTable table; 
@@ -53,6 +55,7 @@ public class searchCriteriaPanel extends JPanel {
 		createGUI();
 	}
 	public void clearllCriterial() {
+		searchType.clearllCriterial();
 		mod = null;
 		mod = new TableModelUtil(data,col);
 		table.setModel(mod);
@@ -86,9 +89,10 @@ public class searchCriteriaPanel extends JPanel {
 		// mod.addRow(bean);
 		 table.setModel(mod);
 		 jScrollPane1 = new JScrollPane();
+		 searchType = new TradeSearchPanel();
 		 jScrollPane1.setViewportView(table);
-		 add(jScrollPane1,BorderLayout.CENTER);
-	     
+		// add(jScrollPane1,BorderLayout.CENTER);
+		 add(searchType,BorderLayout.CENTER);
 	        
 	}
 	 /**
@@ -638,6 +642,11 @@ class MyTableCellEditor  extends DefaultCellEditor {
     return getValue();
   }
 
+}
+
+public void loadTemplate(Vector<UserJobsDetails> jobdetails) {
+	// TODO Auto-generated method stub
+	searchType.loadFilters(jobdetails);
 }
 
 

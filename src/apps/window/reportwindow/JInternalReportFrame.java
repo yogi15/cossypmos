@@ -169,6 +169,7 @@ public class JInternalReportFrame extends JInternalFrame {
 
 	private JPanel getJPanel1() {
 		// TODO Auto-generated method stub
+		
 		searchPanel = new searchCriteriaPanel();
 		return searchPanel;
 	}
@@ -233,6 +234,8 @@ public class JInternalReportFrame extends JInternalFrame {
 		}
 		return jButton5;
 	}
+	
+	// Execute Buttons
 	private JButton getJButton0() {
 		if (jButton0 == null) {
 			jButton0 = new JButton();
@@ -267,9 +270,9 @@ public class JInternalReportFrame extends JInternalFrame {
 				if( columnSQL.contains("where")) {
 					sqlW = columnSQL + " and   " + where;
 				} else {
-					sqlW = columnSQL;
+					sqlW = columnSQL + " where " + where;
 				}
-				
+				sqlW = 	getFilterValues().checkTableAliasForAttributes(sqlW);
 				// + " where   " + where;
 				
 				try {
@@ -312,7 +315,7 @@ public class JInternalReportFrame extends JInternalFrame {
 						
 					} else {
 						sqlW =  getFilterValues().changeColumnNameForNormalReport(sqlW);
-						sqlW = getFilterValues().createWhereOnAttributes(sqlW,where);
+						//sqlW = getFilterValues().createWhereOnAttributes(sqlW,where);
 					//commonUTIL.showAlertMessage(sql);
 						data = (Vector)	 reportPanel.getRemoteTrade().getTradesforReport(sqlW);
 						if(data != null && data.size() > 0) {
@@ -324,8 +327,8 @@ public class JInternalReportFrame extends JInternalFrame {
 					}
 					}
 					
-				System.out.println(data.size());
-				System.out.println("PPP");
+				//System.out.println(data.size());
+			//	System.out.println("PPP");
 			//	jobdataPanel.setDataCreteria(data,filtersValues);
 				//jobdataPanel.setJobdetails(filters);
 				
@@ -763,6 +766,7 @@ public class JInternalReportFrame extends JInternalFrame {
 		// TODO Auto-generated method stub
 		if(!commonUTIL.isEmpty(jobdetails)) {
 			searchPanel.clearllCriterial();
+			searchPanel.loadTemplate(jobdetails);
 			for(int i=0;i<jobdetails.size();i++) {
 				UserJobsDetails jd = jobdetails.get(i);
 				FilterBean bean = new FilterBean();
@@ -827,8 +831,9 @@ public class JInternalReportFrame extends JInternalFrame {
 		
 		int rowCount =searchPanel.table.getRowCount();
 			Vector<UserJobsDetails> jobdets = new Vector<UserJobsDetails>();
-			for(int i=0;i<searchPanel.getFilterBeanData().size();i++) {
-       			FilterBean filterBean = searchPanel.getFilterBeanData().get(i);
+			Vector<FilterBean> filterBeans = searchPanel.getFilterBeanData();
+			for(int i=0;i<filterBeans.size();i++) {
+       			FilterBean filterBean = filterBeans.get(i);
        			UserJobsDetails ud = new UserJobsDetails();
        			ud.setJobId(job.getId());
        			ud.setColumnName(filterBean.getColumnName());
