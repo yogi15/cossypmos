@@ -29,10 +29,12 @@ import dsServices.RemoteTrade;
 public class FilterValues {
 	
 	 Hashtable<String,Vector> dataValues = null; 
-	 String starupData [] = {"SearchCriteria","TaskColumn","Status","ProductType","Currency","EventType","WFType","BUY/SELL","TransferType","FEEType","accEvent","TaskType","TradeAttribute","QuotingCurr","PrimaryCurr","LEAttributes"};
+	 String starupData [] = {"SearchCriteria","TaskColumn","Status","ProductType","Currency","EventType","WFType","BUY/SELL","TransferType","FEEType","accEvent","TaskType","TradeAttribute","QuotingCurr","PrimaryCurr","LEAttributes","BookAttributes"};
 	 String referenceData [] = {"Book" };
 	 String datesSearch [] = {"between",">=",">","<=","<","="};
 	 Hashtable<Integer,Book> bookValues = new Hashtable<Integer,Book>(); 
+	 static Hashtable<String,String> attributesTableName = new Hashtable<String,String>(); 
+	 static Hashtable<String,String> attributesTableWhereClause = new Hashtable<String,String>(); 
 	 Hashtable<Integer,LegalEntity> counterPary = new Hashtable<Integer,LegalEntity>(); 
 	 static Hashtable<String,String> columnNames = new Hashtable<String,String>(); 
 	 static Hashtable<String,String> numberDataTypes = new Hashtable<String,String>(); 
@@ -41,15 +43,28 @@ public class FilterValues {
 	 static Hashtable<String,String> forwardColumnMaps = new   Hashtable<String,String>();
 	 static Hashtable<String,String> replaceColumnNameOnSQL = new   Hashtable<String,String>();
 	 
-	 String attributesObject [] = {"legalEntity.Attributes","book.Attributes","transfer.attributes"};
+	 String attributesObject [] = {"LegalEntity.Attributes","Book.Attributes","Transfer.attributes"};
 	 RemoteTrade remoteTrade = null;
 	 RemoteBOProcess remoteBO = null;
 	 RemoteTask remoteTask = null;
 	 RemoteReferenceData remote = null;
 	 static {
+		 // add attributseTables 
+		 attributesTableName.put("LegalEntity.Attributes","leAttribute leattribute");
+		 attributesTableName.put("Book.Attributes","Book book");
+		 attributesTableName.put("Transfer.attributes","Transfer transer");
+		 attributesTableWhereClause.put("LegalEntity.Attributes", "t.cpid = leattribute.le_id and leattribute.attributeValue =");
+		 
 		 replaceColumnNameOnSQL.put("Trade.DeliveryDate", "to_char(Trade.DeliveryDate,'dd/mm/yyyy') SettleMentDate");
 		 replaceColumnNameOnSQL.put("Trade.TradeDate", "to_char(Trade.TradeDate,'dd/mm/yyyy HH:MM:ss') TradeDate");
 		 replaceColumnNameOnSQL.put("Trade.BaseCurrency", "substr(Trade.tradedesc,0,3) BaseCurrency");
+		 replaceColumnNameOnSQL.put("Trade.Type", "Trade.Type Direction ");
+		 replaceColumnNameOnSQL.put("Trade.tradedesc1","Trade.tradedesc1 ProductType");
+		 replaceColumnNameOnSQL.put("Trade.AMT1","Trade.Quantity AMT1");
+		 replaceColumnNameOnSQL.put("Trade.AMT2","Trade.Nominal AMT2");
+		 replaceColumnNameOnSQL.put("Trade.Price","Trade.Price Rate ");
+		 replaceColumnNameOnSQL.put("Posting.CreditAccId", " (select accountname from ACCOUNT where id = Posting.CreditAccId) CreditAcc");
+		 replaceColumnNameOnSQL.put("Posting.DebitAccId", " (select accountname from ACCOUNT where id = Posting.DebitAccId) DebitAcc");
 		 
 		 forwardColumnMaps.put("Monthly", "TO_CHAR(settledate,'MON')");
 		 forwardColumnMaps.put("Daily", "TO_CHAR(settledate,'DD')");
@@ -86,6 +101,7 @@ public class FilterValues {
 		 columnNames.put("Quantity", "Quantity");
 		 columnNames.put("TaskDate", "TaskDate");
 		 columnNames.put("Monthly", "TO_CHAR(settledate,'MON')");
+		 columnNames.put("TradeID", "ID");
 		 numberDataTypes.put("Book", "Bookid");
 		 numberDataTypes.put("LegalEntity", "id");
 		 numberDataTypes.put("Task", "id");
@@ -111,6 +127,10 @@ public class FilterValues {
 		 tableNames.put("Le", "Le");
 		 tableNames.put("Trader", "Le");
 		 tableNames.put("PNL", "Liquidpos");
+		 
+		 // this used when where statement is having table alias but table string don't have table name
+		 tableNames.put("legalEntity", "Le"); // this to be removed.
+		 tableNames.put("LegalEntity", "Le"); 
 		// tableNames.put("Cashposition", "Cashposition");
 		 
 		 
@@ -136,13 +156,34 @@ public class FilterValues {
 		dataValues.put("CounterParty", getCounterParty(remote));
 		dataValues.put("QuotingCurr", dataValues.get("Currency"));
 		dataValues.put("PrimaryCurr", dataValues.get("Currency"));
-		dataValues.put("legalEntity.Attributes", dataValues.get("LEAttributes"));
+		dataValues.put("Book.Attributes", dataValues.get("BookAttributes"));
+		dataValues.put("LegalEntity.Attributes", dataValues.get("LEAttributes"));
+		
 		
 		
 	}
 	
 	public String [] getDateSearchCriteria() {
 		return datesSearch;
+	}
+	
+	
+	public Vector getDomainValues(String domainName) {
+		Vector domainData = null;
+		domainData = dataValues.get(domainName);
+		if(domainData == null) {
+			
+			try {
+				domainData = (Vector) remote.getStartUPData(domainName);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				commonUTIL.display("FilterValues", "getDomainValues");
+			}
+			if(domainData != null) {
+				 dataValues.put(domainName,domainData);
+			}
+		}
+		return domainData;
 	}
 	
 	public  Vector getValuesonColumn(String name,RemoteReferenceData remote1) {
@@ -404,6 +445,21 @@ public class FilterValues {
 		}
 		
 	}
+	
+	public Vector getBooks() {
+		Vector books = null;
+		
+			if(dataValues.containsKey("Book")) 
+				books = dataValues.get("Book");
+		return books;
+	}
+	public Vector getLegalEntitys() {
+		return	dataValues.get("CounterParty");
+		
+	}	
+	
+	
+	
 	Hashtable<String,String[]> stringarray = new Hashtable<String,String[]>();
 
 
@@ -470,6 +526,7 @@ public class FilterValues {
 		// TODO Auto-generated method stub
 		String where  ="";
 		boolean isForwardLadder = false;
+		boolean isAttribute = false;
 	    int att = 0;
 		if(jobdetails == null || jobdetails.size() == 0 || jobdetails.isEmpty()) 
 			return where;
@@ -756,13 +813,58 @@ public class FilterValues {
 		}
 		
 	}
+	
+    private String addTableNameIfrequired(String columnSQL) {
+    	
+    	
+    	int selectIndex = columnSQL.indexOf("select");
+    	String sql = "Select ";
+    	int fromIndex = columnSQL.indexOf("from");
+    	int whereIndex = columnSQL.indexOf("where");
+    	String sqlColumn = columnSQL.substring(selectIndex+6, fromIndex);
+    	String [] tablename = getArrayofRepeatedString(columnSQL.substring(fromIndex+4,whereIndex),",");
+    	String whereClause [] = getArrayofRepeatedString(columnSQL.substring(whereIndex+5, columnSQL.length()),"and");
+    	if(whereClause == null)
+    		return columnSQL;
+    	if(tablename == null) {
+    		String table = columnSQL.substring(fromIndex+4,whereIndex);
+    		String newtables = table;
+    		for(int i=0; i< whereClause.length;i++) {
+    			String where = whereClause[i];
+    			String tableinwhere = where.substring(0, where.indexOf("."));
+    			if(!table.trim().contains(tableinwhere.trim())) {
+    				newtables = newtables + ", " + getTableName(tableinwhere.trim()) + " "+ tableinwhere ;
+    			}
+    			
+    		}
+    		sql = sql +  columnSQL.substring(selectIndex+6, fromIndex) + " from  " + newtables + " where " + columnSQL.substring(whereIndex+5, columnSQL.length());
+    	}
+    	
+    	//String 
+    
+    	
+    	return "";
+    }
+    
+    private String [] getArrayofRepeatedString(String name,String regex) {
+    	if(!name.contains(regex)) 
+    		return null;
+    	String [] names = name.split(regex);
+    	return names;
+    }
+    
+    
 //	tradeAttribute.ISIN
 	public String createWhereOnAttributes(String columnSQL,String where) {
+		String querySQL = "";
+	
 		if(!columnSQL.contains("tradeAttribute")) {
-			  if(columnSQL.contains("where"))
-				return columnSQL ;
-			  else 
-				  return columnSQL + " where " +  where; 
+			  if(columnSQL.contains("where")) {
+				  querySQL = addTableNameIfrequired(columnSQL);
+			  }  else {
+				  querySQL =   addTableNameIfrequired(columnSQL + " where " +  where); 
+			  }
+			  return querySQL;
 		}
 		int counter = 0;
 		String tablename = "";
@@ -880,6 +982,26 @@ public class FilterValues {
 		return sql;
 	}
 
+	// this is to add attribute table name in sql if any attribute table name is existing in whereclause.
+	
+	public String checkTableAliasForAttributes(String sql) {
+		String where = sql.substring(sql.indexOf("where"), sql.length());
+		String sqlwithoutWhere = sql.substring(0,sql.indexOf("where"));
+		for(int i=0;i<attributesObject.length;i++) {
+		
+			
+			if(where.contains(attributesObject[i])) {
+				String attributesTable = attributesTableName.get(attributesObject[i]);
+				if(!sqlwithoutWhere.contains(attributesTable)) {
+					sqlwithoutWhere = sqlwithoutWhere + " , " + attributesTable ;
+				}
+			}
+		}
+		return sqlwithoutWhere + " " +  where;
+	}
+	
+	
+	
 	public String changeColumnNameForForwoardReport(String sqlW) {
 		// TODO Auto-generated method stub
 		String sql = sqlW;
