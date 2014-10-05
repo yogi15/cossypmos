@@ -136,8 +136,8 @@ public class ReportColumns {
 		
 		
 		
-		columnsMaps.put("Trade.TradeId","id"); // to be changed
-		 reversecolumnsMaps.put("Trade.id", "Trade.TradeId");
+		columnsMaps.put("Trade.TradeID","id"); // to be changed
+		 reversecolumnsMaps.put("Trade.id", "Trade.id");
 		columnsMaps.put("Trade.Currency","Currency");
 		//columnsMaps.put("Trade.Currency","productId "); 
 	//	columnsMaps.put("Trade.CounterParty","cpID");
@@ -153,8 +153,8 @@ public class ReportColumns {
         columnsMaps.put("Trade.Nominal","Nominal ");
 	    columnsMaps.put("Trade.Quantity","Quantity"); 
 	   
-	    columnsMaps.put("Trade.AMT2 ","Amount2");
-	    columnsMaps.put("Trade.AMT1","Amount1"); 
+	    columnsMaps.put("Trade.AMT2","AMT2");
+	    columnsMaps.put("Trade.AMT1","AMT1"); 
 	    columnsMaps.put("Trade.currPair","CurrencyPair"); 
 		columnsMaps.put("Trade.User","userid ");  // to be changed
 		columnsMaps.put("Trade.Price","Price");
