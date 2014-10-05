@@ -570,17 +570,18 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			bean = new FilterBean();
 			if(TradeKeyWordName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(TradeKeyWordName.getSelectedItem().toString()))) {
 			bean.setColumnName("TradeKeyword");
-			bean.setColumnValues(TradeKeyWordName.getSelectedItem().toString()+"="+TradeKeyWordValue.getText());
+			bean.setColumnValues("tradeattribute.attributename = '"+TradeKeyWordName.getSelectedItem().toString()+"' and tradeattribute.attributevalue = '"+TradeKeyWordValue.getText() +"'");
 			bean.setAnd_or("And");
 			bean.setSearchCriteria("in");
 			filterBeans.add(bean);
 			}
 		}
+		
 		if(!commonUTIL.isEmpty(LeAttributesValues.getText())) {
 			bean = new FilterBean();
 			if(LeAttributes.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(LeAttributes.getSelectedItem().toString()))) {
 			bean.setColumnName("LeKeyword");
-			bean.setColumnValues(LeAttributes.getSelectedItem().toString()+"="+LeAttributesValues.getText());
+			bean.setColumnValues("legalentityattribute.attributename = '"+LeAttributes.getSelectedItem().toString()+"' and legalentityattribute.attributevalue = '"+LeAttributesValues.getText() +"'");
 			bean.setAnd_or("And");
 			bean.setSearchCriteria("in");
 			filterBeans.add(bean);
@@ -588,9 +589,9 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		}
 		if(!commonUTIL.isEmpty(BookAttributeValue.getText())) {
 			bean = new FilterBean();
-			if(LeAttributes.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BookAttributeName.getSelectedItem().toString()))) {
+			if(BookAttributeName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BookAttributeName.getSelectedItem().toString()))) {
 			bean.setColumnName("BookKeyword");
-			bean.setColumnValues(BookAttributeName.getSelectedItem().toString()+"="+BookAttributeValue.getText());
+			bean.setColumnValues("bookattribute.attributename = '"+BookAttributeName.getSelectedItem().toString()+"' and bookattribute.attributevalue = '"+BookAttributeValue.getText() +"'");
 			bean.setAnd_or("And");
 			bean.setSearchCriteria("in");
 			filterBeans.add(bean);
@@ -747,6 +748,11 @@ if(Currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Currency.getSelecte
 		BookAttributeName.setSelectedIndex(-1);
 		BookName.setSelectedIndex(-1);
 		LegalEntityName.setSelectedIndex(-1);
+		TradeKeyWordName.setSelectedIndex(-1);
+		TradeKeyWordValue.setText("");
+		LeAttributes.setSelectedIndex(-1);
+		LeAttributesValues.setText("");
+		BookAttributeValue.setText("");
 		//Legal
 		
 	}
@@ -789,6 +795,31 @@ if(Currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Currency.getSelecte
 			}
 			if(bean.getColumnName().equalsIgnoreCase("cpid")) {
 				LegalEntityName.setSelectedIndex(getCPtoSelected(Integer.parseInt(bean.getValues())));
+			}
+			if(bean.getColumnName().equalsIgnoreCase("TradeKeyword")) {
+				
+				String tradeAttName = "tradeattribute.attributename = '";
+				String tradeAttValue = "' and tradeattribute.attributevalue = '";
+				String tradeAttributeNames = bean.getValues().substring(bean.getValues().indexOf("tradeattribute.attributename = '")+tradeAttName.length(),bean.getValues().indexOf("' and tradeattribute.attributevalue = '"));
+				String tradeAttributeValue = bean.getValues().substring(bean.getValues().indexOf("' and tradeattribute.attributevalue = '")+tradeAttValue.length(),bean.getValues().length()-1);
+				TradeKeyWordName.setSelectedItem(tradeAttributeNames);
+				TradeKeyWordValue.setText(tradeAttributeValue);
+			}
+			if(bean.getColumnName().equalsIgnoreCase("LeKeyword")) {
+				String leAttName = "legalentityattribute.attributename = '";
+				String leAttValue = "' and legalentityattribute.attributevalue = '";
+				String leAttributeNames = bean.getValues().substring(bean.getValues().indexOf(leAttName)+leAttName.length(),bean.getValues().indexOf(leAttValue));
+				String leAttributeValue = bean.getValues().substring(bean.getValues().indexOf(leAttValue)+leAttValue.length(),bean.getValues().length()-1);
+				LeAttributes.setSelectedItem(leAttributeNames);
+				LeAttributesValues.setText(leAttributeValue);
+			}
+			if(bean.getColumnName().equalsIgnoreCase("BookKeyword")) {
+				String leAttName = "bookattribute.attributename = '";
+				String leAttValue = "' and bookattribute.attributevalue = '";
+				String leAttributeNames = bean.getValues().substring(bean.getValues().indexOf(leAttName)+leAttName.length(),bean.getValues().indexOf(leAttValue));
+				String leAttributeValue = bean.getValues().substring(bean.getValues().indexOf(leAttValue)+leAttValue.length(),bean.getValues().length()-1);
+				BookAttributeName.setSelectedItem(leAttributeNames);
+				BookAttributeValue.setText(leAttributeValue);
 			}
 		}
 		
