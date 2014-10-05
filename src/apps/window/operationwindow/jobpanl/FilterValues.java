@@ -42,18 +42,24 @@ public class FilterValues {
 	 static Hashtable<String,String> tableNames = new   Hashtable<String,String>();
 	 static Hashtable<String,String> forwardColumnMaps = new   Hashtable<String,String>();
 	 static Hashtable<String,String> replaceColumnNameOnSQL = new   Hashtable<String,String>();
-	 
-	 String attributesObject [] = {"LegalEntity.Attributes","Book.Attributes","Transfer.attributes"};
+	 static Hashtable<String,String> attributesWhereClause = new Hashtable<String,String>();
+	 String attributesObject [] = {"tradeattribute","legalentityattribute","bookattribute","Book.Attributes","Transfer.attributes"}; // used for attributes only.
 	 RemoteTrade remoteTrade = null;
 	 RemoteBOProcess remoteBO = null;
 	 RemoteTask remoteTask = null;
 	 RemoteReferenceData remote = null;
 	 static {
 		 // add attributseTables 
-		 attributesTableName.put("LegalEntity.Attributes","leAttribute leattribute");
+		 attributesTableName.put("tradeattribute","attribute tradeattribute");
+		 attributesTableName.put("legalentityattribute","leattribute legalentityattribute ");
+		 attributesTableName.put("bookattribute","bookattributes Bookattributes ");
 		 attributesTableName.put("Book.Attributes","Book book");
 		 attributesTableName.put("Transfer.attributes","Transfer transer");
+		 
 		 attributesTableWhereClause.put("LegalEntity.Attributes", "t.cpid = leattribute.le_id and leattribute.attributeValue =");
+		 
+		 attributesWhereClause.put("TradeKeyword","trade.id = tradeattribute.id  ");
+		 attributesWhereClause.put("LeKeyword"," legalentity.id = legalentityattribute.le_id  ");
 		 
 		 replaceColumnNameOnSQL.put("Trade.DeliveryDate", "to_char(Trade.DeliveryDate,'dd/mm/yyyy') SettleMentDate");
 		 replaceColumnNameOnSQL.put("Trade.TradeDate", "to_char(Trade.TradeDate,'dd/mm/yyyy HH:MM:ss') TradeDate");
@@ -77,7 +83,9 @@ public class FilterValues {
 		 forwardColumnMaps.put("TO_CHAR(settledate,'WW')", "TO_CHAR(settledate,'WW') Weekly");
 		 
 		 columnNames.put("Book", "Bookid");
+		 columnNames.put("Type", "Type");
 		 columnNames.put("LegalEntity", "id");
+		 columnNames.put("cpid","cpid");
 		 columnNames.put("Currency", "Currency");
 		 columnNames.put("SettleCurrency", "Currency");
 		 columnNames.put("Action", "action");
@@ -111,6 +119,8 @@ public class FilterValues {
 		 numberDataTypes.put("TradeID", "tradeid");
 		 numberDataTypes.put("Amount", "amount");
 		 numberDataTypes.put("Quantity", "Quantity");
+		 numberDataTypes.put("cpid", "cpid");
+		 
 		
 		 matachingColumns.put("PrimaryCurr", "Currency");
 		 matachingColumns.put("QuotingCurr", "Currency");
@@ -525,6 +535,7 @@ public class FilterValues {
 	public String createWhere(Vector<FilterBean> jobdetails,String tableName1) {
 		// TODO Auto-generated method stub
 		String where  ="";
+		Vector<FilterBean> attributesFilterBeans = new Vector<FilterBean>();
 		boolean isForwardLadder = false;
 		boolean isAttribute = false;
 	    int att = 0;
@@ -532,42 +543,44 @@ public class FilterValues {
 			return where;
 		for(int i=0;i<jobdetails.size();i++) {
 			FilterBean bean = (FilterBean) jobdetails.get(i);
-			if(bean.getColumnName().equalsIgnoreCase("Ladder")) 
-				isForwardLadder = true;
-			boolean isStaticRefData = true;
-			if(isObjectAttribute(bean.getColumnName())) {
-				 where = where + " " + bean.getColumnName() + " "  + bean.getSearchCriteria() + " '%"  +bean.getColumnValues() + "="+bean.getAnd_or()+"%'";
-			} else 	   if(bean.getColumnName().equalsIgnoreCase("Book")) {
-				   where = where + " " + tableNames.get(tableName1).toLowerCase() +"."+ createCriteriaOnBook(dataValues.get("Book"),bean);
+			    if(bean.getColumnName().endsWith("Keyword")) {
+			    	attributesFilterBeans.add(bean);
+			    } else { 
+			    	if(bean.getColumnName().equalsIgnoreCase("Ladder")) 
+			    			isForwardLadder = true;
+			    			boolean isStaticRefData = true;
+			    	if(isObjectAttribute(bean.getColumnName())) {
+			    			where = where + " " + bean.getColumnName() + " "  + bean.getSearchCriteria() + " '%"  +bean.getColumnValues() + "="+bean.getAnd_or()+"%'";
+					} else 	   if(bean.getColumnName().equalsIgnoreCase("Book")) {
+								where = where + " " + tableNames.get(tableName1).toLowerCase() +"."+ createCriteriaOnBook(dataValues.get("Book"),bean);
 				   
-			   } else    if(bean.getColumnName().equalsIgnoreCase("CounterParty")) {
-				   isStaticRefData = false;
-				   where = where + " " + tableNames.get(tableName1).toLowerCase()+"."+ createCriteriaOnCounterParty(dataValues.get("CounterParty"),bean);
+					} else    if(bean.getColumnName().equalsIgnoreCase("CounterParty")) {
+						isStaticRefData = false;
+						where = where + " " + tableNames.get(tableName1).toLowerCase()+"."+ createCriteriaOnCounterParty(dataValues.get("CounterParty"),bean);
 				   
-			   } else  if(bean.getColumnName().equalsIgnoreCase("TradeAttribute")) { 
-				   where = where + " " + createWhereForAttribute(bean,att);
-				   att++;
-			       if(i != jobdetails.size()-1) {
-			    	   where = where + " and ";
-			       }
-			   } else {
-				   where = where +  " " + tableNames.get(tableName1).toLowerCase()+"."+ createCriteria(bean,tableName1);
-			   }
-			   
-				  
-			   
-			   if(i != jobdetails.size()-1) {
-				   if(bean.getAnd_or() == null || bean.getAnd_or().isEmpty())
-					   where = where + " and ";
-				   else 
-					   if(bean.getColumnName().endsWith("Date")) {
-						   where = where + " and ";
-					   } else {
-					       where = where + " " + bean.getAnd_or() +  "  ";
-					   }
-			   } 
+					} else  if(bean.getColumnName().equalsIgnoreCase("TradeAttribute")) { 
+							where = where + " " + createWhereForAttribute(bean,att);
+							att++;
+							if(i != jobdetails.size()-1) {
+									where = where + " and ";
+							}
+					} else {
+							where = where +  " " + tableNames.get(tableName1).toLowerCase()+"."+ createCriteria(bean,tableName1);
+					}
+			   	   if(i != jobdetails.size()-1) {
+			   		   if(bean.getAnd_or() == null || bean.getAnd_or().isEmpty())
+			   			   where = where + " and ";
+			   		   else 
+			   			   if(bean.getColumnName().endsWith("Date")) {
+			   				   where = where + " and ";
+			   			   } else {
+			   				   where = where + " " + bean.getAnd_or() +  "  ";
+			   			   }
+			   	   } 
+			    } 
 			
 		}
+		where  = addAttributesFilters(attributesFilterBeans,where);
 		if(tableName1.equalsIgnoreCase("trade"))
 		    where = where + " and trade.version >= 0 ";
 		if(isForwardLadder) {
@@ -577,6 +590,21 @@ public class FilterValues {
 	}
 	
 	
+	private String addAttributesFilters(
+			Vector<FilterBean> attributesFilterBeans, String where) {
+		// TODO Auto-generated method stub attributesWhereClause
+		for(int i=0;i<attributesFilterBeans.size();i++) {
+			FilterBean bean = attributesFilterBeans.get(i);
+			String whereClause = attributesWhereClause.get(bean.getColumnName());
+			if(!where.isEmpty()) 
+			where = where +" and " + bean.getColumnValues();
+			else 
+				where = where +"  " + bean.getColumnValues();
+			where = whereClause + " and " + where;
+		}
+		return where;
+	}
+
 	private String genearteGroupClauseForForwardLadder(String where) {
 		// TODO Auto-generated method stub
 		String whereC = where;
@@ -616,7 +644,7 @@ public class FilterValues {
 
 	private String createCriteriaOnBook(Vector<Book> books,FilterBean bean) {
 		String bookCriteria  ="";
-		String ids =bean.getIdSelected();
+		String ids =bean.getColumnValues();
 		if(books == null || books.size() == 0 || books.isEmpty()) 
 			return null;
 		if(ids == null) 
@@ -987,13 +1015,31 @@ public class FilterValues {
 	public String checkTableAliasForAttributes(String sql) {
 		String where = sql.substring(sql.indexOf("where"), sql.length());
 		String sqlwithoutWhere = sql.substring(0,sql.indexOf("where"));
+		boolean containLegalEntityTable = false;
+		boolean containBookTable = false;
+		if(sqlwithoutWhere.contains("Le legalEntity"))
+			containLegalEntityTable = true;
+		if(sqlwithoutWhere.contains("Book book"))
+			containBookTable = true;
 		for(int i=0;i<attributesObject.length;i++) {
 		
 			
 			if(where.contains(attributesObject[i])) {
 				String attributesTable = attributesTableName.get(attributesObject[i]);
 				if(!sqlwithoutWhere.contains(attributesTable)) {
-					sqlwithoutWhere = sqlwithoutWhere + " , " + attributesTable ;
+					                if(containLegalEntityTable) {
+												sqlwithoutWhere = sqlwithoutWhere + " , " + attributesTable ;
+					                }  else  {
+					                	sqlwithoutWhere = sqlwithoutWhere + " , le legalentity " + " , " + attributesTable ;
+					                	where =  where + " and trade.cpid = legalentity.id ";
+					                }
+					                if(containBookTable) {
+					                	sqlwithoutWhere = sqlwithoutWhere + " , " + attributesTable ;
+					                } else {
+					                	sqlwithoutWhere = sqlwithoutWhere + " , Book book " + " , " + attributesTable ;
+					                	where =  where + " and trade.bookid = book.bookno";
+					                }
+					                	
 				}
 			}
 		}
