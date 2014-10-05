@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -125,17 +124,10 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		add(getJLabel1(), new Constraints(new Leading(45, 24, 10, 10), new Leading(83, -33, 10, 10)));
 		add(getMaturityDateFrom(), new Constraints(new Leading(100, 95, 12, 12), new Leading(78, 12, 12)));
 		add(getJLabel5(), new Constraints(new Leading(10, 81, 12, 12), new Leading(78, 12, 12)));
-		add(getJLabel6(), new Constraints(new Leading(213, 12, 12), new Leading(78, 12, 12)));
-		add(getJLabel4(), new Constraints(new Leading(213, 12, 12), new Leading(43, 12, 12)));
-		add(getTradeDateTo(), new Constraints(new Leading(243, 93, 12, 12), new Leading(43, 12, 12)));
-		add(getMaturityDateTo(), new Constraints(new Leading(243, 93, 10, 10), new Leading(78, 12, 12)));
 		add(getTradeKeyWordName(), new Constraints(new Leading(100, 95, 12, 12), new Leading(146, 10, 10)));
 		add(getJLabel2(), new Constraints(new Leading(10, 84, 12, 12), new Leading(145, 12, 12)));
-		add(getTradeKeyWordValue(), new Constraints(new Leading(243, 93, 12, 12), new Leading(145, 12, 12)));
 		add(getJLabel7(), new Constraints(new Leading(10, 81, 12, 12), new Leading(113, 12, 12)));
 		add(getSettlementDateFrom(), new Constraints(new Leading(100, 95, 12, 12), new Leading(113, 12, 12)));
-		add(getSettlementDateTo(), new Constraints(new Leading(243, 93, 12, 12), new Leading(110, 12, 12)));
-		add(getJLabel8(), new Constraints(new Leading(213, 28, 12, 12), new Leading(114, 16, 12, 12)));
 		add(getJLabel9(), new Constraints(new Leading(10, 84, 12, 12), new Leading(183, 12, 12)));
 		add(getJLabel10(), new Constraints(new Leading(10, 84, 12, 12), new Leading(215, 12, 12)));
 		add(getBookAttributeName(), new Constraints(new Leading(100, 95, 10, 10), new Leading(215, 12, 12)));
@@ -143,9 +135,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		add(getJLabel12(), new Constraints(new Leading(10, 76, 12, 12), new Leading(289, 16, 10, 10)));
 		add(getLeAttributes(), new Constraints(new Leading(100, 95, 10, 10), new Leading(289, 12, 12)));
 		add(getBookName(), new Constraints(new Leading(100, 93, 12, 12), new Leading(180, 12, 12)));
-		add(getBookAttributeValue(), new Constraints(new Leading(242, 95, 12, 12), new Leading(215, 12, 12)));
 		add(getLegalEntityName(), new Constraints(new Leading(100, 95, 12, 12), new Leading(253, 12, 12)));
-		add(getLeAttributesValues(), new Constraints(new Leading(242, 95, 12, 12), new Leading(289, 12, 12)));
 		add(getJLabel13(), new Constraints(new Leading(10, 76, 12, 12), new Leading(327, 16, 12, 12)));
 		add(getCurrency(), new Constraints(new Leading(100, 58, 10, 10), new Leading(327, 12, 12)));
 		add(getJLabel14(), new Constraints(new Leading(10, 76, 12, 12), new Leading(365, 16, 12, 12)));
@@ -158,10 +148,19 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		add(getAction(), new Constraints(new Leading(262, 104, 12, 12), new Leading(361, 12, 12)));
 		add(getJLabel18(), new Constraints(new Leading(209, 46, 12, 12), new Leading(329, 16, 12, 12)));
 		add(getCurrencyPair(), new Constraints(new Leading(260, 104, 12, 12), new Leading(325, 12, 12)));
-		add(getJLabel19(), new Constraints(new Leading(206, 35, 12, 12), new Leading(14, 16, 12, 12)));
-		add(getBUYSELL(), new Constraints(new Leading(245, 65, 10, 10), new Leading(12, 12, 12)));
 		add(getJLabel20(), new Constraints(new Leading(10, 76, 12, 12), new Leading(433, 16, 12, 12)));
 		add(getProductId(), new Constraints(new Leading(100, 95, 12, 12), new Leading(429, 12, 12)));
+		add(getJLabel19(), new Constraints(new Leading(211, 35, 12, 12), new Leading(15, 16, 12, 12)));
+		add(getJLabel4(), new Constraints(new Leading(213, 12, 12), new Leading(49, 12, 12)));
+		add(getLeAttributesValues(), new Constraints(new Leading(260, 95, 12, 12), new Leading(289, 12, 12)));
+		add(getBookAttributeValue(), new Constraints(new Leading(260, 95, 12, 12), new Leading(212, 12, 12)));
+		add(getTradeKeyWordValue(), new Constraints(new Leading(260, 93, 12, 12), new Leading(145, 12, 12)));
+		add(getSettlementDateTo(), new Constraints(new Leading(260, 93, 12, 12), new Leading(113, 12, 12)));
+		add(getJLabel6(), new Constraints(new Leading(213, 12, 12), new Leading(83, 17, 12, 12)));
+		add(getJLabel8(), new Constraints(new Leading(213, 28, 12, 12), new Leading(116, 16, 12, 12)));
+		add(getMaturityDateTo(), new Constraints(new Leading(260, 93, 12, 12), new Leading(78, 12, 12)));
+		add(getTradeDateTo(), new Constraints(new Leading(260, 93, 12, 12), new Leading(43, 12, 12)));
+		add(getBUYSELL(), new Constraints(new Leading(260, 65, 12, 12), new Leading(11, 12, 12)));
 		setSize(407, 519);
 	}
 
