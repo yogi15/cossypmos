@@ -416,12 +416,14 @@ public class CounterPartyWindow extends JPanel {
 
 					clearData();
 					modelt.delRow(rowindex);
+					commonUTIL
+					.showAlertMessage("Counter Party Deleted");
 
 				} else {
 
 					// log
 					commonUTIL
-							.showAlertMessage("There was an error while deleting the Legal Entity");
+							.showAlertMessage("There was an error while deleting the Counter Party");
 				}
 
 				detailsTable.repaint();
@@ -454,39 +456,43 @@ public class CounterPartyWindow extends JPanel {
 					le.setAttributes(getAttributes());
 					le.setAlias(aliasTextField.getText());
 					le.setCountry(countryComboBox.getSelectedItem().toString());
+					
+					try {
 
-				} else {
+						int id = remoteBORef.saveLe(le);
+						
+						if (id > 0) {
 
-					// log
-					commonUTIL.showAlertMessage("LE not saved ");
-				}
+							//TableModel mo = detailsTable.getModel();
+							le.setId(id);
+							modelt.addRow(le);
+							repaint();
+							commonUTIL
+									.showAlertMessage("Counter Party  saved with id "
+											+ le.getId());
+						
+						} else if (id == -1) {
 
-				boolean flag = false;
+							commonUTIL.showAlertMessage("Counter Party already exists ");
 
-				try {
+						} else if (id == -2) {
+							
+							commonUTIL.showAlertMessage("Counter Party attributes not saved ");
+							
+						} else {
+							
+							commonUTIL.showAlertMessage("Counter Party not saved ");
+							
+						}
 
-					int id = remoteBORef.saveLe(le);
+					} catch (RemoteException e) {
 
-					if (id <= 0) {
+						e.printStackTrace();
 
-						commonUTIL.showAlertMessage("not saved ");
-
-					} else {
-
-						TableModel mo = detailsTable.getModel();
-						le.setId(id);
-						modelt.addRow(le);
-						repaint();
-						commonUTIL
-								.showAlertMessage("Legal Entity  saved with id "
-										+ le.getId());
 					}
 
-				} catch (RemoteException e) {
-
-					e.printStackTrace();
-
-				}
+				} 
+				
 			}
 
 		});
@@ -554,14 +560,33 @@ public class CounterPartyWindow extends JPanel {
 
 		boolean isValid = true;
 
-		if (nameTextField.getText().equals("") || getRoles().equals("")
-				|| aliasTextField.getText().equals("")
-				|| countryComboBox.getSelectedItem().toString().equals("")) {
-
+		if (nameTextField.getText().equals("")) {
+			
 			isValid = false;
-
+			commonUTIL.showAlertMessage("Please enter Name");
+			
 		}
-
+		
+		if (getRoles().equals("")) {
+			
+			isValid = false;
+			commonUTIL.showAlertMessage("Please select Roles");
+			
+		}
+		
+		if ( aliasTextField.getText().equals("")) {
+			
+			isValid = false;
+			commonUTIL.showAlertMessage("Please enter Alias");
+			
+		}
+		
+		if (countryComboBox.getSelectedItem().toString().equals("")) {
+			
+			isValid = false;
+			commonUTIL.showAlertMessage("Please select Country");
+			
+		}
 		return isValid;
 
 	}
@@ -571,7 +596,7 @@ public class CounterPartyWindow extends JPanel {
 		for (int i = 0; i < attributesTable.getRowCount(); i++) {
 			String attributeN = attributesTable.getValueAt(i, 0).toString();
 			String attributeV = attributesTable.getValueAt(i, 1).toString();
-			if ((attributeV != null) || (!attributeV.isEmpty())) {
+			if (!((attributeV == null) || attributeV.isEmpty() || attributeV.equals(""))) {
 				value = value.trim() + attributeN + "=" + attributeV + ";";
 				// value = ValidateData(attributeN,value);
 
