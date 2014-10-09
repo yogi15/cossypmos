@@ -4,9 +4,11 @@ import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Vector;
 
 import util.AccessMechanismUtil;
+import util.commonUTIL;
 
 import dbSQL.AttributSQL;
 import dbSQL.B2BConfigSQL;
@@ -34,6 +36,7 @@ import dbSQL.dsSQL;
 import beans.Attribute;
 import beans.B2BConfig;
 import beans.Book;
+import beans.BookAttribute;
 import beans.Country;
 import beans.CurrencyDefault;
 import beans.CurrencyPair;
@@ -42,6 +45,7 @@ import beans.DateRule;
 import beans.Favorities;
 import beans.Folder;
 import beans.Holiday;
+import beans.LEAttribute;
 import beans.LeContacts;
 import beans.LegalEntity;
 import beans.LiquidationConfig;
@@ -55,13 +59,127 @@ import beans.WFConfig;
 
 public class ReferenceDataImp implements RemoteReferenceData {
 	
+	private Vector<LEAttribute> processLEAttribues(LegalEntity le, int id) {
+		
+		Vector<LEAttribute> leAttrVec = new Vector<LEAttribute>();
+		
+		String attributes = le.getAttributes();
+		
+		if (!commonUTIL.isEmpty(attributes)) {
+			
+			String atttoken [] = attributes.trim().split(";"); 
+			
+			for(int i =0;i<atttoken.length;i++) {
+				String att = (String) atttoken[i];
+				if(att.contains("=")) {
+						String attvalue = att.substring(att.indexOf('=')+1, att.length());
+						String attnameName = att.substring(0, att.indexOf('='));
+						LEAttribute leAttrBean = new LEAttribute();
+						leAttrBean.setId(id);
+						leAttrBean.setName(attnameName);
+						leAttrBean.setValue(attvalue);
+						
+						leAttrVec.add(leAttrBean);
+				}
+			}
+			
+		}
+		
+		return leAttrVec;	
+	}
+	
+	private Vector<BookAttribute> processBookAttribues(Book book, int id) {
+		
+		Vector<BookAttribute> bookAttrVec = new Vector<BookAttribute>();
+		
+		String attributes = book.getAttributes();
+		
+		if (!commonUTIL.isEmpty(attributes)) {
+			
+			String atttoken [] = attributes.trim().split(";"); 
+			
+			for(int i =0;i<atttoken.length;i++) {
+				String att = (String) atttoken[i];
+				if(att.contains("=")) {
+					
+						String attvalue = att.substring(att.indexOf('=')+1, att.length());
+						String attnameName = att.substring(0, att.indexOf('='));
+					
+						BookAttribute bookAttrBean = new BookAttribute();
+						bookAttrBean.setId(id);
+						bookAttrBean.setName(attnameName);
+						bookAttrBean.setValue(attvalue);
+						
+						bookAttrVec.add(bookAttrBean);
+				}
+			}
+			
+		}
+		return bookAttrVec;	
+	}
+	
+	private String getBookAttributesString(Collection<BookAttribute> bookAttrVec) {
+		
+		Iterator<BookAttribute> itr = bookAttrVec.iterator();
+	    StringBuffer attribute = new StringBuffer();  
+		
+	    while(itr.hasNext()) {
+			
+			BookAttribute element = (BookAttribute) itr.next();
+			
+			attribute.append(element.getName())
+			.append("=")
+			.append(element.getValue())
+			.append(";");
+	      
+		}
+		
+		return attribute.toString();
+	}
+	
+	private String getLEAttributesString(Collection<LEAttribute> leAttrVec) {
+		
+		Iterator<LEAttribute> itr = leAttrVec.iterator();
+	    StringBuffer attribute = new StringBuffer();  
+		
+	    while(itr.hasNext()) {
+			
+	    	LEAttribute element = (LEAttribute) itr.next();
+			
+			attribute.append(element.getName())
+			.append("=")
+			.append(element.getValue())
+			.append(";");
+	      
+		}
+		
+		return attribute.toString();
+	}
 
 	@Override
 	public void removeLe(LegalEntity le) throws RemoteException {
 		// TODO Auto-generated method stub
 		
-		LegalEntitySQL.delete(le, dsSQL.getConn());
+		Connection con = dsSQL.getConn();
+		boolean isDeleted = LegalEntitySQL.delete(le, con);
+		int i = 0;
 		
+		if (isDeleted) {
+
+			Vector<LEAttribute> leAttrVec = processLEAttribues(le, le.getId());
+			
+			boolean isAttributeDeleted = AttributSQL.deleteLEAttribute(leAttrVec, con);
+			
+			if (!isAttributeDeleted) {
+				 
+				i = -2;
+			
+			} 
+		} else {
+			
+			i = -2;
+		}
+	
 	}
 
 	@Override
@@ -81,40 +199,124 @@ public class ReferenceDataImp implements RemoteReferenceData {
 	
 	@Override
 	public int saveBook(Book book) throws RemoteException {
-		// TODO Auto-generated method stub
-		return BookSQL.save(book, dsSQL.getConn());
+		
+		Connection con = dsSQL.getConn();
+		int id = BookSQL.save(book, con);
+			
+		if ( id > 0 && !book.getAttributes().equals("")) {
+			
+			boolean isAttributeSaved = false;
+			Vector<BookAttribute> bookAttrVec = processBookAttribues(book, id);
+			
+			isAttributeSaved = AttributSQL.saveBookAttribute(bookAttrVec, con);
+			
+			if (!isAttributeSaved) {
+				 id = -2;
+			}
+			
+		}
+		
+		return id;
 	}
 
 	@Override
 	public int saveLe(LegalEntity le) throws RemoteException {
-		// TODO Auto-generated method stub
+		
+		Connection con = dsSQL.getConn();
 		int id = 0;
-		  if(!isExistLEwithName(le))
-		  id = LegalEntitySQL.save(le, dsSQL.getConn());
+		
+		if(!isExistLEwithName(le)) {
+			
+			id = LegalEntitySQL.save(le, dsSQL.getConn());
+		
+		} else {
+			
+			id = -1;
+		}
+
+		if (id > 0 && !le.getAttributes().equals("")) {
+
+			Vector<LEAttribute> leAttrVec = processLEAttribues(le, id);
+
+			boolean isAttributeSaved = AttributSQL.saveLEAttribute(leAttrVec, con);
+
+			if (!isAttributeSaved) {
+
+				id = -2;
+
+			}
+		} 
+			
 		  return id;
 	}
 
 	@Override
 	public Book selectBook(Book book) throws RemoteException {
-		// TODO Auto-generated method stub
-		return BookSQL.selectBook(book.getBookno(), dsSQL.getConn());
 		
+		Connection con = dsSQL.getConn();
+		Book  bookObj = BookSQL.selectBook(book.getBookno(), con);
+		
+		if (bookObj != null) {
+			
+			Collection<BookAttribute> bookAttrVec = AttributSQL.selectBookAttribute(bookObj.getBookno(), con);
+			
+			String attributes = getBookAttributesString(bookAttrVec);
+			
+			bookObj.setAttributes(attributes);
+		}
+		
+		return bookObj;
 	}
+	
 	@Override
 	public Vector getBookWhere(String sql) throws RemoteException {
-		// TODO Auto-generated method stub
 		
-		return (Vector) BookSQL.selectbookWhere(sql, dsSQL.getConn());
+		Connection con = dsSQL.getConn();
+		Collection<Book> bookVec =  BookSQL.selectbookWhere(sql, con);
+		Vector<Book> returnBookVec = new Vector<Book>();
 		
+		int size = bookVec.size();
+		
+		String attributes = "";
+		
+		Iterator<Book> itr = bookVec.iterator();
+	    		
+	    while(itr.hasNext()) {
+			
+	    	Book element = (Book) itr.next();
+	    	
+			Collection<BookAttribute> bookAttrVec = AttributSQL.selectBookAttribute(
+					element.getBookno(), con);
+			
+			attributes = getBookAttributesString(bookAttrVec);
+			
+			element.setAttributes(attributes);
+			returnBookVec.add(element);
+		}
+		
+	    return returnBookVec;
 	}
+	
 	@Override
 	public LegalEntity selectLE(int id) throws RemoteException {
-		// TODO Auto-generated method stub
+		
+		Connection con = dsSQL.getConn();
 		LegalEntity le = null;
-		Vector legalEntitys = (Vector) LegalEntitySQL.selectLegalEntity(id, dsSQL.getConn());
+		
+		Vector legalEntitys = (Vector) LegalEntitySQL.selectLegalEntity(id, con);
+		
 		if(legalEntitys != null && legalEntitys.size() >0 ) {
+			
 			le =   (LegalEntity) legalEntitys.elementAt(0);
+			
+			Collection<LEAttribute> leAttrVec = AttributSQL.selectLEAttribute(le.getId(), con);
+			
+			String attributes = getLEAttributesString(leAttrVec);
+			
+			le.setAttributes(attributes);
 		}
+		
+		
 		return le;
 		
 		
@@ -135,34 +337,90 @@ public class ReferenceDataImp implements RemoteReferenceData {
 	
 	@Override
 	public boolean updateBook(Book book) throws RemoteException {
-		// TODO Auto-generated method stub
-		return BookSQL.update(book, dsSQL.getConn());
 		
+		Connection con = dsSQL.getConn();
+		
+		boolean isBookUpdated = BookSQL.update(book, con);
+		
+		if (isBookUpdated && !book.getAttributes().equals("")) {
+			
+			Vector<BookAttribute> updateBookAttribute = processBookAttribues(book, book.getBookno());
+			
+			Collection<BookAttribute> isAttributeAlreadySaved = AttributSQL.selectBookAttribute(book.getBookno(), con);
+			
+			if (isAttributeAlreadySaved.size() > 0) {
+			
+				boolean isAttributeUpdated = AttributSQL.updateBookAttribute(updateBookAttribute, con);
+				
+			} else {
+				
+				boolean isAttributeSaved= AttributSQL.saveBookAttribute(updateBookAttribute, con);
+			}
+			
+			
+		}
+		
+		return isBookUpdated;
 	}
 
 	@Override
 	public boolean updateLe(LegalEntity le) throws RemoteException {
-		// TODO Auto-generated method stub
+		
+		Connection con = dsSQL.getConn();
+		
 	//	if(!isExistLEwithName(le))
-		return LegalEntitySQL.update(le, dsSQL.getConn());
+		boolean isLEUpdated =  LegalEntitySQL.update(le, dsSQL.getConn());
+		
+		if (isLEUpdated && !le.getAttributes().equals("")) {
+			
+			Vector<LEAttribute> updateLEAttribute = processLEAttribues(le, le.getId());
+			
+			Collection<LEAttribute> isAttributeAlreadySaved = AttributSQL.selectLEAttribute(le.getId(), con);
+			
+			if (isAttributeAlreadySaved.size() > 0) {
+				
+				boolean isAttributeUpdated = AttributSQL.updateLEAttribute(updateLEAttribute, con);
+				
+			} else {
+				
+				boolean isAttributeUpdated = AttributSQL.saveLEAttribute(updateLEAttribute, con);
+				
+			}
+			
+			
+			
+		}
+		
+		return isLEUpdated;
+		
  	//	return false;
 	}
 
 	@Override
 	public void removeBook(Book book) throws RemoteException {
-		// TODO Auto-generated method stub
-		BookSQL.delete(book, dsSQL.getConn());
+		
+		Connection con = dsSQL.getConn();
+		
+		boolean isBookDeleted = BookSQL.delete(book, con);
+		
+		if (isBookDeleted) {
+			
+			Vector<BookAttribute> deleteBookAttrVec = processBookAttribues(book, book.getBookno());
+			
+			boolean isAttributeDeleted = AttributSQL.deleteBookAttribute(deleteBookAttrVec, con);
+		}		
+		
 	}
 
 	@Override
 	public void removeSDI(Sdi sdi) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		SdiSQL.delete(sdi, dsSQL.getConn());
 	}
 
 	@Override
 	public Sdi saveSDI(Sdi sdi) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		if(sdi.getId() == 0)
 		  return SdiSQL.save(sdi, dsSQL.getConn()); 
 		else 
@@ -171,21 +429,20 @@ public class ReferenceDataImp implements RemoteReferenceData {
 	
 	@Override
 	public Sdi selectSDI(Sdi sdi) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		Vector Sdis = (Vector) SdiSQL.selectSDI(sdi.getId(), dsSQL.getConn());
 		return (Sdi) Sdis.elementAt(0);
 	}
 
 	@Override
 	public Sdi updateSDI(Sdi sdi) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return SdiSQL.update(sdi, dsSQL.getConn());
 		
 	}
 
 	@Override
 	public int getMAXLEID() throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		return BookSQL.selectMaxID(dsSQL.getConn());
 		
@@ -193,14 +450,52 @@ public class ReferenceDataImp implements RemoteReferenceData {
 
 	@Override
 	public Collection selectAllLs() throws RemoteException {
-		// TODO Auto-generated method stub
-		return LegalEntitySQL.selectALL(dsSQL.getConn());
+		
+		Connection con = dsSQL.getConn();
+		Vector<LegalEntity> returnLE = new Vector<LegalEntity>();
+		
+		Collection<LegalEntity> allBooks =  LegalEntitySQL.selectALL(con);
+		
+		Iterator<LegalEntity> itr = allBooks.iterator();
+	    
+	    while(itr.hasNext()) {
+			
+	    	LegalEntity element = (LegalEntity) itr.next();
+	    	
+	    	Collection<LEAttribute> leAttrVec = AttributSQL.selectALLLEAttribute(con);
+	    	
+	    	element.setAttributes(getLEAttributesString(leAttrVec));
+	    	
+	    	returnLE.add(element);
+	    	
+	    }
+	    
+	    return returnLE;
+	    
 	}
 
 	@Override
 	public Collection selectALLBooks() throws RemoteException {
-		// TODO Auto-generated method stub
-		return BookSQL.selectALL(dsSQL.getConn());
+		
+		Connection con = dsSQL.getConn();
+		Vector<Book> returnBooks = new Vector<Book>();
+		Collection<Book> allBooks =  BookSQL.selectALL(con);
+		
+		Iterator<Book> itr = allBooks.iterator();
+	    
+	    while(itr.hasNext()) {
+			
+	    	Book element = (Book) itr.next();
+	    	
+	    	Collection<BookAttribute> bookAttrVec = AttributSQL.selectBookAttribute(element.getBookno(), con);
+	    	
+	    	element.setAttributes(getBookAttributesString(bookAttrVec));
+	    	
+	    	returnBooks.add(element);
+	    	
+	    }
+	    
+	    return returnBooks;
 	}
 
 	@Override
@@ -388,9 +683,30 @@ public class ReferenceDataImp implements RemoteReferenceData {
 	}
 	@Override
 	public Collection selectLEonWhereClause(String whereClause) throws RemoteException {
-		// TODO Auto-generated method stub
-		return LegalEntitySQL.selectLEOnWhereClause(whereClause, dsSQL.getConn());
+		
+		Connection con = dsSQL.getConn();
+		Vector<LegalEntity> returnLE = new Vector<LegalEntity>();
+		
+		Collection<LegalEntity> le =  LegalEntitySQL.selectLEOnWhereClause(whereClause,con);
+		
+		Iterator<LegalEntity> itr = le.iterator();
+	    
+	    while(itr.hasNext()) {
+			
+	    	LegalEntity element = (LegalEntity) itr.next();
+	    	
+	    	Collection<LEAttribute> leAttrVec = AttributSQL.selectALLLEAttribute(con);
+	    	
+	    	element.setAttributes(getLEAttributesString(leAttrVec));
+	    	
+	    	returnLE.add(element);
+	    	
+	    }
+	    
+	    return returnLE;
+
 	}
+	
 	@Override
 	public Collection selectWhereAttribute(String sql) throws RemoteException {
 		// TODO Auto-generated method stub
@@ -405,18 +721,34 @@ public class ReferenceDataImp implements RemoteReferenceData {
 
 	@Override
 	public boolean deleteLE(LegalEntity deleteLegalEntity) throws RemoteException {
-		// TODO Auto-generated method stub
+
+		Connection con = dsSQL.getConn();
 		
-		boolean isLeDeleted = LegalEntitySQL.delete( deleteLegalEntity, dsSQL.getConn());
+		boolean isLeDeleted = LegalEntitySQL.delete( deleteLegalEntity, con);
 		
+		if (isLeDeleted && !deleteLegalEntity.getAttributes().equals("")) {
+			
+			Vector<LEAttribute> deleteLEAttrVec = processLEAttribues(deleteLegalEntity, deleteLegalEntity.getId());
+			
+			boolean isAttributeDeleted = AttributSQL.deleteLEAttribute(deleteLEAttrVec, con);
+			
+		}
 		return isLeDeleted;
 	}
 
 	@Override
 	public boolean deleteBook(Book book) throws RemoteException {
-		// TODO Auto-generated method stub
-		boolean isBookDeleted = BookSQL.delete( book, dsSQL.getConn());
 		
+		Connection con = dsSQL.getConn();
+		
+		boolean isBookDeleted = BookSQL.delete(book, con);
+		
+		if (isBookDeleted && !book.getAttributes().equals("")) {
+			
+			Vector<BookAttribute> deleteBookAttrVec = processBookAttribues(book, book.getBookno());
+			
+			boolean isAttributeDeleted = AttributSQL.deleteBookAttribute(deleteBookAttrVec, con);
+		}
 		return isBookDeleted;
 	}
 
