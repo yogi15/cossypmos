@@ -31,6 +31,7 @@ import util.commonUTIL;
 import beans.Book;
 import beans.Folder;
 import beans.LegalEntity;
+import beans.StartUPData;
 import dsServices.RemoteReferenceData;
 import dsServices.ServerConnectionUtil;
 
@@ -47,9 +48,9 @@ public class BookWindow extends JPanel {
 	private JComboBox leComboBox;
 	private JLabel folderLabel;
 	private JComboBox folderComboBox;
-	private JTable jTable0;
+	private JTable attributesTable;
 	private JScrollPane jScrollPane0;
-	private JTable jTable1;
+	private JTable detailsTable;
 	private JScrollPane jScrollPane1;
 	private JLabel jLabel5;
 	private JButton saveAsNewButton;
@@ -57,6 +58,9 @@ public class BookWindow extends JPanel {
 	private JButton deleteButton;
 	private JButton clearButton;
 	Vector<Book> data = null;
+	DefaultTableModel attributemodel = null;
+	Vector attributes = null;
+	String co11[] = { "AttributeName", "AttributeValue" };
 	javax.swing.DefaultComboBoxModel counterPartyCom = new javax.swing.DefaultComboBoxModel();
 	Hashtable counterPartyID = new Hashtable();
 	Hashtable folderID = new Hashtable();
@@ -133,7 +137,7 @@ public class BookWindow extends JPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				int rowIndex = jTable1.getSelectedRow();
+				int rowIndex = detailsTable.getSelectedRow();
 				// feesData.remove(rowIndex);
 
 				Book book = data.get(rowIndex);
@@ -273,7 +277,53 @@ public class BookWindow extends JPanel {
 		return flag;
 
 	}
+	
+	private String getAttributes() {
+		String value = "";
+		int rowCount = attributesTable.getRowCount();
+		
+		for (int i = 0; i < rowCount; i++) {
+			String attributeN = attributesTable.getValueAt(i, 0).toString();
+			String attributeV = attributesTable.getValueAt(i, 1).toString();
+			if (!((attributeV == null) || attributeV.isEmpty() || attributeV.equals(""))) {
+				value = value.trim() + attributeN + "=" + attributeV + ";";
+				// value = ValidateData(attributeN,value);
 
+			}
+		}
+		return value;
+	}
+	
+	private void setAttributesValues(String values) {
+		if (values != null && values.length() > 0) {
+			String atttoken[] = values.trim().split(";");
+
+			for (int i = 0; i < atttoken.length; i++) {
+				String att = (String) atttoken[i];
+
+				if (att.contains("=")) {
+					String attvalue = att.substring(att.indexOf('=') + 1,
+							att.length());
+					String attnameName = att.substring(0, att.indexOf('='));
+					for (int r = 0; r < attributemodel.getRowCount(); r++) {
+						String atteName = (String) attributemodel.getValueAt(r,
+								0);
+						if (atteName.equalsIgnoreCase(attnameName)) {
+							attributemodel.setValueAt(attvalue, r, 1);
+						}
+
+					}
+				}
+			}
+		} else {
+			for (int r = 0; r < attributemodel.getRowCount(); r++) {
+
+				attributemodel.setValueAt("", r, 1);
+			}
+		}
+
+	}
+	
 	private JLabel getJLabel5() {
 		if (jLabel5 == null) {
 			jLabel5 = new JLabel();
@@ -291,24 +341,24 @@ public class BookWindow extends JPanel {
 			jScrollPane1
 					.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-			jScrollPane1.setViewportView(getJTable1());
+			jScrollPane1.setViewportView(getDetailsTable());
 		}
 		return jScrollPane1;
 	}
 
-	private JTable getJTable1() {
-		if (jTable1 == null) {
-			jTable1 = new JTable();
+	private JTable getDetailsTable() {
+		if (detailsTable == null) {
+			detailsTable = new JTable();
 			model = new TableModelBookUtil(data, bookcol, remoteBORef,
 					counterPartyID, folderID);
-			jTable1.setModel(model);
+			detailsTable.setModel(model);
 		}
-		jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+		detailsTable.addMouseListener(new java.awt.event.MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
-				Book book = (Book) data.get(jTable1.getSelectedRow());
+				Book book = (Book) data.get(detailsTable.getSelectedRow());
 				bookNameTextField.setText(book.getBook_name());
 
 				bookIdTextField.setText(new Integer(book.getBookno())
@@ -333,37 +383,42 @@ public class BookWindow extends JPanel {
 					}
 					f++;
 				}
+				setAttributesValues(book.getAttributes());
 
 			}
 
 		});
 
-		return jTable1;
+		return detailsTable;
 	}
 
 	private JScrollPane getJScrollPane0() {
 		if (jScrollPane0 == null) {
 			jScrollPane0 = new JScrollPane();
-			jScrollPane0.setViewportView(getJTable0());
+			jScrollPane0.setViewportView(getAttributesTable());
 		}
 		return jScrollPane0;
 	}
 
-	private JTable getJTable0() {
-		if (jTable0 == null) {
-			jTable0 = new JTable();
-			jTable0.setModel(new DefaultTableModel(new Object[][] {
-					{ "0x0", "0x1", }, { "1x0", "1x1", }, }, new String[] {
-					"Title 0", "Title 1", }) {
-				private static final long serialVersionUID = 1L;
-				Class<?>[] types = new Class<?>[] { Object.class, Object.class, };
-
-				public Class<?> getColumnClass(int columnIndex) {
-					return types[columnIndex];
+	private JTable getAttributesTable() {
+		if (attributesTable == null) {
+			attributesTable = new JTable();
+			attributemodel = new DefaultTableModel(co11, 0);
+			attributesTable.setModel(attributemodel);
+			attributesTable.setAutoscrolls(true);
+			attributesTable.setAutoCreateRowSorter(true);
+			attributesTable.setAutoscrolls(true);
+			// attributesTable.seta
+			if (attributes != null) {
+				for (int i = 0; i < attributes.size(); i++) {
+					StartUPData attributs = (StartUPData) attributes.get(i);
+					attributemodel.insertRow(i,
+							new Object[] { attributs.getName(), "" });
 				}
-			});
+			}
+
 		}
-		return jTable0;
+		return attributesTable;
 	}
 
 	private JComboBox getFolderComboBox() {
@@ -443,6 +498,9 @@ public class BookWindow extends JPanel {
 			remoteBORef = (RemoteReferenceData) de
 					.getRMIService("ReferenceData");
 			data = (Vector) remoteBORef.selectALLBooks();
+			
+			attributes = (Vector) remoteBORef.getStartUPData("BookAttributes");
+			
 			processLEDataCombo1(counterPartyCom, counterPartyID);
 			processFolderDataCombo1(folderData, folderID);
 
@@ -457,6 +515,7 @@ public class BookWindow extends JPanel {
 		book.setBookno(Integer.parseInt( bookIdTextField.getText()) );
 		book.setLe_id(returnCounteryPartyID( leComboBox.getSelectedIndex(), counterPartyID) );
 		book.setFolderID(returnFolderID( folderComboBox.getSelectedIndex(), folderID) );
+		book.setAttributes(getAttributes());
 
 	}
 
@@ -563,9 +622,15 @@ public class BookWindow extends JPanel {
 		bookNameTextField.setText("");
 		leComboBox.setSelectedIndex(0);
 		folderComboBox.setSelectedIndex(0);
+		
+		int rowCount = attributesTable.getRowCount();
+		
+		for (int i = 0; i < rowCount; i++) {
+			
+			attributesTable.setValueAt("", i, 1);
 
+		}
 	}
-}
 
 class TableModelBookUtil extends AbstractTableModel {
 
@@ -686,4 +751,5 @@ class TableModelBookUtil extends AbstractTableModel {
 		System.out.println("New value of data:");
 
 	}
+ }
 }
