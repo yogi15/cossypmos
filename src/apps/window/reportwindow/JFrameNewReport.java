@@ -16,7 +16,6 @@ import com.jidesoft.docking.DefaultDockableHolder;
 import com.jidesoft.docking.DefaultDockingManager;
 import com.jidesoft.docking.DockContext;
 import com.jidesoft.docking.DockableFrame;
-import com.jidesoft.grid.SortableTable;
 import com.jidesoft.icons.JideIconsFactory;
 import com.jidesoft.plaf.LookAndFeelFactory;
 import com.jidesoft.swing.JideScrollPane;
@@ -206,7 +205,7 @@ public class JFrameNewReport extends DefaultDockableHolder {
 	}
 
 	static int i = 0;
-	private SortableTable _sortableTable;
+	//private SortableTable _sortableTable;
 
 	protected DockableFrame createSampleTaskListFrame() {
 
@@ -254,7 +253,7 @@ public class JFrameNewReport extends DefaultDockableHolder {
 		menuBar.add(setupd);
 		menuBar.add(formatMenu);
 		// Create and add simple menu item to one of the drop down menu
-		JMenuItem newAction = new JMenuItem("New");
+/*		JMenuItem newAction = new JMenuItem("New");
 		JMenuItem save = new JMenuItem("Save");
 		JMenuItem saveAsNewAction = new JMenuItem("Save as New");
 
@@ -262,7 +261,7 @@ public class JFrameNewReport extends DefaultDockableHolder {
 		JMenuItem opemAction = new JMenuItem("Open ");
 		JMenuItem Excel = new JMenuItem("Excel");
 		JMenuItem cvs = new JMenuItem("CVS ");
-		JMenuItem html = new JMenuItem("HTML ");
+		JMenuItem html = new JMenuItem("HTML ");*/
 		
 		
 		
@@ -299,31 +298,31 @@ public class JFrameNewReport extends DefaultDockableHolder {
 					
 					@Override
 					public void mouseReleased(MouseEvent arg0) {
-						// TODO Auto-generated method stub
+						
 						
 					}
 					
 					@Override
 					public void mousePressed(MouseEvent arg0) {
-						// TODO Auto-generated method stub
+						
 						
 					}
 					
 					@Override
 					public void mouseExited(MouseEvent arg0) {
-						// TODO Auto-generated method stub
+						
 						
 					}
 					
 					@Override
 					public void mouseEntered(MouseEvent arg0) {
-						// TODO Auto-generated method stub
+						
 						
 					}
 					
 					@Override
 					public void mouseClicked(MouseEvent arg0) {
-						// TODO Auto-generated method stub
+						
 						String templateName = templatesLists.jTextField0.getText();
 						tempalteframe.setTitle(templateName);
 						templateIdSelected = templatesLists.getTemplateId();
@@ -368,7 +367,7 @@ public class JFrameNewReport extends DefaultDockableHolder {
 								 job = (UserJob) remoteTask.saveUserJob(job);
 								teamplates.put(listModel.size()-1, job);
 							} catch (RemoteException e1) {
-								// TODO Auto-generated catch block
+								
 								e1.printStackTrace();
 							}
 							internalFrame.clearSearchCriteria();
@@ -403,17 +402,16 @@ public class JFrameNewReport extends DefaultDockableHolder {
 			public void windowClosing(WindowEvent e) {
 
 				String tableName = "";
-				String joinsTable = "";
 				String tablerefer = "";
 
 				Object obj[] = choiceColumns.cmodList2.toArray();
 				if (obj.length > 0) {
 					String SQLcolumnsName = sqlGen.getSQLColumns(obj);
-					for (int i = 0; i < obj.length; i++) { // this to get
-															// columns from
-															// hashtable to
-															// build table name
+					for (int i = 0; i < obj.length; i++) { 
+					// this to get columns from hashtable to build table name
+						
 						tablerefer = tablerefer + (String) obj[i] + ",";
+						
 					}
 					tableName = sqlGen.getSQLTables(tablerefer);
 					if (!tableName.contains(filterValues.getTableName(reportType))) {
@@ -508,7 +506,7 @@ public class JFrameNewReport extends DefaultDockableHolder {
 	        //reportPanel.setUserJob(job);
 
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			commonUTIL.displayError("JFrameNewReport ", " Constructor ", e);
 		}
 	}
