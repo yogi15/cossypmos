@@ -322,11 +322,24 @@ public class ReportSQLGenerator {
 	}
 
 	public String getSQLColumns(Object[] obj) {
+		
 		String SQLcolumnsName = "";
-		for (int i = 0; i < obj.length; i++)
+		String columnName = "";
+		
+		for (int i = 0; i < obj.length; i++) {
+			
+			columnName = ReportColumns.getColumnName((String) obj[i]);
 			// this to get columns from hashtable
-			SQLcolumnsName = SQLcolumnsName
-					+ ReportColumns.getColumnName((String) obj[i]) + ",";
+			
+			if (!commonUTIL.isEmpty(columnName)) {
+				
+				SQLcolumnsName = SQLcolumnsName
+				+columnName  + ",";
+				
+			}
+						
+		}
+			
 		if (SQLcolumnsName.trim().length() > 0) {
 			SQLcolumnsName = SQLcolumnsName.substring(0,
 					SQLcolumnsName.length() - 1);
