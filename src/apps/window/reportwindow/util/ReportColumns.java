@@ -1,5 +1,6 @@
 package apps.window.reportwindow.util;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -34,9 +35,19 @@ public class ReportColumns {
 	static Hashtable<String,Vector> childcolumnsMaps = new Hashtable<String, Vector>();
 	static Hashtable<String,String> attributecolumnsMaps = new Hashtable<String, String>();
 	static Hashtable<String,String> reversecolumnsMaps = new Hashtable<String, String>();
+	//static Hashtable<String,String> customcolumnsMaps = new Hashtable<String, String>();
+	
+	static Hashtable<String,String> selectMaps = new Hashtable<String, String>();
+	
+	static Hashtable<String,String> feeMaps = new Hashtable<String, String>();
+	
+	static ArrayList<String> ignoreList = new ArrayList<String>();
 	
 	static {
-		
+
+		ignoreList.add("'NA')");
+		ignoreList.add("0.0)");
+		ignoreList.add("''NA'')");
 		
 		Vector tradeAttribute = ReferenceDataCache.getStarupData("TradeAttribute");
 		childcolumnsMaps.put("Trade.Attributes", tradeAttribute);
@@ -68,6 +79,18 @@ public class ReportColumns {
 		columnsMaps.put("Fees.Currency","Currency");
 		columnsMaps.put("Fees.Amount","Amount");
 		
+/*		feeMaps.put("Fees.Tradeid","Fees.Tradeid");
+		feeMaps.put("Fees.Leid","(select name from le where id = Fees.Leid ) Name");*/
+		reversecolumnsMaps.put("(select name from le where id = Fees.Leid ) Name", "Fees.Leid");
+/*		feeMaps.put("Fees.Feetype","NVL(Fees.Feetype, 'NA')");
+		feeMaps.put("Fees.Payrec","NVL(Fees.Payrec, 'NA')");
+		feeMaps.put("Fees.Currency","NVL(Fees.Currency, 'NA')");
+		feeMaps.put("Fees.Amount","NVL(Fees.Amount, 0.0)");
+		reversecolumnsMaps.put("NVL(Fees.Feetype", "Fees.Feetype");
+		reversecolumnsMaps.put("NVL(Fees.Payrec", "Fees.Payrec");
+		reversecolumnsMaps.put("NVL(Fees.Currency", "Fees.Currency");
+		reversecolumnsMaps.put("NVL(Fees.Amount","Fees.Amount");
+			*/
 		columnsMaps.put("Posting.Type","Type");
 		columnsMaps.put("Posting.Status","status");
 		columnsMaps.put("Posting.BookingDate","BookingDate");
@@ -135,9 +158,11 @@ public class ReportColumns {
 		columnsMaps.put("Transfer.TradeID","TradeID");
 		
 		
+		//customcolumnsMaps.put("Trade.FX.NEAR_AMT1","Quantity");
+		//customcolumnsMaps.put("Trade.FX.NEAR_AMT2","Nominal");
+		//customcolumnsMaps.put("Trade.Bond.Amount","TradeAmount");
 		
-		columnsMaps.put("Trade.TradeID","id"); // to be changed
-		 reversecolumnsMaps.put("Trade.id", "Trade.id");
+		columnsMaps.put("Trade.id","id"); // to be changed
 		columnsMaps.put("Trade.Currency","Currency");
 		//columnsMaps.put("Trade.Currency","productId "); 
 	//	columnsMaps.put("Trade.CounterParty","cpID");
@@ -145,33 +170,45 @@ public class ReportColumns {
 	//	columnsMaps.put("Trade.Trader","traderid");
 		columnsMaps.put("Trade.Direction","Type");
 		columnsMaps.put("Trade.TradeDate","TradeDate"); 
-	    columnsMaps.put("Trade.Broker","BrokerID");
-		columnsMaps.put("Trade.TradeAmount","TradeAmount"); 
+	    columnsMaps.put("Trade.Broker","Broker");
+	    columnsMaps.put("Trade.Bond.Description","Bond.Description");
+	    columnsMaps.put("Trade.FX.CurrencyPair","FX.CurrencyPair");
+		columnsMaps.put("Trade.Bond.Amount","Bond.Amount"); 
 		columnsMaps.put("Trade.EffectiveDate","EffectiveDate");
-		columnsMaps.put("Trade.EndDate","DeliveryDate");
+		//columnsMaps.put("Trade.EndDate","DeliveryDate");
 	//	columnsMaps.put("Trade.Book","bookId ");
-        columnsMaps.put("Trade.Nominal","Nominal ");
-	    columnsMaps.put("Trade.Quantity","Quantity"); 
-	   
-	    columnsMaps.put("Trade.AMT2","AMT2");
-	    columnsMaps.put("Trade.AMT1","AMT1"); 
-	    columnsMaps.put("Trade.currPair","CurrencyPair"); 
+        columnsMaps.put("Trade.Bond.Nominal","Bond.Nominal ");
+	    columnsMaps.put("Trade.Bond.Quantity","Bond.Quantity"); 
+		columnsMaps.put("Trade.Action","Action ");
+		columnsMaps.put("Trade.ProductType","ProductType");
+	    columnsMaps.put("Trade.FX.NEAR_AMT1","FX.NEAR_AMT1"); 
+	    columnsMaps.put("Trade.FX.NEAR_AMT2","FX.NEAR_AMT2");
+	    //columnsMaps.put("Trade.CurrencyPair","CurrencyPair"); 
 		columnsMaps.put("Trade.User","userid ");  // to be changed
-		columnsMaps.put("Trade.Price","Price");
+		columnsMaps.put("Trade.FX.NearRate","Price");
 		columnsMaps.put("Trade.Version","Version"); 
 		columnsMaps.put("Trade.Attributes","Attributes");
 		columnsMaps.put("Trade.BaseCurrency","BaseCurrency");
 		columnsMaps.put("Trade.Yield","Yield ");
-		reversecolumnsMaps.put("Trade.tradedesc", "Trade.TradeProductName1");
-		columnsMaps.put("Trade.TradeProductName1","tradedesc"); // to be changed
+		//columnsMaps.put("Trade.BrokerID","BrokerID ");
+/*		columnsMaps.put("Trade.TradeProductName1","tradedesc"); // to be changed
 		columnsMaps.put("Trade.TradeProductName2","tradedesc1");// to be changed
-		reversecolumnsMaps.put("Trade.tradedesc1", "Trade.TradeProductName2");
+*/		reversecolumnsMaps.put("Trade.id", "Trade.id");
+		reversecolumnsMaps.put("Trade.tradedesc", "Trade.TradeProductName1");
+		reversecolumnsMaps.put("Trade.Product", "Product");
 		reversecolumnsMaps.put("Trade.Type", "Trade.Direction");
 		reversecolumnsMaps.put("Trade.DeliveryDate","Trade.EndDate");
+		reversecolumnsMaps.put("Trade.Quantity","Trade.Quantity");
+		reversecolumnsMaps.put("Trade.BrokerID","Trade.Broker");
+		reversecolumnsMaps.put("Trade.CurrencyPair","Trade.CurrencyPair");
+		reversecolumnsMaps.put("Trade.userid","Trade.User");
+		reversecolumnsMaps.put("Trade.Quantity","Trade.FX.NEAR_AMT1");
+		reversecolumnsMaps.put("Trade.Nominal","Trade.FX.NEAR_AMT2");
+		reversecolumnsMaps.put("Trade.TradeAmount","Trade.Bond.Amount");
+		
 		
 	//	columnsMaps.put("Trade.Trader","traderID ");
-		columnsMaps.put("Trade.Action","Action ");
-		columnsMaps.put("Trade.ProductType","ProductType");
+
 		
 	//	columnsMaps.put("Product.ID","id");
 				columnsMaps.put("Product.productType ","productType");
@@ -236,6 +273,12 @@ public class ReportColumns {
 		
 		  return val;
 		  
+	}
+	
+	public static boolean containsInIgnoreList(String value) {
+		 
+		return ignoreList.contains(value.trim());
+ 		  
 	}
 	
 	public static void addChildLeaf(DefaultMutableTreeNode leaf,String name) {
@@ -353,27 +396,66 @@ public class ReportColumns {
 		  }
 		  
 	  }
-	  
-	  
-	  
+
 	}
 //	Trade.Attributes.Genspec
 	public static String getColumnName(String columnFromHash) {
 		String columnName = "";
 		String returnValue ="";
+		
+		columnFromHash = columnFromHash.trim();
+		
 		if(columnFromHash.contains("Attribute")) {
-			columnName = attributecolumnsMaps.get(columnFromHash.trim());
+			columnName = attributecolumnsMaps.get(columnFromHash);
 			returnValue= columnName;
 		} else {
-		if(columnsMaps.containsKey(columnFromHash.trim())) {
-			columnName = columnsMaps.get(columnFromHash.trim());
-			if(commonUTIL.isEmpty(columnName)) 
-				columnName = reversecolumnsMaps.get(columnFromHash.trim());
-		}
-		returnValue= columnFromHash.substring(0,columnFromHash.indexOf(".")+1) + columnName;
+			
+			if (columnFromHash.startsWith("Fees")) {
+				
+				columnName = feeMaps.get(columnFromHash);
+				
+				if(commonUTIL.isEmpty(columnName)) 
+					columnName = reversecolumnsMaps.get(columnFromHash);
+				
+				returnValue=  columnName;
+				
+			} else if(columnsMaps.containsKey(columnFromHash)) {
+					
+				columnName = columnsMaps.get(columnFromHash);
+			
+				if(commonUTIL.isEmpty(columnName)) 
+					columnName = reversecolumnsMaps.get(columnFromHash);
+				
+				returnValue= columnFromHash.substring(0,columnFromHash.indexOf(".")+1) + columnName;
+			
+			} 
+		
 	}
 	
 		return returnValue;
 	}
 	
+	public static String getSelectedColumnName(String columnFromHash) {
+		String columnName = "";
+		String returnValue ="";
+		if(columnFromHash.contains("Attribute")) {
+			
+			columnName = attributecolumnsMaps.get(columnFromHash.trim());
+			returnValue= columnName;
+		
+		} else {
+			
+			 if(columnsMaps.containsKey(columnFromHash.trim())) {
+					columnName = columnsMaps.get(columnFromHash.trim());
+			
+				if(commonUTIL.isEmpty(columnName)) 
+					columnName = reversecolumnsMaps.get(columnFromHash.trim());
+				
+				returnValue= columnFromHash.substring(0,columnFromHash.indexOf(".")+1) + columnName;
+			}
+		
+	}
+	
+		return returnValue;
+	}
 }
