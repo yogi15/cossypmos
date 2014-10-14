@@ -75,17 +75,27 @@ public class FilterValues {
 				" legalentity.id = legalentityattribute.le_id  ");
 
 		replaceColumnNameOnSQL.put("Trade.DeliveryDate",
-				"to_char(Trade.DeliveryDate,'dd/mm/yyyy') SettleMentDate");
+				"to_char(Trade.DeliveryDate,'dd/mm/yyyy') DeliveryDate");
+		replaceColumnNameOnSQL.put("Trade.EffectiveDate",
+		"to_char(Trade.DeliveryDate,'dd/mm/yyyy') EffectiveDate");
 		replaceColumnNameOnSQL.put("Trade.TradeDate",
 				"to_char(Trade.TradeDate,'dd/mm/yyyy HH:MM:ss') TradeDate");
 		replaceColumnNameOnSQL.put("Trade.BaseCurrency",
 				"substr(Trade.tradedesc,0,3) BaseCurrency");
 		replaceColumnNameOnSQL.put("Trade.Type", "Trade.Type Direction ");
-		replaceColumnNameOnSQL.put("Trade.tradedesc1",
+		replaceColumnNameOnSQL.put("Trade.ProductType",
 				"Trade.tradedesc1 ProductType");
-		replaceColumnNameOnSQL.put("Trade.AMT1", "Trade.Quantity AMT1");
-		replaceColumnNameOnSQL.put("Trade.AMT2", "Trade.Nominal AMT2");
+		replaceColumnNameOnSQL.put("Trade.FX.NEAR_AMT1", "Trade.Quantity FX_NEAR_AMT1");
+		replaceColumnNameOnSQL.put("Trade.FX.NEAR_AMT2", "Trade.Nominal FX_NEAR_AMT2");
 		replaceColumnNameOnSQL.put("Trade.Price", "Trade.Price Rate ");
+		replaceColumnNameOnSQL.put("Trade.Bond.Amount", "Trade.Nominal Bond_Amount");
+		replaceColumnNameOnSQL.put("Trade.Broker", "(select NVL(NAME,'') from LE where id= Trade.BrokerId)Broker_Name");
+		replaceColumnNameOnSQL.put("Trade.Bond.Description","Trade.TradeDesc Bond_Description");
+		replaceColumnNameOnSQL.put("Trade.FX.CurrencyPair","Trade.TradeDesc FX_CUrrencyPair");
+		replaceColumnNameOnSQL.put("Trade.Bond.Nominal","Trade.Nominal Bond_Quantity");
+		replaceColumnNameOnSQL.put("Trade.Bond.Quantity","Trade.Quantity Bond_Quantity");
+		
+		
 		replaceColumnNameOnSQL
 				.put("Posting.CreditAccId",
 						" (select accountname from ACCOUNT where id = Posting.CreditAccId) CreditAcc");
@@ -1192,7 +1202,7 @@ public class FilterValues {
 				// break;
 
 			}
-		}
+		}	
 		return sql;
 	}
 
