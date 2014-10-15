@@ -129,9 +129,9 @@ public class ReportSQLGenerator {
 			attachWhere = true;
 			if (sqlJoins.length() > 0)
 				sqlJoins = sqlJoins + " and " + reportType
-						+ ".id = Fees.tradeid ";
+						+ ".id = Fees.tradeid (+) ";
 			else
-				sqlJoins = reportType + ".id = Fees.tradeid ";
+				sqlJoins = reportType + ".id = Fees.tradeid (+) ";
 		}
 		if (tablename.contains("legalEntity")) {
 			attachWhere = true;
@@ -347,5 +347,5 @@ public class ReportSQLGenerator {
 		}
 		return SQLcolumnsName;
 	}
-
+	
 }
