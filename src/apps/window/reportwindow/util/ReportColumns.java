@@ -41,13 +41,7 @@ public class ReportColumns {
 	
 	static Hashtable<String,String> feeMaps = new Hashtable<String, String>();
 	
-	static ArrayList<String> ignoreList = new ArrayList<String>();
-	
 	static {
-
-		ignoreList.add("'NA')");
-		ignoreList.add("0.0)");
-		ignoreList.add("''NA'')");
 		
 		Vector tradeAttribute = ReferenceDataCache.getStarupData("TradeAttribute");
 		childcolumnsMaps.put("Trade.Attributes", tradeAttribute);
@@ -163,7 +157,7 @@ public class ReportColumns {
 		//customcolumnsMaps.put("Trade.Bond.Amount","TradeAmount");
 		
 		columnsMaps.put("Trade.id","id"); // to be changed
-		columnsMaps.put("Trade.Currency","Currency");
+		columnsMaps.put("Trade.FX.QuoteCCY","FX.QuoteCCY");
 		//columnsMaps.put("Trade.Currency","productId "); 
 	//	columnsMaps.put("Trade.CounterParty","cpID");
 		columnsMaps.put("Trade.Status","Status");
@@ -175,21 +169,24 @@ public class ReportColumns {
 	    columnsMaps.put("Trade.FX.CurrencyPair","FX.CurrencyPair");
 		columnsMaps.put("Trade.Bond.Amount","Bond.Amount"); 
 		columnsMaps.put("Trade.EffectiveDate","EffectiveDate");
+		columnsMaps.put("Trade.FX.FAR_EndDate","FX.FAR_EndDate");
 		//columnsMaps.put("Trade.EndDate","DeliveryDate");
 	//	columnsMaps.put("Trade.Book","bookId ");
-        columnsMaps.put("Trade.Bond.Nominal","Bond.Nominal ");
+        //columnsMaps.put("Trade.Bond.Nominal","Bond.Nominal ");
 	    columnsMaps.put("Trade.Bond.Quantity","Bond.Quantity"); 
 		columnsMaps.put("Trade.Action","Action ");
 		columnsMaps.put("Trade.ProductType","ProductType");
 	    columnsMaps.put("Trade.FX.NEAR_AMT1","FX.NEAR_AMT1"); 
 	    columnsMaps.put("Trade.FX.NEAR_AMT2","FX.NEAR_AMT2");
-	    //columnsMaps.put("Trade.CurrencyPair","CurrencyPair"); 
+	    columnsMaps.put("Trade.FX.FAR_AMT1", "FX_FAR_AMT1");
+	    columnsMaps.put("Trade.FX.FAR_AMT2", "FX_FAR_AMT2");
+	    columnsMaps.put("Trade.FX.FarRate","FX.FarRate"); 
 		columnsMaps.put("Trade.User","userid ");  // to be changed
-		columnsMaps.put("Trade.FX.NearRate","Price");
+		columnsMaps.put("Trade.FX.NearRate","FX.NearRate");
 		columnsMaps.put("Trade.Version","Version"); 
 		columnsMaps.put("Trade.Attributes","Attributes");
 		columnsMaps.put("Trade.BaseCurrency","BaseCurrency");
-		columnsMaps.put("Trade.Yield","Yield ");
+		//columnsMaps.put("Trade.Yield","Yield ");
 		//columnsMaps.put("Trade.BrokerID","BrokerID ");
 /*		columnsMaps.put("Trade.TradeProductName1","tradedesc"); // to be changed
 		columnsMaps.put("Trade.TradeProductName2","tradedesc1");// to be changed
@@ -273,12 +270,6 @@ public class ReportColumns {
 		
 		  return val;
 		  
-	}
-	
-	public static boolean containsInIgnoreList(String value) {
-		 
-		return ignoreList.contains(value.trim());
- 		  
 	}
 	
 	public static void addChildLeaf(DefaultMutableTreeNode leaf,String name) {
@@ -410,16 +401,7 @@ public class ReportColumns {
 			returnValue= columnName;
 		} else {
 			
-			if (columnFromHash.startsWith("Fees")) {
-				
-				columnName = feeMaps.get(columnFromHash);
-				
-				if(commonUTIL.isEmpty(columnName)) 
-					columnName = reversecolumnsMaps.get(columnFromHash);
-				
-				returnValue=  columnName;
-				
-			} else if(columnsMaps.containsKey(columnFromHash)) {
+		if(columnsMaps.containsKey(columnFromHash)) {
 					
 				columnName = columnsMaps.get(columnFromHash);
 			
