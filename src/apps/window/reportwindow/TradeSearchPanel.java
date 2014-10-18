@@ -57,8 +57,8 @@ public class TradeSearchPanel extends SearchCriteriaType {
 	private JComboBox LeAttributes;
 	private JTextField MaturityDateTo;
 	private JTextField LegalEntity;
-	Hashtable<Integer,beans.Book> books = new Hashtable<Integer,beans.Book> ();
-	Hashtable<Integer,beans.LegalEntity> counterPartyID = new Hashtable();
+	
+	
 	javax.swing.DefaultComboBoxModel bookData = new javax.swing.DefaultComboBoxModel();
 	javax.swing.DefaultComboBoxModel legalEntityData = new javax.swing.DefaultComboBoxModel();
 	javax.swing.DefaultComboBoxModel bookAttributesData = new javax.swing.DefaultComboBoxModel();
@@ -559,12 +559,8 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		Vector<FilterBean> filterBeans = new Vector<FilterBean>();
 		FilterBean bean = null;
 		if(!commonUTIL.isEmpty(TradeID.getText())) {
-			bean = new FilterBean();
-			bean.setColumnName("TradeID");
-			bean.setColumnValues(TradeID.getText());
-			bean.setAnd_or("And");
-			bean.setSearchCriteria("in");
-			filterBeans.add(bean);
+			
+			filterBeans.add(getTradeID(TradeID.getText()));
 		}
 		if(!commonUTIL.isEmpty(TradeKeyWordValue.getText())) {
 			bean = new FilterBean();
@@ -598,140 +594,51 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			}
 		}
 		if(!commonUTIL.isEmpty(TradeDateFrom.getText())) {
-			bean = new FilterBean();
-			bean.setColumnName("TradeDate");
-			bean.setColumnValues(TradeDateFrom.getText());
-			bean.setAnd_or(TradeDateFrom.getText());
-			bean.setSearchCriteria("between");
-			filterBeans.add(bean);
+			
+			filterBeans.add(getTradeDateFrom(TradeDateFrom.getText()));
 		}
 		if(!commonUTIL.isEmpty(MaturityDateFrom.getText())) {
-			bean = new FilterBean();
-			bean.setColumnName("DeliveryDate");
-			bean.setColumnValues(MaturityDateFrom.getText());
-			bean.setAnd_or(MaturityDateFrom.getText());
-			bean.setSearchCriteria("between");
-			filterBeans.add(bean);
+			filterBeans.add(getMaturityDateFrom(MaturityDateFrom.getText()));
 		}
 		if(BUYSELL.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BUYSELL.getSelectedItem().toString()))) {
-			
-			bean = new FilterBean();
-			bean.setColumnName("Type");
-			bean.setColumnValues(BUYSELL.getSelectedItem().toString());
-			bean.setSearchCriteria("in");
-			bean.setAnd_or("And");
+			filterBeans.add(getBUYSELL(BUYSELL.getSelectedItem().toString()));
 		
-			filterBeans.add(bean);
+			
 		}
 		if(Status.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Status.getSelectedItem().toString()))) {
 			
-			bean = new FilterBean();
-			bean.setColumnName("Status");
-			bean.setColumnValues(Status.getSelectedItem().toString());
-			bean.setAnd_or("And");
-			bean.setSearchCriteria("in");
-			filterBeans.add(bean);
+			filterBeans.add(getStatus(Status.getSelectedItem().toString()));
 		}
 		if(Action.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Action.getSelectedItem().toString()))) {
 			
-			bean = new FilterBean();
-			bean.setColumnName("Action");
-			bean.setColumnValues(Action.getSelectedItem().toString());
-			bean.setSearchCriteria("in");
-			bean.setAnd_or("And");
-		
-			filterBeans.add(bean);
+			filterBeans.add(getAction(Action.getSelectedItem().toString()));
 		}
 		if(ProductType.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(ProductType.getSelectedItem().toString()))) {
 			
-			bean = new FilterBean();
-			bean.setColumnName("ProductType");
-			bean.setColumnValues(ProductType.getSelectedItem().toString());
-			bean.setAnd_or("And");
-			bean.setSearchCriteria("in");
-			filterBeans.add(bean);
+			filterBeans.add(getProductType(ProductType.getSelectedItem().toString()));
 		}
 		if(ProductSubType.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(ProductSubType.getSelectedItem().toString()))) {
 			
-			bean = new FilterBean();
-			bean.setColumnName("ProductSubType");
-			bean.setColumnValues(ProductSubType.getSelectedItem().toString());
-			bean.setSearchCriteria("in");
-			bean.setAnd_or("And");
-		
-			filterBeans.add(bean);
+			filterBeans.add(getProductSubType(ProductSubType.getSelectedItem().toString()));
 		}
 		if(BookName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BookName.getSelectedItem().toString()))) {
+			filterBeans.add(getBookName(BookName.getSelectedIndex()));
 			
-			bean = new FilterBean();
-			bean.setColumnName("Book");
-			bean.setSearchCriteria("in");
-			
-			bean.setColumnValues(new Integer(getBookID(BookName.getSelectedIndex())).toString());
-			bean.setAnd_or("And");
-		
-			filterBeans.add(bean);
 		}
 if(LegalEntityName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(LegalEntityName.getSelectedItem().toString()))) {
+	filterBeans.add(getLegalEntity(LegalEntityName.getSelectedIndex()));
 			
-			bean = new FilterBean();
-			bean.setColumnName("cpid");
-			
-			bean.setColumnValues(new Integer(getCPid(LegalEntityName.getSelectedIndex())).toString());
-			bean.setAnd_or("And");
-			bean.setSearchCriteria("in");
-			filterBeans.add(bean);
 		}
 if(Currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Currency.getSelectedItem().toString()))) {
+	filterBeans.add(getCurrency(Currency.getSelectedItem().toString()));
 	
-	bean = new FilterBean();
-	bean.setColumnName("Currency");
-	
-	bean.setColumnValues(Currency.getSelectedItem().toString());
-	bean.setAnd_or("And");
-	bean.setSearchCriteria("in");
-	filterBeans.add(bean);
 }
 		return filterBeans;
 		
 	}
 
 	
-	private int getBookID(int idSelected) {
-		Book book = (Book) books.get(BookName.getSelectedIndex());
-		return book.getBookno();
-		
-	}
-	private int getCPid(int idSelected) {
-		LegalEntity le = (LegalEntity)  counterPartyID.get(LegalEntityName.getSelectedIndex());
-		return le.getId();
-		
-	}
 	
-	private int getBooktoSelected(int idSelected) {
-		int selectID = 0;
-		for(int i=0;i<books.size();i++) {
-			selectID = i;
-			Book book = (Book) books.get(i);
-			if(book != null)
-			if(book.getBookno() == idSelected) 
-				break;
-		}
-		return selectID;
-		
-	}
-	private int getCPtoSelected(int idSelected) {
-		int selectID = 0;
-		for(int i=0;i<counterPartyID.size();i++) {
-			selectID = i;
-			LegalEntity le = (LegalEntity) counterPartyID.get(i);
-			if(le != null)
-			if(le.getId() == idSelected) 
-				break;
-		}
-		return selectID;
-		
-	}
 	@Override
 	public void clearllCriterial() {
 		// TODO Auto-generated method stub
@@ -824,77 +731,8 @@ if(Currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Currency.getSelecte
 		}
 		
 	}
-private void processLEDataCombo1(javax.swing.DefaultComboBoxModel combodata, Hashtable ids) {
-		
-		Vector ledata;
-		
-				//String roleType = " role like 'PO' ";
-			ledata = (Vector) getFilterValues().getLegalEntitys();
 
-			Iterator it = ledata.iterator();
-			int p = 0;
-			combodata.addElement("");
-			while (it.hasNext()) {
 
-				LegalEntity le = (LegalEntity) it.next();
-
-				combodata.insertElementAt(le.getName(), p);
-				ids.put(p, le);
-				
-				p++;
-			
-			}
-
-		
-
-	}
-	
-private void processBookDataCombo1(javax.swing.DefaultComboBoxModel combodata, Hashtable ids) {
-	
-	Vector ledata;
-	
-			//String roleType = " role like 'PO' ";
-		ledata = (Vector) getFilterValues().getBooks();
-
-		Iterator it = ledata.iterator();
-		int p = 1;
-		combodata.addElement("");
-		while (it.hasNext()) {
-
-			Book book = (Book) it.next();
-
-			combodata.insertElementAt(book.getBook_name(), p);
-			ids.put(p, book);
-			
-			p++;
-		
-		}
-
-	
-
-}
-private void processDomainData(javax.swing.DefaultComboBoxModel combodata, Vector<String> domainData) {
-	
-	Vector ledata;
-	
-			//String roleType = " role like 'PO' ";
-		ledata =domainData;
-
-		Iterator it = ledata.iterator();
-		int p = 0;
-		combodata.addElement("");
-		while (it.hasNext()) {
-
-			StartUPData stData = (StartUPData) it.next();
-
-			combodata.insertElementAt(stData.getName(), p);
-			
-		
-		}
-
-	
-
-}
      
 	
 	
