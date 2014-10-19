@@ -66,8 +66,8 @@ public class ReportColumns {
 		columnsMaps.put("PNL.RealisedPNL","RealisedPNL");
 		
 		columnsMaps.put("Fees.Tradeid","Tradeid");
-		columnsMaps.put("Fees.Leid","(select name from le where id = Fees.Leid ) Name");
-		reversecolumnsMaps.put("(select name from le where id = Fees.Leid ) Name", "Fees.Leid");
+		columnsMaps.put("Fees.Le","Fees_LE");
+		//reversecolumnsMaps.put("(select name from le where id = Fees.Leid ) Name", "Fees.Leid");
 		columnsMaps.put("Fees.Feetype","Feetype");
 		columnsMaps.put("Fees.Payrec","Payrec");
 		columnsMaps.put("Fees.Currency","Currency");
