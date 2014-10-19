@@ -186,6 +186,8 @@ public class ReportColumns {
 		columnsMaps.put("Trade.Version","Version"); 
 		columnsMaps.put("Trade.Attributes","Attributes");
 		columnsMaps.put("Trade.BaseCurrency","BaseCurrency");
+		columnsMaps.put("Trade.FX.Near_EndDate","FX.Near_EndDate");
+		
 		//columnsMaps.put("Trade.Yield","Yield ");
 		//columnsMaps.put("Trade.BrokerID","BrokerID ");
 /*		columnsMaps.put("Trade.TradeProductName1","tradedesc"); // to be changed
