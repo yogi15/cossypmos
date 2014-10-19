@@ -57,7 +57,7 @@ public class searchCriteriaPanel extends JPanel {
 		createGUI(reportType);
 	}
 	public void clearllCriterial() {
-		//searchType.clearllCriterial();
+		searchType.clearllCriterial();
 		mod = null;
 		mod = new TableModelUtil(data,col);
 		table.setModel(mod);
@@ -91,11 +91,11 @@ public class searchCriteriaPanel extends JPanel {
 		// mod.addRow(bean);
 		 table.setModel(mod);
 		 jScrollPane1 = new JScrollPane();
-		// searchType = makeSearchTypePanel(reportType);
+		 searchType = makeSearchTypePanel(reportType);
 		 
-		 jScrollPane1.setViewportView(table);
-		 add(jScrollPane1,BorderLayout.CENTER);
-		//add(searchType,BorderLayout.CENTER);
+		// jScrollPane1.setViewportView(table);
+		// add(jScrollPane1,BorderLayout.CENTER);
+		add(searchType,BorderLayout.CENTER);
 	        
 	}
 	 /**
