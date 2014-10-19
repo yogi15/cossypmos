@@ -87,8 +87,8 @@ public class FilterValues {
 				"Trade.tradedesc1 ProductType");
 		replaceColumnNameOnSQL.put("Trade.FX.NEAR_AMT1", "Trade.quantity FX_NEAR_AMT1");
 		replaceColumnNameOnSQL.put("Trade.FX.NEAR_AMT2", "Trade.nominal FX_NEAR_AMT2");
-		replaceColumnNameOnSQL.put("Trade.FX.FAR_AMT1", "Trade.amount FX_FAR_AMT1");
-		replaceColumnNameOnSQL.put("Trade.FX.FAR_AMT2", "Trade.yield FX_FAR_AMT2");
+		replaceColumnNameOnSQL.put("Trade.FX_FAR_AMT1", "Trade.amount FX_FAR_AMT1");
+		replaceColumnNameOnSQL.put("Trade.FX_FAR_AMT2", "Trade.yield FX_FAR_AMT2");
 		replaceColumnNameOnSQL.put("Trade.Price", "Trade.Price Rate ");
 		replaceColumnNameOnSQL.put("Trade.Bond.Amount", "Trade.Nominal Bond_Amount");
 		replaceColumnNameOnSQL.put("Trade.Broker", "(select NVL(NAME,'') from LE where id= Trade.BrokerId)Broker_Name");
