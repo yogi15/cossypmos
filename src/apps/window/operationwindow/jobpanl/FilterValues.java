@@ -87,7 +87,7 @@ public class FilterValues {
 				"Trade.tradedesc1 ProductType");
 		replaceColumnNameOnSQL.put("Trade.FX.NEAR_AMT1", "Trade.quantity FX_NEAR_AMT1");
 		replaceColumnNameOnSQL.put("Trade.FX.NEAR_AMT2", "Trade.nominal FX_NEAR_AMT2");
-		replaceColumnNameOnSQL.put("Trade.FX_FAR_AMT1", "Trade.amount FX_FAR_AMT1");
+		replaceColumnNameOnSQL.put("Trade.FX_FAR_AMT1", "Trade.TradeAmount FX_FAR_AMT1");
 		replaceColumnNameOnSQL.put("Trade.FX_FAR_AMT2", "Trade.yield FX_FAR_AMT2");
 		replaceColumnNameOnSQL.put("Trade.Price", "Trade.Price Rate ");
 		replaceColumnNameOnSQL.put("Trade.Bond.Amount", "Trade.Nominal Bond_Amount");
@@ -96,7 +96,8 @@ public class FilterValues {
 		replaceColumnNameOnSQL.put("Trade.FX.CurrencyPair","Trade.TradeDesc FX_CUrrencyPair");
 		replaceColumnNameOnSQL.put("Trade.Bond.Nominal","Trade.Nominal Bond_Quantity");
 		replaceColumnNameOnSQL.put("Trade.Bond.Quantity","Trade.Quantity Bond_Quantity");
-		replaceColumnNameOnSQL.put("Trade.FX.FAR_EndDate","to_char(Trade.EffectiveDate,'dd/mm/yyyy') FX_FAR_EndDate");
+		replaceColumnNameOnSQL.put("Trade.FX.FAR_EndDate","to_char(to_date(substr(Trade.EffectiveDate,1,10), 'dd/mm/yyyy'), 'dd/mm/yyyy') FX_FAR_EndDate");
+		replaceColumnNameOnSQL.put("Trade.FX.Near_EndDate","to_char(Trade.DeliveryDate,'dd/mm/yyyy') FX_Near_EndDate");
 		replaceColumnNameOnSQL.put("Trade.FX.FarRate","Trade.SECONDETRADEPRICE FX_FAR_Rate"); 
 		replaceColumnNameOnSQL.put("Trade.FX.NearRate","Trade.price FX_NEAR_Rate");
 		replaceColumnNameOnSQL.put("Trade.FX.QuoteCCY","Trade.currency FX_QuoteCCY");
