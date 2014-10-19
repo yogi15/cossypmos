@@ -74,10 +74,10 @@ public class FilterValues {
 		attributesWhereClause.put("LeKeyword",
 				" legalentity.id = legalentityattribute.le_id  ");
 
-		replaceColumnNameOnSQL.put("Trade.DeliveryDate",
+		/*replaceColumnNameOnSQL.put("Trade.DeliveryDate",
 				"to_char(Trade.DeliveryDate,'dd/mm/yyyy') DeliveryDate");
 		replaceColumnNameOnSQL.put("Trade.EffectiveDate",
-		"to_char(Trade.DeliveryDate,'dd/mm/yyyy') EffectiveDate");
+		"to_char(Trade.DeliveryDate,'dd/mm/yyyy') EffectiveDate");*/
 		replaceColumnNameOnSQL.put("Trade.TradeDate",
 				"to_char(Trade.TradeDate,'dd/mm/yyyy HH:MM:ss') TradeDate");
 		replaceColumnNameOnSQL.put("Trade.BaseCurrency",
@@ -85,8 +85,10 @@ public class FilterValues {
 		replaceColumnNameOnSQL.put("Trade.Type", "Trade.Type Direction ");
 		replaceColumnNameOnSQL.put("Trade.ProductType",
 				"Trade.tradedesc1 ProductType");
-		replaceColumnNameOnSQL.put("Trade.FX.NEAR_AMT1", "Trade.Quantity FX_NEAR_AMT1");
-		replaceColumnNameOnSQL.put("Trade.FX.NEAR_AMT2", "Trade.Nominal FX_NEAR_AMT2");
+		replaceColumnNameOnSQL.put("Trade.FX.NEAR_AMT1", "Trade.quantity FX_NEAR_AMT1");
+		replaceColumnNameOnSQL.put("Trade.FX.NEAR_AMT2", "Trade.nominal FX_NEAR_AMT2");
+		replaceColumnNameOnSQL.put("Trade.FX.FAR_AMT1", "Trade.amount FX_FAR_AMT1");
+		replaceColumnNameOnSQL.put("Trade.FX.FAR_AMT2", "Trade.yield FX_FAR_AMT2");
 		replaceColumnNameOnSQL.put("Trade.Price", "Trade.Price Rate ");
 		replaceColumnNameOnSQL.put("Trade.Bond.Amount", "Trade.Nominal Bond_Amount");
 		replaceColumnNameOnSQL.put("Trade.Broker", "(select NVL(NAME,'') from LE where id= Trade.BrokerId)Broker_Name");
@@ -94,7 +96,10 @@ public class FilterValues {
 		replaceColumnNameOnSQL.put("Trade.FX.CurrencyPair","Trade.TradeDesc FX_CUrrencyPair");
 		replaceColumnNameOnSQL.put("Trade.Bond.Nominal","Trade.Nominal Bond_Quantity");
 		replaceColumnNameOnSQL.put("Trade.Bond.Quantity","Trade.Quantity Bond_Quantity");
-		
+		replaceColumnNameOnSQL.put("Trade.FX.FAR_EndDate","to_char(Trade.EffectiveDate,'dd/mm/yyyy') FX_FAR_EndDate");
+		replaceColumnNameOnSQL.put("Trade.FX.FarRate","Trade.SECONDETRADEPRICE FX_FAR_Rate"); 
+		replaceColumnNameOnSQL.put("Trade.FX.NearRate","Trade.price FX_NEAR_Rate");
+		replaceColumnNameOnSQL.put("Trade.FX.QuoteCCY","Trade.currency FX_QuoteCCY");
 		
 		replaceColumnNameOnSQL
 				.put("Posting.CreditAccId",
