@@ -27,9 +27,11 @@ import javax.swing.event.CellEditorListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 
+import util.ClassInstantiateUtil;
 import util.commonUTIL;
 
 
+import apps.window.tradewindow.BackOfficePanel;
 import beans.FilterBean;
 import beans.UserJobsDetails;
 
@@ -51,11 +53,11 @@ public class searchCriteriaPanel extends JPanel {
 		private JScrollPane jScrollPane1;
 		
 
-	public searchCriteriaPanel() {
-		createGUI();
+	public searchCriteriaPanel(String reportType) {
+		createGUI(reportType);
 	}
 	public void clearllCriterial() {
-		searchType.clearllCriterial();
+		//searchType.clearllCriterial();
 		mod = null;
 		mod = new TableModelUtil(data,col);
 		table.setModel(mod);
@@ -75,7 +77,7 @@ public class searchCriteriaPanel extends JPanel {
 		table.repaint();
 		mod.fireTableDataChanged();
 	}
-	private void createGUI() {
+	private void createGUI(String reportType) {
 		setLayout(new BorderLayout());
 		setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 		 mod = new TableModelUtil(data,col);
@@ -89,10 +91,11 @@ public class searchCriteriaPanel extends JPanel {
 		// mod.addRow(bean);
 		 table.setModel(mod);
 		 jScrollPane1 = new JScrollPane();
-		 searchType = new TradeSearchPanel();
+		// searchType = makeSearchTypePanel(reportType);
+		 
 		 jScrollPane1.setViewportView(table);
-		// add(jScrollPane1,BorderLayout.CENTER);
-		 add(searchType,BorderLayout.CENTER);
+		 add(jScrollPane1,BorderLayout.CENTER);
+		//add(searchType,BorderLayout.CENTER);
 	        
 	}
 	 /**
@@ -648,6 +651,21 @@ public void loadTemplate(Vector<UserJobsDetails> jobdetails) {
 	// TODO Auto-generated method stub
 	searchType.loadFilters(jobdetails);
 }
+protected SearchCriteriaType makeSearchTypePanel(String name) {
+	String productWindowName = "apps.window.reportwindow."
+			+ name + "SearchPanel";
+	SearchCriteriaType panel = null;
 
+	try {
+		Class class1 = ClassInstantiateUtil.getClass(productWindowName,
+				true);
+		panel = (SearchCriteriaType) class1.newInstance();
+		// productWindow = (BondPanel)
+	} catch (Exception e) {
+		System.out.println(e);
+	}
+
+	return panel;
+}
 
 }
