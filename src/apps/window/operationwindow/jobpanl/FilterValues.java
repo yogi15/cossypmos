@@ -102,6 +102,13 @@ public class FilterValues {
 		replaceColumnNameOnSQL.put("Trade.FX.NearRate","Trade.price FX_NEAR_Rate");
 		replaceColumnNameOnSQL.put("Trade.FX.QuoteCCY","Trade.currency FX_QuoteCCY");
 		
+		replaceColumnNameOnSQL.put("Fees.Feetype","NVL(Fees.Feetype, 'NA') Feetype");
+		replaceColumnNameOnSQL.put("Fees.Payrec","NVL(Fees.Payrec, 'NA') Payrec");
+		replaceColumnNameOnSQL.put("Fees.Currency","NVL(Fees.Currency, 'NA')Fees_Currency");
+		replaceColumnNameOnSQL.put("Fees.Amount","NVL(Fees.Amount, 0) Fees_Amount");
+		replaceColumnNameOnSQL.put("Fees.Tradeid","NVL(Fees.Tradeid, 0) Tradeid");
+		replaceColumnNameOnSQL.put("Fees.Fees_LE","NVL((select name from le where id = Fees.Leid ), 'NA')Fees_LE");
+		
 		replaceColumnNameOnSQL
 				.put("Posting.CreditAccId",
 						" (select accountname from ACCOUNT where id = Posting.CreditAccId) CreditAcc");
