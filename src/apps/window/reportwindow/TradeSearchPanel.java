@@ -2,6 +2,7 @@ package apps.window.reportwindow;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
@@ -17,6 +18,8 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
+import com.jidesoft.combobox.DateComboBox;
+
 import util.commonUTIL;
 import beans.Book;
 import beans.FilterBean;
@@ -30,7 +33,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 	private static final long serialVersionUID = 1L;
 	private JLabel jLabel0;
 	private JTextField TradeID;
-	private JTextField TradeDateFrom;
+	private DateComboBox TradeDateFrom;
 	private JLabel jLabel3;
 	private JLabel jLabel1;
 	private JComboBox<String> TradeKeyWordName;
@@ -39,12 +42,12 @@ public class TradeSearchPanel extends SearchCriteriaType {
 	private JLabel jLabel5;
 	private JLabel jLabel6;
 	private JLabel jLabel4;
-	private JTextField TradeDateTo;
-	private JTextField MaturityDateFrom;
+	private DateComboBox TradeDateTo;
+	private DateComboBox MaturityDateFrom;
 	private JTextField TradeKeyWordValue;
 	private JLabel jLabel7;
-	private JTextField SettlementDateFrom;
-	private JTextField SettlementDateTo;
+	private DateComboBox SettlementDateFrom;
+	private DateComboBox SettlementDateTo;
 	private JLabel jLabel8;
 	private JLabel jLabel9;
 	private JComboBox BookName;
@@ -55,7 +58,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 	private JComboBox LegalEntityName;
 	private JLabel jLabel12;
 	private JComboBox LeAttributes;
-	private JTextField MaturityDateTo;
+	private DateComboBox MaturityDateTo;
 	private JTextField LegalEntity;
 	
 	
@@ -338,10 +341,11 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		return LegalEntity;
 	}
 
-	private JTextField getMaturityDateTo() {
+	private DateComboBox getMaturityDateTo() {
 		if (MaturityDateTo == null) {
-			MaturityDateTo = new JTextField();
-			
+			MaturityDateTo = new DateComboBox();
+			MaturityDateTo.setFormat(commonUTIL.getDateFormat());
+			MaturityDateTo.setDate(null);
 		}
 		return MaturityDateTo;
 	}
@@ -425,16 +429,20 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		return jLabel8;
 	}
 
-	private JTextField getSettlementDateTo() {
+	private DateComboBox getSettlementDateTo() {
 		if (SettlementDateTo == null) {
-			SettlementDateTo = new JTextField();
+			SettlementDateTo = new DateComboBox();
+			SettlementDateTo.setFormat(commonUTIL.getDateFormat());
+			SettlementDateTo.setDate(null);
 		}
 		return SettlementDateTo;
 	}
 
-	private JTextField getSettlementDateFrom() {
+	private DateComboBox getSettlementDateFrom() {
 		if (SettlementDateFrom == null) {
-			SettlementDateFrom = new JTextField();
+			SettlementDateFrom = new DateComboBox();
+			SettlementDateFrom.setFormat(commonUTIL.getDateFormat());
+			SettlementDateFrom.setDate(null);
 		}
 		return SettlementDateFrom;
 	}
@@ -454,17 +462,21 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		return TradeKeyWordValue;
 	}
 
-	private JTextField getMaturityDateFrom() {
+	private DateComboBox getMaturityDateFrom() {
 		if (MaturityDateFrom == null) {
-			MaturityDateFrom = new JTextField();
+			MaturityDateFrom = new DateComboBox();
+			MaturityDateFrom.setFormat(commonUTIL.getDateFormat());
+			MaturityDateFrom.setDate(null);
 			
 		}
 		return MaturityDateFrom;
 	}
 
-	private JTextField getTradeDateTo() {
+	private DateComboBox getTradeDateTo() {
 		if (TradeDateTo == null) {
-			TradeDateTo = new JTextField();
+			TradeDateTo = new DateComboBox();
+			TradeDateTo.setFormat(commonUTIL.getDateFormat());
+			TradeDateTo.setDate(null);
 		}
 		return TradeDateTo;
 	}
@@ -532,10 +544,16 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		return jLabel3;
 	}
 
-	private JTextField getTradeDateFrom() {
+	private DateComboBox getTradeDateFrom() {
 		if (TradeDateFrom == null) {
-			TradeDateFrom = new JTextField();
+			
+			TradeDateFrom = new  com.jidesoft.combobox.DateComboBox();
+			//TradeDateFrom.setTimeDisplayed(true);
+			TradeDateFrom.setFormat(commonUTIL.getDateFormat());
+			TradeDateFrom.setDate(null);
+			
 		}
+		
 		return TradeDateFrom;
 	}
 
@@ -561,7 +579,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		if(!commonUTIL.isEmpty(TradeID.getText())) {
 			
 			filterBeans.add(getTradeID(TradeID.getText()));
-		}
+		} 
 		if(!commonUTIL.isEmpty(TradeKeyWordValue.getText())) {
 			bean = new FilterBean();
 			if(TradeKeyWordName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(TradeKeyWordName.getSelectedItem().toString()))) {
@@ -571,8 +589,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			bean.setSearchCriteria("in");
 			filterBeans.add(bean);
 			}
-		}
-		
+		}		
 		if(!commonUTIL.isEmpty(LeAttributesValues.getText())) {
 			bean = new FilterBean();
 			if(LeAttributes.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(LeAttributes.getSelectedItem().toString()))) {
@@ -582,7 +599,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			bean.setSearchCriteria("in");
 			filterBeans.add(bean);
 			}
-		}
+		} 
 		if(!commonUTIL.isEmpty(BookAttributeValue.getText())) {
 			bean = new FilterBean();
 			if(BookAttributeName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BookAttributeName.getSelectedItem().toString()))) {
@@ -592,43 +609,177 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			bean.setSearchCriteria("in");
 			filterBeans.add(bean);
 			}
-		}
-		if(!commonUTIL.isEmpty(TradeDateFrom.getText())) {
+		} 
+		
+		if( (TradeDateFrom.getDate() != null 
+				&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(TradeDateFrom.getDate())))) {				
 			
-			filterBeans.add(getTradeDateFrom(TradeDateFrom.getText()));
+			Date fromTrade = TradeDateFrom.getDate();
+			
+			if (TradeDateTo.getDate() != null) {
+				
+				Date toTradeDate = TradeDateTo.getDate();
+				
+				if (toTradeDate.after(fromTrade)) {
+					
+					filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromTrade), 
+							commonUTIL.convertDateTOString(toTradeDate), "TradeDate"));
+				
+					
+				}  else {
+					
+					commonUTIL.showAlertMessage("Trade From Date should be less then Trade To Date");
+					
+				}				
+			} 
+			
+			
+			if (fromTrade == null  && TradeDateTo.getDate() != null) {
+				
+				commonUTIL.showAlertMessage("Please select Trade From Date first");
+			
+			}
+			
+			filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromTrade), 
+					commonUTIL.convertDateTOString(fromTrade), "TradeDate"));
 		}
-		if(!commonUTIL.isEmpty(MaturityDateFrom.getText())) {
-			filterBeans.add(getMaturityDateFrom(MaturityDateFrom.getText()));
+		
+		if( (SettlementDateFrom.getDate() != null 
+				&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(SettlementDateFrom.getDate())))) {				
+			
+			Date fromSettlementDate = SettlementDateFrom.getDate();
+			
+			if (SettlementDateTo.getDate() != null) {
+				
+				Date toSettlementDate = SettlementDateTo.getDate();
+				
+				if (toSettlementDate.after(fromSettlementDate)) {
+					
+					filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromSettlementDate), 
+							commonUTIL.convertDateTOString(toSettlementDate), "DeliveryDate"));
+				
+					
+				}  else {
+					
+					commonUTIL.showAlertMessage("Settlement From Date should be less then Settlement To Date");
+					
+				}				
+			} 
+			
+			
+			if (fromSettlementDate == null  && SettlementDateTo.getDate() != null) {
+				
+				commonUTIL.showAlertMessage("Please select Settlement From Date first");
+			
+			}
+			
+			filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromSettlementDate), 
+					commonUTIL.convertDateTOString(fromSettlementDate), "DeliveryDate"));
 		}
+		
+			
+			/*if (TradeDateTo.getDate() != null 
+						&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(TradeDateTo.getDate()))) {
+				
+				if (TradeDateFrom.getDate() != null ) {
+					
+					if (TradeDateTo.getDate().after(TradeDateFrom.getDate())) {
+						
+						filterBeans.add(getTradeDateFrom(commonUTIL.convertDateTOString(TradeDateTo.getDate()), "TradeDateTo"));
+						
+						
+					} else {
+						
+						commonUTIL.showAlertMessage("Trade From Date should be less then Trade To Date");
+						
+					}
+				
+				} else {
+					
+					commonUTIL.showAlertMessage("Please select Trade From Date first");
+					
+				}
+				
+		}  
+			if (MaturityDateFrom.getDate() != null 
+								&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(MaturityDateFrom.getDate()))){
+				filterBeans.add(getTradeDateFrom(commonUTIL.convertDateTOString(MaturityDateFrom.getDate()), "MaturityDateFrom"));
+		} 
+			if (MaturityDateTo.getDate() != null 
+											&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(MaturityDateTo.getDate()))) {
+				
+				if (MaturityDateFrom.getDate() != null ) {
+					
+					if (MaturityDateTo.getDate().after(MaturityDateFrom.getDate())) {
+						
+						filterBeans.add(getTradeDateFrom(commonUTIL.convertDateTOString(MaturityDateTo.getDate()), "MaturityDateTo"));
+						
+					} else {
+						
+						commonUTIL.showAlertMessage("Maturity From Date should be before Maturity To Date");
+					}
+				
+				} else {
+					
+					commonUTIL.showAlertMessage("Please select Maturity From Date first");
+					
+				}
+				
+		}  
+			if (SettlementDateFrom.getDate() != null 
+													&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(SettlementDateFrom.getDate()))) {
+				filterBeans.add(getTradeDateFrom(commonUTIL.convertDateTOString(SettlementDateFrom.getDate()), "SettlementDateFrom"));
+		}  
+			if (SettlementDateTo.getDate() != null 
+												&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(SettlementDateTo.getDate()))) {
+				
+				if (SettlementDateFrom.getDate() != null ) {
+					
+					if (SettlementDateTo.getDate().after(SettlementDateFrom.getDate())) {
+						
+						filterBeans.add(getTradeDateFrom(commonUTIL.convertDateTOString(SettlementDateTo.getDate()), "SettlementDateTo"));
+						
+					} else {
+						
+						commonUTIL.showAlertMessage("Settlement From Date should be before Settlement To Date");
+					}
+				
+				} else {
+					
+					commonUTIL.showAlertMessage("Please select Settlement From Date first");
+					
+				}
+															
+		} */ 
 		if(BUYSELL.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BUYSELL.getSelectedItem().toString()))) {
 			filterBeans.add(getBUYSELL(BUYSELL.getSelectedItem().toString()));
 		
 			
-		}
+		} 
 		if(Status.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Status.getSelectedItem().toString()))) {
 			
 			filterBeans.add(getStatus(Status.getSelectedItem().toString()));
-		}
+		} 
 		if(Action.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Action.getSelectedItem().toString()))) {
 			
 			filterBeans.add(getAction(Action.getSelectedItem().toString()));
-		}
+		} 
 		if(ProductType.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(ProductType.getSelectedItem().toString()))) {
 			
 			filterBeans.add(getProductType(ProductType.getSelectedItem().toString()));
-		}
+		} 
 		if(ProductSubType.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(ProductSubType.getSelectedItem().toString()))) {
 			
 			filterBeans.add(getProductSubType(ProductSubType.getSelectedItem().toString()));
-		}
+		} 
 		if(BookName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BookName.getSelectedItem().toString()))) {
 			filterBeans.add(getBookName(BookName.getSelectedIndex()));
 			
-		}
+		} 
 if(LegalEntityName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(LegalEntityName.getSelectedItem().toString()))) {
 	filterBeans.add(getLegalEntity(LegalEntityName.getSelectedIndex()));
 			
-		}
+		} 
 if(Currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Currency.getSelectedItem().toString()))) {
 	filterBeans.add(getCurrency(Currency.getSelectedItem().toString()));
 	
@@ -641,10 +792,13 @@ if(Currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Currency.getSelecte
 	
 	@Override
 	public void clearllCriterial() {
-		// TODO Auto-generated method stub
 		TradeID.setText("");
-		TradeDateFrom.setText("");
-		MaturityDateFrom.setText("");
+		TradeDateFrom.setDate(null);
+		TradeDateTo.setDate(null);
+		MaturityDateFrom.setDate(null);
+		MaturityDateTo.setDate(null);
+		SettlementDateFrom.setDate(null);
+		SettlementDateTo.setDate(null);
 		BUYSELL.setSelectedIndex(-1);
 		Status.setSelectedIndex(-1);
 		Action.setSelectedIndex(-1);
@@ -666,18 +820,37 @@ if(Currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Currency.getSelecte
 
 	@Override
 	public void loadFilters(Vector<UserJobsDetails> jobdetails  ) {
-		// TODO Auto-generated method stub
 		for(int i=0;i<jobdetails.size();i++) {
 			UserJobsDetails bean = jobdetails.get(i);
 			
 			if(bean.getColumnName().equalsIgnoreCase("TradeID")) {
 				TradeID.setText(bean.getValues());
 			}
-			if(bean.getColumnName().equalsIgnoreCase("TradeDate")) {
-				TradeDateFrom.setText(bean.getValues());
+			else if(bean.getColumnName().equalsIgnoreCase("TradeDate")) {
+				TradeDateFrom.setDate(commonUTIL
+						.convertStringtoSQLDate(bean.getValues()));
+				TradeDateTo.setDate(commonUTIL
+						.convertStringtoSQLDate(bean.getAnd_or()));
 			}
-			if(bean.getColumnName().equalsIgnoreCase("DeliveryDate")) {
-				MaturityDateFrom.setText(bean.getValues());
+			else if(bean.getColumnName().equalsIgnoreCase("TradeDateTo")) {
+				TradeDateTo.setDate(commonUTIL
+						.convertStringtoSQLDate(bean.getValues()));
+			}
+			else if(bean.getColumnName().equalsIgnoreCase("MaturityDateFrom")) {
+				MaturityDateFrom.setDate(commonUTIL
+						.convertStringtoSQLDate(bean.getValues()));
+			}
+			else if(bean.getColumnName().equalsIgnoreCase("MaturityDateTo")) {
+				MaturityDateTo.setDate(commonUTIL
+						.convertStringtoSQLDate(bean.getValues()));
+			}
+			else if(bean.getColumnName().equalsIgnoreCase("SettlementDateFrom")) {
+				SettlementDateFrom.setDate(commonUTIL
+						.convertStringtoSQLDate(bean.getValues()));
+			}
+			else if(bean.getColumnName().equalsIgnoreCase("SettlementDateTo")) {
+				SettlementDateTo.setDate(commonUTIL
+						.convertStringtoSQLDate(bean.getValues()));
 			}
 			if(bean.getColumnName().equalsIgnoreCase("Type")) {
 				BUYSELL.setSelectedItem(bean.getValues());
