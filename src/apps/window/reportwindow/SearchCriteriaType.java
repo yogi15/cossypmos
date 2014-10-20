@@ -77,14 +77,24 @@ public abstract class SearchCriteriaType extends JPanel
     	 return bean;
      }
      
-     public FilterBean getTradeDateFrom(String TradeDateFrom)  {
+     public FilterBean getCriteriaDate(String TradeDateFrom, String DateTo, String colName)  {
     	 FilterBean bean = null;
     	 if(!commonUTIL.isEmpty(TradeDateFrom)) {
     		 bean = new FilterBean();
- 			bean.setColumnName("TradeDate");
+ 			bean.setColumnName(colName);
  			bean.setColumnValues(TradeDateFrom);
- 			bean.setAnd_or(TradeDateFrom);
- 			bean.setSearchCriteria("between");
+ 			
+ 			if (!DateTo.equals(TradeDateFrom)) {
+ 				
+ 				bean.setAnd_or(DateTo);
+ 				bean.setSearchCriteria("between");
+ 				
+ 			} else {
+ 				
+ 				bean.setAnd_or(TradeDateFrom);
+ 				bean.setSearchCriteria("equal");
+ 			}
+ 			
  			
  		}
     	 return bean;
