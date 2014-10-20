@@ -875,7 +875,14 @@ public class FilterValues {
 					+ "', 'dd/MM/YYYY')";
 			dateWhereClause = dateWhereClause + " and to_date('"
 					+ endDate.trim() + "', 'dd/MM/YYYY')";
+			
+		} else if (searchCriteria.equalsIgnoreCase("equal")) {
+			
+			dateWhereClause = " = to_date('" + startDate.trim()
+			+ "', 'dd/MM/YYYY')";
+			
 		} else {
+			
 			dateWhereClause = searchCriteria + "  to_date('" + startDate.trim()
 					+ "', 'dd/MM/YYYY')";
 			if (commonUTIL.isEmpty(endDate))
