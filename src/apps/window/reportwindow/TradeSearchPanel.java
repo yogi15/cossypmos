@@ -100,7 +100,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 	private void init() {
 		// TODO Auto-generated method stub
 		processBookDataCombo1(bookData, books);
-		processLEDataCombo1(legalEntityData,  counterPartyID);
+		processLEDataCombo1(legalEntityData,  counterPartyID, "CounterParty");
 		processDomainData(bookAttributesData,  getFilterValues().getDomainValues("BookAttributes"));
 		processDomainData(legalEntityAttributeData,  getFilterValues().getDomainValues("LEAttributes"));
 		processDomainData(tradeAttributeData,  getFilterValues().getDomainValues("TradeAttribute"));
@@ -776,14 +776,19 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			filterBeans.add(getBookName(BookName.getSelectedIndex()));
 			
 		} 
-if(LegalEntityName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(LegalEntityName.getSelectedItem().toString()))) {
-	filterBeans.add(getLegalEntity(LegalEntityName.getSelectedIndex()));
+		
+		if(LegalEntityName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(LegalEntityName.getSelectedItem().toString()))) {
+			
+			filterBeans.add(getLegalEntity(LegalEntityName.getSelectedIndex(), "cpid"));
 			
 		} 
-if(Currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Currency.getSelectedItem().toString()))) {
-	filterBeans.add(getCurrency(Currency.getSelectedItem().toString()));
+		
+		if(Currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Currency.getSelectedItem().toString()))) {
+			
+			filterBeans.add(getCurrency(Currency.getSelectedItem().toString(), "Currency"));
 	
-}
+		}
+		
 		return filterBeans;
 		
 	}
