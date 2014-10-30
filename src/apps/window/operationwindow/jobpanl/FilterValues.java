@@ -102,12 +102,16 @@ public class FilterValues {
 		replaceColumnNameOnSQL.put("Trade.FX.NearRate","Trade.price FX_NEAR_Rate");
 		replaceColumnNameOnSQL.put("Trade.FX.QuoteCCY","Trade.currency FX_QuoteCCY");
 		
+		
 		replaceColumnNameOnSQL.put("Fees.Feetype","NVL(Fees.Feetype, 'NA') Feetype");
 		replaceColumnNameOnSQL.put("Fees.Payrec","NVL(Fees.Payrec, 'NA') Payrec");
 		replaceColumnNameOnSQL.put("Fees.Currency","NVL(Fees.Currency, 'NA')Fees_Currency");
 		replaceColumnNameOnSQL.put("Fees.Amount","NVL(Fees.Amount, 0) Fees_Amount");
 		replaceColumnNameOnSQL.put("Fees.Tradeid","NVL(Fees.Tradeid, 0) Tradeid");
 		replaceColumnNameOnSQL.put("Fees.Fees_LE","NVL((select name from le where id = Fees.Leid ), 'NA')Fees_LE");
+		
+		replaceColumnNameOnSQL.put("Transfer.Transfer_ProdcutType","NVL((select producttype from product where id = Transfer.productId ), 'NA')Product_Type");
+		replaceColumnNameOnSQL.put("Transfer.TransferStatus","Transfer.Status");
 		
 		replaceColumnNameOnSQL
 				.put("Posting.CreditAccId",
@@ -136,14 +140,16 @@ public class FilterValues {
 		columnNames.put("cpid", "cpid");
 		columnNames.put("Currency", "Currency");
 		columnNames.put("SettleCurrency", "Currency");
+		columnNames.put("TrasnferCurrency", "SettleCurrency");
 		columnNames.put("Action", "action");
 		columnNames.put("Status", "Status");
 		columnNames.put("ProductType", "ProductType");
+		columnNames.put("ProductSubType", "TRADEDESC1");
 		columnNames.put("EventType", "EventType");
 		columnNames.put("WFConfig", "EventType");
 		columnNames.put("WFType", "WFType");
 		columnNames.put("BUY/SELL", "Type");
-		columnNames.put("TradeID", "tradeid");
+		columnNames.put("otherTradeID", "tradeid");
 		columnNames.put("Amount", "amount");
 		columnNames.put("TaskType", "taskType");
 		columnNames.put("TaskType", "taskType");
@@ -158,6 +164,10 @@ public class FilterValues {
 		columnNames.put("TaskDate", "TaskDate");
 		columnNames.put("Monthly", "TO_CHAR(settledate,'MON')");
 		columnNames.put("TradeID", "ID");
+		columnNames.put("TransferId", "ID");
+		columnNames.put("TransferType", "TransferType");
+		columnNames.put("TransferEventType", "EventType");
+		
 		numberDataTypes.put("Book", "Bookid");
 		numberDataTypes.put("LegalEntity", "id");
 		numberDataTypes.put("Task", "id");
