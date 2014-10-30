@@ -143,11 +143,11 @@ public class ReportColumns {
 	//	columnsMaps.put("Transfer.ATTRIBUTES","Attributes");
 		columnsMaps.put("Transfer.UserID","UserID"); // to be changed
 		columnsMaps.put("Transfer.cpid","cpid");// to be changed
-		columnsMaps.put("Transfer.ProdcutType","ProdcutType");
+		columnsMaps.put("Transfer.ProdcutType","Transfer_ProdcutType");
 		columnsMaps.put("Transfer.NetterdTransferID","NetterdTransferID");
 		columnsMaps.put("Transfer.NettedConfigID","NettedConfigID");
 		columnsMaps.put("Transfer.SettleAmount","SettleAmount");
-		columnsMaps.put("Transfer.ProductID","ProductID");
+		//columnsMaps.put("Transfer.ProductID","ProductID");
 	//	columnsMaps.put("Transfer.TransferId","id");
 		columnsMaps.put("Transfer.TradeID","TradeID");
 		
