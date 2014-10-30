@@ -32,6 +32,8 @@ public abstract class SearchCriteriaType extends JPanel
 	FilterValues filterValues = null;
 	Hashtable<Integer,beans.Book> books = new Hashtable<Integer,beans.Book> ();
 	Hashtable<Integer,beans.LegalEntity> counterPartyID = new Hashtable();
+	Hashtable<Integer,beans.LegalEntity> poID = new Hashtable();
+	Hashtable<Integer,beans.LegalEntity> agentID = new Hashtable();
      /**
 	 * @return the filterValues
 	 */
@@ -77,6 +79,30 @@ public abstract class SearchCriteriaType extends JPanel
     	 return bean;
      }
      
+     public FilterBean getOtherId(String tradeID)  {
+    	 FilterBean bean = null;
+    	 if(!commonUTIL.isEmpty(tradeID)) {
+ 			bean = new FilterBean();
+ 			bean.setColumnName("otherTradeID");
+ 			bean.setColumnValues(tradeID);
+ 			bean.setAnd_or("And");
+ 			bean.setSearchCriteria("in");
+ 			
+ 		}
+    	 return bean;
+     }
+     
+     public FilterBean getTransferId(String transferId)  {
+    	 FilterBean bean = null;
+    	
+		bean = new FilterBean();
+		bean.setColumnName("TransferId");
+		bean.setColumnValues(transferId);
+		bean.setAnd_or("And");
+		bean.setSearchCriteria("in");
+ 			
+    	 return bean;
+     }
      public FilterBean getCriteriaDate(String TradeDateFrom, String DateTo, String colName)  {
     	 FilterBean bean = null;
     	 if(!commonUTIL.isEmpty(TradeDateFrom)) {
@@ -148,11 +174,11 @@ public abstract class SearchCriteriaType extends JPanel
  		}
     	 return bean;
      }
-     public FilterBean getCurrency(String Currency)  {
+     public FilterBean getCurrency(String Currency, String colName)  {
     	 FilterBean bean = null;
     	 if(!commonUTIL.isEmpty(Currency)) {
     		 bean = new FilterBean();
-    			bean.setColumnName("Currency");
+    			bean.setColumnName(colName);
     			
     			bean.setColumnValues(Currency);
     			bean.setAnd_or("And");
@@ -185,6 +211,34 @@ public abstract class SearchCriteriaType extends JPanel
  		}
     	 return bean;
      }
+     
+     public FilterBean getTransferType(String transferType)  {
+    	 FilterBean bean = null;
+    	 if(!commonUTIL.isEmpty(transferType)) {
+    		 bean = new FilterBean();
+ 			bean.setColumnName("TransferType");
+ 			bean.setColumnValues(transferType);
+ 			bean.setSearchCriteria("in");
+ 			bean.setAnd_or("And");
+ 			
+ 		}
+    	 return bean;
+     }
+    
+     public FilterBean getTransferEventType(String transferEventType)  {
+    	 FilterBean bean = null;
+    	 if(!commonUTIL.isEmpty(transferEventType)) {
+    		 bean = new FilterBean();
+ 			bean.setColumnName("TransferEventType");
+ 			bean.setColumnValues(transferEventType);
+ 			bean.setSearchCriteria("in");
+ 			bean.setAnd_or("And");
+ 			
+ 		}
+    	 return bean;
+     }
+     
+     
      public FilterBean getBookName(int bookID)  {
     	 FilterBean bean = null;
     	 if(bookID > 0) {
@@ -200,15 +254,30 @@ public abstract class SearchCriteriaType extends JPanel
  		}
     	 return bean;
      }
-     public FilterBean getLegalEntity(int cpid)  {
+     public FilterBean getLegalEntity(int leId, String role)  {
     	 FilterBean bean = null;
-    	 if(cpid > 0) {
+    	
+    	 if(leId > -1) {
+    		 
     		 bean = new FilterBean();
- 			bean.setColumnName("cpid");
- 			
- 			bean.setColumnValues(new Integer(getCPid(cpid)).toString());
- 			bean.setAnd_or("And");
- 			bean.setSearchCriteria("in");
+ 			 bean.setColumnName(role);
+ 			 
+ 			 if (role.equals("cpid")) {
+ 				 
+ 				bean.setColumnValues(new Integer(getCPid(leId)).toString());
+ 				
+ 			 } else if (role.equals("poId")) {
+ 				 
+ 				bean.setColumnValues(new Integer(getPOid(leId)).toString());
+ 			 
+ 			 } else if (role.equals("agentId")) {
+ 				 
+  				bean.setColumnValues(new Integer(getAgentid(leId)).toString());
+  			 
+ 			 }
+ 			 
+ 			 bean.setAnd_or("And");
+ 			 bean.setSearchCriteria("in");
  			
  		}
     	 return bean;
@@ -225,6 +294,17 @@ public abstract class SearchCriteriaType extends JPanel
  		
  	}
  	
+     public int getPOid(int idSelected) {
+  		LegalEntity le = (LegalEntity)  poID.get(idSelected);
+  		return le.getId();
+  		
+  	}
+     
+     public int getAgentid(int idSelected) {
+  		LegalEntity le = (LegalEntity)  agentID.get(idSelected);
+  		return le.getId();
+  		
+  	}
      public int getBooktoSelected(int idSelected) {
  		int selectID = 0;
  		for(int i=0;i<books.size();i++) {
@@ -249,24 +329,28 @@ public abstract class SearchCriteriaType extends JPanel
  		return selectID;
  		
  	}
-     public void processLEDataCombo1(javax.swing.DefaultComboBoxModel combodata, Hashtable ids) {
+     public void processLEDataCombo1(javax.swing.DefaultComboBoxModel combodata, Hashtable ids, String role) {
  		
  		Vector ledata;
  		
  				//String roleType = " role like 'PO' ";
- 			ledata = (Vector) getFilterValues().getLegalEntitys();
+ 			ledata = (Vector<String>) getFilterValues().getLegalEntitys();
 
  			Iterator it = ledata.iterator();
  			int p = 0;
  			combodata.addElement("");
+ 			
  			while (it.hasNext()) {
 
  				LegalEntity le = (LegalEntity) it.next();
-
- 				combodata.insertElementAt(le.getName(), p);
- 				ids.put(p, le);
  				
- 				p++;
+ 				if (le.getRole().equalsIgnoreCase(role)) {
+ 					
+ 					combodata.insertElementAt(le.getName(), p);
+ 	 				ids.put(p, le);
+ 	 				p++;
+ 	 				
+ 				}
  			
  			}
 
