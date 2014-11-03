@@ -108,10 +108,11 @@ public class FilterValues {
 		replaceColumnNameOnSQL.put("Fees.Currency","NVL(Fees.Currency, 'NA')Fees_Currency");
 		replaceColumnNameOnSQL.put("Fees.Amount","NVL(Fees.Amount, 0) Fees_Amount");
 		replaceColumnNameOnSQL.put("Fees.Tradeid","NVL(Fees.Tradeid, 0) Tradeid");
-		replaceColumnNameOnSQL.put("Fees.Fees_LE","NVL((select name from le where id = Fees.Leid ), 'NA')Fees_LE");
+		replaceColumnNameOnSQL.put("Fees.Fees_LE","NVL((select name from le where id = Fees.Leid ), 'NA')Fees_CP");
 		
 		replaceColumnNameOnSQL.put("Transfer.Transfer_ProdcutType","NVL((select producttype from product where id = Transfer.productId ), 'NA')Product_Type");
 		replaceColumnNameOnSQL.put("Transfer.TransferStatus","Transfer.Status");
+		replaceColumnNameOnSQL.put("Transfer.cpid","NVL((select name from le where id = Transfer.cpid ), 'NA')Transfer_CP");
 		
 		replaceColumnNameOnSQL
 				.put("Posting.CreditAccId",
@@ -167,6 +168,7 @@ public class FilterValues {
 		columnNames.put("TransferId", "ID");
 		columnNames.put("TransferType", "TransferType");
 		columnNames.put("TransferEventType", "EventType");
+		columnNames.put("TransferDate", "DeliveryDate");
 		
 		numberDataTypes.put("Book", "Bookid");
 		numberDataTypes.put("LegalEntity", "id");
@@ -537,14 +539,15 @@ public class FilterValues {
 			return null;
 		for (int i = 0; i < jobdetails.size(); i++) {
 			FilterBean bean = (FilterBean) jobdetails.get(i);
+			String colName = bean.getColumnName();
 			boolean isStaticRefData = true;
-			if (bean.getColumnName().equalsIgnoreCase("Book")) {
+			if (colName.equalsIgnoreCase("Book")) {
 				isStaticRefData = false;
 				where = where
 						+ createCriteriaOnBook(dataValues.get("Book"), bean);
 
 			}
-			if (bean.getColumnName().equalsIgnoreCase("CounterParty")) {
+			if (colName.equalsIgnoreCase("CounterParty")) {
 				isStaticRefData = false;
 				where = where
 						+ createCriteriaOnCounterParty(
@@ -567,12 +570,13 @@ public class FilterValues {
 
 	public String createWhereForAttribute(FilterBean bean, int count) {
 		String where = "";
+		String colName = bean.getColumnName();
 		if (count == 0) {
 			where = where + " attribute" + count + ".attributename = '"
 					+ bean.getColumnValues() + "' and attribute" + count
 					+ ".attributeValue " + bean.getSearchCriteria() + " '"
 					+ bean.getAnd_or() + "'";
-			if (bean.getColumnName().contains("Trade")) {
+			if (colName.contains("Trade")) {
 				where = where + " and attribute" + count
 						+ ".type = 'Trade' and attribute" + count
 						+ ".id = Trade.id";
@@ -582,7 +586,7 @@ public class FilterValues {
 					+ bean.getColumnValues() + "' and attribute" + count
 					+ ".attributeValue " + bean.getSearchCriteria() + " '"
 					+ bean.getAnd_or() + "'";
-			if (bean.getColumnName().contains("Trade")) {
+			if (colName.contains("Trade")) {
 				where = where + " and attribute" + count
 						+ ".type = 'Trade'  and attribute" + count
 						+ ".id = Trade.id";
@@ -615,25 +619,26 @@ public class FilterValues {
 			return where;
 		for (int i = 0; i < jobdetails.size(); i++) {
 			FilterBean bean = (FilterBean) jobdetails.get(i);
-			if (bean.getColumnName().endsWith("Keyword")) {
+			String colName = bean.getColumnName();
+			if (colName.endsWith("Keyword")) {
 				attributesFilterBeans.add(bean);
 			} else {
-				if (bean.getColumnName().equalsIgnoreCase("Ladder"))
+				if (colName.equalsIgnoreCase("Ladder"))
 					isForwardLadder = true;
 				boolean isStaticRefData = true;
-				if (isObjectAttribute(bean.getColumnName())) {
-					where = where + " " + bean.getColumnName() + " "
+				if (isObjectAttribute(colName)) {
+					where = where + " " + colName + " "
 							+ bean.getSearchCriteria() + " '%"
 							+ bean.getColumnValues() + "=" + bean.getAnd_or()
 							+ "%'";
-				} else if (bean.getColumnName().equalsIgnoreCase("Book")) {
+				} else if (colName.equalsIgnoreCase("Book")) {
 					where = where
 							+ " "
 							+ tableNames.get(tableName1).toLowerCase()
 							+ "."
 							+ createCriteriaOnBook(dataValues.get("Book"), bean);
 
-				} else if (bean.getColumnName()
+				} else if (colName
 						.equalsIgnoreCase("CounterParty")) {
 					isStaticRefData = false;
 					where = where
@@ -643,19 +648,30 @@ public class FilterValues {
 							+ createCriteriaOnCounterParty(
 									dataValues.get("CounterParty"), bean);
 
-				} else if (bean.getColumnName().equalsIgnoreCase(
+				} else if (colName.equalsIgnoreCase(
 						"TradeAttribute")) {
 					where = where + " " + createWhereForAttribute(bean, att);
 					att++;
 					if (i != jobdetails.size() - 1) {
 						where = where + " and ";
 					}
-				} else if (bean.getColumnName().endsWith("Date")) {
+				} else if (colName.endsWith("Date")) {
+					
+					if (colName.equals("TransferDate")) {
+						
+						where = where + "  to_date("
+						+ tableNames.get(tableName1).toLowerCase() + "."
+						+ createCriteria(bean, tableName1) ;
 
-					where = where + "  trunc("
-							+ tableNames.get(tableName1).toLowerCase() + "."
-							+ createCriteria(bean, tableName1) ;
+					} else {
+						
+						where = where + "  trunc("
+						+ tableNames.get(tableName1).toLowerCase() + "."
+						+ createCriteria(bean, tableName1) ;
 
+						
+					}
+					
 				} else {
 					where = where + " "
 							+ tableNames.get(tableName1).toLowerCase() + "."
@@ -664,7 +680,7 @@ public class FilterValues {
 				if (i != jobdetails.size() - 1) {
 					if (bean.getAnd_or() == null || bean.getAnd_or().isEmpty())
 						where = where + " and ";
-					else if (bean.getColumnName().endsWith("Date")) {
+					else if (colName.endsWith("Date")) {
 						where = where + " and ";
 					} else {
 						where = where + " " + bean.getAnd_or() + "  ";
@@ -853,25 +869,42 @@ public class FilterValues {
 
 	private String createCriteria(FilterBean bean, String tableName1) {
 		String criteria = "";
-		if (bean.getColumnName().endsWith("Date")) {
-			criteria = columnNames.get(bean.getColumnName())
-					+ ") "
-					+ " "
-					+ getDatesWhereClause(
-							bean.getColumnValues(),
-							bean.getAnd_or(),
-							bean.getSearchCriteria(),
-							tableNames.get(tableName1) + "."
-									+ columnNames.get(bean.getColumnName()));
-		} else if (bean.getColumnName().equalsIgnoreCase("Ladder")) {
+		String colName = bean.getColumnName();
+		if (colName.endsWith("Date")) {
+			if (colName.equals("TransferDate")) {
+				
+				criteria = columnNames.get(colName)
+				+ ", 'dd/mm/yyyy') "
+				+ " "
+				+ getDatesWhereClause(
+						bean.getColumnValues(),
+						bean.getAnd_or(),
+						bean.getSearchCriteria(),
+						tableNames.get(tableName1) + "."
+								+ columnNames.get(colName));
+			} else {
+				
+				criteria = columnNames.get(colName)
+				+ ") "
+				+ " "
+				+ getDatesWhereClause(
+						bean.getColumnValues(),
+						bean.getAnd_or(),
+						bean.getSearchCriteria(),
+						tableNames.get(tableName1) + "."
+								+ columnNames.get(colName));
+				
+			}
+			
+		} else if (colName.equalsIgnoreCase("Ladder")) {
 			criteria = getForwardLadderWhereClause(bean.getColumnValues());
 		} else {
-			criteria = columnNames.get(bean.getColumnName())
+			criteria = columnNames.get(colName)
 					+ " "
 					+ " "
 					+ attachsqlTypeCrietria(bean.getSearchCriteria().trim(),
 							bean.getColumnValues().toUpperCase(),
-							bean.getColumnName());
+							colName);
 		}
 		return criteria;
 
@@ -1129,7 +1162,8 @@ public class FilterValues {
 		String cols[] = null;
 		for (int i = 0; i < filterBeanData.size(); i++) {
 			FilterBean bean = (FilterBean) filterBeanData.get(i);
-			if (bean.getColumnName().equalsIgnoreCase("Ladder")) {
+			String colName = bean.getColumnName();
+			if (colName.equalsIgnoreCase("Ladder")) {
 				if (bean.getColumnValues().contains(",")) {
 					cols = bean.getColumnValues().split(",");
 					sql = sql + forwardColumnMaps.get(cols[0]);
@@ -1137,12 +1171,12 @@ public class FilterValues {
 					sql = sql + forwardColumnMaps.get(bean.getColumnValues())
 							+ ",";
 				}
-			} else if (bean.getColumnName().equalsIgnoreCase("SettleDate")) {
+			} else if (colName.equalsIgnoreCase("SettleDate")) {
 
-			} else if (bean.getColumnName().equalsIgnoreCase("Currency")) {
+			} else if (colName.equalsIgnoreCase("Currency")) {
 
 			} else {
-				sql = sql + bean.getColumnName() + ",";
+				sql = sql + colName + ",";
 			}
 
 		}
