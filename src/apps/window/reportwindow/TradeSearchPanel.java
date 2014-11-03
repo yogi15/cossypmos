@@ -640,8 +640,13 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			
 			}
 			
-			filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromTrade), 
-					commonUTIL.convertDateTOString(fromTrade), "TradeDate"));
+			if (fromTrade != null  && TradeDateTo.getDate() == null) {
+				
+				filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromTrade), 
+						commonUTIL.convertDateTOString(fromTrade), "TradeDate"));
+				
+			}
+			
 		}
 		
 		if( (SettlementDateFrom.getDate() != null 
@@ -673,8 +678,13 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			
 			}
 			
-			filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromSettlementDate), 
-					commonUTIL.convertDateTOString(fromSettlementDate), "DeliveryDate"));
+			if (fromSettlementDate != null  && SettlementDateTo.getDate() == null) {
+					
+				filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromSettlementDate), 
+						commonUTIL.convertDateTOString(fromSettlementDate), "DeliveryDate"));
+				
+			}
+			
 		}
 		
 			
@@ -753,8 +763,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		} */ 
 		if(BUYSELL.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BUYSELL.getSelectedItem().toString()))) {
 			filterBeans.add(getBUYSELL(BUYSELL.getSelectedItem().toString()));
-		
-			
+					
 		} 
 		if(Status.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Status.getSelectedItem().toString()))) {
 			
@@ -875,7 +884,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			if(bean.getColumnName().equalsIgnoreCase("ProductSubType")) {
 				ProductSubType.setSelectedItem(bean.getValues());
 			}
-			if(bean.getColumnName().equalsIgnoreCase("BookID")) {
+			if(bean.getColumnName().equalsIgnoreCase("Book")) {
 				BookName.setSelectedIndex(getBooktoSelected(Integer.parseInt(bean.getValues())));
 			}
 			if(bean.getColumnName().equalsIgnoreCase("cpid")) {
