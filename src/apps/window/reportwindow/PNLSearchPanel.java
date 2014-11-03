@@ -54,6 +54,7 @@ public class PNLSearchPanel extends SearchCriteriaType {
 
 	javax.swing.DefaultComboBoxModel productTypeAttributeData = new javax.swing.DefaultComboBoxModel();
 	javax.swing.DefaultComboBoxModel productSubTypeAttributeData = new javax.swing.DefaultComboBoxModel();
+	
 	public PNLSearchPanel() {
 		processBookDataCombo1(bookData, books);
 		processLEDataCombo1(legalEntityData,  counterPartyID, "CounterParty");
