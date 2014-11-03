@@ -66,6 +66,8 @@ import com.jidesoft.docking.DockableFrame;
 import com.jidesoft.grid.DateCellEditor;
 import com.jidesoft.popup.JidePopup;
 
+import constants.CommonConstants;
+
 public class JInternalReportFrame extends JInternalFrame {
 
 	private searchCriteriaPanel searchPanel = null;
@@ -170,7 +172,7 @@ public class JInternalReportFrame extends JInternalFrame {
 	private JPanel getJPanel1() {
 		// TODO Auto-generated method stub
 		
-		searchPanel = new searchCriteriaPanel();
+		searchPanel = new searchCriteriaPanel(getReportType());
 		return searchPanel;
 	}
 	private JButton getJButton4() {
@@ -255,6 +257,11 @@ public class JInternalReportFrame extends JInternalFrame {
 					 where =  getFilterValues().createWhere(searchPanel.getFilterBeanData(),"Trade");
 				} else {
 					 where =  getFilterValues().createWhere(searchPanel.getFilterBeanData(),getReportType());
+				}
+				
+				if (where.equals(CommonConstants.BLANKSTRING)) {
+					commonUTIL.showAlertMessage("Please select atleast one criteria");
+					return;
 				}
 			//	String where =  getFilterValues().createWhere(searchPanel.getFilterBeanData(),getReportType());
 				String sqlW = "";
