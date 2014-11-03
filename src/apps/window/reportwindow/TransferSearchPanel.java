@@ -21,6 +21,8 @@ import beans.UserJobsDetails;
 
 import com.jidesoft.combobox.DateComboBox;
 
+import constants.CommonConstants;
+
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class TransferSearchPanel extends SearchCriteriaType {
 
@@ -30,7 +32,6 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	private JLabel jLabel0;
 	private JLabel jLabel3;
 	private JLabel jLabel4;
-	private JLabel jLabel5;
 	private JTextField TransferId;
 	private DateComboBox EndDate;
 	private JLabel jLabel6;
@@ -43,25 +44,22 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	private JLabel jLabel13;
 	private JLabel jLabel14;
 	private JLabel jLabel15;
-	private JLabel jLabel16;
-	private JTextField counterParty;
+
 	private DateComboBox StartDate;
 	private JTextField tradeId;
 	private JTextField nettingID;
 	private JLabel jLabel17;
-	private JComboBox leComboBox;
-	private JComboBox poComboBOx;
-	private JComboBox currencyComboBox;
-	private JComboBox productTypeComboBox;
-	private JComboBox statusComboBox;
-	private JComboBox actionComboBox;
-	private JComboBox transferTypeComboBox;
-	private JComboBox nettingTypeComboBox;
-	private JComboBox eventTypeComboBox;
-
-	private JComboBox settlementTypeComboBox;
-	private JComboBox agentComboBox;
-
+	private JComboBox<String> leComboBox;
+	private JComboBox<String>  poComboBOx;
+	private JComboBox<String>  currencyComboBox;
+	private JComboBox<String>  productTypeComboBox;
+	private JComboBox<String>  statusComboBox;
+	private JComboBox<String>  actionComboBox;
+	private JComboBox<String>  transferTypeComboBox;
+	private JComboBox<String>  nettingTypeComboBox;
+	private JComboBox<String>  eventTypeComboBox;
+	private JComboBox<String>  methodComboBox;
+	private JComboBox<String>  settlementTypeComboBox;
 	
 	javax.swing.DefaultComboBoxModel<String> legalEntityData = new javax.swing.DefaultComboBoxModel<String>();
 	javax.swing.DefaultComboBoxModel<String> poData = new javax.swing.DefaultComboBoxModel<String>();
@@ -73,13 +71,13 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	javax.swing.DefaultComboBoxModel<String> productTypeAttributeData = new javax.swing.DefaultComboBoxModel<String>();
 	javax.swing.DefaultComboBoxModel<String> transferTypeAttributeData = new javax.swing.DefaultComboBoxModel<String>();
 	javax.swing.DefaultComboBoxModel<String> eventTypeAttributeData = new javax.swing.DefaultComboBoxModel<String>();
+	javax.swing.DefaultComboBoxModel<String> methodAttributeData = new javax.swing.DefaultComboBoxModel<String>();
 	
 	private JLabel jLabel18;
 	private JLabel jLabel19;
 	private JLabel jLabel20;
-	private JComboBox bookComboBox;
+	private JComboBox<String> bookComboBox;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-	
 	public TransferSearchPanel() {
 		init();
 		initComponents();
@@ -91,7 +89,8 @@ public class TransferSearchPanel extends SearchCriteriaType {
 		processLEDataCombo1(poData,  poID, "PO");
 		processLEDataCombo1(agentData,  agentID, "Agent");
 		
-		processDomainData(bookAttributesData,  getFilterValues().getDomainValues("BookAttributes"));
+		processBookDataCombo1(bookAttributesData, books);
+		//processDomainData(bookAttributesData,  getFilterValues().getDomainValues("Book"));
 		processDomainData(currencyAttributeData,  getFilterValues().getDomainValues("Currency"));
 		processDomainData(statusAttributeData,  getFilterValues().getDomainValues("Status"));
 		processDomainData(actionAttributeData,  getFilterValues().getDomainValues("Action"));
@@ -112,42 +111,40 @@ public class TransferSearchPanel extends SearchCriteriaType {
 		setOpaque(true);
 		setLayout(new GroupLayout());
 		add(getJLabel2(), new Constraints(new Leading(-181, 60, 10, 10), new Leading(181, 10, 10)));
-		add(getTransferId(), new Constraints(new Leading(264, 96, 10, 10), new Leading(12, 12, 12)));
-		add(getJLabel8(), new Constraints(new Leading(201, 52, 12, 12), new Leading(111, 12, 12)));
-		add(getTradeId(), new Constraints(new Leading(95, 98, 12, 12), new Leading(12, 12, 12)));
-		add(getNettingID(), new Constraints(new Leading(95, 98, 12, 12), new Leading(269, 12, 12)));
 		add(getJLabel1(), new Constraints(new Leading(8, 52, 12, 12), new Leading(18, 12, 12)));
-		add(getJLabel0(), new Constraints(new Leading(201, 12, 12), new Leading(15, 12, 12)));
 		add(getJLabel9(), new Constraints(new Leading(8, 70, 12, 12), new Leading(149, 12, 12)));
 		add(getJLabel3(), new Constraints(new Leading(8, 52, 12, 12), new Leading(47, 12, 12)));
-		add(getJLabel15(), new Constraints(new Leading(201, 52, 12, 12), new Leading(149, 12, 12)));
-		add(getJLabel7(), new Constraints(new Leading(10, 70, 12, 12), new Leading(108, 19, 12, 12)));
-		add(getJLabel17(), new Constraints(new Leading(7, 59, 10, 10), new Leading(79, 12, 12)));
-		add(getLeComboBox(), new Constraints(new Leading(95, 98, 12, 12), new Leading(73, 12, 12)));
-		add(getPOComboBOx(), new Constraints(new Leading(264, 96, 12, 12), new Leading(73, 12, 12)));
-		add(getJLabel6(), new Constraints(new Leading(201, 52, 12, 12), new Leading(79, 12, 12)));
-		add(getCurrencyComboBox(), new Constraints(new Leading(264, 96, 12, 12), new Leading(105, 12, 12)));
-		add(getProductTypeComboBox(), new Constraints(new Leading(95, 98, 12, 12), new Leading(104, 12, 12)));
-		add(getStatusComboBox(), new Constraints(new Leading(96, 98, 12, 12), new Leading(142, 12, 12)));
-		add(getActionComboBox(), new Constraints(new Leading(264, 96, 12, 12), new Leading(142, 12, 12)));
-		add(getTransferTypeComboBox(), new Constraints(new Leading(96, 98, 12, 12), new Leading(174, 12, 12)));
-		add(getJLabel10(), new Constraints(new Leading(7, 70, 12, 12), new Leading(179, 12, 12)));
-		add(getNettingTypeComboBox(), new Constraints(new Leading(95, 98, 12, 12), new Leading(206, 12, 12)));
-		add(getJLabel11(), new Constraints(new Leading(7, 70, 12, 12), new Leading(212, 12, 12)));
-		add(getEventTypeComboBox(), new Constraints(new Leading(96, 96, 12, 12), new Leading(238, 12, 12)));
-		add(getJLabel12(), new Constraints(new Leading(7, 70, 12, 12), new Leading(244, 12, 12)));
-		add(getJLabel13(), new Constraints(new Leading(7, 70, 12, 12), new Leading(272, 17, 12, 12)));
-		add(getSettlementTypeComboBox(), new Constraints(new Leading(93, 98, 12, 12), new Leading(299, 10, 10)));
-		add(getAgentComboBox(), new Constraints(new Leading(93, 98, 12, 12), new Leading(327, 12, 12)));
-		add(getStartDate(), new Constraints(new Leading(95, 98, 12, 12), new Leading(41, 20, 12, 12)));
-		add(getEndDate(), new Constraints(new Leading(264, 96, 12, 12), new Leading(41, 20, 12, 12)));
-		add(getJLabel4(), new Constraints(new Leading(203, 52, 10, 10), new Leading(47, 12, 12)));
-		add(getJLabel14(), new Constraints(new Leading(7, 84, 12, 12), new Leading(301, 20, 12, 12)));
-		add(getJLabel16(), new Constraints(new Leading(8, 84, 12, 12), new Leading(330, 12, 12)));
-		add(getJLabel18(), new Constraints(new Leading(8, 12, 12), new Leading(424, 12, 12)));
-		add(getJLabel19(), new Constraints(new Leading(4, 12, 12), new Leading(395, 10, 10)));
-		add(getJLabel20(), new Constraints(new Leading(8, 12, 12), new Leading(365, 12, 12)));
-		add(getBookComboBox(), new Constraints(new Leading(93, 98, 12, 12), new Leading(359, 12, 12)));
+		add(getJLabel7(), new Constraints(new Leading(8, 70, 12, 12), new Leading(108, 19, 12, 12)));
+		add(getJLabel10(), new Constraints(new Leading(8, 70, 12, 12), new Leading(179, 12, 12)));
+		add(getJLabel11(), new Constraints(new Leading(8, 70, 12, 12), new Leading(212, 12, 12)));
+		add(getJLabel12(), new Constraints(new Leading(209, 70, 10, 10), new Leading(179, 12, 12)));
+		add(getJLabel14(), new Constraints(new Leading(8, 84, 12, 12), new Leading(246, 20, 12, 12)));
+		add(getJLabel20(), new Constraints(new Leading(8, 12, 12), new Leading(294, 10, 10)));
+		add(getJLabel18(), new Constraints(new Leading(8, 12, 12), new Leading(326, 12, 12)));
+		add(getJLabel8(), new Constraints(new Leading(206, 58, 10, 10), new Leading(252, 10, 10)));
+		add(getJLabel17(), new Constraints(new Leading(8, 36, 12, 12), new Leading(79, 12, 12)));
+		add(getTransferId(), new Constraints(new Leading(279, 128, 10, 10), new Leading(12, 12, 12)));
+		add(getEndDate(), new Constraints(new Leading(279, 128, 12, 12), new Leading(41, 20, 12, 12)));
+		add(getPOComboBOx(), new Constraints(new Leading(279, 128, 12, 12), new Leading(73, 12, 12)));
+		add(getJLabel6(), new Constraints(new Leading(209, 52, 12, 12), new Leading(79, 12, 12)));
+		add(getJLabel19(), new Constraints(new Leading(209, 12, 12), new Leading(105, 22, 12, 12)));
+		add(getProductTypeComboBox(), new Constraints(new Leading(84, 114, 12, 12), new Leading(107, 12, 12)));
+		add(getLeComboBox(), new Constraints(new Leading(84, 114, 12, 12), new Leading(73, 12, 12)));
+		add(getStartDate(), new Constraints(new Leading(84, 113, 10, 10), new Leading(41, 20, 12, 12)));
+		add(getTradeId(), new Constraints(new Leading(84, 114, 12, 12), new Leading(12, 12, 12)));
+		add(getJLabel4(), new Constraints(new Leading(209, 52, 12, 12), new Leading(47, 12, 12)));
+		add(getJLabel0(), new Constraints(new Leading(209, 12, 12), new Leading(18, 12, 12)));
+		add(getJLabel15(), new Constraints(new Leading(209, 52, 12, 12), new Leading(149, 12, 12)));
+		add(getJLabel13(), new Constraints(new Leading(209, 70, 12, 12), new Leading(209, 17, 12, 12)));
+		add(getEventTypeComboBox(), new Constraints(new Leading(279, 128, 12, 12), new Leading(173, 12, 12)));
+		add(getNettingID(), new Constraints(new Leading(279, 124, 12, 12), new Leading(206, 12, 12)));
+		add(getCurrencyComboBox(), new Constraints(new Leading(279, 128, 12, 12), new Leading(246, 12, 12)));
+		add(getActionComboBox(), new Constraints(new Leading(279, 128, 12, 12), new Leading(107, 12, 12)));
+		add(getStatusComboBox(), new Constraints(new Leading(84, 112, 12, 12), new Leading(143, 12, 12)));
+		add(getTransferTypeComboBox(), new Constraints(new Leading(84, 114, 12, 12), new Leading(173, 12, 12)));
+		add(getNettingTypeComboBox(), new Constraints(new Leading(84, 113, 12, 12), new Leading(206, 12, 12)));
+		add(getSettlementTypeComboBox(), new Constraints(new Leading(84, 112, 12, 12), new Leading(246, 12, 12)));
+		add(getBookComboBox(), new Constraints(new Leading(84, 112, 12, 12), new Leading(288, 10, 10)));
 		setSize(420, 537);
 	}
 
@@ -170,7 +167,7 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	private JLabel getJLabel19() {
 		if (jLabel19 == null) {
 			jLabel19 = new JLabel();
-			jLabel19.setText("Product SubType");
+			jLabel19.setText("PrdSubType");
 		}
 		return jLabel19;
 	}
@@ -182,90 +179,81 @@ public class TransferSearchPanel extends SearchCriteriaType {
 		}
 		return jLabel18;
 	}
-
-	private JComboBox getAgentComboBox() {
-		if (agentComboBox == null) {
-			agentComboBox = new JComboBox();
-			agentComboBox.setModel(agentData);
-		}
-		return agentComboBox;
-	}
-
-	private JComboBox getSettlementTypeComboBox() {
+	private JComboBox<String> getSettlementTypeComboBox() {
 		if (settlementTypeComboBox == null) {
-			settlementTypeComboBox = new JComboBox();
+			settlementTypeComboBox = new JComboBox<String>();
 			settlementTypeComboBox.setModel(new DefaultComboBoxModel(new Object[] {}));
 		}
 		return settlementTypeComboBox;
 	}
 
-	private JComboBox getEventTypeComboBox() {
+	private JComboBox<String> getEventTypeComboBox() {
 		if (eventTypeComboBox == null) {
-			eventTypeComboBox = new JComboBox();
+			eventTypeComboBox = new JComboBox<String>();
 			eventTypeComboBox.setModel(eventTypeAttributeData);
 		}
 		return eventTypeComboBox;
 	}
 
-	private JComboBox getNettingTypeComboBox() {
+	private JComboBox<String> getNettingTypeComboBox() {
 		if (nettingTypeComboBox == null) {
-			nettingTypeComboBox = new JComboBox();
+			nettingTypeComboBox = new JComboBox<String>();
 			nettingTypeComboBox.setModel(new DefaultComboBoxModel(new Object[] {}));
 		}
 		return nettingTypeComboBox;
 	}
 
-	private JComboBox getTransferTypeComboBox() {
+	private JComboBox<String> getTransferTypeComboBox() {
 		if (transferTypeComboBox == null) {
-			transferTypeComboBox = new JComboBox();
+			transferTypeComboBox = new JComboBox<String>();
 			transferTypeComboBox.setModel(transferTypeAttributeData);
 		}
 		return transferTypeComboBox;
 	}
 
-	private JComboBox getActionComboBox() {
+	private JComboBox<String> getActionComboBox() {
 		if (actionComboBox == null) {
-			actionComboBox = new JComboBox();
+			actionComboBox = new JComboBox<String>();
 			actionComboBox.setModel(actionAttributeData);
 		}
 		return actionComboBox;
 	}
 
-	private JComboBox getStatusComboBox() {
+	private JComboBox<String> getStatusComboBox() {
 		if (statusComboBox == null) {
-			statusComboBox = new JComboBox();
+			statusComboBox = new JComboBox<String>();
 			statusComboBox.setModel(statusAttributeData);
 		}
 		return statusComboBox;
 	}
 
-	private JComboBox getProductTypeComboBox() {
+	private JComboBox<String> getProductTypeComboBox() {
 		if (productTypeComboBox == null) {
-			productTypeComboBox = new JComboBox();
+			productTypeComboBox = new JComboBox<String>();
 			productTypeComboBox.setModel(productTypeAttributeData);
 		}
 		return productTypeComboBox;
 	}
 
-	private JComboBox getCurrencyComboBox() {
+	private JComboBox<String> getCurrencyComboBox() {
 		if (currencyComboBox == null) {
-			currencyComboBox = new JComboBox();
+			currencyComboBox = new JComboBox<String>();
 			currencyComboBox.setModel(currencyAttributeData);
 		}
 		return currencyComboBox;
 	}
 
-	private JComboBox getPOComboBOx() {
+	private JComboBox<String> getPOComboBOx() {
 		if (poComboBOx == null) {
-			poComboBOx = new JComboBox();
+			poComboBOx = new JComboBox<String>();
 			poComboBOx.setModel(poData);
 		}
 		return poComboBOx;
 	}
 
-	private JComboBox getLeComboBox() {
+	private JComboBox<String> getLeComboBox() {
 		if (leComboBox == null) {
-			leComboBox = new JComboBox();
+			leComboBox = new JComboBox<String>();
 			leComboBox.setModel(legalEntityData);
 		}
 		return leComboBox;
@@ -274,17 +262,10 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	private JLabel getJLabel17() {
 		if (jLabel17 == null) {
 			jLabel17 = new JLabel();
-			jLabel17.setText("Counter Party");
+			jLabel17.setText("CP");
 		}
 		return jLabel17;
 	}
-
-	/*private JComboBox getEventTypeComboBox() {
-		if (eventTypeComboBox == null) {
-			eventTypeComboBox = new JComboBox();
-		}
-		return eventTypeComboBox;
-	}*/
 
 	private JTextField getNettingID() {
 		if (nettingID == null) {
@@ -309,14 +290,6 @@ public class TransferSearchPanel extends SearchCriteriaType {
 		}
 		return EndDate;
 	}
-	private JLabel getJLabel16() {
-		if (jLabel16 == null) {
-			jLabel16 = new JLabel();
-			jLabel16.setText("Agent");
-		}
-		return jLabel16;
-	}
-
 	private JLabel getJLabel15() {
 		if (jLabel15 == null) {
 			jLabel15 = new JLabel();
@@ -328,7 +301,7 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	private JLabel getJLabel14() {
 		if (jLabel14 == null) {
 			jLabel14 = new JLabel();
-			jLabel14.setText("Settlement Type");
+			jLabel14.setText("SettleType");
 		}
 		return jLabel14;
 	}
@@ -336,7 +309,7 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	private JLabel getJLabel13() {
 		if (jLabel13 == null) {
 			jLabel13 = new JLabel();
-			jLabel13.setText("Netting ID");
+			jLabel13.setText("NettingID");
 		}
 		return jLabel13;
 	}
@@ -344,7 +317,7 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	private JLabel getJLabel12() {
 		if (jLabel12 == null) {
 			jLabel12 = new JLabel();
-			jLabel12.setText("Event Type");
+			jLabel12.setText("EventType");
 		}
 		return jLabel12;
 	}
@@ -352,7 +325,7 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	private JLabel getJLabel11() {
 		if (jLabel11 == null) {
 			jLabel11 = new JLabel();
-			jLabel11.setText("Netting Type");
+			jLabel11.setText("NettingType");
 		}
 		return jLabel11;
 	}
@@ -360,7 +333,7 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	private JLabel getJLabel10() {
 		if (jLabel10 == null) {
 			jLabel10 = new JLabel();
-			jLabel10.setText("Ledger Type");
+			jLabel10.setText("LedgerType");
 		}
 		return jLabel10;
 	}
@@ -376,7 +349,7 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	private JLabel getJLabel8() {
 		if (jLabel8 == null) {
 			jLabel8 = new JLabel();
-			jLabel8.setText("Settlement Currency");
+			jLabel8.setText("SettleCCY");
 		}
 		return jLabel8;
 	}
@@ -413,14 +386,6 @@ public class TransferSearchPanel extends SearchCriteriaType {
 		return TransferId;
 	}
 
-	private JLabel getJLabel5() {
-		if (jLabel5 == null) {
-			jLabel5 = new JLabel();
-			jLabel5.setText("LegalEntity");
-		}
-		return jLabel5;
-	}
-
 	private JLabel getJLabel4() {
 		if (jLabel4 == null) {
 			jLabel4 = new JLabel();
@@ -440,7 +405,7 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	private JLabel getJLabel0() {
 		if (jLabel0 == null) {
 			jLabel0 = new JLabel();
-			jLabel0.setText("Ledger ID");
+			jLabel0.setText("LedgerID");
 		}
 		return jLabel0;
 	}
@@ -466,7 +431,6 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	public Vector<FilterBean> searchCriteria() {
 		
 		Vector<FilterBean> filterBeans = new Vector<FilterBean>();
-		FilterBean bean = null;
 		
 		if(!commonUTIL.isEmpty(tradeId.getText())) {
 			
@@ -491,7 +455,7 @@ public class TransferSearchPanel extends SearchCriteriaType {
 				if (toTradeDate.after(fromTrade)) {
 					
 					filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromTrade), 
-							commonUTIL.convertDateTOString(toTradeDate), "TradeDate"));
+							commonUTIL.convertDateTOString(toTradeDate), "TransferDate"));
 				
 					
 				}  else {
@@ -508,56 +472,60 @@ public class TransferSearchPanel extends SearchCriteriaType {
 			
 			}
 			
-			filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromTrade), 
-					commonUTIL.convertDateTOString(fromTrade), "TradeDate"));
+			if (fromTrade != null  && EndDate == null) {
+				
+				filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromTrade), 
+						commonUTIL.convertDateTOString(fromTrade), "TransferDate"));
+				
+			}
+			
 		}
 		
-		if((!commonUTIL.isEmpty(leComboBox.getSelectedItem().toString()))) {
+		if( leComboBox.getSelectedItem()!= null && !commonUTIL.isEmpty(leComboBox.getSelectedItem().toString())) {
 			
 			filterBeans.add(getLegalEntity(leComboBox.getSelectedIndex(), "cpid"));
 			
 		} 
 		
-		if((!commonUTIL.isEmpty(poComboBOx.getSelectedItem().toString()))) {
+		if(poComboBOx.getSelectedItem() != null  && !commonUTIL.isEmpty(poComboBOx.getSelectedItem().toString())) {
 			
 			filterBeans.add(getLegalEntity(poComboBOx.getSelectedIndex(), "poId"));
 			
 		}
 
-		if((!commonUTIL.isEmpty(productTypeComboBox.getSelectedItem().toString()))) {
+		if(productTypeComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(productTypeComboBox.getSelectedItem().toString())) {
 			
 			filterBeans.add(getProductType(productTypeComboBox.getSelectedItem().toString()));
 		} 	
 		
-		if( (!commonUTIL.isEmpty(currencyComboBox.getSelectedItem().toString()))) {
+		if( currencyComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(currencyComboBox.getSelectedItem().toString())) {
 			
 			filterBeans.add(getCurrency(currencyComboBox.getSelectedItem().toString(), "TrasnferCurrency"));
 	
 		}
 		
-		if((!commonUTIL.isEmpty(statusComboBox.getSelectedItem().toString()))) {
+		if( statusComboBox.getSelectedItem() != null &&  !commonUTIL.isEmpty(statusComboBox.getSelectedItem().toString())) {
 			
 			filterBeans.add(getStatus(statusComboBox.getSelectedItem().toString()));
 		} 
 		
-		if( (!commonUTIL.isEmpty(actionComboBox.getSelectedItem().toString()))) {
+		if( actionComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(actionComboBox.getSelectedItem().toString())) {
 			
 			filterBeans.add(getAction(actionComboBox.getSelectedItem().toString()));
 		} 
 		
-		if( (!commonUTIL.isEmpty(transferTypeComboBox.getSelectedItem().toString()))) {
+		if( transferTypeComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(transferTypeComboBox.getSelectedItem().toString())) {
 			
 			filterBeans.add(getTransferType(transferTypeComboBox.getSelectedItem().toString()));
 		}
 		
-		if( (!commonUTIL.isEmpty(eventTypeComboBox.getSelectedItem().toString()))) {
+		if( eventTypeComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(eventTypeComboBox.getSelectedItem().toString())) {
 			
 			filterBeans.add(getTransferEventType(eventTypeComboBox.getSelectedItem().toString()));
 		}
-
-		if((!commonUTIL.isEmpty(agentComboBox.getSelectedItem().toString()))) {
-			
-			filterBeans.add(getLegalEntity(agentComboBox.getSelectedIndex(), "agentId"));
+		
+		if(bookComboBox.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(bookComboBox.getSelectedItem().toString()))) {
+			filterBeans.add(getBookName(bookComboBox.getSelectedIndex()));
 			
 		} 
 
@@ -567,13 +535,106 @@ public class TransferSearchPanel extends SearchCriteriaType {
 
 	@Override
 	public void clearllCriterial() {
-		// TODO Auto-generated method stub
+		
+		tradeId.setText(CommonConstants.BLANKSTRING);
+		TransferId.setText(CommonConstants.BLANKSTRING);
+		StartDate.setDate(null);
+		EndDate.setDate(null);
+		leComboBox.setSelectedIndex(-1);
+		poComboBOx.setSelectedIndex(-1);
+		productTypeComboBox.setSelectedIndex(-1);
+		statusComboBox.setSelectedIndex(-1);
+		actionComboBox.setSelectedIndex(-1);
+		eventTypeComboBox.setSelectedIndex(-1);
+		transferTypeComboBox.setSelectedIndex(-1);
+		nettingTypeComboBox.setSelectedIndex(-1);
+		nettingID.setText(CommonConstants.BLANKSTRING);
+		settlementTypeComboBox.setSelectedIndex(-1);
+		currencyComboBox.setSelectedIndex(-1);
+		bookComboBox.setSelectedIndex(-1);
+		// method and prodSubType left 
 		
 	}
 
 	@Override
 	public void loadFilters(Vector<UserJobsDetails> jobdetails) {
-		// TODO Auto-generated method stub
+		
+		for(int i=0;i<jobdetails.size();i++) {
+			UserJobsDetails bean = jobdetails.get(i);
+			
+			if(bean.getColumnName().equalsIgnoreCase("otherTradeID")) {
+				tradeId.setText(bean.getValues());
+			}
+			else if(bean.getColumnName().equalsIgnoreCase("TransferId")) {
+				TransferId.setText(bean.getValues());
+			}
+			else if(bean.getColumnName().equalsIgnoreCase("TransferDate")) {
+				
+				if (bean.getCriteria().equals("between")) {
+					
+					StartDate.setDate(commonUTIL
+							.convertStringtoSQLDate(bean.getValues()));
+					
+					EndDate.setDate(commonUTIL
+							.convertStringtoSQLDate(bean.getAnd_or()));
+					
+				} else if (bean.getCriteria().equals("equal")) {
+					
+					StartDate.setDate(commonUTIL
+							.convertStringtoSQLDate(bean.getValues()));
+					
+					EndDate.setDate(null);
+				}				
+			}
+			else if(bean.getColumnName().equalsIgnoreCase("cpid")) {
+				leComboBox.setSelectedIndex(getCPtoSelected(Integer.parseInt(bean.getValues())));
+			}
+			
+			else if(bean.getColumnName().equalsIgnoreCase("poId")) {
+				poComboBOx.setSelectedIndex(getPOtoSelected(Integer.parseInt(bean.getValues())));
+			}
+			
+			else if(bean.getColumnName().equalsIgnoreCase("ProductType")) {
+				productTypeComboBox.setSelectedItem(bean.getValues());
+			}
+			
+			else if(bean.getColumnName().equalsIgnoreCase("ProductSubType")) {
+				//ProductSubType.setSelectedItem(bean.getValues());
+			}
+			
+			else if(bean.getColumnName().equalsIgnoreCase("Status")) {
+				statusComboBox.setSelectedItem(bean.getValues());
+			}
+			
+			else if(bean.getColumnName().equalsIgnoreCase("Action")) {
+				actionComboBox.setSelectedItem(bean.getValues());
+			}
+			
+			else if(bean.getColumnName().equalsIgnoreCase("TransferType")) {
+				transferTypeComboBox.setSelectedItem(bean.getValues());
+			}
+			
+			else if(bean.getColumnName().equalsIgnoreCase("TransferEventType")) {
+				eventTypeComboBox.setSelectedItem(bean.getValues());
+			}
+			
+			else if(bean.getColumnName().equalsIgnoreCase("TransferNettingType")) {
+				nettingTypeComboBox.setSelectedItem(bean.getValues());
+			}
+			
+			else if(bean.getColumnName().equalsIgnoreCase("TransferNettingType")) {
+				nettingTypeComboBox.setSelectedItem(bean.getValues());
+			}
+			
+			else if(bean.getColumnName().equalsIgnoreCase("Book")) {
+				bookComboBox.setSelectedIndex(getBooktoSelected(Integer.parseInt(bean.getValues())));
+			}
+			
+			else if(bean.getColumnName().equalsIgnoreCase("TransferMethod")) {
+				methodComboBox.setSelectedItem(bean.getValues());
+			}
+			
+		}
 		
 	}
 
