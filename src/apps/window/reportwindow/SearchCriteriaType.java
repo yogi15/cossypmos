@@ -329,6 +329,20 @@ public abstract class SearchCriteriaType extends JPanel
  		return selectID;
  		
  	}
+     
+     public int getPOtoSelected(int idSelected) {
+  		int selectID = 0;
+  		for(int i=0;i<poID.size();i++) {
+  			selectID = i;
+  			LegalEntity le = (LegalEntity) poID.get(i);
+  			if(le != null)
+  			if(le.getId() == idSelected) 
+  				break;
+  		}
+  		return selectID;
+  		
+  	}
+     
      public void processLEDataCombo1(javax.swing.DefaultComboBoxModel combodata, Hashtable ids, String role) {
  		
  		Vector ledata;
