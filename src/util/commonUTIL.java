@@ -600,7 +600,17 @@ public class commonUTIL {
 		SimpleDateFormat formatter = new SimpleDateFormat(CommonConstants.SDF_DATE_TIME_FORMAT);
 		return formatter.format(date.getTime());
 	}
-
+	
+	/*
+	 * @author yogesh
+	 * @return date in string format
+	 */
+	
+	public static String convertDateTOString(Date date) {
+		// TODO Auto-generated method stub
+		SimpleDateFormat formatter = new SimpleDateFormat(CommonConstants.SDF_DATE_FORMAT);
+		return formatter.format(date.getTime());
+	}
 	
 	/**
 	 * Returns true if date1 is greater than date2
