@@ -15,7 +15,10 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
+import util.commonUTIL;
+
 import beans.FilterBean;
+import beans.LegalEntity;
 import beans.UserJobsDetails;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
@@ -33,7 +36,7 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 	private JComboBox counterParty;
 	private JComboBox primaryCurr;
 	private JComboBox quotingCurr;
-	private JTextField type;
+	private JComboBox BUYSELL;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	javax.swing.DefaultComboBoxModel bookData = new javax.swing.DefaultComboBoxModel();
 	javax.swing.DefaultComboBoxModel legalEntityData = new javax.swing.DefaultComboBoxModel();
@@ -55,6 +58,7 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 		initComponents();
 	}
 
+
 	private void initComponents() {
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 		setLayout(new GroupLayout());
@@ -69,17 +73,21 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 		add(getCounterPary(), new Constraints(new Leading(145, 126, 12, 12), new Leading(54, 12, 12)));
 		add(getPrimaryCurr(), new Constraints(new Leading(147, 79, 10, 10), new Leading(116, 12, 12)));
 		add(getQuotingCurr(), new Constraints(new Leading(147, 82, 10, 10), new Leading(148, 12, 12)));
-		add(getType(), new Constraints(new Leading(147, 78, 12, 12), new Leading(182, 10, 10)));
+		add(getBUYSELL(), new Constraints(new Leading(147, 78, 12, 12), new Leading(182, 10, 10)));
 		setSize(320, 397);
 	}
 
-	private JTextField getType() {
-		if (type == null) {
-			type = new JTextField();
-			type.setText("  ");
+	private JComboBox getBUYSELL() {
+		if (BUYSELL == null) {
+			BUYSELL = new JComboBox();
+			BUYSELL.addItem("");
+			BUYSELL.setSelectedIndex(0);
+			BUYSELL.addItem("BUY");
+			BUYSELL.addItem("SELL");
 		}
-		return type;
+		return BUYSELL;
 	}
+
 
 	private JComboBox getQuotingCurr() {
 		if (quotingCurr == null) {
@@ -172,18 +180,75 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 	@Override
 	public Vector<FilterBean> searchCriteria() {
 		// TODO Auto-generated method stub
-		return null;
+		Vector<FilterBean> filterBeans = new Vector<FilterBean>();
+		FilterBean bean = null;
+		if(currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(currency.getSelectedItem().toString()))) {
+			
+			filterBeans.add(getCurrency(currency.getSelectedItem().toString(), "Currency"));
+	
+		}
+		if(book.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(book.getSelectedItem().toString()))) {
+			filterBeans.add(getBookName(book.getSelectedIndex()));
+			
+		}
+if(primaryCurr.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(primaryCurr.getSelectedItem().toString()))) {
+			
+			filterBeans.add(getCurrency(primaryCurr.getSelectedItem().toString(), "primaryCurr"));
+	
+		}
+if(quotingCurr.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(quotingCurr.getSelectedItem().toString()))) {
+	
+	filterBeans.add(getCurrency(quotingCurr.getSelectedItem().toString(), "quotingCurr"));
+
+}
+if(counterParty.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(counterParty.getSelectedItem().toString()))) {
+	
+	filterBeans.add(getLegalEntity(counterParty.getSelectedIndex(), "cpid"));
+	
+} 
+if(BUYSELL.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BUYSELL.getSelectedItem().toString()))) {
+	filterBeans.add(getBUYSELL(BUYSELL.getSelectedItem().toString()));
+
+	
+} 
+		return filterBeans;
 	}
 
 	@Override
 	public void clearllCriterial() {
 		// TODO Auto-generated method stub
-		
+		currency.setSelectedIndex(-1);
+		BUYSELL.setSelectedIndex(-1);
+		primaryCurr.setSelectedIndex(-1);
+		quotingCurr.setSelectedIndex(-1);
+		book.setSelectedIndex(-1);
+		counterParty.setSelectedIndex(-1);
 	}
 
 	@Override
 	public void loadFilters(Vector<UserJobsDetails> jobdetails) {
 		// TODO Auto-generated method stub
+		for(int i=0;i<jobdetails.size();i++) {
+			UserJobsDetails bean = jobdetails.get(i);
+			if(bean.getColumnName().equalsIgnoreCase("Type")) {
+				BUYSELL.setSelectedItem(bean.getValues());
+			}
+			if(bean.getColumnName().equalsIgnoreCase("Currency")) {
+				currency.setSelectedItem(bean.getValues());
+			}
+			if(bean.getColumnName().equalsIgnoreCase("BookID")) {
+				book.setSelectedIndex(getBooktoSelected(Integer.parseInt(bean.getValues())));
+			}
+			if(bean.getColumnName().equalsIgnoreCase("cpid")) {
+				counterParty.setSelectedIndex(getCPtoSelected(Integer.parseInt(bean.getValues())));
+			}
+			if(bean.getColumnName().equalsIgnoreCase("primaryCurr")) {
+				primaryCurr.setSelectedItem(bean.getValues());
+			}
+			if(bean.getColumnName().equalsIgnoreCase("quotingCurr")) {
+				quotingCurr.setSelectedItem(bean.getValues());
+			}
+		}
 		
 	}
 
