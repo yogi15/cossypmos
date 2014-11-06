@@ -1026,15 +1026,18 @@ public class TradeApplication extends DefaultDockableHolder {
 	private JPanel getJPanel1() {
 		if (jPanel1 == null) {
 			jPanel1 = new JPanel();
-			jPanel1.setLayout(new GroupLayout());
+		//	jPanel1.setLayout(new GroupLayout());
 			if (productWindowpanel != null) {
-				jPanel1.add(tradeP, new Constraints(new Bilateral(4, 5, 0),
-						new Leading(5, 226, 10, 10)));
-				jPanel1.add(getJSplitPane0(), new Constraints(new Bilateral(4,
-						5, 7), new Leading(237, 371, 10, 10)));
+				jPanel1.add(tradeP);
+				jPanel1.add(getJSplitPane0());
+				//jPanel1.add(tradeP, new Constraints(new Bilateral(4, 5, 0),
+						//new Leading(5, 226, 10, 10)));
+				//jPanel1.add(getJSplitPane0(), new Constraints(new Bilateral(4,
+				//		5, 7), new Leading(237, 371, 10, 10)));
 			} else {
-				jPanel1.add(tradeP, new Constraints(new Bilateral(41, 9, 94),
-						new Bilateral(34, 12, 5)));
+			//	jPanel1.add(tradeP, new Constraints(new Bilateral(41, 9, 94),
+					//	new Bilateral(34, 12, 5)));
+				jPanel1.add(tradeP);
 			}
 		}
 		commonUTIL.setBackGroundColor(jPanel1);
