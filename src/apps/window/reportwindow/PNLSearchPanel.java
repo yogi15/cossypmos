@@ -1,5 +1,6 @@
 package apps.window.reportwindow;
 
+import java.util.Date;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -13,6 +14,10 @@ import javax.swing.border.EtchedBorder;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
+
+import com.jidesoft.combobox.DateComboBox;
+
+import util.commonUTIL;
 
 import beans.FilterBean;
 import beans.UserJobsDetails;
@@ -31,18 +36,18 @@ public class PNLSearchPanel extends SearchCriteriaType {
 	private JLabel jLabel7;
 	private JLabel jLabel8;
 	private JLabel jLabel9;
-	private JTextField TradeDate;
+	private DateComboBox TradeDateFrom;
 	private JComboBox currency;
 	private JComboBox ProductType;
 	private JComboBox productSubType;
-	private JComboBox status;
-	private JComboBox action;
+	private JComboBox Status;
+	private JComboBox Action;
 	private JComboBox book;
 	private JComboBox counterParty;
 	private JComboBox bookAttributes;
 	private JComboBox leAttributes;
-	private JTextField jTextField1;
-	private JTextField jTextField2;
+	private JTextField leAttributeName;
+	private JTextField bookAttributeValue;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	javax.swing.DefaultComboBoxModel bookData = new javax.swing.DefaultComboBoxModel();
 	javax.swing.DefaultComboBoxModel legalEntityData = new javax.swing.DefaultComboBoxModel();
@@ -93,20 +98,22 @@ public class PNLSearchPanel extends SearchCriteriaType {
 		add(getJTextField1(), new Constraints(new Leading(232, 76, 10, 10), new Leading(299, 12, 12)));
 		add(getJTextField2(), new Constraints(new Leading(230, 76, 10, 10), new Leading(266, 12, 12)));
 		setSize(346, 361);
+	//	leAttributeName.setText("dfdfdfd");
+		//bookAttributeValue.setText("2222");
 	}
 
 	private JTextField getJTextField2() {
-		if (jTextField2 == null) {
-			jTextField2 = new JTextField();
+		if (bookAttributeValue == null) {
+			bookAttributeValue = new JTextField();
 		}
-		return jTextField2;
+		return bookAttributeValue;
 	}
 
 	private JTextField getJTextField1() {
-		if (jTextField1 == null) {
-			jTextField1 = new JTextField();
+		if (leAttributeName == null) {
+			leAttributeName = new JTextField();
 		}
-		return jTextField1;
+		return leAttributeName;
 	}
 
 	private JComboBox getLeAttributes() {
@@ -142,26 +149,32 @@ public class PNLSearchPanel extends SearchCriteriaType {
 	}
 
 	private JComboBox getAction() {
-		if (action == null) {
-			action = new JComboBox();
-			action.setModel(actionAttributeData);
+		if (Action == null) {
+			Action = new JComboBox();
+			Action.setModel(actionAttributeData);
 		}
-		return action;
+		return Action;
 	}
 
 	private JComboBox getStatus() {
-		if (status == null) {
-			status = new JComboBox();
-			status.setModel(statusAttributeData);
+		if (Status == null) {
+			Status = new JComboBox();
+			Status.setModel(statusAttributeData);
 		}
-		return status;
+		return Status;
 	}
 	
-	private JTextField getTradeDate() {
-		if (TradeDate == null) {
-			TradeDate = new JTextField();
+	private  com.jidesoft.combobox.DateComboBox getTradeDate() {
+if (TradeDateFrom == null) {
+			
+			TradeDateFrom = new  com.jidesoft.combobox.DateComboBox();
+			//TradeDateFrom.setTimeDisplayed(true);
+			TradeDateFrom.setFormat(commonUTIL.getDateFormat());
+			TradeDateFrom.setDate(null);
+			
 		}
-		return TradeDate;
+		
+		return TradeDateFrom;
 	}
 
 	private JComboBox getProductType() {
@@ -187,12 +200,17 @@ public class PNLSearchPanel extends SearchCriteriaType {
 		return currency;
 	}
 
-	private JTextField getJTextField0() {
-		if (TradeDate == null) {
-			TradeDate = new JTextField();
-			TradeDate.setText("jTextField0");
+	private DateComboBox getJTextField0() {
+if (TradeDateFrom == null) {
+			
+			TradeDateFrom = new  com.jidesoft.combobox.DateComboBox();
+			//TradeDateFrom.setTimeDisplayed(true);
+			TradeDateFrom.setFormat(commonUTIL.getDateFormat());
+			TradeDateFrom.setDate(null);
+			
 		}
-		return TradeDate;
+		
+		return TradeDateFrom;
 	}
 
 	private JLabel getJLabel9() {
@@ -278,18 +296,159 @@ public class PNLSearchPanel extends SearchCriteriaType {
 	@Override
 	public Vector<FilterBean> searchCriteria() {
 		// TODO Auto-generated method stub
-		return null;
+		Vector<FilterBean> filterBeans = new Vector<FilterBean>();
+		FilterBean bean = null;
+		if(!commonUTIL.isEmpty(leAttributeName.getText())) {
+			bean = new FilterBean();
+			if(leAttributes.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(leAttributes.getSelectedItem().toString()))) {
+			bean.setColumnName("LeKeyword");
+			bean.setColumnValues("legalentityattribute.attributename = '"+leAttributes.getSelectedItem().toString()+"' and legalentityattribute.attributevalue = '"+leAttributeName.getText() +"'");
+			bean.setAnd_or("And");
+			bean.setSearchCriteria("in");
+			filterBeans.add(bean);
+			}
+		} 
+		if(!commonUTIL.isEmpty(bookAttributeValue.getText())) {
+			bean = new FilterBean();
+			if(bookAttributes.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(bookAttributes.getSelectedItem().toString()))) {
+			bean.setColumnName("BookKeyword");
+			bean.setColumnValues("bookattribute.attributename = '"+bookAttributes.getSelectedItem().toString()+"' and bookattribute.attributevalue = '"+bookAttributeValue.getText() +"'");
+			bean.setAnd_or("And");
+			bean.setSearchCriteria("in");
+			filterBeans.add(bean);
+			}
+		} 
+		if( (TradeDateFrom.getDate() != null  
+				&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(TradeDateFrom.getDate())))) {				
+			
+			Date fromTrade = TradeDateFrom.getDate();
+			
+			if (TradeDateFrom.getDate() != null) {
+				
+				Date toTradeDate = TradeDateFrom.getDate();
+				
+				if (toTradeDate.after(fromTrade)) {
+					
+					filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromTrade), 
+							commonUTIL.convertDateTOString(toTradeDate), "TradeDate"));
+				
+					
+				}  else {
+					
+					commonUTIL.showAlertMessage("Trade From Date should be less then Trade To Date");
+					
+				}				
+			} 
+		}
+if(Status.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Status.getSelectedItem().toString()))) {
+			
+			filterBeans.add(getStatus(Status.getSelectedItem().toString()));
+		} 
+		if(Action.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Action.getSelectedItem().toString()))) {
+			
+			filterBeans.add(getAction(Action.getSelectedItem().toString()));
+		} 
+		if(ProductType.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(ProductType.getSelectedItem().toString()))) {
+			
+			filterBeans.add(getProductType(ProductType.getSelectedItem().toString()));
+		} 
+		if(productSubType.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(productSubType.getSelectedItem().toString()))) {
+			
+			filterBeans.add(getProductSubType(productSubType.getSelectedItem().toString()));
+		} 
+		if(book.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(book.getSelectedItem().toString()))) {
+			filterBeans.add(getBookName(book.getSelectedIndex()));
+			
+		} 
+		
+		if(counterParty.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(counterParty.getSelectedItem().toString()))) {
+			
+			filterBeans.add(getLegalEntity(counterParty.getSelectedIndex(), "cpid"));
+			
+		} 
+		
+if(currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(currency.getSelectedItem().toString()))) {
+			
+			filterBeans.add(getCurrency(currency.getSelectedItem().toString(), "Currency"));
+	
+		}
+		return filterBeans;
 	}
 
+	
 	@Override
 	public void clearllCriterial() {
 		// TODO Auto-generated method stub
+		
+		TradeDateFrom.setDate(null);
+		
+		Status.setSelectedIndex(-1);
+		Action.setSelectedIndex(-1);
+		currency.setSelectedIndex(-1);
+		
+		ProductType.setSelectedIndex(-1);
+		productSubType.setSelectedIndex(-1);
+		bookAttributes.setSelectedIndex(-1);
+		book.setSelectedIndex(-1);
+		counterParty.setSelectedIndex(-1);
+		
+		leAttributes.setSelectedIndex(-1);
+		
 		
 	}
 
 	@Override
 	public void loadFilters(Vector<UserJobsDetails> jobdetails) {
-		// TODO Auto-generated method stub
+		for(int i=0;i<jobdetails.size();i++) {
+			UserJobsDetails bean = jobdetails.get(i);
+			
+			
+			 if(bean.getColumnName().equalsIgnoreCase("TradeDate")) {
+				TradeDateFrom.setDate(commonUTIL
+						.convertStringtoSQLDate(bean.getValues()));
+				
+			}
+			else 
+			if(bean.getColumnName().equalsIgnoreCase("Action")) {
+				Action.setSelectedItem(bean.getValues());
+			}
+			if(bean.getColumnName().equalsIgnoreCase("Status")) {
+				Status.setSelectedItem(bean.getValues());
+			}
+			if(bean.getColumnName().equalsIgnoreCase("Currency")) {
+				currency.setSelectedItem(bean.getValues());
+			}
+			if(bean.getColumnName().equalsIgnoreCase("ProductType")) {
+				ProductType.setSelectedItem(bean.getValues());
+			}
+			if(bean.getColumnName().equalsIgnoreCase("ProductSubType")) {
+				productSubType.setSelectedItem(bean.getValues());
+			}
+			if(bean.getColumnName().equalsIgnoreCase("Book")) {
+				book.setSelectedIndex(getBooktoSelected(Integer.parseInt(bean.getValues())));
+			}
+			if(bean.getColumnName().equalsIgnoreCase("cpid")) {
+				counterParty.setSelectedIndex(getCPtoSelected(Integer.parseInt(bean.getValues())));
+			}
+			
+			if(bean.getColumnName().equalsIgnoreCase("LeKeyword")) {
+				String leAttName = "legalentityattribute.attributename = '";
+				String leAttValue = "' and legalentityattribute.attributevalue = '";
+				String leAttributeNames = bean.getValues().substring(bean.getValues().indexOf(leAttName)+leAttName.length(),bean.getValues().indexOf(leAttValue));
+				String leAttributeValue = bean.getValues().substring(bean.getValues().indexOf(leAttValue)+leAttValue.length(),bean.getValues().length()-1);
+				leAttributes.setSelectedItem(leAttributeNames);
+				leAttributeName.setText(leAttributeValue);
+			}
+			if(bean.getColumnName().equalsIgnoreCase("BookKeyword")) {
+				String leAttName = "bookattribute.attributename = '";
+				String leAttValue = "' and bookattribute.attributevalue = '";
+				String leAttributeNames = bean.getValues().substring(bean.getValues().indexOf(leAttName)+leAttName.length(),bean.getValues().indexOf(leAttValue));
+				String leAttributeValue = bean.getValues().substring(bean.getValues().indexOf(leAttValue)+leAttValue.length(),bean.getValues().length()-1);
+				bookAttributes.setSelectedItem(leAttributeNames);
+				bookAttributeValue.setText(leAttributeValue);
+			}
+		}
+		
 		
 	}
 
