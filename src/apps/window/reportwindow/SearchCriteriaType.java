@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 
 import util.commonUTIL;
@@ -397,6 +398,34 @@ public abstract class SearchCriteriaType extends JPanel
     		
 
     	}
+     
+
+ 	public void processLEDataCombo1(DefaultComboBoxModel legalEntityData2,
+ 			Hashtable<Integer, LegalEntity> counterPartyID2) {
+ 		// TODO Auto-generated method stub
+ 		Vector ledata;
+ 		
+			//String roleType = " role like 'PO' ";
+		ledata = (Vector<String>) getFilterValues().getLegalEntitys();
+
+		Iterator it = ledata.iterator();
+		int p = 0;
+		legalEntityData2.addElement("");
+		
+		while (it.hasNext()) {
+
+			LegalEntity le = (LegalEntity) it.next();
+			
+		
+				
+				legalEntityData2.insertElementAt(le.getName(), p);
+				counterPartyID2.put(p, le);
+				p++;
+				
+		
+		
+		}
+ 	}
      
      protected void processDomainData(javax.swing.DefaultComboBoxModel combodata, Vector<String> domainData) {
     		
