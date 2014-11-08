@@ -3,12 +3,9 @@ package apps.window.reportwindow;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -18,14 +15,12 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
-import com.jidesoft.combobox.DateComboBox;
-
 import util.commonUTIL;
-import beans.Book;
 import beans.FilterBean;
-import beans.LegalEntity;
-import beans.StartUPData;
 import beans.UserJobsDetails;
+
+import com.jidesoft.combobox.DateComboBox;
+import com.jidesoft.combobox.MultiSelectListExComboBox;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class TradeSearchPanel extends SearchCriteriaType {
@@ -72,10 +67,11 @@ public class TradeSearchPanel extends SearchCriteriaType {
 	javax.swing.DefaultComboBoxModel statusAttributeData = new javax.swing.DefaultComboBoxModel();
 	javax.swing.DefaultComboBoxModel productTypeAttributeData = new javax.swing.DefaultComboBoxModel();
 	javax.swing.DefaultComboBoxModel productSubTypeAttributeData = new javax.swing.DefaultComboBoxModel();
+	MultiSelectListExComboBox values = new MultiSelectListExComboBox();
 	
 	private JTextField LeAttributesValues;
 	private JLabel jLabel13;
-	private JComboBox Currency;
+	private MultiSelectListExComboBox Currency;
 	private JLabel jLabel14;
 	private JComboBox Status;
 	private JLabel jLabel15;
@@ -150,7 +146,6 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		add(getLegalEntityName(), new Constraints(new Leading(100, 95, 12, 12), new Leading(253, 12, 12)));
 		add(getLeAttributesValues(), new Constraints(new Leading(242, 95, 12, 12), new Leading(289, 12, 12)));
 		add(getJLabel13(), new Constraints(new Leading(10, 76, 12, 12), new Leading(327, 16, 12, 12)));
-		add(getCurrency(), new Constraints(new Leading(100, 58, 10, 10), new Leading(327, 12, 12)));
 		add(getJLabel14(), new Constraints(new Leading(10, 76, 12, 12), new Leading(365, 16, 12, 12)));
 		add(getStatus(), new Constraints(new Leading(100, 94, 12, 12), new Leading(361, 12, 12)));
 		add(getJLabel15(), new Constraints(new Leading(213, 39, 10, 10), new Leading(365, 16, 12, 12)));
@@ -165,6 +160,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		add(getBUYSELL(), new Constraints(new Leading(245, 65, 10, 10), new Leading(12, 12, 12)));
 		add(getJLabel20(), new Constraints(new Leading(10, 76, 12, 12), new Leading(433, 16, 12, 12)));
 		add(getProductId(), new Constraints(new Leading(100, 95, 12, 12), new Leading(429, 12, 12)));
+		add(getCurrency(), new Constraints(new Leading(100, 94, 12, 12), new Leading(327, 12, 12)));
 		setSize(407, 519);
 	}
 
@@ -302,9 +298,11 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		return jLabel14;
 	}
 
-	private JComboBox getCurrency() {
+	private MultiSelectListExComboBox getCurrency() {
 		if (Currency == null) {
-			Currency = new JComboBox();
+			//Currency = new JComboBox();
+		//	Currency.setModel(currencyAttributeData);
+			Currency = new MultiSelectListExComboBox();
 			Currency.setModel(currencyAttributeData);
 		}
 		return Currency;
@@ -792,9 +790,9 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			
 		} 
 		
-		if(Currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Currency.getSelectedItem().toString()))) {
-			
-			filterBeans.add(getCurrency(Currency.getSelectedItem().toString(), "Currency"));
+		if(Currency.getSelectedIndex() != -1 ) {
+			int i [] = Currency.getSelectedIndices();
+			filterBeans.add(getCurrency(Currency, "Currency"));
 	
 		}
 		
