@@ -102,17 +102,15 @@ public class FilterValues {
 		replaceColumnNameOnSQL.put("Trade.FX.NearRate","Trade.price FX_NEAR_Rate");
 		replaceColumnNameOnSQL.put("Trade.FX.QuoteCCY","Trade.currency FX_QuoteCCY");
 		
-		
 		replaceColumnNameOnSQL.put("Fees.Feetype","NVL(Fees.Feetype, 'NA') Feetype");
 		replaceColumnNameOnSQL.put("Fees.Payrec","NVL(Fees.Payrec, 'NA') Payrec");
 		replaceColumnNameOnSQL.put("Fees.Currency","NVL(Fees.Currency, 'NA')Fees_Currency");
 		replaceColumnNameOnSQL.put("Fees.Amount","NVL(Fees.Amount, 0) Fees_Amount");
 		replaceColumnNameOnSQL.put("Fees.Tradeid","NVL(Fees.Tradeid, 0) Tradeid");
-		replaceColumnNameOnSQL.put("Fees.Fees_LE","NVL((select name from le where id = Fees.Leid ), 'NA')Fees_CP");
+		replaceColumnNameOnSQL.put("Fees.Fees_LE","NVL((select name from le where id = Fees.Leid ), 'NA')Fees_LE");
 		
 		replaceColumnNameOnSQL.put("Transfer.Transfer_ProdcutType","NVL((select producttype from product where id = Transfer.productId ), 'NA')Product_Type");
 		replaceColumnNameOnSQL.put("Transfer.TransferStatus","Transfer.Status");
-		replaceColumnNameOnSQL.put("Transfer.cpid","NVL((select name from le where id = Transfer.cpid ), 'NA')Transfer_CP");
 		
 		replaceColumnNameOnSQL
 				.put("Posting.CreditAccId",
@@ -168,7 +166,6 @@ public class FilterValues {
 		columnNames.put("TransferId", "ID");
 		columnNames.put("TransferType", "TransferType");
 		columnNames.put("TransferEventType", "EventType");
-		columnNames.put("TransferDate", "DeliveryDate");
 		
 		numberDataTypes.put("Book", "Bookid");
 		numberDataTypes.put("LegalEntity", "id");
@@ -539,15 +536,14 @@ public class FilterValues {
 			return null;
 		for (int i = 0; i < jobdetails.size(); i++) {
 			FilterBean bean = (FilterBean) jobdetails.get(i);
-			String colName = bean.getColumnName();
 			boolean isStaticRefData = true;
-			if (colName.equalsIgnoreCase("Book")) {
+			if (bean.getColumnName().equalsIgnoreCase("Book")) {
 				isStaticRefData = false;
 				where = where
 						+ createCriteriaOnBook(dataValues.get("Book"), bean);
 
 			}
-			if (colName.equalsIgnoreCase("CounterParty")) {
+			if (bean.getColumnName().equalsIgnoreCase("CounterParty")) {
 				isStaticRefData = false;
 				where = where
 						+ createCriteriaOnCounterParty(
@@ -570,13 +566,12 @@ public class FilterValues {
 
 	public String createWhereForAttribute(FilterBean bean, int count) {
 		String where = "";
-		String colName = bean.getColumnName();
 		if (count == 0) {
 			where = where + " attribute" + count + ".attributename = '"
 					+ bean.getColumnValues() + "' and attribute" + count
 					+ ".attributeValue " + bean.getSearchCriteria() + " '"
 					+ bean.getAnd_or() + "'";
-			if (colName.contains("Trade")) {
+			if (bean.getColumnName().contains("Trade")) {
 				where = where + " and attribute" + count
 						+ ".type = 'Trade' and attribute" + count
 						+ ".id = Trade.id";
@@ -586,7 +581,7 @@ public class FilterValues {
 					+ bean.getColumnValues() + "' and attribute" + count
 					+ ".attributeValue " + bean.getSearchCriteria() + " '"
 					+ bean.getAnd_or() + "'";
-			if (colName.contains("Trade")) {
+			if (bean.getColumnName().contains("Trade")) {
 				where = where + " and attribute" + count
 						+ ".type = 'Trade'  and attribute" + count
 						+ ".id = Trade.id";
@@ -619,26 +614,25 @@ public class FilterValues {
 			return where;
 		for (int i = 0; i < jobdetails.size(); i++) {
 			FilterBean bean = (FilterBean) jobdetails.get(i);
-			String colName = bean.getColumnName();
-			if (colName.endsWith("Keyword")) {
+			if (bean.getColumnName().endsWith("Keyword")) {
 				attributesFilterBeans.add(bean);
 			} else {
-				if (colName.equalsIgnoreCase("Ladder"))
+				if (bean.getColumnName().equalsIgnoreCase("Ladder"))
 					isForwardLadder = true;
 				boolean isStaticRefData = true;
-				if (isObjectAttribute(colName)) {
-					where = where + " " + colName + " "
+				if (isObjectAttribute(bean.getColumnName())) {
+					where = where + " " + bean.getColumnName() + " "
 							+ bean.getSearchCriteria() + " '%"
 							+ bean.getColumnValues() + "=" + bean.getAnd_or()
 							+ "%'";
-				} else if (colName.equalsIgnoreCase("Book")) {
+				} else if (bean.getColumnName().equalsIgnoreCase("Book")) {
 					where = where
 							+ " "
 							+ tableNames.get(tableName1).toLowerCase()
 							+ "."
 							+ createCriteriaOnBook(dataValues.get("Book"), bean);
 
-				} else if (colName
+				} else if (bean.getColumnName()
 						.equalsIgnoreCase("CounterParty")) {
 					isStaticRefData = false;
 					where = where
@@ -648,30 +642,19 @@ public class FilterValues {
 							+ createCriteriaOnCounterParty(
 									dataValues.get("CounterParty"), bean);
 
-				} else if (colName.equalsIgnoreCase(
+				} else if (bean.getColumnName().equalsIgnoreCase(
 						"TradeAttribute")) {
 					where = where + " " + createWhereForAttribute(bean, att);
 					att++;
 					if (i != jobdetails.size() - 1) {
 						where = where + " and ";
 					}
-				} else if (colName.endsWith("Date")) {
-					
-					if (colName.equals("TransferDate")) {
-						
-						where = where + "  to_date("
-						+ tableNames.get(tableName1).toLowerCase() + "."
-						+ createCriteria(bean, tableName1) ;
+				} else if (bean.getColumnName().endsWith("Date")) {
 
-					} else {
-						
-						where = where + "  trunc("
-						+ tableNames.get(tableName1).toLowerCase() + "."
-						+ createCriteria(bean, tableName1) ;
+					where = where + "  trunc("
+							+ tableNames.get(tableName1).toLowerCase() + "."
+							+ createCriteria(bean, tableName1) ;
 
-						
-					}
-					
 				} else {
 					where = where + " "
 							+ tableNames.get(tableName1).toLowerCase() + "."
@@ -680,7 +663,7 @@ public class FilterValues {
 				if (i != jobdetails.size() - 1) {
 					if (bean.getAnd_or() == null || bean.getAnd_or().isEmpty())
 						where = where + " and ";
-					else if (colName.endsWith("Date")) {
+					else if (bean.getColumnName().endsWith("Date")) {
 						where = where + " and ";
 					} else {
 						where = where + " " + bean.getAnd_or() + "  ";
@@ -717,6 +700,7 @@ public class FilterValues {
 	private String genearteGroupClauseForForwardLadder(String where) {
 		// TODO Auto-generated method stub
 		String whereC = where;
+		boolean addWhere = false;
 		String[] whereSplit = null;
 		if (where.contains(";")) {
 			whereSplit = whereC.split(";");
@@ -728,10 +712,15 @@ public class FilterValues {
 		String whereClause = "";
 		for (int i = 0; i < whereConditions.length; i++) {
 			String w = whereConditions[i];
+			
 			if (!w.trim().isEmpty()) {
 				if (w.contains("TO_CHAR")) {
+					if(w.contains("And")) {
+						w = w.substring(0, w.indexOf("And"));
+					}
 					groupClause = " group by currency , " + w;
 				} else {
+					addWhere = true;
 					whereClause = whereClause + w;
 				}
 			}
@@ -740,18 +729,20 @@ public class FilterValues {
 		whereClause = whereClause.trim();
 		String wClause = "";
 		if (whereSplit == null) {
-			whereClause = whereClause.substring(0, whereClause.length() - 3)
+			whereClause = whereClause.substring(0, whereClause.length() - 0)
 					+ "  " + groupClause;
 		} else {
-			wClause = whereClause.substring(0, whereClause.length() - 3) + "  "
+			wClause = whereClause.substring(0, whereClause.length() - 1) + "  "
 					+ groupClause + ";";
 			for (int ws = 1; ws < whereSplit.length; ws++) {
 				wClause = wClause
-						+ whereClause.substring(0, whereClause.length() - 3)
+						+ whereClause.substring(0, whereClause.length() - 1)
 						+ "  " + " group by currency , " + whereSplit[ws] + ";";
 			}
 			whereClause = wClause.substring(0, wClause.length() - 1);
 		}
+		if(addWhere) 
+			whereClause = " where " + whereClause;
 		return whereClause;
 	}
 
@@ -869,42 +860,25 @@ public class FilterValues {
 
 	private String createCriteria(FilterBean bean, String tableName1) {
 		String criteria = "";
-		String colName = bean.getColumnName();
-		if (colName.endsWith("Date")) {
-			if (colName.equals("TransferDate")) {
-				
-				criteria = columnNames.get(colName)
-				+ ", 'dd/mm/yyyy') "
-				+ " "
-				+ getDatesWhereClause(
-						bean.getColumnValues(),
-						bean.getAnd_or(),
-						bean.getSearchCriteria(),
-						tableNames.get(tableName1) + "."
-								+ columnNames.get(colName));
-			} else {
-				
-				criteria = columnNames.get(colName)
-				+ ") "
-				+ " "
-				+ getDatesWhereClause(
-						bean.getColumnValues(),
-						bean.getAnd_or(),
-						bean.getSearchCriteria(),
-						tableNames.get(tableName1) + "."
-								+ columnNames.get(colName));
-				
-			}
-			
-		} else if (colName.equalsIgnoreCase("Ladder")) {
+		if (bean.getColumnName().endsWith("Date")) {
+			criteria = columnNames.get(bean.getColumnName())
+					+ ") "
+					+ " "
+					+ getDatesWhereClause(
+							bean.getColumnValues(),
+							bean.getAnd_or(),
+							bean.getSearchCriteria(),
+							tableNames.get(tableName1) + "."
+									+ columnNames.get(bean.getColumnName()));
+		} else if (bean.getColumnName().equalsIgnoreCase("Ladder")) {
 			criteria = getForwardLadderWhereClause(bean.getColumnValues());
 		} else {
-			criteria = columnNames.get(colName)
+			criteria = columnNames.get(bean.getColumnName())
 					+ " "
 					+ " "
 					+ attachsqlTypeCrietria(bean.getSearchCriteria().trim(),
 							bean.getColumnValues().toUpperCase(),
-							colName);
+							bean.getColumnName());
 		}
 		return criteria;
 
@@ -925,7 +899,6 @@ public class FilterValues {
 			+ "', 'dd/MM/YYYY')";
 			
 		} else {
-			
 			dateWhereClause = searchCriteria + "  to_date('" + startDate.trim()
 					+ "', 'dd/MM/YYYY')";
 			if (commonUTIL.isEmpty(endDate))
@@ -1162,8 +1135,7 @@ public class FilterValues {
 		String cols[] = null;
 		for (int i = 0; i < filterBeanData.size(); i++) {
 			FilterBean bean = (FilterBean) filterBeanData.get(i);
-			String colName = bean.getColumnName();
-			if (colName.equalsIgnoreCase("Ladder")) {
+			if (bean.getColumnName().equalsIgnoreCase("Ladder")) {
 				if (bean.getColumnValues().contains(",")) {
 					cols = bean.getColumnValues().split(",");
 					sql = sql + forwardColumnMaps.get(cols[0]);
@@ -1171,12 +1143,12 @@ public class FilterValues {
 					sql = sql + forwardColumnMaps.get(bean.getColumnValues())
 							+ ",";
 				}
-			} else if (colName.equalsIgnoreCase("SettleDate")) {
+			} else if (bean.getColumnName().equalsIgnoreCase("SettleDate")) {
 
-			} else if (colName.equalsIgnoreCase("Currency")) {
+			} else if (bean.getColumnName().equalsIgnoreCase("Currency")) {
 
 			} else {
-				sql = sql + colName + ",";
+				sql = sql + bean.getColumnName() + ",";
 			}
 
 		}
@@ -1199,6 +1171,8 @@ public class FilterValues {
 	// existing in whereclause.
 
 	public String checkTableAliasForAttributes(String sql) {
+		if(!sql.contains("where"))
+			return sql;
 		String where = sql.substring(sql.indexOf("where"), sql.length());
 		String sqlwithoutWhere = sql.substring(0, sql.indexOf("where"));
 		boolean containLegalEntityTable = false;
@@ -1239,17 +1213,19 @@ public class FilterValues {
 
 	public String changeColumnNameForForwoardReport(String sqlW) {
 		// TODO Auto-generated method stub
-		String sql = sqlW;
+		String sql = sqlW.substring(0, sqlW.indexOf("from"));
+		String afterFrom = sqlW.substring(sqlW.indexOf("from"),sqlW.length());
 		Enumeration keys = forwardColumnMaps.keys();
 		while (keys.hasMoreElements()) {
 			String key = (String) keys.nextElement();
 			if (sqlW.contains(key)) {
 				String value = (String) forwardColumnMaps.get(key);
-				sql = sqlW.replace(key, value);
+				sql = sql.replace(key, value);
 				break;
 
 			}
 		}
+	sql = sql + afterFrom;
 		return sql;
 
 	}
