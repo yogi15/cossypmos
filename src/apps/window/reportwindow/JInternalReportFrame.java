@@ -274,10 +274,14 @@ public class JInternalReportFrame extends JInternalFrame {
 					commonUTIL.display("Execute Button", "Column are not gettting generated");
 					return;
 				}
-				if( columnSQL.contains("where")) {
-					sqlW = columnSQL + " and   " + where;
+				if(!getReportType().equalsIgnoreCase("ForwardLadder")) {
+					if( columnSQL.contains("where")) {
+						sqlW = columnSQL + " and   " + where;
+					} else {
+						sqlW = columnSQL + " where " + where;
+					}
 				} else {
-					sqlW = columnSQL + " where " + where;
+					sqlW = columnSQL + where;
 				}
 				sqlW = 	getFilterValues().checkTableAliasForAttributes(sqlW);
 				// + " where   " + where;
@@ -306,7 +310,7 @@ public class JInternalReportFrame extends JInternalFrame {
 						    
 						} else {
 							sqlW =  getFilterValues().changeColumnNameForForwoardReport(sqlW);
-							sqlW = getFilterValues().createWhereOnAttributes(sqlW,where);
+						//	sqlW = getFilterValues().createWhereOnAttributes(sqlW,where);
 							//commonUTIL.showAlertMessage(sql);
 							
 								data = (Vector)	 reportPanel.getRemoteTrade().getTradesforReport(sqlW);
