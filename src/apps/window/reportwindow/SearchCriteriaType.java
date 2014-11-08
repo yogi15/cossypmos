@@ -1,5 +1,7 @@
 package apps.window.reportwindow;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -7,6 +9,8 @@ import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
+
+import com.jidesoft.combobox.MultiSelectListExComboBox;
 
 import util.commonUTIL;
 
@@ -67,6 +71,34 @@ public abstract class SearchCriteriaType extends JPanel
     	 
      }
      
+     
+     
+     public MultiSelectListExComboBox getMultiSelectListExComboBox(String val [],final FilterBean filler ) {
+ 		final MultiSelectListExComboBox values = new MultiSelectListExComboBox(val, String[].class);
+ 		values.addItemListener(new ItemListener() {
+ 			@Override
+ 			public void itemStateChanged(ItemEvent e) {
+ 				if (values.getSelectedIndex() != -1) {
+ 					// TODO Auto-generated method stub
+ 					String attributeName = values.getSelectedItem().toString();
+ 					String idSelected ="";
+ 					int ids [] = values.getSelectedIndices();
+ 					String ss = "";
+ 					Object obj[] = values.getSelectedObjects();
+ 					for (int i = 0; i < values.getSelectedObjects().length; i++) {
+ 						    ss = ss + (String) obj[i] + ",";
+ 						    idSelected = idSelected + ids[i] +",";
+ 					}
+ 					
+ 					filler.setColumnValues(ss.substring(0, ss.length()-1));
+ 					filler.setIdSelected(idSelected.substring(0, idSelected.length()-1));
+ 					
+
+ 				}
+ 			}
+ 		});
+ 		return values;
+ 	}
      public FilterBean getTradeID(String tradeID)  {
     	 FilterBean bean = null;
     	 if(!commonUTIL.isEmpty(tradeID)) {
@@ -213,6 +245,22 @@ public abstract class SearchCriteriaType extends JPanel
     			bean.setSearchCriteria("in");
  			
  		}
+    	 return bean;
+     }
+     public FilterBean getCurrency(MultiSelectListExComboBox values, String colName)  {
+    	 FilterBean  bean = new FilterBean();
+    	 String ss = "";
+    	 String idSelected ="";
+    	 int ids [] = values.getSelectedIndices();
+			Object obj[] = values.getSelectedObjects();
+			for (int i = 0; i < values.getSelectedObjects().length; i++) {
+				    ss = ss + (String) obj[i] + ",";
+				    idSelected = idSelected + ids[i] +",";
+			}
+			bean.setColumnValues(ss.substring(0, ss.length()-1));
+			bean.setIdSelected(idSelected.substring(0, idSelected.length()-1));
+			bean.setSearchCriteria("in");
+ 			bean.setAnd_or("And");
     	 return bean;
      }
      public FilterBean getProductType(String ProductType)  {
