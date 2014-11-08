@@ -1,5 +1,6 @@
 package apps.window.reportwindow;
 
+import java.util.Date;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -14,6 +15,10 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
+import com.jidesoft.combobox.DateComboBox;
+
+import util.commonUTIL;
+
 import beans.FilterBean;
 import beans.UserJobsDetails;
 
@@ -23,7 +28,7 @@ public class ForwardLadderSearchPanel extends SearchCriteriaType {
 	private static final long serialVersionUID = 1L;
 	private JLabel jLabel0;
 	private JComboBox Ladder;
-	private JTextField settleDate;
+	private DateComboBox settleDate;
 	private JComboBox currency;
 	private JLabel jLabel1;
 	private JLabel jLabel2;
@@ -66,10 +71,12 @@ public class ForwardLadderSearchPanel extends SearchCriteriaType {
 		return jLabel1;
 	}
 
-	private JTextField getSettleDate() {
+	private DateComboBox getSettleDate() {
 		if (settleDate == null) {
-			settleDate = new JTextField();
-			settleDate.setText("          ");
+			settleDate =  new DateComboBox();
+			settleDate.setFormat(commonUTIL.getDateFormat());
+			settleDate.setDate(null);;
+			
 		}
 		return settleDate;
 	}
@@ -99,19 +106,55 @@ public class ForwardLadderSearchPanel extends SearchCriteriaType {
 	@Override
 	public Vector<FilterBean> searchCriteria() {
 		// TODO Auto-generated method stub
-		return null;
+		Vector<FilterBean> filterBeans = new Vector<FilterBean>();
+if( (settleDate.getDate() != null 
+&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(settleDate.getDate())))) {	
+			
+			
+			filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(settleDate.getDate()), 
+					commonUTIL.convertDateTOString(settleDate.getDate()), "SettleDate"));		
+				
+				
+		}
+
+if(Ladder.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Ladder.getSelectedItem().toString()))) {
+	filterBeans.add(getLadder(Ladder.getSelectedItem().toString(),"Ladder"));
+
+	
+}
+if(currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(currency.getSelectedItem().toString()))) {
+	filterBeans.add(getCurrency(currency.getSelectedItem().toString(), "Currency"));
+
+	
+}
+return filterBeans;
 	}
 
 	@Override
 	public void clearllCriterial() {
 		// TODO Auto-generated method stub
+		settleDate.setDate(null);
+		currency.setSelectedIndex(-1);
+		Ladder.setSelectedIndex(-1);
 		
 	}
 
 	@Override
 	public void loadFilters(Vector<UserJobsDetails> jobdetails) {
 		// TODO Auto-generated method stub
-		
+		for(int i=0;i<jobdetails.size();i++) {
+			UserJobsDetails bean = jobdetails.get(i);
+			if(bean.getColumnName().equalsIgnoreCase("Currency")) {
+				currency.setSelectedItem(bean.getValues());
+			}
+			else if(bean.getColumnName().equalsIgnoreCase("Ladder")) {
+					Ladder.setSelectedItem(bean.getValues());
+			}
+			else if(bean.getColumnName().equalsIgnoreCase("SettleDate")) {
+				settleDate.setDate(commonUTIL
+						.convertStringtoSQLDate(bean.getValues()));
+		}
+		}
 	}
 
 }
