@@ -138,12 +138,39 @@ public abstract class SearchCriteriaType extends JPanel
  		}
     	 return bean;
      }
+     public FilterBean getSettleDateFrom(String SettleDateFrom)  {
+    	 FilterBean bean = null;
+    	 if(!commonUTIL.isEmpty(SettleDateFrom)) {
+    		 bean = new FilterBean();
+ 			bean.setColumnName("SettleDate");
+ 			bean.setColumnValues(SettleDateFrom);
+ 			bean.setAnd_or(SettleDateFrom);
+ 			bean.setSearchCriteria("between");
+ 			
+ 		}
+    	 return bean;
+     }
+     
+     
      public FilterBean getBUYSELL(String tradeType)  {
     	 FilterBean bean = null;
     	 if(!commonUTIL.isEmpty(tradeType)) {
     	 bean = new FilterBean();
 			bean.setColumnName("Type");
 			bean.setColumnValues(tradeType);
+			bean.setSearchCriteria("in");
+			bean.setAnd_or("And");
+		
+ 			
+ 		}
+    	 return bean;
+     }
+     public FilterBean getLadder(String ladder,String Ladder)  {
+    	 FilterBean bean = null;
+    	 if(!commonUTIL.isEmpty(ladder)) {
+    	 bean = new FilterBean();
+			bean.setColumnName(Ladder);
+			bean.setColumnValues(ladder);
 			bean.setSearchCriteria("in");
 			bean.setAnd_or("And");
 		
