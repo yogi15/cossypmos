@@ -257,8 +257,33 @@ public abstract class SearchCriteriaType extends JPanel
 				    ss = ss + (String) obj[i] + ",";
 				    idSelected = idSelected + ids[i] +",";
 			}
+			bean.setColumnName("Currency");
 			bean.setColumnValues(ss.substring(0, ss.length()-1));
 			bean.setIdSelected(idSelected.substring(0, idSelected.length()-1));
+			bean.setSearchCriteria("in");
+ 			bean.setAnd_or("And");
+    	 return bean;
+     }
+     public FilterBean getprimaryCurrency(String values, String colName)  {
+    	 FilterBean  bean = new FilterBean();
+    	 String ss = "";
+    	 String idSelected ="";
+    	
+			bean.setColumnName("PrimaryCurrLedger");
+			bean.setColumnValues(values);
+			//bean.setIdSelected(idSelected.substring(0, idSelected.length()-1));
+			bean.setSearchCriteria("in");
+ 			bean.setAnd_or("And");
+    	 return bean;
+     }
+     public FilterBean getquotingCurrency(String values, String colName)  {
+    	 FilterBean  bean = new FilterBean();
+    	 String ss = "";
+    	 String idSelected ="";
+    	
+			bean.setColumnName("QuotingCurrLedger");
+			bean.setColumnValues(values);
+			//bean.setIdSelected(idSelected.substring(0, idSelected.length()-1));
 			bean.setSearchCriteria("in");
  			bean.setAnd_or("And");
     	 return bean;
