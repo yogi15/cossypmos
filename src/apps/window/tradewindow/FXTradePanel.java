@@ -89,20 +89,20 @@ import constants.CommonConstants;
 	import dsServices.RemoteReferenceData;
 	import dsServices.RemoteTask;
 	import dsServices.RemoteTrade;
-import dsServices.ServerConnectionUtil;
+	import dsServices.ServerConnectionUtil;
 	
 	
 	//VS4E -- DO NOT REMOVE THIS LINE!
 	public class FXTradePanel extends  TradePanel {
 	
 		
-		BasicData basicData = null;
-		int instrumentType = 0;
-		 static String FXSWAP = "FXSWAP";
-		 static String FXFORWARDOPTION = "FXFORWARDOPTION";
-		 static String FXFORWARD = "FXFORWARD";
-		 static String FXTAKEUP = "FXTAKEUP";
-		 static String FX = "FX";
+		  BasicData basicData = null;
+		  int instrumentType = 0;
+		  static String FXSWAP = "FXSWAP";
+		  static String FXFORWARDOPTION = "FXFORWARDOPTION";
+		  static String FXFORWARD = "FXFORWARD";
+		  static String FXTAKEUP = "FXTAKEUP";
+		  static String FX = "FX";
 		 
 		 int bookId =0;
 		 int counterPartyID =0;
@@ -869,8 +869,6 @@ import dsServices.ServerConnectionUtil;
 										    	return;
 										    }
 										}
-										
-									
 										tradeTakeUp.setQuantity(amt1);
 										tradeTakeUp.setNominal(amt2);
 										tradeTakeUp.setTradeDate(takeupW.jTextField5.getText());
@@ -3262,8 +3260,6 @@ import dsServices.ServerConnectionUtil;
 			trade.setCpID(new Integer(basicData.counterPary.getName()).intValue());
 			}
 			trade.setTraderID(new Integer(basicData.jTextField7.getName()).intValue());
-			
-			//tradeDate will always be currentDate. The actual TradeDate will be in attributes
 			trade.setTradeDate(commonUTIL.getCurrentDateTime());
 		    trade.setDelivertyDate(out.outRightDate.getSelectedDateAsText());
 		    trade.setStatus(out.jTextField6.getText());
@@ -3765,7 +3761,7 @@ import dsServices.ServerConnectionUtil;
 								
 					} */
 						int tradeDateRowno = -1;
-						String strTradeDate = "Trade Date";
+						String strTradeDate = "TradeModifiedDateTime";
 						String tradeDateVal="";
 						boolean tradeDateFilled = false;
 						Vector<Attribute> attributesData = attributes.getData();
@@ -3799,7 +3795,7 @@ import dsServices.ServerConnectionUtil;
 							
 						}
 					
-						
+				
 				if(attributesV.trim().length() > 0)
 				return attributesV.substring(0, attributesV.length()-1);
 				return attributesV;
