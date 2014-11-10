@@ -111,6 +111,9 @@ public class FilterValues {
 		
 		replaceColumnNameOnSQL.put("Transfer.Transfer_ProdcutType","NVL((select producttype from product where id = Transfer.productId ), 'NA')Product_Type");
 		replaceColumnNameOnSQL.put("Transfer.TransferStatus","Transfer.Status");
+		replaceColumnNameOnSQL.put("trade.substr(trade.tradedesc,0,3)","substr(trade.tradedesc,0,3)");
+		replaceColumnNameOnSQL.put("trade.substr(trade.currencypair,5,6)","substr(trade.currencypair,5,6)");
+		
 		
 		replaceColumnNameOnSQL
 				.put("Posting.CreditAccId",
@@ -134,6 +137,8 @@ public class FilterValues {
 				"TO_CHAR(settledate,'WW') Weekly");
 
 		columnNames.put("Book", "Bookid");
+		columnNames.put("PrimaryCurrLedger", "substr(trade.tradedesc,0,3)");
+		columnNames.put("QuotingCurrLedger", "substr(trade.currencypair,5,6)");
 		columnNames.put("Type", "Type");
 		columnNames.put("LegalEntity", "id");
 		columnNames.put("cpid", "cpid");
