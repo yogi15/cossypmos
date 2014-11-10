@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -67,11 +68,13 @@ public class TradeSearchPanel extends SearchCriteriaType {
 	javax.swing.DefaultComboBoxModel statusAttributeData = new javax.swing.DefaultComboBoxModel();
 	javax.swing.DefaultComboBoxModel productTypeAttributeData = new javax.swing.DefaultComboBoxModel();
 	javax.swing.DefaultComboBoxModel productSubTypeAttributeData = new javax.swing.DefaultComboBoxModel();
-	MultiSelectListExComboBox values = new MultiSelectListExComboBox();
+	javax.swing.DefaultComboBoxModel primarycurrencyAttributeData = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel quotingcurrencyAttributeData = new javax.swing.DefaultComboBoxModel();
+	MultiSelectListExComboBox Currency = new MultiSelectListExComboBox();
 	
 	private JTextField LeAttributesValues;
 	private JLabel jLabel13;
-	private MultiSelectListExComboBox Currency;
+	//private MultiSelectListExComboBox Currency;
 	private JLabel jLabel14;
 	private JComboBox Status;
 	private JLabel jLabel15;
@@ -86,6 +89,10 @@ public class TradeSearchPanel extends SearchCriteriaType {
 	private JComboBox BUYSELL;
 	private JLabel jLabel20;
 	private JTextField ProductId;
+	private JLabel jLabel21;
+	private JComboBox primaryCurr;
+	private JLabel jLabel22;
+	private JComboBox quotingCurr;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	public TradeSearchPanel() {
 		init();
@@ -101,6 +108,8 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		processDomainData(legalEntityAttributeData,  getFilterValues().getDomainValues("LEAttributes"));
 		processDomainData(tradeAttributeData,  getFilterValues().getDomainValues("TradeAttribute"));
 		processDomainData(currencyAttributeData,  getFilterValues().getDomainValues("Currency"));
+		processDomainData(primarycurrencyAttributeData,  getFilterValues().getDomainValues("Currency"));
+		processDomainData(quotingcurrencyAttributeData,  getFilterValues().getDomainValues("Currency"));
 		processDomainData(statusAttributeData,  getFilterValues().getDomainValues("Status"));
 		processDomainData(actionAttributeData,  getFilterValues().getDomainValues("Action"));
 		processDomainData(productTypeAttributeData,  getFilterValues().getDomainValues("ProductType"));
@@ -152,16 +161,62 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		add(getJLabel16(), new Constraints(new Leading(10, 76, 12, 12), new Leading(399, 16, 12, 12)));
 		add(getProductType(), new Constraints(new Leading(101, 94, 12, 12), new Leading(395, 12, 12)));
 		add(getJLabel17(), new Constraints(new Leading(211, 51, 10, 10), new Leading(399, 16, 12, 12)));
-		add(getProductSubType(), new Constraints(new Leading(260, 108, 10, 10), new Leading(395, 12, 12)));
-		add(getAction(), new Constraints(new Leading(262, 104, 12, 12), new Leading(361, 12, 12)));
 		add(getJLabel18(), new Constraints(new Leading(209, 46, 12, 12), new Leading(329, 16, 12, 12)));
-		add(getCurrencyPair(), new Constraints(new Leading(260, 104, 12, 12), new Leading(325, 12, 12)));
 		add(getJLabel19(), new Constraints(new Leading(206, 35, 12, 12), new Leading(14, 16, 12, 12)));
 		add(getBUYSELL(), new Constraints(new Leading(245, 65, 10, 10), new Leading(12, 12, 12)));
 		add(getJLabel20(), new Constraints(new Leading(10, 76, 12, 12), new Leading(433, 16, 12, 12)));
 		add(getProductId(), new Constraints(new Leading(100, 95, 12, 12), new Leading(429, 12, 12)));
 		add(getCurrency(), new Constraints(new Leading(100, 94, 12, 12), new Leading(327, 12, 12)));
+		add(getJLabel21(), new Constraints(new Leading(10, 12, 12), new Leading(465, 10, 10)));
+		add(getQuotingCurr(), new Constraints(new Leading(100, 94, 12, 12), new Leading(465, 12, 12)));
+		add(getJLabel22(), new Constraints(new Leading(209, 65, 10, 10), new Leading(467, 12, 12)));
+		add(getProductSubType(), new Constraints(new Leading(272, 108, 10, 10), new Leading(397, 12, 12)));
+		add(getAction(), new Constraints(new Leading(272, 108, 10, 10), new Leading(363, 12, 12)));
+		add(getCurrencyPair(), new Constraints(new Leading(273, 108, 12, 12), new Leading(327, 12, 12)));
+		add(getPrimaryCurr(), new Constraints(new Leading(272, 108, 10, 10), new Leading(465, 12, 12)));
 		setSize(407, 519);
+		primaryCurr.setEditable(false);
+		primaryCurr.setEnabled(false);
+		quotingCurr.setEditable(false);
+		quotingCurr.setEnabled(false);
+	}
+
+	private JComboBox getPrimaryCurr(){
+	if(primaryCurr==null){
+	primaryCurr = new JComboBox<>();
+	primaryCurr.setModel(primarycurrencyAttributeData);
+	
+
+	
+	}
+	return primaryCurr;
+	}
+
+	private JLabel getJLabel22() {
+		if (jLabel22 == null) {
+			jLabel22 = new JLabel();
+			jLabel22.setText("QuotingCurr");
+		}
+		return jLabel22;
+	}
+
+	private JComboBox getQuotingCurr(){
+		if(quotingCurr==null){
+			quotingCurr = new JComboBox<>();
+			quotingCurr.setModel(quotingcurrencyAttributeData);
+
+		
+		}
+		return quotingCurr;
+		}
+
+
+	private JLabel getJLabel21() {
+		if (jLabel21 == null) {
+			jLabel21 = new JLabel();
+			jLabel21.setText("PrimaryCurr");
+		}
+		return jLabel21;
 	}
 
 	private JTextField getProductId() {
@@ -251,7 +306,24 @@ public class TradeSearchPanel extends SearchCriteriaType {
 	        		ProductSubType.removeAll();
 	        		processDomainData(productSubTypeAttributeData,  getFilterValues().getDomainValues(productType+".subType"));
 	        		ProductSubType.setModel(productSubTypeAttributeData);
-	        		
+	        		if(productType.equalsIgnoreCase("FX")) {
+	        			primaryCurr.setEditable(true);
+	        			primaryCurr.setEnabled(true);
+	        			quotingCurr.setEditable(true);
+	        			quotingCurr.setEnabled(true);
+	        			
+	        		}
+	        		else {
+	        			
+	        			primaryCurr.setEditable(false);
+	        			primaryCurr.setEnabled(false);
+	        			quotingCurr.setEditable(false);
+	        			quotingCurr.setEnabled(false);
+	        			primaryCurr.setSelectedIndex(-1);
+	        			quotingCurr.setSelectedIndex(-1);
+	        			
+	        		}
+	        		 
 	        	}
 			});
 		}
@@ -303,10 +375,11 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			//Currency = new JComboBox();
 		//	Currency.setModel(currencyAttributeData);
 			Currency = new MultiSelectListExComboBox();
+			Currency.setEditable(true);
 			Currency.setModel(currencyAttributeData);
 		}
 		return Currency;
-	}
+	} 
 
 	private JLabel getJLabel13() {
 		if (jLabel13 == null) {
@@ -609,7 +682,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			}
 		} 
 		
-		if( (TradeDateFrom.getDate() != null 
+	/*	if( (TradeDateFrom.getDate() != null 
 				&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(TradeDateFrom.getDate())))) {				
 			
 			Date fromTrade = TradeDateFrom.getDate();
@@ -686,7 +759,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		}
 		
 			
-			/*if (TradeDateTo.getDate() != null 
+			if (TradeDateTo.getDate() != null 
 						&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(TradeDateTo.getDate()))) {
 				
 				if (TradeDateFrom.getDate() != null ) {
@@ -791,14 +864,24 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		} 
 		
 		if(Currency.getSelectedIndex() != -1 ) {
-			int i [] = Currency.getSelectedIndices();
+		//	int i [] = Currency.getSelectedIndices();
 			filterBeans.add(getCurrency(Currency, "Currency"));
 	
-		}
+		} 
+		if(primaryCurr.getSelectedIndex() != -1 ) {
+			//	int i [] = Currency.getSelectedIndices();
+				filterBeans.add(getprimaryCurrency(primaryCurr.getSelectedItem().toString(), "PrimaryCurr"));
+		
+			} 
+		if(quotingCurr.getSelectedIndex() != -1 ) {
+			//	int i [] = Currency.getSelectedIndices();
+				filterBeans.add(getprimaryCurrency(quotingCurr.getSelectedItem().toString(), "QuotingCurr"));
+		
+			} 
 		
 		return filterBeans;
 		
-	}
+	} 
 
 	
 	
@@ -814,7 +897,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		BUYSELL.setSelectedIndex(-1);
 		Status.setSelectedIndex(-1);
 		Action.setSelectedIndex(-1);
-		Currency.setSelectedIndex(-1);
+		//Currency.setSelectedIndex(-1);
 		BUYSELL.setSelectedIndex(-1);
 		ProductType.setSelectedIndex(-1);
 		ProductSubType.setSelectedIndex(-1);
@@ -826,13 +909,15 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		LeAttributes.setSelectedIndex(-1);
 		LeAttributesValues.setText("");
 		BookAttributeValue.setText("");
+		primaryCurr.setSelectedIndex(-1);
+		quotingCurr.setSelectedIndex(-1);
 		//Legal
 		
 	}
 
 	@Override
 	public void loadFilters(Vector<UserJobsDetails> jobdetails  ) {
-		for(int i=0;i<jobdetails.size();i++) {
+	for(int i=0;i<jobdetails.size();i++) {
 			UserJobsDetails bean = jobdetails.get(i);
 			
 			if(bean.getColumnName().equalsIgnoreCase("TradeID")) {
@@ -874,7 +959,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 				Status.setSelectedItem(bean.getValues());
 			}
 			if(bean.getColumnName().equalsIgnoreCase("Currency")) {
-				Currency.setSelectedItem(bean.getValues());
+			//	Currency.setSelectedItem(bean.getValues());
 			}
 			if(bean.getColumnName().equalsIgnoreCase("ProductType")) {
 				ProductType.setSelectedItem(bean.getValues());
@@ -887,6 +972,12 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			}
 			if(bean.getColumnName().equalsIgnoreCase("cpid")) {
 				LegalEntityName.setSelectedIndex(getCPtoSelected(Integer.parseInt(bean.getValues())));
+			}
+			if(bean.getColumnName().equalsIgnoreCase("primaryCurr")) {
+				primaryCurr.setSelectedItem(bean.getValues());
+			}
+			if(bean.getColumnName().equalsIgnoreCase("QuotingCurr")) {
+				quotingCurr.setSelectedItem(bean.getValues());
 			}
 			if(bean.getColumnName().equalsIgnoreCase("TradeKeyword")) {
 				
@@ -913,7 +1004,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 				BookAttributeName.setSelectedItem(leAttributeNames);
 				BookAttributeValue.setText(leAttributeValue);
 			}
-		}
+		} 
 		
 	}
 
