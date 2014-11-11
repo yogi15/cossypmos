@@ -222,6 +222,26 @@ public abstract class SearchCriteriaType extends JPanel
  		}
     	 return bean;
      }
+     
+     public FilterBean getStatus(MultiSelectListExComboBox values)  {
+    	 FilterBean bean = new FilterBean();
+    	 String ss = "";
+    	 String idSelected ="";
+    	 int ids [] = values.getSelectedIndices();
+			Object obj[] = values.getSelectedObjects();
+			for (int i = 0; i < values.getSelectedObjects().length; i++) {
+				    ss = ss + (String) obj[i] + ",";
+				    idSelected = idSelected + ids[i] +",";
+			}
+			bean.setColumnName("Status");
+			bean.setColumnValues(ss.substring(0, ss.length()-1));
+			bean.setIdSelected(idSelected.substring(0, idSelected.length()-1));
+			bean.setSearchCriteria("in");
+ 			bean.setAnd_or("And");
+
+    	 return bean;
+     }
+     
      public FilterBean getAction(String Action)  {
     	 FilterBean bean = null;
     	 if(!commonUTIL.isEmpty(Action)) {
@@ -273,7 +293,7 @@ public abstract class SearchCriteriaType extends JPanel
 			bean.setColumnValues(values);
 			//bean.setIdSelected(idSelected.substring(0, idSelected.length()-1));
 			bean.setSearchCriteria("in");
- 			bean.setAnd_or("And");
+ 			bean.setAnd_or("or");
     	 return bean;
      }
      public FilterBean getquotingCurrency(String values, String colName)  {
@@ -341,20 +361,46 @@ public abstract class SearchCriteriaType extends JPanel
      
      
      public FilterBean getBookName(int bookID)  {
-    	 FilterBean bean = null;
-    	 if(bookID > 0) {
-    		 bean = new FilterBean();
- 			bean.setColumnName("Book");
- 			bean.setSearchCriteria("in");
- 			
- 			bean.setColumnValues(new Integer(getBookID(bookID)).toString());
- 			bean.setAnd_or("And");
- 		
- 			
- 			
- 		}
-    	 return bean;
+         FilterBean bean = null;
+         if(bookID > 0) {
+                 bean = new FilterBean();
+                        bean.setColumnName("Book");
+                        bean.setSearchCriteria("in");
+                        
+                        bean.setColumnValues(new Integer(getBookID(bookID)).toString());
+                        bean.setAnd_or("And");
+                
+                        
+                        
+                }
+         return bean;
      }
+     
+     public FilterBean getBookName(MultiSelectListExComboBox values)  {
+    	 FilterBean bean = null;
+    	 
+    	 String ss = "";
+    	 String idSelected ="";
+    	 int ids [] = values.getSelectedIndices();
+		
+    	 Object obj[] = values.getSelectedObjects();
+		
+    	 for (int i = 0; i < values.getSelectedObjects().length; i++) {
+				    
+    		 ss = ss + (String) obj[i] + ",";
+			 idSelected = idSelected + ids[i] +",";
+			 
+    	 }
+    	
+    	 bean = new FilterBean();
+		 bean.setColumnValues(ss.substring(0, ss.length()-1));
+		 bean.setIdSelected(idSelected.substring(0, idSelected.length()-1));
+		 bean.setColumnName("Book");
+		 bean.setSearchCriteria("in");
+		 bean.setAnd_or("And");
+ 		 			
+    	 return bean;
+     } 
      public FilterBean getLegalEntity(int leId, String role)  {
     	 FilterBean bean = null;
     	
@@ -444,6 +490,20 @@ public abstract class SearchCriteriaType extends JPanel
   		
   	}
      
+    public String[] getMultipleValuesSelected(String bookNames) {
+    	
+    	String splitBookNames[] = bookNames.split(",");
+    	
+    	int length = splitBookNames.length;
+    	int bookids[] = new int[length];
+    	
+    	/*for(int i = 0; i < length; i++){
+    		
+    		bookids[i] = books.get(splitBookNames[i]).getBookno();
+    	}
+    	*/
+    	return splitBookNames;
+    }
      public void processLEDataCombo1(javax.swing.DefaultComboBoxModel combodata, Hashtable ids, String role) {
  		
  		Vector ledata;
