@@ -667,7 +667,7 @@ public class FilterValues {
 				}
 				if (i != jobdetails.size() - 1) {
 					if (bean.getAnd_or() == null || bean.getAnd_or().isEmpty())
-						where = where + " and ";
+						where = where + bean.getAnd_or();
 					else if (bean.getColumnName().endsWith("Date")) {
 						where = where + " and ";
 					} else {
@@ -753,7 +753,17 @@ public class FilterValues {
 
 	private String createCriteriaOnBook(Vector<Book> books, FilterBean bean) {
 		String bookCriteria = "";
-		String ids = bean.getColumnValues();
+		String ids  = "";
+		if (bean.getIdSelected() != null) {
+			
+			ids = bean.getIdSelected();
+		
+		} else {
+			
+			ids = bean.getColumnValues();
+			
+		}
+		
 		if (books == null || books.size() == 0 || books.isEmpty())
 			return null;
 		if (ids == null)
