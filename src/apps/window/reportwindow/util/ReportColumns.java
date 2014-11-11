@@ -144,7 +144,7 @@ public class ReportColumns {
 		columnsMaps.put("Transfer.UserID","UserID"); // to be changed
 		columnsMaps.put("Transfer.CP","cpid");// to be changed
 		columnsMaps.put("Transfer.ProdcutType","Transfer_ProdcutType");
-		columnsMaps.put("Transfer.NetterdTransferID","NetterdTransferID");
+		columnsMaps.put("Transfer.NettedTransferID","NettedTransferID");
 		columnsMaps.put("Transfer.NettedConfigID","NettedConfigID");
 		columnsMaps.put("Transfer.SettleAmount","SettleAmount");
 		//columnsMaps.put("Transfer.ProductID","ProductID");
