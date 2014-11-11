@@ -46,7 +46,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 	private DateComboBox SettlementDateTo;
 	private JLabel jLabel8;
 	private JLabel jLabel9;
-	private JComboBox BookName;
+	private MultiSelectListExComboBox BookName;
 	private JLabel jLabel10;
 	private JComboBox BookAttributeName;
 	private JTextField BookAttributeValue;
@@ -70,13 +70,14 @@ public class TradeSearchPanel extends SearchCriteriaType {
 	javax.swing.DefaultComboBoxModel productSubTypeAttributeData = new javax.swing.DefaultComboBoxModel();
 	javax.swing.DefaultComboBoxModel primarycurrencyAttributeData = new javax.swing.DefaultComboBoxModel();
 	javax.swing.DefaultComboBoxModel quotingcurrencyAttributeData = new javax.swing.DefaultComboBoxModel();
-	MultiSelectListExComboBox Currency = new MultiSelectListExComboBox();
+	
 	
 	private JTextField LeAttributesValues;
 	private JLabel jLabel13;
 	//private MultiSelectListExComboBox Currency;
 	private JLabel jLabel14;
-	private JComboBox Status;
+	private MultiSelectListExComboBox Status;
+	private MultiSelectListExComboBox Currency;
 	private JLabel jLabel15;
 	private JComboBox Action;
 	private JLabel jLabel16;
@@ -175,21 +176,22 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		add(getCurrencyPair(), new Constraints(new Leading(273, 108, 12, 12), new Leading(327, 12, 12)));
 		add(getPrimaryCurr(), new Constraints(new Leading(272, 108, 10, 10), new Leading(465, 12, 12)));
 		setSize(407, 519);
-		primaryCurr.setEditable(false);
+		/*primaryCurr.setEditable(false);
 		primaryCurr.setEnabled(false);
 		quotingCurr.setEditable(false);
-		quotingCurr.setEnabled(false);
+		quotingCurr.setEnabled(false);*/
 	}
 
-	private JComboBox getPrimaryCurr(){
-	if(primaryCurr==null){
-	primaryCurr = new JComboBox<>();
-	primaryCurr.setModel(primarycurrencyAttributeData);
-	
+	private JComboBox<String> getPrimaryCurr(){
+		
+		if(primaryCurr==null){
+		
+			primaryCurr = new JComboBox<String>();
+			primaryCurr.setModel(primarycurrencyAttributeData);
 
-	
-	}
-	return primaryCurr;
+		}
+		
+		return primaryCurr;
 	}
 
 	private JLabel getJLabel22() {
@@ -199,16 +201,19 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		}
 		return jLabel22;
 	}
-
-	private JComboBox getQuotingCurr(){
+	
+	private JComboBox<String> getQuotingCurr(){
+		
 		if(quotingCurr==null){
-			quotingCurr = new JComboBox<>();
+			quotingCurr = new JComboBox<String>();
 			quotingCurr.setModel(quotingcurrencyAttributeData);
 
 		
 		}
+			
 		return quotingCurr;
-		}
+		
+	}
 
 
 	private JLabel getJLabel21() {
@@ -354,9 +359,9 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		return jLabel15;
 	}
 
-	private JComboBox getStatus() {
+	private MultiSelectListExComboBox getStatus() {
 		if (Status == null) {
-			Status = new JComboBox();
+			Status = new MultiSelectListExComboBox();
 			Status.setModel(statusAttributeData);
 		}
 		return Status;
@@ -375,7 +380,6 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			//Currency = new JComboBox();
 		//	Currency.setModel(currencyAttributeData);
 			Currency = new MultiSelectListExComboBox();
-			Currency.setEditable(true);
 			Currency.setModel(currencyAttributeData);
 		}
 		return Currency;
@@ -476,9 +480,9 @@ public class TradeSearchPanel extends SearchCriteriaType {
 		return jLabel10;
 	}
 
-	private JComboBox getBookName() {
+	private MultiSelectListExComboBox getBookName() {
 		if (BookName == null) {
-			BookName = new JComboBox();
+			BookName = new MultiSelectListExComboBox();
 			BookName.setModel(bookData);
 		}
 		return BookName;
@@ -681,201 +685,51 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			filterBeans.add(bean);
 			}
 		} 
-		
-	/*	if( (TradeDateFrom.getDate() != null 
-				&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(TradeDateFrom.getDate())))) {				
-			
-			Date fromTrade = TradeDateFrom.getDate();
-			
-			if (TradeDateTo.getDate() != null) {
-				
-				Date toTradeDate = TradeDateTo.getDate();
-				
-				if (toTradeDate.after(fromTrade)) {
-					
-					filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromTrade), 
-							commonUTIL.convertDateTOString(toTradeDate), "TradeDate"));
-				
-					
-				}  else {
-					
-					commonUTIL.showAlertMessage("Trade From Date should be less then Trade To Date");
-					
-				}				
-			} 
-			
-			
-			if (fromTrade == null  && TradeDateTo.getDate() != null) {
-				
-				commonUTIL.showAlertMessage("Please select Trade From Date first");
-			
-			}
-			
-			if (fromTrade != null  && TradeDateTo.getDate() == null) {
-				
-				filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromTrade), 
-						commonUTIL.convertDateTOString(fromTrade), "TradeDate"));
-				
-			}
-			
-		}
-		
-		if( (SettlementDateFrom.getDate() != null 
-				&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(SettlementDateFrom.getDate())))) {				
-			
-			Date fromSettlementDate = SettlementDateFrom.getDate();
-			
-			if (SettlementDateTo.getDate() != null) {
-				
-				Date toSettlementDate = SettlementDateTo.getDate();
-				
-				if (toSettlementDate.after(fromSettlementDate)) {
-					
-					filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromSettlementDate), 
-							commonUTIL.convertDateTOString(toSettlementDate), "DeliveryDate"));
-				
-					
-				}  else {
-					
-					commonUTIL.showAlertMessage("Settlement From Date should be less then Settlement To Date");
-					
-				}				
-			} 
-			
-			
-			if (fromSettlementDate == null  && SettlementDateTo.getDate() != null) {
-				
-				commonUTIL.showAlertMessage("Please select Settlement From Date first");
-			
-			}
-			
-			if (fromSettlementDate != null  && SettlementDateTo.getDate() == null) {
-					
-				filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromSettlementDate), 
-						commonUTIL.convertDateTOString(fromSettlementDate), "DeliveryDate"));
-				
-			}
-			
-		}
-		
-			
-			if (TradeDateTo.getDate() != null 
-						&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(TradeDateTo.getDate()))) {
-				
-				if (TradeDateFrom.getDate() != null ) {
-					
-					if (TradeDateTo.getDate().after(TradeDateFrom.getDate())) {
-						
-						filterBeans.add(getTradeDateFrom(commonUTIL.convertDateTOString(TradeDateTo.getDate()), "TradeDateTo"));
-						
-						
-					} else {
-						
-						commonUTIL.showAlertMessage("Trade From Date should be less then Trade To Date");
-						
-					}
-				
-				} else {
-					
-					commonUTIL.showAlertMessage("Please select Trade From Date first");
-					
-				}
-				
-		}  
-			if (MaturityDateFrom.getDate() != null 
-								&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(MaturityDateFrom.getDate()))){
-				filterBeans.add(getTradeDateFrom(commonUTIL.convertDateTOString(MaturityDateFrom.getDate()), "MaturityDateFrom"));
-		} 
-			if (MaturityDateTo.getDate() != null 
-											&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(MaturityDateTo.getDate()))) {
-				
-				if (MaturityDateFrom.getDate() != null ) {
-					
-					if (MaturityDateTo.getDate().after(MaturityDateFrom.getDate())) {
-						
-						filterBeans.add(getTradeDateFrom(commonUTIL.convertDateTOString(MaturityDateTo.getDate()), "MaturityDateTo"));
-						
-					} else {
-						
-						commonUTIL.showAlertMessage("Maturity From Date should be before Maturity To Date");
-					}
-				
-				} else {
-					
-					commonUTIL.showAlertMessage("Please select Maturity From Date first");
-					
-				}
-				
-		}  
-			if (SettlementDateFrom.getDate() != null 
-													&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(SettlementDateFrom.getDate()))) {
-				filterBeans.add(getTradeDateFrom(commonUTIL.convertDateTOString(SettlementDateFrom.getDate()), "SettlementDateFrom"));
-		}  
-			if (SettlementDateTo.getDate() != null 
-												&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(SettlementDateTo.getDate()))) {
-				
-				if (SettlementDateFrom.getDate() != null ) {
-					
-					if (SettlementDateTo.getDate().after(SettlementDateFrom.getDate())) {
-						
-						filterBeans.add(getTradeDateFrom(commonUTIL.convertDateTOString(SettlementDateTo.getDate()), "SettlementDateTo"));
-						
-					} else {
-						
-						commonUTIL.showAlertMessage("Settlement From Date should be before Settlement To Date");
-					}
-				
-				} else {
-					
-					commonUTIL.showAlertMessage("Please select Settlement From Date first");
-					
-				}
-															
-		} */ 
-		if(BUYSELL.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BUYSELL.getSelectedItem().toString()))) {
+		 
+		if(BUYSELL.getSelectedItem() != null && !BUYSELL.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(BUYSELL.getSelectedItem().toString()))) {
 			filterBeans.add(getBUYSELL(BUYSELL.getSelectedItem().toString()));
 					
 		} 
-		if(Status.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Status.getSelectedItem().toString()))) {
+		if(Status.getSelectedItem() != null && !Status.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(Status.getSelectedItem().toString()))) {
 			
-			filterBeans.add(getStatus(Status.getSelectedItem().toString()));
+			filterBeans.add(getStatus(Status));
 		} 
-		if(Action.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(Action.getSelectedItem().toString()))) {
+		if(Action.getSelectedItem() != null && !Action.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(Action.getSelectedItem().toString()))) {
 			
 			filterBeans.add(getAction(Action.getSelectedItem().toString()));
 		} 
-		if(ProductType.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(ProductType.getSelectedItem().toString()))) {
+		if(ProductType.getSelectedItem() != null && !ProductType.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(ProductType.getSelectedItem().toString()))) {
 			
 			filterBeans.add(getProductType(ProductType.getSelectedItem().toString()));
 		} 
-		if(ProductSubType.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(ProductSubType.getSelectedItem().toString()))) {
+		if(ProductSubType.getSelectedItem() != null && !ProductSubType.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(ProductSubType.getSelectedItem().toString()))) {
 			
 			filterBeans.add(getProductSubType(ProductSubType.getSelectedItem().toString()));
 		} 
-		if(BookName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BookName.getSelectedItem().toString()))) {
-			filterBeans.add(getBookName(BookName.getSelectedIndex()));
+		if(BookName.getSelectedItem() != null && !BookName.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(BookName.getSelectedItem().toString()))) {
+			filterBeans.add(getBookName(BookName));
 			
 		} 
 		
-		if(LegalEntityName.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(LegalEntityName.getSelectedItem().toString()))) {
+		if(LegalEntityName.getSelectedItem() != null && !LegalEntityName.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(LegalEntityName.getSelectedItem().toString()))) {
 			
 			filterBeans.add(getLegalEntity(LegalEntityName.getSelectedIndex(), "cpid"));
 			
 		} 
 		
-		if(Currency.getSelectedIndex() != -1 ) {
+		if( Currency.getSelectedItem() != null   && !Currency.getSelectedItem().equals(" ") && !commonUTIL.isEmpty(Currency.getSelectedItem().toString())) {
 		//	int i [] = Currency.getSelectedIndices();
 			filterBeans.add(getCurrency(Currency, "Currency"));
 	
 		} 
-		if(primaryCurr.getSelectedIndex() != -1 ) {
+		if(primaryCurr.getSelectedItem() != null && !primaryCurr.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(Currency.getSelectedItem().toString()))) {
 			//	int i [] = Currency.getSelectedIndices();
 				filterBeans.add(getprimaryCurrency(primaryCurr.getSelectedItem().toString(), "PrimaryCurr"));
 		
 			} 
-		if(quotingCurr.getSelectedIndex() != -1 ) {
+		if(quotingCurr.getSelectedItem()!= null && !quotingCurr.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(Currency.getSelectedItem().toString()))) {
 			//	int i [] = Currency.getSelectedIndices();
-				filterBeans.add(getprimaryCurrency(quotingCurr.getSelectedItem().toString(), "QuotingCurr"));
+				filterBeans.add(getquotingCurrency(quotingCurr.getSelectedItem().toString(), "QuotingCurr"));
 		
 			} 
 		
@@ -956,10 +810,10 @@ public class TradeSearchPanel extends SearchCriteriaType {
 				Action.setSelectedItem(bean.getValues());
 			}
 			if(bean.getColumnName().equalsIgnoreCase("Status")) {
-				Status.setSelectedItem(bean.getValues());
+				Status.setSelectedObjects(getMultipleValuesSelected(bean.getValues()));
 			}
 			if(bean.getColumnName().equalsIgnoreCase("Currency")) {
-			//	Currency.setSelectedItem(bean.getValues());
+				Currency.setSelectedObjects(getMultipleValuesSelected(bean.getValues()));
 			}
 			if(bean.getColumnName().equalsIgnoreCase("ProductType")) {
 				ProductType.setSelectedItem(bean.getValues());
@@ -968,7 +822,7 @@ public class TradeSearchPanel extends SearchCriteriaType {
 				ProductSubType.setSelectedItem(bean.getValues());
 			}
 			if(bean.getColumnName().equalsIgnoreCase("Book")) {
-				BookName.setSelectedIndex(getBooktoSelected(Integer.parseInt(bean.getValues())));
+				BookName.setSelectedObjects(getMultipleValuesSelected(bean.getValues()));
 			}
 			if(bean.getColumnName().equalsIgnoreCase("cpid")) {
 				LegalEntityName.setSelectedIndex(getCPtoSelected(Integer.parseInt(bean.getValues())));
