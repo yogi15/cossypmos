@@ -55,7 +55,7 @@ public class JFrameMainApplication extends JFrame {
 			new JMenuItem("Holiday"), new JMenuItem("Folder"),
 			new JMenu("Favorities"), new JMenuItem("MessageConfig") };
 	private static JMenuItem[] reports = { new JMenuItem("TradeReport"),
-			new JMenuItem("TransferReport"), new JMenuItem("PostingReport"),new JMenuItem("MessageReport"),new JMenuItem("CashPositionReport"),new JMenuItem("ForwardLadderReport"),
+			new JMenuItem("TransferReport"), new JMenuItem("PostingReport"),new JMenuItem("MessageReport"),new JMenuItem("CashLedgerPositionReport"),new JMenuItem("CashPositionReport"),new JMenuItem("ForwardLadderReport"),
 			new JMenuItem("PNLReport"), new JMenuItem("Other") };
 	private static JMenuItem[] favItems = { new JMenuItem("CounterParty"),
 			new JMenuItem("Trader"), new JMenuItem("Tenor"),
