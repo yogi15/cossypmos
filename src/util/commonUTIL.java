@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -65,6 +66,8 @@ public class commonUTIL {
       System.out.println("Classname : " + name + " : MethodName : " +methodName + " :: "+ e);
        
     }
+	
+	
 	
 	
 	static public  Color getColors() {
@@ -192,7 +195,15 @@ public class commonUTIL {
 	} 
 	
 	
-
+    static public String getStringFromDoubleExp(double amount) {
+    	String value = BigDecimal.valueOf(amount).toPlainString();
+    	if(value.contains(".")) {
+    		value = value.substring(0, value.indexOf(".")+2);
+    	} 
+    	return value;
+    }
+	
+	
 	static public void setLabelFont(JComponent label) {
 		label.setFont(new Font("Arial", Font.BOLD, 13));
 	
