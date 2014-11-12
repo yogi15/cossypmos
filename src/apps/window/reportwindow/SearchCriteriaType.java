@@ -513,7 +513,7 @@ public abstract class SearchCriteriaType extends JPanel
 
  			Iterator it = ledata.iterator();
  			int p = 0;
- 			combodata.addElement("");
+ 			combodata.insertElementAt("", p++);
  			
  			while (it.hasNext()) {
 
@@ -521,9 +521,9 @@ public abstract class SearchCriteriaType extends JPanel
  				
  				if (le.getRole().equalsIgnoreCase(role)) {
  					
- 					combodata.insertElementAt(le.getName(), p);
+ 					combodata.insertElementAt(le.getName(), p++);
  	 				ids.put(p, le);
- 	 				p++;
+ 	 				
  	 				
  				}
  			
@@ -596,12 +596,12 @@ public abstract class SearchCriteriaType extends JPanel
 
     			Iterator it = ledata.iterator();
     			int p = 0;
-    			combodata.addElement("");
+    			combodata.insertElementAt("", p++);
     			while (it.hasNext()) {
 
     				StartUPData stData = (StartUPData) it.next();
 
-    				combodata.insertElementAt(stData.getName(), p);
+    				combodata.insertElementAt(stData.getName(), p++);
     				
     			
     			}
