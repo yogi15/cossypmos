@@ -28,6 +28,7 @@ public class ReportColumns {
 	static DefaultMutableTreeNode parentPostingColumns = new DefaultMutableTreeNode("Posting");
 	static DefaultMutableTreeNode parentOpenPosColumns = new DefaultMutableTreeNode("OpenPos");
 	static DefaultMutableTreeNode parentCashpositionColumns = new DefaultMutableTreeNode("Cashposition");
+	static DefaultMutableTreeNode parentCashLedgerPositionColumns = new DefaultMutableTreeNode("CashLedgerPosition");
 	static DefaultMutableTreeNode parentTraderColumns = new DefaultMutableTreeNode("Trader");
 	static DefaultMutableTreeNode parentPNLColumns = new DefaultMutableTreeNode("PNL");
 	static DefaultMutableTreeNode parentFeesColumns = new DefaultMutableTreeNode("Fees");
@@ -313,6 +314,7 @@ public class ReportColumns {
 		 }
 		 if(showOpenPosition)
 		 _root.add(parentCashpositionColumns);
+		 _root.add(parentCashLedgerPositionColumns);
 		 _root.add(parentOpenPosColumns);
 		 _root.add(parentPNLColumns);
 		
@@ -373,6 +375,12 @@ public class ReportColumns {
 			  if(showOpenPosition) {
 			   leaf = new DefaultMutableTreeNode(key.substring("Cashposition.".length(),key.length()));
 			   parentCashpositionColumns.add(leaf);
+			  }
+		  }
+		  else if (key.contains("CashLedgerPosition.")) {
+			  if(showOpenPosition) {
+			   leaf = new DefaultMutableTreeNode(key.substring("Cashposition.".length(),key.length()));
+			   parentCashLedgerPositionColumns.add(leaf);
 			  }
 		  }
 		  else if (key.contains("OpenPos.")) {

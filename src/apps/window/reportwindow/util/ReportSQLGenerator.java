@@ -105,7 +105,7 @@ public class ReportSQLGenerator {
 
 	public String getjoinSQL(String tablename, String reportType) {
 	//	String reportType = tableNames.get(reportType1);
-		if(reportType.equalsIgnoreCase("Cashposition") || reportType.equalsIgnoreCase("PNL") ) {  // this is a bug rethink of logic.
+		if(reportType.equalsIgnoreCase("Cashposition") || reportType.equalsIgnoreCase("PNL")  || reportType.equalsIgnoreCase("CashLedgerPosition") ) {  // this is a bug rethink of logic.
 			reportType = "trade";
 		}
 		// TODO Auto-generated method stub
@@ -117,6 +117,7 @@ public class ReportSQLGenerator {
 			attachWhere = true;
 			sqlJoins = reportType + ".productid = product.id ";
 		}
+		
 		if (tablename.contains("book")) {
 			attachWhere = true;
 			if (sqlJoins.length() > 0)
@@ -321,6 +322,9 @@ public class ReportSQLGenerator {
 
 	}
 
+	
+	// Generate Columns where Popup is closed.
+	
 	public String getSQLColumns(Object[] obj) {
 		
 		String SQLcolumnsName = "";
@@ -347,5 +351,5 @@ public class ReportSQLGenerator {
 		}
 		return SQLcolumnsName;
 	}
-	
+
 }
