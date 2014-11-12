@@ -686,48 +686,48 @@ public class TradeSearchPanel extends SearchCriteriaType {
 			}
 		} 
 		 
-		if(BUYSELL.getSelectedItem() != null && !BUYSELL.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(BUYSELL.getSelectedItem().toString()))) {
+		if( (BUYSELL.getSelectedIndex() > 0 )) {
 			filterBeans.add(getBUYSELL(BUYSELL.getSelectedItem().toString()));
 					
 		} 
-		if(Status.getSelectedItem() != null && !Status.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(Status.getSelectedItem().toString()))) {
+		if( (Status.getSelectedIndex() > 0) ) {
 			
 			filterBeans.add(getStatus(Status));
 		} 
-		if(Action.getSelectedItem() != null && !Action.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(Action.getSelectedItem().toString()))) {
+		if( (Action.getSelectedIndex() > 0)) {
 			
 			filterBeans.add(getAction(Action.getSelectedItem().toString()));
 		} 
-		if(ProductType.getSelectedItem() != null && !ProductType.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(ProductType.getSelectedItem().toString()))) {
+		if((ProductType.getSelectedIndex() > 0)  ) {
 			
 			filterBeans.add(getProductType(ProductType.getSelectedItem().toString()));
 		} 
-		if(ProductSubType.getSelectedItem() != null && !ProductSubType.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(ProductSubType.getSelectedItem().toString()))) {
+		if( (ProductSubType.getSelectedIndex() > 0) ) {
 			
 			filterBeans.add(getProductSubType(ProductSubType.getSelectedItem().toString()));
 		} 
-		if(BookName.getSelectedItem() != null && !BookName.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(BookName.getSelectedItem().toString()))) {
+		if( (BookName.getSelectedIndex() > 0)) {
 			filterBeans.add(getBookName(BookName));
 			
 		} 
 		
-		if(LegalEntityName.getSelectedItem() != null && !LegalEntityName.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(LegalEntityName.getSelectedItem().toString()))) {
+		if((LegalEntityName.getSelectedIndex() > 0)) {
 			
 			filterBeans.add(getLegalEntity(LegalEntityName.getSelectedIndex(), "cpid"));
 			
 		} 
 		
-		if( Currency.getSelectedItem() != null   && !Currency.getSelectedItem().equals(" ") && !commonUTIL.isEmpty(Currency.getSelectedItem().toString())) {
+		if( (Currency.getSelectedIndex() > 0) ) {
 		//	int i [] = Currency.getSelectedIndices();
 			filterBeans.add(getCurrency(Currency, "Currency"));
 	
 		} 
-		if(primaryCurr.getSelectedItem() != null && !primaryCurr.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(Currency.getSelectedItem().toString()))) {
+		if( (primaryCurr.getSelectedIndex() > 0 ) ) {
 			//	int i [] = Currency.getSelectedIndices();
 				filterBeans.add(getprimaryCurrency(primaryCurr.getSelectedItem().toString(), "PrimaryCurr"));
 		
 			} 
-		if(quotingCurr.getSelectedItem()!= null && !quotingCurr.getSelectedItem().equals(" ") && (!commonUTIL.isEmpty(Currency.getSelectedItem().toString()))) {
+		if( (quotingCurr.getSelectedIndex() > 0) ) {
 			//	int i [] = Currency.getSelectedIndices();
 				filterBeans.add(getquotingCurrency(quotingCurr.getSelectedItem().toString(), "QuotingCurr"));
 		
