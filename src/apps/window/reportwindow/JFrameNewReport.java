@@ -16,6 +16,7 @@ import com.jidesoft.docking.DefaultDockableHolder;
 import com.jidesoft.docking.DefaultDockingManager;
 import com.jidesoft.docking.DockContext;
 import com.jidesoft.docking.DockableFrame;
+import com.jidesoft.grid.SortableTable;
 import com.jidesoft.icons.JideIconsFactory;
 import com.jidesoft.plaf.LookAndFeelFactory;
 import com.jidesoft.swing.JideScrollPane;
@@ -205,7 +206,7 @@ public class JFrameNewReport extends DefaultDockableHolder {
 	}
 
 	static int i = 0;
-	//private SortableTable _sortableTable;
+	private SortableTable _sortableTable;
 
 	protected DockableFrame createSampleTaskListFrame() {
 
@@ -405,13 +406,14 @@ public class JFrameNewReport extends DefaultDockableHolder {
 				String tablerefer = "";
 
 				Object obj[] = choiceColumns.cmodList2.toArray();
+				if(obj.length == 0) 
+					return;
 				if (obj.length > 0) {
 					String SQLcolumnsName = sqlGen.getSQLColumns(obj);
 					for (int i = 0; i < obj.length; i++) { 
 					// this to get columns from hashtable to build table name
 						
 						tablerefer = tablerefer + (String) obj[i] + ",";
-						
 					}
 					tableName = sqlGen.getSQLTables(tablerefer);
 					if (!tableName.contains(filterValues.getTableName(reportType))) {
@@ -477,7 +479,7 @@ public class JFrameNewReport extends DefaultDockableHolder {
 			    searchColumn = (Vector) remoteBORef.getStartUPData(reportType + "Column");// understand which column to display on 	// selected report
 		}
 			
-			if(reportType.equalsIgnoreCase("CashPosition") || reportType.equalsIgnoreCase("PNL"))
+			if(reportType.equalsIgnoreCase("CashPosition") || reportType.equalsIgnoreCase("PNL") || reportType.equalsIgnoreCase("CashLedgerPosition"))
 			   columnsTreeNode = columns.getTreeNodes(true);
 			else 
 				 columnsTreeNode = columns.getTreeNodes(false);
@@ -506,7 +508,7 @@ public class JFrameNewReport extends DefaultDockableHolder {
 	        //reportPanel.setUserJob(job);
 
 		} catch (RemoteException e) {
-			
+			// TODO Auto-generated catch block
 			commonUTIL.displayError("JFrameNewReport ", " Constructor ", e);
 		}
 	}
