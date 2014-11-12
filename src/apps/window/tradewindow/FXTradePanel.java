@@ -1,95 +1,111 @@
 	package apps.window.tradewindow;
 	
 	import java.awt.Color;
-	import java.awt.Dimension;
-	import java.awt.Toolkit;
-	import java.awt.event.ActionEvent;
-	import java.awt.event.ActionListener;
-	import java.awt.event.ItemEvent;
-	import java.awt.event.ItemListener;
-	import java.awt.event.KeyAdapter;
-	import java.awt.event.KeyEvent;
-	import java.awt.event.MouseEvent;
-	import java.awt.event.MouseListener;
-	import java.net.URL;
-	import java.rmi.RemoteException;
-	import java.text.ParseException;
-	import java.text.SimpleDateFormat;
-	import java.util.Collection;
-	import java.util.Enumeration;
-	import java.util.Hashtable;
-	import java.util.Iterator;
-	import java.util.Vector;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.net.URL;
+import java.rmi.RemoteException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Vector;
 	
 	import apps.window.tradewindow.FXPanels.Swap;
-	import apps.window.tradewindow.FXPanels.TradeAttributes;
-	import apps.window.tradewindow.FXPanels.outRight;
-	import apps.window.tradewindow.panelWindow.FeesPanel;
-	import apps.window.tradewindow.panelWindow.PostingPanel;
-	import apps.window.tradewindow.panelWindow.SDIPanel;
-	import apps.window.tradewindow.panelWindow.TaskPanel;
-	import apps.window.tradewindow.panelWindow.TransferPanel;
+import apps.window.tradewindow.FXPanels.TradeAttributes;
+import apps.window.tradewindow.FXPanels.outRight;
+import apps.window.tradewindow.panelWindow.FeesPanel;
+import apps.window.tradewindow.panelWindow.PostingPanel;
+import apps.window.tradewindow.panelWindow.SDIPanel;
+import apps.window.tradewindow.panelWindow.TaskPanel;
+import apps.window.tradewindow.panelWindow.TransferPanel;
 	
 	import javax.swing.BorderFactory;
-	import javax.swing.DefaultCellEditor;
-	import javax.swing.JButton;
-	import javax.swing.JComboBox;
-	import javax.swing.JLabel;
-	import javax.swing.JPanel;
-	import javax.swing.JTable;
-	import javax.swing.JTextField;
-	import javax.swing.SwingUtilities;
-	import javax.swing.border.EtchedBorder;
-	import javax.swing.border.LineBorder;
-	import javax.swing.table.AbstractTableModel;
-	import javax.swing.table.DefaultTableModel;
-	import javax.swing.table.TableCellRenderer;
-	import javax.swing.table.TableColumnModel;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 	
 	import org.dyno.visual.swing.layouts.Bilateral;
-	import org.dyno.visual.swing.layouts.Constraints;
-	import org.dyno.visual.swing.layouts.GroupLayout;
-	import org.dyno.visual.swing.layouts.Leading;
+import org.dyno.visual.swing.layouts.Constraints;
+import org.dyno.visual.swing.layouts.GroupLayout;
+import org.dyno.visual.swing.layouts.Leading;
 	
+import com.jidesoft.converter.BooleanConverter;
+import com.jidesoft.converter.DateConverter;
+import com.jidesoft.converter.DoubleConverter;
+import com.jidesoft.converter.IntegerConverter;
+import com.jidesoft.converter.MonthNameConverter;
+import com.jidesoft.converter.ObjectConverterManager;
+import com.jidesoft.converter.PercentConverter;
+import com.jidesoft.converter.QuarterNameConverter;
+import com.jidesoft.converter.YearNameConverter;
+import com.jidesoft.grid.CellEditorManager;
+import com.jidesoft.grid.CellRendererManager;
+import com.jidesoft.grouper.ObjectGrouperManager;
+import com.jidesoft.plaf.LookAndFeelFactory;
 	import com.standbysoft.component.date.swing.JDatePicker;
 
 import constants.CommonConstants;
 	
 	import productPricing.Pricer;
-	import util.NumericTextField;
-	import util.ReferenceDataCache;
-	import util.commonUTIL;
-	import util.common.DateU;
-	import apps.window.tradewindow.FXPanels.BasicData;
-	import apps.window.tradewindow.FXPanels.FWDOptionPanel;
-	import apps.window.tradewindow.FXPanels.FunctionalityD;
-	import apps.window.tradewindow.FXPanels.JTableButtonRenderer;
-	import apps.window.tradewindow.FXPanels.Swap;
-	import apps.window.tradewindow.FXPanels.TakeUPWindow;
-	import apps.window.tradewindow.FXPanels.TradeAttributesD;
-	import apps.window.tradewindow.FXPanels.outRight;
-	import apps.window.tradewindow.FXPanels.rollPanel;
-	import apps.window.tradewindow.panelWindow.FeesPanel;
-	import apps.window.tradewindow.panelWindow.SDIPanel;
-	import apps.window.tradewindow.util.FXSplitUtil;
-	import apps.window.utilwindow.JDialogTable;
-	import beans.Attribute;
-	import beans.B2BConfig;
-	import beans.Book;
-	import beans.CurrencySplitConfig;
-	import beans.Favorities;
-	import beans.LegalEntity;
-	import beans.Product;
-	import beans.StartUPData;
-	import beans.Trade;
-	import beans.Users;
-	import dsEventProcessor.TaskEventProcessor;
-	import dsServices.RemoteBOProcess;
-	import dsServices.RemoteProduct;
-	import dsServices.RemoteReferenceData;
-	import dsServices.RemoteTask;
-	import dsServices.RemoteTrade;
-	import dsServices.ServerConnectionUtil;
+import util.NumericTextField;
+import util.ReferenceDataCache;
+import util.commonUTIL;
+import util.common.DateU;
+import apps.window.tradewindow.FXPanels.BasicData;
+import apps.window.tradewindow.FXPanels.FWDOptionPanel;
+import apps.window.tradewindow.FXPanels.FunctionalityD;
+import apps.window.tradewindow.FXPanels.JTableButtonRenderer;
+import apps.window.tradewindow.FXPanels.Swap;
+import apps.window.tradewindow.FXPanels.TakeUPWindow;
+import apps.window.tradewindow.FXPanels.TradeAttributesD;
+import apps.window.tradewindow.FXPanels.outRight;
+import apps.window.tradewindow.FXPanels.rollPanel;
+import apps.window.tradewindow.panelWindow.FeesPanel;
+import apps.window.tradewindow.panelWindow.SDIPanel;
+import apps.window.tradewindow.util.FXSplitUtil;
+import apps.window.utilwindow.JDialogTable;
+import beans.Attribute;
+import beans.B2BConfig;
+import beans.Book;
+import beans.CurrencySplitConfig;
+import beans.Favorities;
+import beans.LegalEntity;
+import beans.Product;
+import beans.StartUPData;
+import beans.Trade;
+import beans.Users;
+import dsEventProcessor.TaskEventProcessor;
+import dsServices.RemoteBOProcess;
+import dsServices.RemoteProduct;
+import dsServices.RemoteReferenceData;
+import dsServices.RemoteTask;
+import dsServices.RemoteTrade;
+import dsServices.ServerConnectionUtil;
 	
 	
 	//VS4E -- DO NOT REMOVE THIS LINE!
@@ -418,11 +434,58 @@ import constants.CommonConstants;
 		private JPanel jPanel3;
 		private JPanel jPanel4;
 		private rollPanel rollpanel;
+		 void initJide() {
+		        // Initialize JIDE settings.
+		        // JIDE Licenses Verification
+
+		        LookAndFeelFactory.installDefaultLookAndFeelAndExtension();
+
+		        //---------------------------------------------------------------------
+		        // JIDE ObjectConverterManager.initDefaultConverter
+		        CellEditorManager.initDefaultEditor();
+		        CellRendererManager.initDefaultRenderer();
+		        ObjectConverterManager.initDefaultConverter();
+		        ObjectGrouperManager.initDefaultGrouper();
+
+		        // Note: Apply special converters to display class in something useful to the user.
+		        ObjectConverterManager.registerConverter(Date.class, new DateConverter(), DateConverter.DATE_CONTEXT);
+		        ObjectConverterManager.registerConverter(Date.class, new DateConverter(), DateConverter.DATETIME_CONTEXT);
+		        ObjectConverterManager.registerConverter(boolean.class, new BooleanConverter());
+		        ObjectConverterManager.registerConverter(Boolean.class, new BooleanConverter());
+
+		        // Special formatting of integers
+		        DecimalFormat myFormatter = new DecimalFormat("#########"); // removes the thousand separator
+		        IntegerConverter intConverter = new IntegerConverter();
+		        intConverter.setNumberFormat(myFormatter);
+		        ObjectConverterManager.registerConverter(int.class, intConverter);
+		        ObjectConverterManager.registerConverter(Integer.class, intConverter);
+
+		        // Choose formatting of doubles
+		        NumberFormat format = NumberFormat.getNumberInstance();
+		        format.setMinimumFractionDigits(9);
+		        format.setMaximumFractionDigits(10);
+		        DoubleConverter converter = new DoubleConverter(format);
+		        ObjectConverterManager.registerConverter(Double.class, converter);
+		        ObjectConverterManager.registerConverter(double.class, converter);
+
+		        ObjectConverterManager.registerConverter(double.class,
+		            new PercentConverter(), PercentConverter.CONTEXT);
+		        ObjectConverterManager.registerConverter(Double.class,
+		            new PercentConverter(), PercentConverter.CONTEXT);
+
+		        // Register convertors for date class.
+		        ObjectConverterManager.registerConverter(Date.class, new YearNameConverter(), YearNameConverter.CONTEXT);
+		        ObjectConverterManager.registerConverter(Date.class, new QuarterNameConverter(), QuarterNameConverter.CONTEXT);
+		        ObjectConverterManager.registerConverter(Date.class, new MonthNameConverter(), MonthNameConverter.CONTEXT);
+		    }
+
+
 		public FXTradePanel() {
 			initComponents();
 		}
 	
 		private void initComponents() {
+			initJide();
 			setBorder(new LineBorder(Color.black, 1, false));
 			setLayout(new GroupLayout());
 			add(getSwap(), new Constraints(new Leading(7, 12, 12), new Leading(193, 89, 12, 12)));
@@ -1452,18 +1515,21 @@ import constants.CommonConstants;
 									double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) * -1;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(new Double(amt1).toString());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
 									double amt2 = Math.abs(amt1);								
-									out.jTextField2.setText(new Double(amt2/spot).toString());
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2/spot));
 									
 									 double farAmt1 = amt1 * -1;
-							    	 swap.jTextField1.setText(new Double(farAmt1/spot).toString());
+							    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1/spot));
 							    	 System.out.println("farAmt1 " + farAmt1);
-							    	 if (!swap.jTextField4.equals(CommonConstants.BLANKSTRING)) {
+							    	 System.out.println("out.jTextField2"+ out.jTextField2.getText());
+							    	 System.out.println("out.jTextField1"+ out.jTextField1.getText());
+							    	 System.out.println("swap.jTextField2"+ swap.jTextField1.getText());
+							    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText()) && (!swap.jTextField4.getText().equalsIgnoreCase("0"))) {
 							    		 
 							    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
 							    		 double farAmt2 = Math.abs(farAmt1) * -1;								
-							    		 swap.jTextField2.setText(new Double(farAmt2/farRate).toString());
+							    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2/farRate));
 							    	 }
 									
 					    	 } else {
@@ -1471,18 +1537,18 @@ import constants.CommonConstants;
 					    		 	double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) ;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(new Double(amt1).toString());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
 									double amt2 = Math.abs(amt1) * -1;								
-									out.jTextField2.setText(new Double(amt2/spot).toString());
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2/spot));
 									
 									 double farAmt1 = amt1 * -1;
-							    	 swap.jTextField1.setText(String.valueOf(farAmt1));
+							    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1));
 							    	 
-							    	 if (!swap.jTextField4.equals(CommonConstants.BLANKSTRING)) {
+							    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText())) {
 							    		 
 							    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
 							    		 double farAmt2 = Math.abs(farAmt1) * -1;								
-							    		 swap.jTextField2.setText(new Double(farAmt2/farRate).toString());
+							    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2/farRate).toString());
 							    	 }
 					    		 																
 					    	 }
@@ -1519,45 +1585,45 @@ import constants.CommonConstants;
 								
 								double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 								amt1 = Math.abs(amt1) * -1;
-								out.jTextField1.setText(new Double(amt1).toString());
+								out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
 								 double amt2 = Math.abs( (new Double(out.jTextField2.getText()).doubleValue()));
-								 out.jTextField2.setText(new Double(amt2).toString());
+								 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
 								
 							 }  else if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
 								 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
 								 amt2 = Math.abs(amt2) * -1;
-								 out.jTextField2.setText(new Double(amt2).toString());
+								 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
 								 double amt1= Math.abs( (new Double(out.jTextField1.getText()).doubleValue()));
-								 out.jTextField1.setText(new Double(amt1).toString());
+								 out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
 							 }
 							 
 							 if(basicData.buysell.getText().equalsIgnoreCase("SELL/BUY")) {
 									
 								 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) * -1;
-									out.jTextField1.setText(new Double(amt1).toString());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
 									 double amt2 = Math.abs( (new Double(out.jTextField2.getText()).doubleValue()));
-									 out.jTextField2.setText(new Double(amt2).toString());
+									 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
 									 
 									 double samt2 =  (new Double(swap.jTextField1.getText()).doubleValue());
 									 samt2 = Math.abs(samt2) * -1;
 									 double samt1= Math.abs( (new Double(swap.jTextField2.getText()).doubleValue()));
-									 swap.jTextField2.setText(new Double(samt2).toString());
+									 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2));
 									
-									 swap.jTextField1.setText(new Double(samt1).toString());
+									 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(samt1).toString());
 									
 								 }  else if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL")) {
 									 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
 									 amt2 = Math.abs(amt2) * -1;
-									 out.jTextField2.setText(new Double(amt2).toString());
+									 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
 									 double amt1= Math.abs( (new Double(out.jTextField1.getText()).doubleValue()));
-									 out.jTextField1.setText(new Double(amt1).toString());
+									 out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
 									 
 									 double samt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
 										samt1 = Math.abs(samt1) * -1;
-										swap.jTextField1.setText(new Double(samt1).toString());
+										swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(samt1).toString());
 										 double samt2 = Math.abs( (new Double(swap.jTextField2.getText()).doubleValue()));
-										 swap.jTextField2.setText(new Double(samt2).toString());
+										 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(samt2).toString());
 									
 								 }
 							 
@@ -1723,13 +1789,12 @@ import constants.CommonConstants;
 					    public void actionPerformed(java.awt.event.ActionEvent e) {
 					    	try{
 					    	 if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL")) {
-									
-					    		 double amt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
+								  		 double amt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) * -1;
 									double Fspot = (new Double(swap.jTextField4.getText()).doubleValue());
 									
 									double amt2 = Math.abs(amt1 *-1);								
-									swap.jTextField2.setText(new Double(amt2 * Fspot).toString());
+									swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * Fspot).toString());
 									
 					    	 } else {
 					    		 
@@ -1738,7 +1803,7 @@ import constants.CommonConstants;
 									double Fspot = (new Double(swap.jTextField4.getText()).doubleValue());
 									
 									double amt2 = Math.abs(amt1) * -1;								
-									swap.jTextField2.setText(new Double(amt2 * Fspot).toString());
+									swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * Fspot).toString());
 									
 									
 					    		 
@@ -1769,18 +1834,18 @@ import constants.CommonConstants;
 									double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) * -1;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(new Double(amt1).toString());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
 									double amt2 = Math.abs(amt1);								
-									out.jTextField2.setText(new Double((amt1 * -1) * spot).toString());
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp((amt1 * -1) * spot).toString());
 									
 					    	 } else {
 					    		 
 					    		 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) ;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(new Double(amt1).toString());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
 									double amt2 = Math.abs(amt1) * -1;								
-									out.jTextField2.setText(new Double((amt1 * -1) * spot).toString());
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp((amt1 * -1) * spot).toString());
 					    		 
 					    	 }
 		                    }catch(NumberFormatException e1) {
@@ -1810,18 +1875,18 @@ import constants.CommonConstants;
 									double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
 									amt2 = Math.abs(amt2);
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField2.setText(new Double(amt2).toString());
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
 									double amt1 = Math.abs(amt2) * -1;								
-									out.jTextField1.setText(new Double(amt1 / spot).toString());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1 / spot).toString());
 									
 					    	 } else {
 					    		 
 					    		 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
 									amt2 = Math.abs(amt2) * -1 ;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField2.setText(new Double(amt2).toString());
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
 									double amt1 = Math.abs(amt2);								
-									out.jTextField1.setText(new Double((amt2 *-1)/ spot).toString());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp((amt2 *-1)/ spot).toString());
 					    		 
 					    	 }}catch(NumberFormatException e1) {
 		                    		commonUTIL.showAlertMessage("Enter Number ");
@@ -1841,18 +1906,18 @@ import constants.CommonConstants;
 									double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) * -1;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(new Double(amt1).toString());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
 									double amt2 = Math.abs(amt1);								
-									out.jTextField2.setText(new Double(amt2 * spot).toString());
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot).toString());
 									
 					    	 } else {
 					    		 
 					    		 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) ;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(new Double(amt1).toString());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
 									double amt2 = Math.abs(amt1) * -1;								
-									out.jTextField2.setText(new Double(amt1 * spot).toString());
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt1 * spot).toString());
 					    		 
 					    	 }
 		                    	}catch(NumberFormatException e1) {
@@ -1873,9 +1938,9 @@ import constants.CommonConstants;
 		                    		 double amt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
 										amt1 = Math.abs(amt1) ;
 										double spot = (new Double(swap.jTextField4.getText()).doubleValue());
-										swap.jTextField1.setText(new Double(amt1).toString());
+										swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
 										double amt2 = Math.abs(amt1) * -1;								
-										swap.jTextField2.setText(new Double(amt2* spot).toString());
+										swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2* spot).toString());
 		                    		
 									
 					    	 } else {
@@ -1883,9 +1948,9 @@ import constants.CommonConstants;
 					    		 double amt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) * -1;
 									double spot = (new Double(swap.jTextField4.getText()).doubleValue());
-									swap.jTextField1.setText(new Double(amt1).toString());
+									swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
 									double amt2 = Math.abs(amt1);								
-									swap.jTextField2.setText(new Double(amt2*spot).toString());
+									swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot).toString());
 					    		 
 					    	 }
 		                    	 }catch(NumberFormatException e1) {
@@ -1914,18 +1979,18 @@ import constants.CommonConstants;
 									double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) * -1;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(new Double(amt1).toString());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
 									double amt2 = Math.abs(amt1);								
-									out.jTextField2.setText(new Double(amt2 * spot).toString());
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot).toString());
 									
 					    	 } else {
 					    		 
 					    		 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 									amt1 = Math.abs(amt1) ;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(new Double(amt1).toString());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
 									double amt2 = Math.abs(amt1) * -1;								
-									out.jTextField2.setText(new Double(amt2 * spot).toString());
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot));
 					    		 
 					    	 }
 		                    }catch(NumberFormatException e1) {
@@ -2321,8 +2386,8 @@ import constants.CommonConstants;
 								double amt2 = Math.abs(new Double(out.jTextField2.getText()).doubleValue()  * -1);
 								swap.jTextField1.setText(out.jTextField1.getText());
 								swap.jTextField2.setText(out.jTextField2.getText());
-								out.jTextField1.setText(new Double(amt1 * -1).toString());
-								out.jTextField2.setText(new Double(amt2 ).toString());
+								out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1 * -1).toString());
+								out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 ).toString());
 								
 								
 							}
@@ -2333,14 +2398,14 @@ import constants.CommonConstants;
 							
 							
 							double amt1 = Math.abs(new Double(out.jTextField1.getText()).doubleValue() * -1);
-							//	out.jTextField1.setText(new Double(amt1).toString());
+							//	out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
 								
 								double amt2 = Math.abs(new Double(out.jTextField2.getText()).doubleValue());
-							//	out.jTextField1.setText(new Double(amt2).toString());
+							//	out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
 								swap.jTextField1.setText(out.jTextField1.getText());
 								swap.jTextField2.setText(out.jTextField2.getText());
-								out.jTextField1.setText(new Double(amt1).toString());
-								out.jTextField2.setText(new Double(amt2 * -1).toString());
+								out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+								out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * -1).toString());
 							
 						}
 							}
@@ -3402,13 +3467,13 @@ import constants.CommonConstants;
 		   
 		  
 		   
-		    out.jTextField4.setText(new Double(trade.getPrice()).toString());
+		    out.jTextField4.setText(commonUTIL.getStringFromDoubleExp(trade.getPrice()).toString());
 		    if(trade.getType().equalsIgnoreCase("BUY")) {
-		       out.jTextField1.setText(new Double(trade.getQuantity()).toString());
-		       out.jTextField2.setText(new Double(trade.getNominal()).toString());
+		       out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(trade.getQuantity()).toString());
+		       out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(trade.getNominal()).toString());
 		    } else  {
-		    	out.jTextField1.setText(new Double(trade.getQuantity()).toString());
-		    	 out.jTextField2.setText(new Double(trade.getNominal()).toString());
+		    	out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(trade.getQuantity()).toString());
+		    	 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(trade.getNominal()).toString());
 		    }
 		    app.openTrade(trade,false);
 		   
@@ -3419,8 +3484,8 @@ import constants.CommonConstants;
 		    processActionData(actionstatus,productType,trade.getTradedesc1(),out.jTextField6.getText(),remoteTrade);
 		    actionController = false;
 		    if(trade.getTradedesc1().equalsIgnoreCase(FXSWAP)) {
-		    	swap.jTextField1.setText(new Double(trade.getTradeAmount()).toString());
-		    	swap.jTextField2.setText(new Double(trade.getYield()).toString());
+		    	swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(trade.getTradeAmount()).toString());
+		    	swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(trade.getYield()).toString());
 		    	swap.swapDate.setSelectedDate(commonUTIL.stringToDate(trade.getEffectiveDate().toString(),true));
 		    	swap.jTextField4.setValue(trade.getSecondPrice());
 		    	try {
