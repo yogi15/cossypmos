@@ -110,7 +110,7 @@ public class ReportColumns {
 		columnsMaps.put("Cashposition.PositionID","PositionID");
 		columnsMaps.put("Cashposition.Settledate","Settledate");
 		columnsMaps.put("Cashposition.Price","Price");
-		columnsMaps.put("Cashposition.Sign","Sign");
+		//columnsMaps.put("Cashposition.Sign","Sign");
 		columnsMaps.put("Cashposition.Quantity","Quantity");
 		//columnsMaps.put("OpenPos.Quantity","Quantity");
 		columnsMaps.put("Cashposition.ProductType","ProductType");
