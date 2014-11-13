@@ -1547,7 +1547,8 @@ import dsServices.ServerConnectionUtil;
 							    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText())) {
 							    		 
 							    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
-							    		 double farAmt2 = Math.abs(farAmt1) * -1;								
+							    		 double farAmt2 = Math.abs(farAmt1) * -1;	
+							    		 if(farRate != 0)
 							    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2/farRate).toString());
 							    	 }
 					    		 																
