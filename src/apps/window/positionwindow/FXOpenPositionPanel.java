@@ -13,6 +13,8 @@ import org.dyno.visual.swing.layouts.Bilateral;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 
+import util.commonUTIL;
+
 import apps.window.positionwindow.OpenPositionPanel.TableModelUtil;
 import beans.Openpos;
 import beans.Position;
@@ -161,13 +163,13 @@ public class FXOpenPositionPanel extends JFrame {
 		         value =task.getSettleDate();
 		         break;
 		     case 2:
-		    	 value =task.getOpenQuantity();
+		    	 value = commonUTIL.getStringFromDoubleExp(task.getOpenQuantity());
 		         break;
 		     case 3:
-		         value =task.getOpenNominal();
+		         value = commonUTIL.getStringFromDoubleExp(task.getOpenNominal());
 		         break;
 		     case 4:
-		         value = task.getPrice();
+		         value =  commonUTIL.getStringFromDoubleExp(task.getPrice());
 		         break;
 		     
 		    

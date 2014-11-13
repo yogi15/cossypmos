@@ -16,6 +16,8 @@ import org.dyno.visual.swing.layouts.Bilateral;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 
+import util.commonUTIL;
+
 import beans.Liquidation;
 import beans.Openpos;
 import beans.Position;
@@ -139,16 +141,16 @@ public class OpenPositionPanel extends JFrame {
 		         value =task.getTradeDate();
 		         break;
 		     case 4:
-		         value = task.getQuantity();
+		         value = commonUTIL.getStringFromDoubleExp(task.getQuantity());
 		         break;
 		     case 5:
-		         value =task.getOpenQuantity();
+		         value = commonUTIL.getStringFromDoubleExp(task.getOpenQuantity());
 		         break;
 		     case 6:
-		         value = task.getPrice();
+		         value =  commonUTIL.getStringFromDoubleExp(task.getPrice());
 		         break;
 		     case 7:
-		         value = task.getTradeAmt();
+		         value =  commonUTIL.getStringFromDoubleExp(task.getTradeAmt());
 		         break;
 		     case 8:
 		         value =task.getSettleDate();
