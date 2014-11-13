@@ -358,22 +358,22 @@ class TableModelUtil extends AbstractTableModel {
 	         value = task.getPositionId();
 	         break;
 	     case 1:
-	         value =task.getSell_quantity();
+	         value =commonUTIL.getStringFromDoubleExp(task.getSell_quantity());
 	         break;
 	     case 2:
-	    	 value =task.getBuy_quantity();
+	    	 value =commonUTIL.getStringFromDoubleExp(task.getBuy_quantity());
 	         break;
 	     case 3:
-	         value =task.getUnrealized();
+	         value =commonUTIL.getStringFromDoubleExp(task.getUnrealized());
 	         break;
 	     case 4:
-	         value = task.getRealized();
+	         value =commonUTIL.getStringFromDoubleExp( task.getRealized());
 	         break;
 	     case 5:
-	         value =task.getSell_amount();
+	         value =commonUTIL.getStringFromDoubleExp(task.getSell_amount());
 	         break;
 	     case 6:
-	         value = task.getBuy_amount();
+	         value = commonUTIL.getStringFromDoubleExp(task.getBuy_amount());
 	         break;
 	     case 7:
 		    	
