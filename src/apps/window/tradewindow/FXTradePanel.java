@@ -1529,6 +1529,7 @@ import dsServices.ServerConnectionUtil;
 							    		 
 							    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
 							    		 double farAmt2 = Math.abs(farAmt1) * -1;								
+							    		 if(farRate !=0)
 							    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2/farRate));
 							    	 }
 									
@@ -2019,6 +2020,7 @@ import dsServices.ServerConnectionUtil;
 							functionality.jTabbedPane1.add("CurrencyPair",__table);
 							__rows = getRows("Tenor");
 							__table = fillFavourites(__rows,swap.swapDate,null,true);
+							__table = fillFavourites(__rows,out.outRightDate,null,true);
 							functionality.jTabbedPane1.add("Tenor",__table);
 							__rows = getRows("CounterParty");
 							
@@ -2922,6 +2924,7 @@ import dsServices.ServerConnectionUtil;
 			swap.jTextField1.setText("0");
 			swap.jTextField2.setText("0");
 			swap.swapDate.setText("0");
+			swap.jTextField4.setText("0");
 			String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
 	        
 	      //  attributeModel = new DefaultTableModel(attributeColumnName,0);
