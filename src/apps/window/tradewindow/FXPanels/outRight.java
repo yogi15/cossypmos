@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -17,6 +18,7 @@ import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
 import util.NumericTextField;
+import util.commonUTIL;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class outRight extends JPanel {
@@ -28,7 +30,7 @@ public class outRight extends JPanel {
 	public JLabel jLabel4;
 	public JLabel jLabel5;
 	public JTextField jTextField5;
-	DecimalFormat format = new DecimalFormat("##,###,#######");
+	DecimalFormat format = new DecimalFormat("##,###,#######.##");
 	public NumericTextField jTextField1;
 	public NumericTextField jTextField2;
 	public JLabel jLabel6;
@@ -39,7 +41,8 @@ public class outRight extends JPanel {
 	public JLabel jLabel9;
 	public JTextField jTextField6;
 	public com.standbysoft.component.date.swing.JDatePicker outRightDate;
-	public JCheckBox jCheckBox1;
+	
+	//public JCheckBox jCheckBox1;
 	public JLabel jLabel10;
 	public JComboBox jComboBox1;
 	public JCheckBox jCheckBox2;
@@ -86,15 +89,16 @@ public class outRight extends JPanel {
 		}
 		return jLabel10;
 	}
-
-	private JCheckBox getJCheckBox0() {
+	
+	// Today checkbox commented.
+	/*private JCheckBox getJCheckBox0() {
 		if (jCheckBox1 == null) {
 			jCheckBox1 = new JCheckBox();
 			jCheckBox1.setSelected(true);
 			jCheckBox1.setText("Today");
 		}
 		return jCheckBox1;
-	}
+	}*/
 
 	private com.standbysoft.component.date.swing.JDatePicker getJTextField0() {
 		if (outRightDate == null) {
@@ -143,6 +147,13 @@ public class outRight extends JPanel {
 		if (jTextField4 == null) {
 			jTextField4 = new  NumericTextField(10,format);
 		//	jTextField4.setText("jTextField0");
+			jTextField4.addActionListener(new java.awt.event.ActionListener() {
+			    public void actionPerformed(java.awt.event.ActionEvent e) {
+			    //	double dd = new Double(jTextField1.getText()).doubleValue();
+			    //	double dd4 = new Double(jTextField4.getText()).doubleValue();
+			    //	jTextField2.setText(commonUTIL.getStringFromDoubleExp(dd * dd4));
+			    }
+			});
 		}
 		return jTextField4;
 	}
@@ -240,7 +251,7 @@ public class outRight extends JPanel {
 			jPanel0.add(getJLabel6(), new Constraints(new Leading(314, 12, 12), new Leading(41, 24, 12, 12)));
 			jPanel0.add(getJTextField1(), new Constraints(new Leading(148, 150, 10, 10), new Leading(5, 25, 12, 12)));
 			jPanel0.add(getJTextField2(), new Constraints(new Leading(148, 150, 12, 12), new Leading(41, 25, 12, 12)));
-			jPanel0.add(getJCheckBox0(), new Constraints(new Leading(746, 12, 12), new Leading(0, 17, 10, 10)));
+			//jPanel0.add(getJCheckBox0(), new Constraints(new Leading(746, 12, 12), new Leading(0, 17, 10, 10)));
 			jPanel0.add(getJCheckBox2(), new Constraints(new Leading(746, 12, 12), new Leading(16, 19, 12, 12)));
 			//jPanel0.add(getJCheckBox3(), new Constraints(new Leading(746, 69, 12, 12), new Leading(35, 19, 12, 12)));
 			jPanel0.add(getJTextField4(), new Constraints(new Leading(353, 159, 10, 10), new Leading(5, 25, 12, 12)));
@@ -254,6 +265,14 @@ public class outRight extends JPanel {
 			jLabel1.setText("CCY");
 		}
 		return jLabel1;
+	}
+	
+	public static void main(String args[]) {
+		JFrame frame = new JFrame();
+		outRight out = new outRight();
+		frame.add(out.getJPanel0());
+		frame.setVisible(true);
+		frame.setSize(100, 400);
 	}
 
 }
