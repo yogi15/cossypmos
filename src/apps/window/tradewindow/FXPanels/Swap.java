@@ -11,7 +11,6 @@ import javax.swing.border.EtchedBorder;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
-import org.dyno.visual.swing.layouts.Trailing;
 
 import util.NumericTextField;
 
@@ -104,14 +103,14 @@ public class Swap extends JPanel {
 			jPanel0 = new JPanel();
 			jPanel0.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel0.setLayout(new GroupLayout());
-			jPanel0.add(getJLabel0(), new Constraints(new Leading(9, 12, 12), new Leading(12, 12, 12)));
-			jPanel0.add(getJTextField1(), new Constraints(new Leading(69, 166, 12, 12), new Leading(5, 28, 12, 12)));
-			jPanel0.add(getJTextField3(), new Constraints(new Leading(302, 136, 12, 12), new Leading(6, 28, 12, 12)));
-			jPanel0.add(getJLabel2(), new Constraints(new Leading(244, 52, 12, 12), new Leading(12, 12, 12)));
-			jPanel0.add(getJLabel1(), new Constraints(new Leading(9, 12, 12), new Leading(49, 10, 10)));
-			jPanel0.add(getJTextField4(), new Constraints(new Trailing(12, 136, 305, 313), new Leading(44, 28, 12, 12)));
-			jPanel0.add(getJLabel3(), new Constraints(new Leading(244, 57, 30, 160), new Leading(51, 12, 12)));
-			jPanel0.add(getJTextField2(), new Constraints(new Leading(69, 166, 30, 160), new Leading(42, 28, 12, 12)));
+			jPanel0.add(getJLabel0(), new Constraints(new Leading(9, 12, 12), new Leading(16, 12, 12)));
+			jPanel0.add(getJTextField1(), new Constraints(new Leading(69, 166, 12, 12), new Leading(2, 28, 12, 12)));
+			jPanel0.add(getJLabel2(), new Constraints(new Leading(241, 52, 30, 160), new Leading(53, 12, 12)));
+			jPanel0.add(getJTextField3(), new Constraints(new Leading(299, 136, 12, 12), new Leading(39, 28, 12, 12)));
+			jPanel0.add(getJTextField4(), new Constraints(new Leading(299, 136, 12, 12), new Leading(3, 28, 12, 12)));
+			jPanel0.add(getJLabel3(), new Constraints(new Leading(241, 57, 12, 12), new Leading(16, 12, 12)));
+			jPanel0.add(getJLabel1(), new Constraints(new Leading(6, 10, 10), new Leading(53, 12, 12)));
+			jPanel0.add(getJTextField2(), new Constraints(new Leading(69, 166, 12, 12), new Leading(39, 28, 12, 12)));
 		}
 		return jPanel0;
 	}
