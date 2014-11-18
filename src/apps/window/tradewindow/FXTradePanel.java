@@ -1045,7 +1045,25 @@ import dsServices.ServerConnectionUtil;
 						    if(validdateALLFields("NEW")) {
 						    	trade = new Trade();
 						    	mirrorBook.setBookno(0);
-						    
+						    	
+						    	/*int isHoliday = 0;
+								try {
+									isHoliday = remoteReference.checkHolidayOrWeekend((String)basicData.currencyPair.getText().substring(0, 3), 
+											out.outRightDate.getSelectedDateAsText());
+								} catch (RemoteException e2) {
+									// TODO Auto-generated catch block
+									e2.printStackTrace();
+								}
+								
+								if (isHoliday == 1) {
+									
+									commonUTIL.showAlertMessage("Date selected is a Holiday or a weekend. " +
+											"Please select another date");
+									return;
+								} else if (isHoliday == -1) {
+									commonUTIL.showAlertMessage("Server Problem");
+									return;
+								}*/
 						    	removeAttributeFromTrade(trade);
 					             fillTrade(trade,"NEW");
 					             if(trade.getTradedesc1() == null || trade.getTradedesc1().trim().length() == 0) {
@@ -1068,18 +1086,18 @@ import dsServices.ServerConnectionUtil;
 						        		trade.setAutoType("");
 						        		trade.setAttribute("MirrorID","");	
 						        		trade.setAttribute("B2BID","");	
-						        				trade.setAttribute("B2BFlag","");		
-						        						trade.setAttribute("XCurrSOriginalTradeID","");		
-						        								trade.setAttribute("ParitialTo","");		
-						        										trade.setAttribute("SXccySplitID","");		
-						        												trade.setAttribute("ParitialFrom","");		
-						        														trade.setAttribute("XccySplitFrom","");		
-						        																trade.setAttribute("FXccySplitID","");		
-						        																		trade.setAttribute("OffsetID","");		
-						        																				trade.setAttribute("OriginalTradeID","");		
-						        																						trade.setAttribute("MirrorFromTradeID","");	
-						        																						trade.setOffsetid(0);
-						        																					//trade.seto
+						        		trade.setAttribute("B2BFlag","");		
+						        		trade.setAttribute("XCurrSOriginalTradeID","");		
+						        		trade.setAttribute("ParitialTo","");		
+						        		trade.setAttribute("SXccySplitID","");		
+						        		trade.setAttribute("ParitialFrom","");		
+						        		trade.setAttribute("XccySplitFrom","");		
+						        		trade.setAttribute("FXccySplitID","");		
+						        		trade.setAttribute("OffsetID","");		
+						        		trade.setAttribute("OriginalTradeID","");		
+										trade.setAttribute("MirrorFromTradeID","");	
+										trade.setOffsetid(0);
+									//trade.seto
 						        		trade.setParentID(0);
 						        		trade.setB2Bflag(false);
 						        		trade.setB2bid(0);
@@ -1135,7 +1153,7 @@ import dsServices.ServerConnectionUtil;
 			    	
 			    });
 			        // for currency split functionality. 
-			        out.jCheckBox2.addMouseListener(new java.awt.event.MouseAdapter() {
+			       /* out.jCheckBox2.addMouseListener(new java.awt.event.MouseAdapter() {
 	
 						@Override
 						public void mouseClicked(MouseEvent e) {
@@ -1183,7 +1201,7 @@ import dsServices.ServerConnectionUtil;
 							}
 							
 						}
-			        });
+			        });*/
 			        
 			        functionality.jCheckBox0.addMouseListener(new java.awt.event.MouseAdapter() {
 	
@@ -1517,10 +1535,10 @@ import dsServices.ServerConnectionUtil;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
 									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
 									double amt2 = Math.abs(amt1);								
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2/spot));
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot));
 									
 									 double farAmt1 = amt1 * -1;
-							    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1/spot));
+							    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1*spot));
 							    	 System.out.println("farAmt1 " + farAmt1);
 							    	 System.out.println("out.jTextField2"+ out.jTextField2.getText());
 							    	 System.out.println("out.jTextField1"+ out.jTextField1.getText());
@@ -1530,7 +1548,7 @@ import dsServices.ServerConnectionUtil;
 							    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
 							    		 double farAmt2 = Math.abs(farAmt1) * -1;								
 							    		 if(farRate !=0)
-							    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2/farRate));
+							    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2*farRate));
 							    	 }
 									
 					    	 } else {
@@ -1539,8 +1557,9 @@ import dsServices.ServerConnectionUtil;
 									amt1 = Math.abs(amt1) ;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
 									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
-									double amt2 = Math.abs(amt1) * -1;								
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2/spot));
+									double amt2 = Math.abs(amt1) * -1;		
+									System.out.println("------------- "+commonUTIL.getStringFromDoubleExp(amt2*spot));
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot));
 									
 									 double farAmt1 = amt1 * -1;
 							    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1));
@@ -1550,7 +1569,7 @@ import dsServices.ServerConnectionUtil;
 							    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
 							    		 double farAmt2 = Math.abs(farAmt1) * -1;	
 							    		 if(farRate != 0)
-							    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2/farRate).toString());
+							    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2*farRate).toString());
 							    	 }
 					    		 																
 					    	 }
@@ -1634,7 +1653,7 @@ import dsServices.ServerConnectionUtil;
 						 }
 					 });
 			        
-			        out.jCheckBox1.addMouseListener(new java.awt.event.MouseAdapter() {
+			    /*    out.jCheckBox1.addMouseListener(new java.awt.event.MouseAdapter() {
 						 public void mouseClicked(MouseEvent e) {
 							 if(!basicData.jRadioButton2.isSelected()) {
 								 
@@ -1661,7 +1680,7 @@ import dsServices.ServerConnectionUtil;
 						 
 					
 						 
-		          });  
+		          });  */
 			        
 			        basicData.currencyPair.addActionListener(new ActionListener() {
 						
@@ -2270,7 +2289,25 @@ import dsServices.ServerConnectionUtil;
 							if(!validdateALLFields("SAVE")) {
 								return;
 							}	else {
-										
+								/*int isHoliday = 0;
+								try {
+									isHoliday = remoteReference.checkHolidayOrWeekend((String)basicData.currencyPair.getText().substring(0, 3), 
+											out.outRightDate.getSelectedDateAsText());
+								} catch (RemoteException e2) {
+									// TODO Auto-generated catch block
+									e2.printStackTrace();
+								}
+								
+								if (isHoliday == 1) {
+									
+									commonUTIL.showAlertMessage("Date selected is a Holiday or a weekend. " +
+											"Please select another date");
+									return;
+								} else if (isHoliday == -1) {
+									commonUTIL.showAlertMessage("Server Problem");
+									return;
+								}*/
+								
 					             fillTrade(trade,"NEW");
 							}
 			                 trade.setUserID(getUser().getId());
@@ -2345,7 +2382,7 @@ import dsServices.ServerConnectionUtil;
 							swap.setVisible(false);
 							functionality.jButton0.setEnabled(false);
 							productSubType = "FXFORWARD";
-							out.jCheckBox1.setSelected(false);
+							//out.jCheckBox1.setSelected(false);
 							if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL")) {
 								basicData.buysell.setText("BUY");
 							}
@@ -2458,7 +2495,7 @@ import dsServices.ServerConnectionUtil;
 								basicData.jRadioButton5.setSelected(false);
 								
 						    	basicData.jRadioButton0.setSelected(false);
-								commonUTIL.showAlertMessage("Select Currency Pair");
+								//commonUTIL.showAlertMessage("Select Currency Pair");
 								return;
 							}
 							out.jCheckBox2.setEnabled(false);
@@ -2617,17 +2654,17 @@ import dsServices.ServerConnectionUtil;
 			trade.setAutoType("");
 			trade.setAttribute("MirrorID","");	
 			trade.setAttribute("B2BID","");	
-					trade.setAttribute("B2BFlag","");		
-							trade.setAttribute("XCurrSOriginalTradeID","");		
-									trade.setAttribute("ParitialTo","");		
-											trade.setAttribute("SXccySplitID","");		
-													trade.setAttribute("ParitialFrom","");		
-															trade.setAttribute("XccySplitFrom","");		
-																	trade.setAttribute("FXccySplitID","");		
-																			trade.setAttribute("OffsetID","");		
-																					trade.setAttribute("OriginalTradeID","");		
-																							trade.setAttribute("MirrorFromTradeID","");	
-																							trade.setOffsetid(0);
+			trade.setAttribute("B2BFlag","");		
+			trade.setAttribute("XCurrSOriginalTradeID","");		
+			trade.setAttribute("ParitialTo","");		
+			trade.setAttribute("SXccySplitID","");		
+			trade.setAttribute("ParitialFrom","");		
+			trade.setAttribute("XccySplitFrom","");		
+			trade.setAttribute("FXccySplitID","");		
+			trade.setAttribute("OffsetID","");		
+			trade.setAttribute("OriginalTradeID","");		
+			trade.setAttribute("MirrorFromTradeID","");	
+			trade.setOffsetid(0);
 																						//trade.seto
 			trade.setParentID(0);
 			trade.setB2Bflag(false);
@@ -2693,6 +2730,22 @@ import dsServices.ServerConnectionUtil;
 			}
 			
 		}
+		
+		/*public int checkHolidayOrWeekend() {
+			
+			int isHoliday = 0;
+			try {
+				isHoliday = remoteReference.checkHolidayOrWeekend((String)basicData.currencyPair.getText().substring(0, 3), 
+						out.outRightDate.getSelectedDateAsText());
+			} catch (RemoteException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+			
+			return isHoliday;
+		
+		}*/
+		
 		public boolean validdateALLFields(String type) {
 			boolean flag = false;
 			if(!type.equalsIgnoreCase("NEW")) {
@@ -2797,7 +2850,7 @@ import dsServices.ServerConnectionUtil;
 		    		int rowCount = this.attributes.getTableRowCount();
 		    		attru.setName(tradeAttributes.getName().toString());
 		    	//	attru.setName(tradeAttributes.getName().toString());
-		    		if(tradeAttributes.getName().equalsIgnoreCase("TradeDate")) {
+		    		if(tradeAttributes.getName().equalsIgnoreCase("Trade Date") || tradeAttributes.getName().equalsIgnoreCase("TradeModifiedDateTime")) {
 		    	    	
 		    			attru.setValue(commonUTIL.getCurrentDateTime());
 		    	    }
@@ -2813,7 +2866,8 @@ import dsServices.ServerConnectionUtil;
 		    	}
 		    			
 		    	}
-		   	
+		    	
+		    	this.attributes.tradeAction = "New";
 		    	   /* if(tradeAttributes.getName().equalsIgnoreCase("TradeDate")) {
 		    	    	model.insertRow(i, new Object[]{tradeAttributes.getName(),commonUTIL.getCurrentDateTime()});
 		    	    	attributes.put(tradeAttributes.getName(),(String) model.getValueAt(i, 1));
@@ -3330,7 +3384,8 @@ import dsServices.ServerConnectionUtil;
 			}
 			trade.setTraderID(new Integer(basicData.jTextField7.getName()).intValue());
 			trade.setTradeDate(commonUTIL.getCurrentDateTime());
-		    trade.setDelivertyDate(out.outRightDate.getSelectedDateAsText());
+		    
+			trade.setDelivertyDate(out.outRightDate.getSelectedDateAsText());
 		    trade.setStatus(out.jTextField6.getText());
 		    trade.setProductType(productType);
 		   
@@ -3537,8 +3592,8 @@ import dsServices.ServerConnectionUtil;
 				 functionality.jButton0.setEnabled(true);
 				 fwdOp.primaryC.setValue(trade.getQuantity());
 				 fwdOp.quotingC.setValue(trade.getNominal());
-				  rollpanel.setVisible(false);
-		    	productSubType = FXFORWARDOPTION;
+				 rollpanel.setVisible(false);
+				 productSubType = FXFORWARDOPTION;
 		    	 try {
 		    		
 		    		childTrades 	= remoteTrade.getChildTrades(trade.getId());
@@ -3673,9 +3728,14 @@ import dsServices.ServerConnectionUtil;
 	    						int atRows = attributes.jTable1.getRowCount();
 	    						for(int t=0;t <atRows; t++) {
 	    									String atName = (String) attributes.jTable1.getModel().getValueAt(t,0);
-	    									if(atName.trim().equalsIgnoreCase(attnameName.trim())) {
+	    									if(atName.trim().equalsIgnoreCase(attnameName)) {
 	    										attributes.jTable1.setValueAt(attvalue, t, 1);
 	    										attributeDataValue.put(attnameName,attvalue);
+	    										
+	    										if(atName.trim().equalsIgnoreCase("Trade Date")){
+	    											
+	    											attributes.tradeAction = "open";
+	    										}
 	    									} 
 	    						}
 	    				}
