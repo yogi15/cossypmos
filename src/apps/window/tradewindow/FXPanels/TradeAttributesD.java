@@ -50,7 +50,7 @@ public class TradeAttributesD extends JPanel {
 	public JTable jTable1;
 	private JScrollPane jScrollPane0;
 	private JTabbedPane jTabbedPane0;
-	
+	public static String tradeAction = "";
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	
 	Vector<Attribute> data = new Vector<Attribute>();
@@ -336,9 +336,16 @@ public class TradeAttributesD extends JPanel {
 
 		public boolean isCellEditable(int row, int col) {
 			
-			return true;
+			String attrName = getValueAt(row, 0).toString();
+			
+			if ((attrName.equals("Trade Date")|| attrName.equals("TradeModifiedDateTime")) && !tradeAction.equals("New")) {
+				
+				return false;
+			}
+			
+			return true;		
 		}
-
+		
 		public void setValueAt(Object value, int row, int col) {
 			if(row == -1)
 				return;
@@ -723,6 +730,11 @@ class MyTableCellEditor  extends DefaultCellEditor {
     return getValue();
   }
 
+}
+
+public void isCellEditable(int t, int i) {
+	// TODO Auto-generated method stub
+	
 }
 
 
