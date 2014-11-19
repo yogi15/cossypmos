@@ -1046,29 +1046,58 @@ import dsServices.ServerConnectionUtil;
 						    	trade = new Trade();
 						    	mirrorBook.setBookno(0);
 						    	
-						    	/*int isHoliday = 0;
+						    	removeAttributeFromTrade(trade);
+					            fillTrade(trade,"NEW");
+					             
+						    	int isHoliday = 0;
 								try {
-									isHoliday = remoteReference.checkHolidayOrWeekend((String)basicData.currencyPair.getText().substring(0, 3), 
-											out.outRightDate.getSelectedDateAsText());
+									
+									isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(0, 3), 
+											trade.getDelivertyDate());
+									
+									if (isHoliday == 1) {
+										
+										commonUTIL.showAlertMessage("Near Date selected is a Holiday or a weekend. " +
+												"Please select another date");
+										out.outRightDate.setBackground(Color.red);
+									}
+									
+									if (isHoliday != 1) {
+										
+										isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(5, 7), 
+												trade.getEffectiveDate());
+										
+										if (isHoliday == 1) {
+											
+											commonUTIL.showAlertMessage("Far Date selected is a Holiday or a weekend. " +
+													"Please select another date");
+											out.outRightDate.setBackground(Color.red);
+										}
+										
+									} else if (isHoliday == -1) {
+										commonUTIL.showAlertMessage("Server Problem");
+										return;
+									}
+									
 								} catch (RemoteException e2) {
 									// TODO Auto-generated catch block
 									e2.printStackTrace();
 								}
-								
-								if (isHoliday == 1) {
-									
-									commonUTIL.showAlertMessage("Date selected is a Holiday or a weekend. " +
-											"Please select another date");
-									return;
-								} else if (isHoliday == -1) {
-									commonUTIL.showAlertMessage("Server Problem");
-									return;
-								}*/
-						    	removeAttributeFromTrade(trade);
-					             fillTrade(trade,"NEW");
+							
+						    	
+						    	/**/
+						    	
 					             if(trade.getTradedesc1() == null || trade.getTradedesc1().trim().length() == 0) {
 					            	 commonUTIL.showAlertMessage("Product not Registered");
 					            	 return;
+					             }
+					             
+					             if ( (commonUTIL.stringToDate(trade.getEffectiveDate(), true)).before( 
+					            		 commonUTIL.stringToDate(trade.getDelivertyDate(), true)) ) {
+					            	 	
+					            	 commonUTIL.showAlertMessage("Far Date cannot be less than Near Date");
+					            	 return;
+					            	 
 					             }
 					             if(trade.getTradedesc1() != null && trade.getTradedesc1().trim().length() > 0)  {
 				            		
@@ -1144,12 +1173,7 @@ import dsServices.ServerConnectionUtil;
 						    
 						
 							}
-	
-						
-							
-						
-						
-			    
+
 			    	
 			    });
 			        // for currency split functionality. 
@@ -1531,14 +1555,14 @@ import dsServices.ServerConnectionUtil;
 					    	 if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL") || basicData.buysell.getText().equalsIgnoreCase("BUY")) {
 									
 									double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) * -1;
+									amt1 = Math.abs(amt1);
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
 									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
-									double amt2 = Math.abs(amt1);								
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot));
+									double amt2 = amt1* spot;								
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2));
 									
 									 double farAmt1 = amt1 * -1;
-							    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1*spot));
+							    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1));
 							    	 System.out.println("farAmt1 " + farAmt1);
 							    	 System.out.println("out.jTextField2"+ out.jTextField2.getText());
 							    	 System.out.println("out.jTextField1"+ out.jTextField1.getText());
@@ -1546,7 +1570,7 @@ import dsServices.ServerConnectionUtil;
 							    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText()) && (!swap.jTextField4.getText().equalsIgnoreCase("0"))) {
 							    		 
 							    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
-							    		 double farAmt2 = Math.abs(farAmt1) * -1;								
+							    		 double farAmt2 = Math.abs(farAmt1);								
 							    		 if(farRate !=0)
 							    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2*farRate));
 							    	 }
@@ -1554,7 +1578,6 @@ import dsServices.ServerConnectionUtil;
 					    	 } else {
 					    		 
 					    		 	double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) ;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
 									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
 									double amt2 = Math.abs(amt1) * -1;		
@@ -2289,27 +2312,54 @@ import dsServices.ServerConnectionUtil;
 							if(!validdateALLFields("SAVE")) {
 								return;
 							}	else {
-								/*int isHoliday = 0;
+								fillTrade(trade,"NEW");
+								
+								int isHoliday = 0;
 								try {
-									isHoliday = remoteReference.checkHolidayOrWeekend((String)basicData.currencyPair.getText().substring(0, 3), 
-											out.outRightDate.getSelectedDateAsText());
+									
+									isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(0, 3), 
+											trade.getDelivertyDate());
+									
+									if (isHoliday == 1) {
+										
+										commonUTIL.showAlertMessage("Near Date selected is a Holiday or a weekend. " +
+												"Please select another date");
+										out.outRightDate.setBackground(Color.red);
+									}
+									
+									if (isHoliday != 1) {
+										
+										isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(5, 7), 
+												trade.getEffectiveDate());
+										
+										if (isHoliday == 1) {
+											
+											commonUTIL.showAlertMessage("Far Date selected is a Holiday or a weekend. " +
+													"Please select another date");
+											out.outRightDate.setBackground(Color.red);
+										}
+										
+									} else if (isHoliday == -1) {
+										commonUTIL.showAlertMessage("Server Problem");
+										return;
+									}
+									
 								} catch (RemoteException e2) {
 									// TODO Auto-generated catch block
 									e2.printStackTrace();
 								}
 								
-								if (isHoliday == 1) {
-									
-									commonUTIL.showAlertMessage("Date selected is a Holiday or a weekend. " +
-											"Please select another date");
-									return;
-								} else if (isHoliday == -1) {
-									commonUTIL.showAlertMessage("Server Problem");
-									return;
-								}*/
-								
-					             fillTrade(trade,"NEW");
 							}
+							
+							
+				             
+				             if ( (commonUTIL.stringToDate(trade.getEffectiveDate(), true)).before( 
+				            		 commonUTIL.stringToDate(trade.getDelivertyDate(), true)) ) {
+				            	 	
+				            	 commonUTIL.showAlertMessage("Far Date cannot be less than Near Date");
+				            	 return;
+				            	 
+				             }
 			                 trade.setUserID(getUser().getId());
 			                 try {
 			                	 Vector<String> message = new Vector<String>();
@@ -2731,20 +2781,7 @@ import dsServices.ServerConnectionUtil;
 			
 		}
 		
-		/*public int checkHolidayOrWeekend() {
-			
-			int isHoliday = 0;
-			try {
-				isHoliday = remoteReference.checkHolidayOrWeekend((String)basicData.currencyPair.getText().substring(0, 3), 
-						out.outRightDate.getSelectedDateAsText());
-			} catch (RemoteException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
-			
-			return isHoliday;
-		
-		}*/
+		/**/
 		
 		public boolean validdateALLFields(String type) {
 			boolean flag = false;
