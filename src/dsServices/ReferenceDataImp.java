@@ -840,6 +840,13 @@ public class ReferenceDataImp implements RemoteReferenceData {
 		// TODO Auto-generated method stub
 		return HolidaySQL.selectALL(dsSQL.getConn());
 	}
+	
+	@Override
+	public int checkHolidayOrWeekend(String currency, String checkDate) throws RemoteException {
+		// TODO Auto-generated method stub
+		return HolidaySQL.checkHolidayOrWeekend(currency,checkDate, dsSQL.getConn());
+	}
+	
 
 	@Override
 	public boolean saveCurrencyPair(CurrencyPair cp) throws RemoteException {
