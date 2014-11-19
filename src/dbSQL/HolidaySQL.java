@@ -330,6 +330,57 @@ protected static int selectMax(Connection con ) {
      return Holidays;
  }
 
+ public static int checkHolidayOrWeekend(String currency, String date, Connection con ) {
+	 
+	 int j = 0;
+        PreparedStatement stmt = null;
+        Vector Holidays = new Vector();
+        Holiday Holiday = new Holiday();
+        String sql = "";
+	 try {
+		 con.setAutoCommit(false);
+		  sql = SELECTONE + 
+		  new StringBuffer(" currency = '")
+		  .append(currency)
+		  .append("' ")
+		  .append("and")
+		  .append("(hdate like ")
+		  .append("'%" + date +"%' ")
+		  .append("or ")
+		  .append("to_char(to_date('" + date + "', 'dd/mm/yyyy'), 'd') = fweekday ")
+		  .append("or ")
+		  .append("to_char(to_date('" + date + "', 'dd/mm/yyyy'), 'd') = sweekday ")
+		  .append(")")
+		  .toString();
+		  
+		 stmt = dsSQL.newPreparedStatement(con,  sql);
+         
+         ResultSet rs = stmt.executeQuery();
+         commonUTIL.display(" HolidaySQLcheckHolidayOrWeekend", sql);
+         if (rs.next()) {
+        	        
+            return 1;
+         
+         } else {
+        	 
+        	 return 0;
+         }
+        
+	 } catch (Exception e) {
+		 commonUTIL.displayError("HolidaySQL","select :: " + sql,e);
+		 return -2;
+           
+        }
+        finally {
+           try {
+			stmt.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("HolidaySQL","select"+ sql,e);
+		}
+        }
+       
+ }
 }
 
 
