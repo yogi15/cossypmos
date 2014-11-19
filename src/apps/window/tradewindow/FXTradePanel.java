@@ -1064,7 +1064,7 @@ import dsServices.ServerConnectionUtil;
 									
 									if (isHoliday != 1) {
 										
-										isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(5, 7), 
+										isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(4, 7), 
 												trade.getEffectiveDate());
 										
 										if (isHoliday == 1) {
@@ -2329,7 +2329,7 @@ import dsServices.ServerConnectionUtil;
 									
 									if (isHoliday != 1) {
 										
-										isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(5, 7), 
+										isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(4, 7), 
 												trade.getEffectiveDate());
 										
 										if (isHoliday == 1) {
