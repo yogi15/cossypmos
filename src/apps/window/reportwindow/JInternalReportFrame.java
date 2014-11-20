@@ -281,7 +281,9 @@ public class JInternalReportFrame extends JInternalFrame {
 						sqlW = columnSQL + " where " + where;
 					}
 				} else {
-					sqlW = columnSQL + where;
+					where = getFilterValues().genearteGroupClauseForForwardLadder(where, columnSQL);
+					
+					sqlW = columnSQL  + " where " + where;
 				}
 				sqlW = 	getFilterValues().checkTableAliasForAttributes(sqlW);
 				// + " where   " + where;
@@ -309,6 +311,7 @@ public class JInternalReportFrame extends JInternalFrame {
 						    	}
 						    
 						} else {
+							
 							sqlW =  getFilterValues().changeColumnNameForForwoardReport(sqlW);
 						//	sqlW = getFilterValues().createWhereOnAttributes(sqlW,where);
 							//commonUTIL.showAlertMessage(sql);
