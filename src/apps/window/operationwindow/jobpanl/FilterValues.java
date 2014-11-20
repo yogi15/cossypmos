@@ -10,6 +10,8 @@ import java.util.Vector;
 
 import javax.swing.JComboBox;
 
+import com.jidesoft.thirdparty.prefuse.data.util.Index;
+
 import beans.Book;
 import beans.FilterBean;
 import beans.LegalEntity;
@@ -121,13 +123,22 @@ public class FilterValues {
 		replaceColumnNameOnSQL
 				.put("Posting.DebitAccId",
 						" (select accountname from ACCOUNT where id = Posting.DebitAccId) DebitAcc");
-
-		forwardColumnMaps.put("Monthly", "TO_CHAR(settledate,'MON')");
-		forwardColumnMaps.put("Daily", "TO_CHAR(settledate,'DD')");
-		forwardColumnMaps.put("Weekly", "TO_CHAR(settledate,'WW')");
-		forwardColumnMaps.put("Yearly", "TO_CHAR(settledate,'YYYY')");
-		forwardColumnMaps.put("Quarterly", "TO_CHAR(settledate,'Q')");
-
+		
+		forwardColumnMaps.put("1D", " + 1");
+		forwardColumnMaps.put("2D", " + 2");
+		forwardColumnMaps.put("3D", " + 3");
+		forwardColumnMaps.put("4D", " + 4");
+		forwardColumnMaps.put("5D", " + 5");
+		forwardColumnMaps.put("1W", " + 7");
+		forwardColumnMaps.put("2W", " + 14");
+		forwardColumnMaps.put("3W", " + 21");
+		forwardColumnMaps.put("1M", "1");
+		forwardColumnMaps.put("2M", "2");
+		forwardColumnMaps.put("3M", "3");
+		forwardColumnMaps.put("4M", "4");
+		forwardColumnMaps.put("1Y", "12");
+		forwardColumnMaps.put("2Y", "24");
+		
 		forwardColumnMaps
 				.put("TO_CHAR(settledate,'Q')",
 						" decode(TO_CHAR(settledate,'Q'),'1','31 MARCH','2','30 JUNE', '3','30 SEPT','4','31 DEC') Quarterly ");
@@ -244,7 +255,7 @@ public class FilterValues {
 			try {
 				domainData = (Vector) remote.getStartUPData(domainName);
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
+				
 				commonUTIL.display("FilterValues", "getDomainValues");
 			}
 			if (domainData != null) {
@@ -417,7 +428,7 @@ public class FilterValues {
 			actions = (Vector) remoteBO.getOnlyAction(transferID);
 			return actions;
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 			return null;
 		}
@@ -429,7 +440,7 @@ public class FilterValues {
 		try {
 			return remoteBO.selectTransfer(transfer);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 			return null;
 		}
@@ -440,7 +451,7 @@ public class FilterValues {
 		try {
 			return remoteTrade.selectTrade(tradeId);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 			return null;
 		}
@@ -452,7 +463,7 @@ public class FilterValues {
 			actions = (Vector) remoteTrade.getOnlyAction(trade);
 			return actions;
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 			return null;
 		}
@@ -491,7 +502,7 @@ public class FilterValues {
 
 			return counterParty;
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			commonUTIL.displayError("FilterValues ", " getCounterParty", e);
 			return null;
 		}
@@ -512,7 +523,7 @@ public class FilterValues {
 
 			return books;
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			commonUTIL.displayError("FilterValues ", " getBooks", e);
 			return null;
 		}
@@ -535,7 +546,7 @@ public class FilterValues {
 	Hashtable<String, String[]> stringarray = new Hashtable<String, String[]>();
 
 	public String createWhere(Vector<FilterBean> jobdetails) {
-		// TODO Auto-generated method stub
+		
 		String where = "";
 		if (jobdetails == null || jobdetails.size() == 0
 				|| jobdetails.isEmpty())
@@ -609,7 +620,7 @@ public class FilterValues {
 	}
 
 	public String createWhere(Vector<FilterBean> jobdetails, String tableName1) {
-		// TODO Auto-generated method stub
+		
 		String where = "";
 		Vector<FilterBean> attributesFilterBeans = new Vector<FilterBean>();
 		boolean isForwardLadder = false;
@@ -661,10 +672,26 @@ public class FilterValues {
 							+ tableNames.get(tableName1).toLowerCase() + "."
 							+ createCriteria(bean, tableName1) ;
 
+				} else if (bean.getColumnName().endsWith("Ladder")) {
+					
+					if (bean.getColumnValues().contains("D") || bean.getColumnValues().contains("W")) {
+						
+						where = where.substring(0, where.indexOf("and")) + " "
+						+ getForwardLadderWhereClause(bean.getColumnValues());
+						
+					} else if (bean.getColumnValues().contains("M") || bean.getColumnValues().contains("Y") ) {
+						
+						where = where.substring(0, where.indexOf("=")) + "= add_months( " + where.substring(where.indexOf("=")+1, where.indexOf("and") ) + ", "
+						+ getForwardLadderWhereClause(bean.getColumnValues()) + " )";
+						
+					}
+					
 				} else {
+					
 					where = where + " "
-							+ tableNames.get(tableName1).toLowerCase() + "."
-							+ createCriteria(bean, tableName1);
+					+ tableNames.get(tableName1).toLowerCase() + "."
+					+ createCriteria(bean, tableName1);
+					
 				}
 				if (i != jobdetails.size() - 1) {
 					if (bean.getAnd_or() == null || bean.getAnd_or().isEmpty())
@@ -681,15 +708,16 @@ public class FilterValues {
 		where = addAttributesFilters(attributesFilterBeans, where);
 		if (tableName1.equalsIgnoreCase("trade"))
 			where = where + " and trade.version >= 0 ";
-		if (isForwardLadder) {
+		/* 20/11/2014
+		 * if (isForwardLadder) {
 			where = genearteGroupClauseForForwardLadder(where);
-		}
+		}*/
 		return where;
 	}
 
 	private String addAttributesFilters(
 			Vector<FilterBean> attributesFilterBeans, String where) {
-		// TODO Auto-generated method stub attributesWhereClause
+		 
 		for (int i = 0; i < attributesFilterBeans.size(); i++) {
 			FilterBean bean = attributesFilterBeans.get(i);
 			String whereClause = attributesWhereClause
@@ -704,7 +732,7 @@ public class FilterValues {
 	}
 
 	private String genearteGroupClauseForForwardLadder(String where) {
-		// TODO Auto-generated method stub
+		
 		String whereC = where;
 		boolean addWhere = false;
 		String[] whereSplit = null;
@@ -751,7 +779,23 @@ public class FilterValues {
 			whereClause = " where " + whereClause;
 		return whereClause;
 	}
-
+	
+	public String genearteGroupClauseForForwardLadder(String where, String columnSQL) {
+		
+		StringBuffer stringBuf = new StringBuffer(where).append(" group by ");
+		
+		String colsplit [] = columnSQL.substring(columnSQL.indexOf("Total,") + 7, columnSQL.indexOf("from")).split(",");
+		
+		for(String addString : colsplit) {
+			
+			stringBuf = stringBuf.append(addString).append(", ");
+			
+		}
+		where = stringBuf.toString();
+		
+		return where.substring(0, where.lastIndexOf(",")-1);
+	}
+	
 	private String createCriteriaOnBook(Vector<Book> books, FilterBean bean) {
 		String bookCriteria = "";
 		String ids = bean.getColumnValues();
@@ -851,7 +895,7 @@ public class FilterValues {
 
 	private String getForwardLadderWhereClause(String values) {
 
-		// TODO Auto-generated method stub
+		
 		if (values.contains(",")) {
 			String v[] = values.split(",");
 			String value = "";
@@ -926,12 +970,12 @@ public class FilterValues {
 	}
 
 	public String getids(String columnValues, String values) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	public String getFilterValues(String ids, String columnName) {
-		// TODO Auto-generated method stub
+		
 		String bookIds = "";
 		if (ids == null || ids.isEmpty())
 			return null;
@@ -944,24 +988,24 @@ public class FilterValues {
 	}
 
 	public void updateTransferAndPublissh(Transfer transfer, int userID) {
-		// TODO Auto-generated method stub
+		
 		try {
 			transfer.setUserid(userID);
 			remoteBO.updateTransferAndPublish(transfer, userID);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 	}
 
 	public int updateTraderAndPublissh(Trade trade, int userID) {
-		// TODO Auto-generated method stub
+		
 		try {
 			trade.setUserID(userID);
 			return remoteTrade.saveTrade(trade);
 
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 			return -1;
 		}
@@ -973,19 +1017,19 @@ public class FilterValues {
 		try {
 			nettedTransfer = (Vector) remoteBO.getNettedTransfers(transferID);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		return nettedTransfer;
 	}
 
 	public void savePublishTask(Task task, String status) {
-		// TODO Auto-generated method stub
+		
 		try {
 			remoteTask.updateTaskStatus(task, task.getUserid(),
 					task.getUser_name(), status);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			commonUTIL.displayError("FilterValues", "savePublishTask", e);
 		}
 
@@ -1099,7 +1143,7 @@ public class FilterValues {
 
 		}
 		sql = sql.trim().substring(0, sql.length() - 1);
-		// TODO Auto-generated method stub
+
 		whereClause = whereClause.substring(0, whereClause.lastIndexOf("and"));
 		sql = sql + " " + tablename + " " + whereClause;
 		return sql;
@@ -1136,25 +1180,25 @@ public class FilterValues {
 	}
 
 	public String getColumnsForForwardLadder(Vector<FilterBean> filterBeanData) {
-		// TODO Auto-generated method stub
-		String sql = " select sum(actualamt) Total, Currency ,";
+		
+		String sql = " select sum(actualamt) Total, Currency , settledate ";
 		String cols[] = null;
 		for (int i = 0; i < filterBeanData.size(); i++) {
 			FilterBean bean = (FilterBean) filterBeanData.get(i);
 			if (bean.getColumnName().equalsIgnoreCase("Ladder")) {
-				if (bean.getColumnValues().contains(",")) {
+				/*if (bean.getColumnValues().contains(",")) {
 					cols = bean.getColumnValues().split(",");
 					sql = sql + forwardColumnMaps.get(cols[0]);
 				} else {
 					sql = sql + forwardColumnMaps.get(bean.getColumnValues())
 							+ ",";
-				}
+				}*/
 			} else if (bean.getColumnName().equalsIgnoreCase("SettleDate")) {
 
 			} else if (bean.getColumnName().equalsIgnoreCase("Currency")) {
 
 			} else {
-				sql = sql + bean.getColumnName() + ",";
+				sql = sql + "," + bean.getColumnName() ;
 			}
 
 		}
@@ -1218,7 +1262,7 @@ public class FilterValues {
 	}
 
 	public String changeColumnNameForForwoardReport(String sqlW) {
-		// TODO Auto-generated method stub
+		
 		String sql = sqlW.substring(0, sqlW.indexOf("from"));
 		String afterFrom = sqlW.substring(sqlW.indexOf("from"),sqlW.length());
 		Enumeration keys = forwardColumnMaps.keys();
@@ -1237,7 +1281,7 @@ public class FilterValues {
 	}
 
 	public String changeColumnNameForNormalReport(String sqlW) {
-		// TODO Auto-generated method stub
+		
 		String sql = sqlW;
 		Enumeration keys = replaceColumnNameOnSQL.keys();
 		while (keys.hasMoreElements()) {
