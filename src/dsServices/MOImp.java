@@ -54,6 +54,7 @@ public class MOImp implements RemoteMO {
 		return OpenPosSQL.selectOpenposOnTradeID(tradeID, dsSQL.getConn());
 		
 	}
+	
 	@Override
 	public Vector getOpenPositionOnProductSubType(String distinctproductSubType) throws RemoteException {
 		// TODO Auto-generated method stub
@@ -202,6 +203,8 @@ public class MOImp implements RemoteMO {
 		cashPosition1.setQuotingCurr(newpos.getQuotingCurr());
 		cashPosition1.setCurrency(newpos.getPrimaryCurr());
 		 cashPosition1.setActualAmt(cashPosition1.getQuantity());
+		 cashPosition1.setId(newpos.getId());
+		 cashPosition1.setLeg(0);
 		cashPositions.add(cashPosition1);
 			CashPosition cashPosition2 = new CashPosition();
 			cashPosition2.setBookId(newpos.getBookId());
@@ -226,6 +229,8 @@ public class MOImp implements RemoteMO {
 				cashPosition2.setPrimaryCurr(newpos.getPrimaryCurr());
 				cashPosition2.setQuotingCurr(newpos.getQuotingCurr());
 				cashPosition2.setCurrency(newpos.getQuotingCurr());
+				 cashPosition2.setId(newpos.getId());
+				cashPosition2.setLeg(1);
 				if(cashPosition1.getType().equalsIgnoreCase("BUY")) {
 				    cashPosition2.setType("SELL");
 				    cashPosition1.setQuotingAmt(0);
@@ -274,7 +279,22 @@ public class MOImp implements RemoteMO {
 	public void updateOpenPosition(Openpos opos) throws RemoteException {
 		// TODO Auto-generated method stub
 		OpenPosSQL.update(opos, dsSQL.getConn());
-		
+		Trade trade = null;
+		 if(remoteTrade == null) {
+			 de =ServerConnectionUtil.connect("localhost", 1099,commonUTIL.getServerIP() );
+				remoteTrade = (RemoteTrade)  de.getRMIService("Trade");
+				trade = remoteTrade.selectTrade(opos.getTradeId());
+		 } else {
+			 trade = remoteTrade.selectTrade(opos.getTradeId());
+		 }
+		 Vector<CashPosition> cashPs =  createCashPosition(opos, trade);
+		 for(int i=0;i < cashPs.size();i++) {
+			 CashPosition cashPosition1  =  cashPs.get(i);
+			 CashPositionSQL.update(cashPosition1, dsSQL.getConn());
+			 
+			 
+		 }
+		 
 	}
 	@Override
 	public Position updatePosition(Trade trade) throws RemoteException {
@@ -300,7 +320,7 @@ public class MOImp implements RemoteMO {
 		// TODO Auto-generated method stub
 		Position pos = null;
 		if(trade.getProductType().equalsIgnoreCase("FX")) {
-			 pos = PositionSQL.selectFXPositionOnSettleDateCurrencyBookKey(trade.getDelivertyDate(),trade.getBookId(), trade.getTradedesc(), dsSQL.getConn());
+			 pos = PositionSQL.selectFXPositionOnSettleDateCurrencyBookKey(trade.getTradeDate().substring(0, 10),trade.getBookId(), trade.getTradedesc(), dsSQL.getConn());
 		} else {
 		     pos = PositionSQL.selectopenposOnKey(trade.getBookId(), trade.getProductId(), trade.getTradedesc1(), dsSQL.getConn());
 		}
@@ -578,5 +598,8 @@ private Liquidation genearateManualLiquidation(OpenTrade firstTrade,
 	// TODO Auto-generated method stub
 	return liq;
 }
+
+
+
 
 }
