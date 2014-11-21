@@ -9,6 +9,20 @@ public class CashPosition
 		String tradedesc1;
 		String primaryCurr;
 		String Currency;
+		/**
+		 * @return the leg
+		 */
+		public int getLeg() {
+			return leg;
+		}
+		/**
+		 * @param leg the leg to set
+		 */
+		public void setLeg(int leg) {
+			this.leg = leg;
+		}
+		int leg;
+		
 		double actualAmt;
 		
 		/**
