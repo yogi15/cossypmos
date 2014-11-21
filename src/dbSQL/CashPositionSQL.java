@@ -40,11 +40,11 @@ final static private String DELETE_FROM_openpos =
 			"	originalTradeAmt,	" +			
 			"	tradedesc1," +
 			"	fxSwapLegType," +
-			"	tradedesc,primaryCurr,QuotingCurr,Currency,actualAmt,cpid," +
+			"	tradedesc,primaryCurr,QuotingCurr,Currency,actualAmt,cpid,leg," +
 			"    id" +
 			" )" +
 			" VALUES" +
-			"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; 
+			"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; 
 			
 	final static private String distinctProductType = "  select sum(quotingamt) quotingCurr ,sum(openNominal) PrimaryCurr, productsubtype,  concat(concat(productsubtype,'_'),settledate) productsubtype1 from cashposition ";
 	
@@ -76,9 +76,13 @@ final static private String DELETE_FROM_openpos =
 				" primaryCurr ='"+ updateOpenpos.getPrimaryCurr().trim() +"', " +
 				" quotingCurr ='"+ updateOpenpos.getQuotingCurr().trim() +"', " +
 				" currency ='"+ updateOpenpos.getCurrency().trim() +"', " +
-				" actualAmt ="+ updateOpenpos.getActualAmt() +" " +
-				" WHERE	" +
-				" TRADEID  = "+ updateOpenpos.getTradeId() + " and id = " +updateOpenpos.getId();
+				" actualAmt ="+ updateOpenpos.getActualAmt() +", " +
+				" leg ="+ updateOpenpos.getLeg() +" " +
+				" WHERE	";
+				if(commonUTIL.isEmpty(updateOpenpos.getFxSwapLegType()))
+					updateOpenPos = updateOpenPos +  " TRADEID  = "+ updateOpenpos.getTradeId() + " and leg = "+updateOpenpos.getLeg();
+				else 
+					updateOpenPos = updateOpenPos + " TRADEID  = "+ updateOpenpos.getTradeId() +  " and leg = "+updateOpenpos.getLeg() + " and  fxSwapLegType='"+updateOpenpos.getFxSwapLegType().trim()+"'";
 		return updateOpenPos;
 	}
 	
@@ -419,7 +423,7 @@ final static private String DELETE_FROM_openpos =
 			stmt.setInt(1, 		inserOpenpos.getTradeId());
             stmt.setInt(2, 		inserOpenpos.getProductId());
             stmt.setTimestamp(3, 	commonUTIL.convertStringtoSQLTimeStamp(inserOpenpos.getSettleDate()));
-            stmt.setTimestamp(4, 	commonUTIL.getStringToTimestamp(inserOpenpos.getTradeDate()));
+            stmt.setTimestamp(4, 	commonUTIL.convertStringtoSQLTimeStamp(inserOpenpos.getTradeDate()));
             stmt.setDouble(5, 	inserOpenpos.getQuantity());
             stmt.setDouble(6, 	inserOpenpos.getOpenQuantity());
             stmt.setInt(7, 		inserOpenpos.getBookId());
@@ -442,7 +446,8 @@ final static private String DELETE_FROM_openpos =
             stmt.setString(24, 	inserOpenpos.getCurrency());
             stmt.setDouble(25, 	inserOpenpos.getActualAmt());
             stmt.setDouble(26, 	inserOpenpos.getCpID());
-            stmt.setInt(27, 	inserOpenpos.getId());
+            stmt.setInt(27, 	inserOpenpos.getLeg());
+            stmt.setInt(28, 	inserOpenpos.getId());
             stmt.executeUpdate();
             con.commit();
 			
