@@ -521,22 +521,15 @@ public class TradeImp implements RemoteTrade {
 			
 			String oldTradeValues = ((Audit)v1.elementAt(0)).getValues();
 			String newTradeValues = trade.getValues();
-			System.out.println("oldTradeValues " + oldTradeValues);
-			System.out.println("newTradeValues " + newTradeValues);
-			
+			//System.out.println();
 			String changevalues = getChangeValues(oldTradeValues,newTradeValues);
-			System.out.println("changevalues " + changevalues);			
-			if(changevalues.contains("quantity") 
-					|| changevalues.contains("tradeamount") 
-					|| changevalues.contains("price") 
-					|| changevalues.contains("type") 
-					|| changevalues.contains("Nominal") 
-					|| changevalues.contains("CpID") 
-					|| changevalues.contains("delieveryDate") 
-					|| changevalues.contains("ProductName") ) {
-				
+			if(changevalues.contains("quantity") || changevalues.contains("tradeamount") || changevalues.contains("price") || changevalues.contains("type") ) {
 				trade.setEconomicChanged(true);
-				
+			}
+			if(trade.getTradedesc1().equalsIgnoreCase("FXSwap")) {
+				if(changevalues.contains("FarAmt2") || changevalues.contains("Nominal") || changevalues.contains("FarRate")) {
+					trade.setEconomicChanged(true);
+				}
 			}
 			Audit audit = new Audit();
 			audit.setChangeDate(currentDateTime);
@@ -984,7 +977,7 @@ return status;
 						String agentSDIsql = " cpid = " + csdi.getAgentId() + " and  poid = " + psdi.getCpId() + " and sdiformat = '"+psdi.getSdiformat()+"' and currency = '"+ psdi.getCurrency()+ "' and products = '" + psdi.getProducts() + "'";
 						Vector v1 = (Vector) SdiSQL.selectSDIWhere(agentSDIsql,  dsSQL.getConn());
 						
-						if(v1 != null ) 
+						if(v1 != null && (!v1.isEmpty()) ) 
 							agenSdi = (Sdi) v1.elementAt(0);
 						if(agenSdi != null) {
 							csdi.setAgentSdi(agenSdi);
