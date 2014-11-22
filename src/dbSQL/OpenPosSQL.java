@@ -438,7 +438,7 @@ final static private String SELECTONTRADEIDFXSWapType =
 			stmt.setInt(1, 		inserOpenpos.getTradeId());
             stmt.setInt(2, 		inserOpenpos.getProductId());
             stmt.setTimestamp(3, 	commonUTIL.convertStringtoSQLTimeStamp(inserOpenpos.getSettleDate()));
-            stmt.setTimestamp(4, 	commonUTIL.getStringToTimestamp(inserOpenpos.getTradeDate()));
+            stmt.setTimestamp(4, 	commonUTIL.convertStringtoSQLTimeStamp(inserOpenpos.getTradeDate()));
             stmt.setDouble(5, 	inserOpenpos.getQuantity());
             stmt.setDouble(6, 	inserOpenpos.getOpenQuantity());
             stmt.setInt(7, 		inserOpenpos.getBookId());
