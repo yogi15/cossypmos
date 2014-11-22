@@ -173,6 +173,26 @@ public class OpenPosSQL {
 			"		Openpos " +
 			" where " +
 			"		tradeid = 	";
+final static private String SELECTONTRADEIDFXSWapType =
+			
+			" SELECT " +
+			" tradeid," +
+			"  productid," +
+			"  settledate," +
+			" tradedate," +
+			" quantity," +
+			" openquantity," +
+			" bookno," +
+			" price," +
+			" sign," +
+			" positionid," +
+			" openpositionDate," +
+			" producttype," +
+			" productsubtype,openNominal,quotingAmt,tradeAmt,productFV,originalTradeAmt,id,tradedesc1,fxSwapLegType,tradedesc,primaryCurr,QuotingCurr   " +
+			" FROM  " +
+			"		Openpos " +
+			" where " +
+			"		tradeid = 	";
 	
 	static private String SELECTONPOSITIONID =
 		
@@ -473,7 +493,71 @@ public class OpenPosSQL {
 	    Openpos openpos = new Openpos();
 		
 	    try {
-			String sql = SELECTONTRADEID + tradeID;
+			String sql = SELECTONTRADEIDFXSWapType + tradeID ;
+	    	stmt = dsSQL.newPreparedStatement(con,sql );
+			 
+			ResultSet rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				
+				openpos.setTradeId(rs.getInt(1));
+				openpos.setProductId(rs.getInt(2));
+				openpos.setSettleDate(commonUTIL.convertSQLDatetoString(rs.getTimestamp(3)));
+				openpos.setTradeDate(commonUTIL.convertSQLDatetoString(rs.getTimestamp(4)));
+				openpos.setQuantity(rs.getInt(5));
+				openpos.setOpenQuantity(rs.getDouble(6));
+				openpos.setBookId(rs.getInt(7));
+				openpos.setPrice(rs.getDouble(8));
+				openpos.setSign(rs.getInt(9));
+				openpos.setPositionId(rs.getInt(10));
+				openpos.setOpenpositionDate(rs.getString(11));	 
+				openpos.setProductType(rs.getString(12));
+				openpos.setProductSubType(rs.getString(13));
+				openpos.setOpenNominal(rs.getDouble(14));
+				openpos.setQuotingAmt(rs.getDouble(15));
+				
+				openpos.setTradeAmt(rs.getDouble(16));
+				openpos.setProductFV(rs.getDouble(17));
+				openpos.setOriginalTradeAmt(rs.getDouble(18));
+				openpos.setId(rs.getInt(19));
+				openpos.setTradedesc1(rs.getString(20));
+				openpos.setFxSwapLegType(rs.getString(21));
+				openpos.setTradedesc(rs.getString(22));
+				openpos.setPrimaryCurr(rs.getString(23));
+				openpos.setQuotingCurr(rs.getString(24));
+	         
+	         }
+			commonUTIL.display("openposSQL","selectONTradeid " + sql);
+		 } catch ( Exception e ) {
+			 
+			 commonUTIL.displayError("openposSQL","selectONTradeid",e);
+			 return openpos;
+	           
+	     } finally {
+	       
+	    	 try {
+				
+	    		 stmt.close();
+			
+	    	 } catch ( SQLException e ) {
+	    		 
+				// TODO Auto-generated catch block
+				commonUTIL.displayError("openposSQL","selectONTradeid",e);
+			}
+	    	 
+	     }
+	    
+	        return openpos;
+	 }
+	protected static Openpos selectONTradeid( int tradeID, String fxswapLegType,Connection con ) {
+		 
+		int j = 0;
+	    PreparedStatement stmt = null;
+    
+	    Openpos openpos = new Openpos();
+		
+	    try {
+			String sql = SELECTONTRADEIDFXSWapType + tradeID + " fxswaplegtype = '"+fxswapLegType+"'";
 	    	stmt = dsSQL.newPreparedStatement(con,sql );
 			 
 			ResultSet rs = stmt.executeQuery();
@@ -1066,3 +1150,4 @@ int j = 0;
 	}
 	
 }
+
