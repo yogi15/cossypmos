@@ -98,7 +98,7 @@ public class PositionProcessor extends Thread {
 	}
   }
 	
-  
+  // this is only method to process FXPosition.
   public synchronized void processPositiononTrade(Trade trade) {
 	  
 	 if(trade.getProductType().equalsIgnoreCase("FX"))  {
@@ -117,7 +117,7 @@ public class PositionProcessor extends Thread {
 			    } else {
 			  	    processFXPosition(trade,0,false);
 			    }
-		  } else if(trade.getVersion() == -1) {
+		  } else if(trade.getVersion() == -1  || trade.getStatus().equalsIgnoreCase("CANCELLED")) {
 			  if(trade.getTradedesc1().equalsIgnoreCase("FXSWAP")) {
 			    	Trade swapLeg =   trade.getSwapLeg();
 			    	Trade primaryLeg = trade.getSwapPrimaryLeg();
@@ -129,12 +129,15 @@ public class PositionProcessor extends Thread {
 			    }
 		  } else if(trade.getVersion() > 1) {
 			  if(trade.getTradedesc1().equalsIgnoreCase("FXSWAP")) {
+				  if(trade.isEconomicChanged()) {
 			    	Trade swapLeg =   trade.getSwapLeg();
 			    	Trade primaryLeg = trade.getSwapPrimaryLeg();
 			    	  processFXPositionForUpdate(primaryLeg);
 			    	  processFXPositionForUpdate(swapLeg);
+				  }
 			    	
 			    } else {
+			    	if(trade.isEconomicChanged())
 			  processFXPositionForUpdate(trade);
 			    }
 		  }
@@ -202,6 +205,8 @@ public Openpos [] getOpenPositionOnTrade(Trade trade) {
 
 	
 	private void generateFXOpenPosition(Trade trade,Position position,Openpos op) {
+		if(op == null)
+			return;
 		
 		op.setBookId(trade.getBookId());
 		op.setOpenpositionDate(commonUTIL.dateToString(commonUTIL.getCurrentDate()));
@@ -220,9 +225,9 @@ public Openpos [] getOpenPositionOnTrade(Trade trade) {
 		op.setPositionId(position.getPositionId());
 		op.setQuotingAmt(trade.getNominal());
 		op.setSettleDate(trade.getDelivertyDate());
-		op.setTradeDate(trade.getTradeDate());
+		op.setTradeDate(trade.getTradeDate().substring(0, 10));
 		op.setOpenNominal(trade.getNominal());
-		op.setFxSwapLegType(trade.getFxSwapLeg());
+		op.setFxSwapLegType(trade.getFxSwapLeg());  
 		op.setTradedesc1(trade.getTradedesc1());
 		op.setPrimaryCurr(trade.getTradedesc().substring(0, 3));
 		op.setQuotingCurr(trade.getTradedesc().substring(4, 7));
@@ -253,7 +258,7 @@ private void generateFXCurrencyOpenPosition(Trade trade,Position position,Openpo
 		op.setPositionId(position.getPositionId());
 	//	op.setQuotingAmt(trade.getQuantity());
 		op.setSettleDate(trade.getDelivertyDate());
-		op.setTradeDate(trade.getTradeDate());
+		op.setTradeDate(trade.getTradeDate().substring(0, 10));
 	//	op.setOpenNominal(trade.getNominal());
 		op.setFxSwapLegType(trade.getFxSwapLeg());
 		op.setTradedesc1(trade.getTradedesc1());
@@ -307,7 +312,7 @@ private void generateFXCurrencyOpenPosition(Trade trade,Position position,Openpo
 		}
 		
 	
-	
+	// in case of delete and update.
 	
 
 	private synchronized void undoTrade(Trade trade) {
@@ -820,7 +825,7 @@ try {
 		op.setOpenQuantity(trade.getQuantity());
 		op.setPositionId(position.getPositionId());
 		op.setSettleDate(trade.getDelivertyDate());
-		op.setTradeDate(trade.getTradeDate());
+		op.setTradeDate(trade.getTradeDate().substring(0, 10));
 		op.setTradeAmt(trade.getTradeAmount());
 		op.setOriginalTradeAmt(trade.getTradeAmount());
 		Product product = getProduct(trade.getProductId());
@@ -906,9 +911,9 @@ try {
 				 Position oldPosition = (Position) remoteMO.getPositionOnTrade(trade);
 				 processFXPosition(oldPosition,trade,i,isUpdated,liqConfig,false);
 			} else {
-				 Position oldPosition = (Position) remoteMO.getPositionOnSettleDateOnCurrencyOnBook(trade.getDelivertyDate(), getPrimaryCurrency(trade.getTradedesc()), trade.getBookId());
+				 Position oldPosition = (Position) remoteMO.getPositionOnSettleDateOnCurrencyOnBook(trade.getTradeDate().substring(0, 10), getPrimaryCurrency(trade.getTradedesc()), trade.getBookId());
 				 processFXPosition(oldPosition,trade,i,isUpdated,liqConfig,true);
-				 oldPosition = (Position) remoteMO.getPositionOnSettleDateOnCurrencyOnBook(trade.getDelivertyDate(), getQuotingCurrency(trade.getTradedesc()), trade.getBookId());
+				 oldPosition = (Position) remoteMO.getPositionOnSettleDateOnCurrencyOnBook(trade.getTradeDate().substring(0, 10), getQuotingCurrency(trade.getTradedesc()), trade.getBookId());
 				 processFXPosition(oldPosition,trade,i,isUpdated,liqConfig,false);
 			}
 		} catch (RemoteException e) {
@@ -978,9 +983,15 @@ try {
 					 oldPosition = (Position) remoteMO.getPositionOnTrade(trade);
 					updateoldFXPosition(oldPosition,trade,i);
 					remoteMO.updatePosition(oldPosition);
-					Openpos openPost = (Openpos) remoteMO.getOpenPositionOnTradeID(trade.getId());
-					generateFXOpenPosition(trade, oldPosition,openPost);
-					remoteMO.updateOpenPosition(openPost);
+					Openpos openPost = null;
+					if(trade.getFxSwapLeg() == null || trade.getFxSwapLeg().trim().isEmpty() || trade.getFxSwapLeg().length() ==0 )
+						openPost =	(Openpos) remoteMO.getOpenPositionOnTradeID(trade.getId());
+					else 
+						openPost =	(Openpos) remoteMO.getOpenPositionOnFxSwapLeg(trade.getId(), trade.getFxSwapLeg());
+					if(openPost != null) {
+					 generateFXOpenPosition(trade, oldPosition,openPost);
+					 remoteMO.updateOpenPosition(openPost);
+					}
 					
 				}
 			} catch (RemoteException e) {
@@ -995,7 +1006,7 @@ try {
 		// TODO Auto-generated method stub
     	pos.setBookId(trade.getBookId());
     	pos.setProductId(trade.getProductId());
-    	pos.setTradeDate(trade.getTradeDate());
+    	pos.setTradeDate(trade.getTradeDate().substring(0, 9));
     	pos.setSettleDate(trade.getDelivertyDate());
     	 // in this it will be productSubType as position need to be created on currency 
     	//primaryCurrenyPos.setBuy_quantity(trade.getQuantity());                         // -- primary Currency position
@@ -1090,8 +1101,39 @@ try {
     	Trade oldTrade = null;
      try {
 		  oldTrade = (Trade) remoteTrade.getTradeOnVersion(trade.getId(), trade.getVersion() -1);
+		  if(oldTrade.getTradedesc1().equalsIgnoreCase("FXSwap")) {
+		  if(trade.getFxSwapLeg().equalsIgnoreCase("SWAPLEG")) {
+			  oldTrade = oldTrade.getSwapLeg();
+		  } else {
+			  oldTrade = oldTrade.getSwapPrimaryLeg();
+		  }
+		  }
+		//  if(trade.)
 		if(oldTrade != null) {
+			commonUTIL.display("PositionProcessor", "Remove all previous version ");
 		processFXPosition(oldTrade,-1,true);  // remove all previous version positions
+		commonUTIL.display("PositionProcessor", "add updated one");
+		processFXPosition(trade,0,true);  // add updated one. 
+		}
+	
+	} catch (RemoteException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		commonUTIL.displayError("PositionProcessor", "processFXPositionForUpdate", e);
+	}
+    	
+    }
+    public void  processFXPositionForUpdate(Trade trade,String swapLag) {
+    	String sql = " version = " + (trade.getVersion() -1);
+    	Trade oldTrade = null;
+     try {
+		  oldTrade = (Trade) remoteTrade.getTradeOnVersion(trade.getId(), trade.getVersion() -1);
+		  Trade swapLeg =   oldTrade.getSwapLeg();
+	    	Trade primaryLeg = oldTrade.getSwapPrimaryLeg();	
+		if(oldTrade != null) {
+			commonUTIL.display("PositionProcessor", "Remove all previous version ");
+		processFXPosition(oldTrade,-1,true);  // remove all previous version positions
+		commonUTIL.display("PositionProcessor", "add updated one");
 		processFXPosition(trade,0,true);  // add updated one. 
 		}
 	
@@ -1182,7 +1224,7 @@ try {
     	pos.setAmount(trade.getQuantity());
         pos.setNominal(trade.getNominal());
     	pos.setAvg_price(0);
-    	pos.setTradeDate(trade.getTradeDate());
+    	pos.setTradeDate(trade.getTradeDate().substring(0, 10));
     	pos.setSettleDate(trade.getDelivertyDate());
     
     	pos.setRealized(0);
