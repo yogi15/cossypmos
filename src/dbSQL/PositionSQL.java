@@ -138,7 +138,8 @@ public class PositionSQL {
 			+ " bookno,"
 			+ " productId,"
 			+ " positionId,productsubtype,productTYpe,primCurrency,amount,nominal,realisedPNL,tradedate,settledate "
-			+ " FROM	" + "  Position	" + " where  " + "		settledate   	";
+			+ " FROM	" + "  Position	" + " where  ";
+		//	+ " FROM	" + "  Position	" + " where  " + "		settledate   	";
 
 	public static Position save(Position insertLiquid, Connection con) {
 		Position pos = null;
@@ -390,8 +391,8 @@ public class PositionSQL {
 				stmt.setDouble(14, inserPosition.getNominal());
 				stmt.setDouble(15, inserPosition.getRealizedPNL());
 			
-				stmt.setTimestamp(16, commonUTIL
-						.getStringToTimestamp(inserPosition.getTradeDate()));
+				stmt.setDate(16, commonUTIL
+						.convertStringtoSQLDate(inserPosition.getTradeDate()));
 				stmt.setDate(17, commonUTIL.convertStringtoSQLDate(inserPosition.getSettleDate()));
 				stmt.setInt(18, inserPosition.getPositionId());
 				stmt.executeUpdate();
@@ -888,7 +889,7 @@ public class PositionSQL {
 		return positions;
 	}
 
-	public static Position selectFXPositionOnSettleDateCurrencyBookKey(String settleDate,
+	public static Position selectFXPositionOnSettleDateCurrencyBookKey(String tradeDate,
 			int bookid, String currency, Connection con) {
 		int j = 0;
 		PreparedStatement stmt = null;
@@ -896,8 +897,8 @@ public class PositionSQL {
 		Position position = null;
 		String sql = "";
 		try {
-			sql = SELECTPOSITIONONCURRECYSETTLEDATE + " = to_date('"+ settleDate.trim()+ "', 'dd/MM/YYYY')   and  productSubtype = '"+ currency +"' and bookno = " + bookid;
-
+			sql = SELECTPOSITIONONCURRECYSETTLEDATE + "tradedate = to_date('"+ tradeDate.trim()+ "', 'dd/MM/YYYY')   and  productSubtype = '"+ currency +"' and bookno = " + bookid;
+			//sql = SELECTPOSITIONONCURRECYSETTLEDATE + " productSubtype = '"+ currency +"' and bookno = " + bookid;
 			stmt = dsSQL.newPreparedStatement(con, sql);
 
 			ResultSet rs = stmt.executeQuery();
