@@ -526,6 +526,9 @@ public class TradeImp implements RemoteTrade {
 			if(changevalues.contains("quantity") || changevalues.contains("tradeamount") || changevalues.contains("price") || changevalues.contains("type") ) {
 				trade.setEconomicChanged(true);
 			}
+			if (trade.getProductType().equals("FX") && changevalues.contains("delieveryDate")) {
+				trade.setEconomicChanged(true);
+			}
 			if(trade.getTradedesc1().equalsIgnoreCase("FXSwap")) {
 				if(changevalues.contains("FarAmt2") || changevalues.contains("Nominal") || changevalues.contains("FarRate")) {
 					trade.setEconomicChanged(true);
