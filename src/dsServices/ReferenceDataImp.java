@@ -1340,4 +1340,12 @@ String sql = " quoting_currency = '"+cp.getQuoting_currency() + "'";
 		return fetchedUser;
 	}
 
+	@Override
+	public Vector getCurrencySplitConfig(int bookID, String currencyPair,
+			String currency) throws RemoteException {
+		// TODO Auto-generated method stub
+		String sql = " bookid = "+bookID+" and CURRENCYTOSPLIT='"+currency+"' and CURRENCYPAIR='"+currencyPair+"'";
+		return CurrencySplitSQL.selectWhere(sql, dsSQL.getConn());
+	}
+
 }

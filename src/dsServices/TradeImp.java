@@ -37,6 +37,7 @@ import dsEventProcessor.TradeEventProcessor;
 import mainServer.PublishEvent;
 import mqServices.messageProducer.CreateNewMessage;
 import apps.window.tradewindow.BackOfficePanel;
+import apps.window.tradewindow.util.FXSplitUtil;
 import beans.Attribute;
 import beans.Audit;
 import beans.B2BConfig;
@@ -136,13 +137,14 @@ public class TradeImp implements RemoteTrade {
 				return returnStatus;
 				
 			}*/
-			if(trade.getMirrorBookid() > 0) {
+			/*if(trade.getMirrorBookid() > 0) {
 				originalTrade = (Trade) trade.clone();
            		generateMirrorTrade(trade,false);
            	 }
 			if(trade.isB2Bflag()) {
            		generateB2BTrade(trade);
-           	 }
+           	 } */
+			
 			   String productType = null; 
 			      Trade oldTrade = trade;
 		            Vector fees = trade.getFees();
@@ -1193,15 +1195,19 @@ return status;
 
 
 
-			@Override
-			public Trade saveBatchSplitTrades(Vector<Trade> splitTrades,Trade originalTrade)
+			public Vector<String> saveBatchSplitTrades(Vector<Trade> splitTrades,Trade originalTrade, Vector<String> message)
 					throws RemoteException {
 				// TODO Auto-generated method stub
 				if(splitTrades == null || splitTrades.isEmpty())
 					return null;
 				int cout =0;
-				 for(int i=0;i<splitTrades.size();i++) {
-					 Trade trade = splitTrades.get(i);
+				 Trade xccy1 = splitTrades.get(1);
+				 Trade xccy2 = splitTrades.get(3);
+				 Trade mirror1 = splitTrades.get(2);
+				 Trade mirror2 = splitTrades.get(4);
+				 
+			/*	 for(int i=0;i<splitTrades.size();i++) {
+					 Trade trade =(Trade) splitTrades.get(i);
 					int t= saveTrade(trade);
 					
 					if(trade.getOffsetid() > 0) {
@@ -1214,11 +1220,59 @@ return status;
 						cout++;
 					}
 					commonUTIL.display("TradeImp", "saveBatchTrades  Saving Split trades " + t);
-				 }
+				 } */
 				 originalTrade.setAutoType("Original");
-				 int t= saveTrade(originalTrade);
+			//	 int t= saveTrade(originalTrade);
+				 int allocateIDForOriginalTrade =  TradeSQL.selectMaxID(dsSQL.getConn()) + 1; 
+				 int allocateIDForxccy1 =  TradeSQL.selectMaxID(dsSQL.getConn()) + 1;
+				 int allocateIDFormirror1 =  TradeSQL.selectMaxID(dsSQL.getConn()) + 1;
+				 int allocateIDForxccy2 =  TradeSQL.selectMaxID(dsSQL.getConn()) + 1;
+				 int allocateIDFormirror2 =  TradeSQL.selectMaxID(dsSQL.getConn()) + 1;
+				 originalTrade.setAllocatedID(allocateIDForOriginalTrade);
+				 xccy1.setAllocatedID(allocateIDForxccy1);
+				 xccy2.setAllocatedID(allocateIDForxccy2);
+				 mirror1.setAllocatedID(allocateIDFormirror1);
+				 mirror2.setAllocatedID(allocateIDFormirror2);
+				 originalTrade.setAttribute("FXccySplitID", Integer.valueOf(allocateIDForxccy1).toString());
+				 originalTrade.setAttribute("SXccySplitID", Integer.valueOf(allocateIDForxccy2).toString());
+			//	 xccy1.setAttribute("MirrorFromTradeID", Integer.valueOf(allocateIDForxccy2).toString());
+				 xccy1.setParentID(allocateIDForOriginalTrade);
 				 
-				return originalTrade;
+				 xccy1.setAttribute("XCurrSOriginalTradeID", Integer.valueOf(allocateIDForOriginalTrade).toString());
+				 xccy2.setAttribute("XCurrSOriginalTradeID", Integer.valueOf(allocateIDForOriginalTrade).toString());
+				 xccy2.setParentID(allocateIDForOriginalTrade);
+				 xccy1.setAttribute("MirrorID", Integer.valueOf(allocateIDFormirror1).toString());
+				 xccy2.setAttribute("MirrorID", Integer.valueOf(allocateIDFormirror2).toString());
+				 mirror1.setAttribute("MirrorFromTradeID", Integer.valueOf(allocateIDForxccy1).toString());
+				 mirror1.setParentID(allocateIDForOriginalTrade);
+     			 mirror2.setAttribute("MirrorFromTradeID", Integer.valueOf(allocateIDForxccy2).toString());
+     			 mirror2.isMirrorTrade();
+     			 mirror2.setParentID(allocateIDForOriginalTrade);
+     			 saveTrade(mirror2);
+     			saveTrade(mirror1);
+     			saveTrade(xccy2);
+     			saveTrade(xccy1);
+     			return saveTrade(originalTrade,message);
+			//	return originalTrade;
+			}
+			public Vector<String> saveBatchSplitTrades(Vector<Trade> splitTrades,Vector<String> message)
+					throws RemoteException {
+				// TODO Auto-generated method stub
+				if(splitTrades == null || splitTrades.isEmpty())
+					return null;
+				int cout =0;
+				 Trade xccy1 = splitTrades.get(1);
+				 Trade xccy2 = splitTrades.get(3);
+				 Trade mirror1 = splitTrades.get(2);
+				 Trade mirror2 = splitTrades.get(4);
+				Trade originalTrade = FXSplitUtil.getOriginalTradeFromRountingTrades(splitTrades);
+			    
+     			 saveTrade(mirror2);
+     			saveTrade(mirror1);
+     			saveTrade(xccy2);
+     			saveTrade(xccy1);
+     			return saveTrade(originalTrade,message);
+			//	return originalTrade;
 			}
 
 
@@ -1230,7 +1284,7 @@ return status;
 			if(commonUTIL.isEmpty(autoType))
 				return null;
 			 if (autoType.equalsIgnoreCase("Original") ) {
-			           trades =  (Vector) TradeSQL.getXccySplit(trade.getId(), dsSQL.getConn());
+			           trades =  (Vector) TradeSQL.getXccySplitOnParentID(trade.getId(), dsSQL.getConn());
 			         //  trades.add(trade);
 			 }
 			 if (autoType.equalsIgnoreCase("Offset") ) {
@@ -1238,12 +1292,48 @@ return status;
 		           trades =  (Vector) TradeSQL.getXccySplitOnOffset(trade.getOffsetid(), dsSQL.getConn());
 		          // trades.add(trade);
 				 }
-		 }  else {
-			 if(trade.getXccySPlitid() > 0) {
-			  trades =  (Vector) TradeSQL.getXccySplitOnChild(trade.getXccySPlitid(), dsSQL.getConn());
-			 }
+				 
+		 } if(trade.getAutoType().equalsIgnoreCase("Mirror") || trade.getAutoType().equalsIgnoreCase("XccySplit") ) {
+			 trades =  (Vector) TradeSQL.getXccySplitOnParentID(trade.getParentID(), dsSQL.getConn());
+			  Trade tradep =  selectTrade(trade.getParentID());
+			  trades.add(0,tradep);
+			  Vector<Trade> tradesarrange = new Vector<Trade>();
+			  tradesarrange.add(0,tradep);
+			
+			//	Trade tradeOriginal =  selectTrade(tradep.getParentID());
+				Trade xxccy1 =  FXSplitUtil.getSplitOrMirrorTradeFromRountingTrades(Integer.parseInt(tradep.getAttributeValue("FXccySplitID")), trades);
+				   Trade xxccy2 =  FXSplitUtil.getSplitOrMirrorTradeFromRountingTrades(Integer.parseInt(tradep.getAttributeValue("SXccySplitID")), trades);
+				   Trade mirror1 = FXSplitUtil. getSplitOrMirrorTradeFromRountingTrades( Integer.parseInt(xxccy1.getAttributeValue("MirrorID")),trades);
+				   Trade mirror2 = FXSplitUtil. getSplitOrMirrorTradeFromRountingTrades( Integer.parseInt(xxccy2.getAttributeValue("MirrorID")),trades);
+				   
+				   tradesarrange.add(1,xxccy1);
+				   tradesarrange.add(2,mirror1);
+				   
+				   tradesarrange.add(3,xxccy2);
+				   tradesarrange.add(4,mirror2);
+				   trades = tradesarrange;
+				  
+			  
+			   
+			   
+			  
+			  
+		 } else {
+			 Vector<Trade> tradesarrange = new Vector<Trade>();
+			 Trade xxccy1 =  FXSplitUtil.getSplitOrMirrorTradeFromRountingTrades(Integer.parseInt(trade.getAttributeValue("FXccySplitID")), trades);
+			   Trade xxccy2 =  FXSplitUtil.getSplitOrMirrorTradeFromRountingTrades(Integer.parseInt(trade.getAttributeValue("SXccySplitID")), trades);
+			   Trade mirror1 = FXSplitUtil. getSplitOrMirrorTradeFromRountingTrades( Integer.parseInt(xxccy1.getAttributeValue("MirrorID")),trades);
+			   Trade mirror2 = FXSplitUtil. getSplitOrMirrorTradeFromRountingTrades( Integer.parseInt(xxccy2.getAttributeValue("MirrorID")),trades);
+			   tradesarrange.add(0,trade);
+			   tradesarrange.add(1,xxccy1);
+			   tradesarrange.add(2,mirror1);
+			   
+			   tradesarrange.add(3,xxccy2);
+			   tradesarrange.add(4,mirror2);
+			   trades = tradesarrange;
 	        
 		 }
+		
 				return trades;
 			}
 
@@ -1426,6 +1516,9 @@ return status;
 				
 			}
 
+
+
+			
 
 		
 
