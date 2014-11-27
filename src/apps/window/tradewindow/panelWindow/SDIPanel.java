@@ -478,6 +478,12 @@ public class SDIPanel extends BackOfficePanel {
 		if (data != null && (!data.isEmpty())) {
 			Hashtable<String, TransferRule> checkDuplicate = new Hashtable<String, TransferRule>();
 			setSdis(data);
+			if(trade == null)
+				return;
+			if(commonUTIL.isEmpty(data))
+				return;
+			if(trade == null)
+				return;
 			rules = rule.generateRules(trade);
 
 			Iterator it = rules.iterator();
