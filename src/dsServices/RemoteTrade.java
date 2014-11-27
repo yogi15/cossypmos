@@ -42,7 +42,8 @@ public interface RemoteTrade extends Remote {
 	public Collection<Vector<Trade>> getChildTrades(int parentID) throws RemoteException;
 	public Trade getOutStandingBalanceonFWDOption(int FWDOptionID)  throws RemoteException;
 	public Trade getOutStandingBalanceonFWDOption(int FWDOptionID,int tradeID)  throws RemoteException;
-	public Trade saveBatchSplitTrades(Vector<Trade> splitTrades,Trade originalTrade) throws RemoteException;
+	public Vector<String> saveBatchSplitTrades(Vector<Trade> splitTrades,Trade originalTrade,Vector<String>  message) throws RemoteException;
+	public Vector<String> saveBatchSplitTrades(Vector<Trade> splitTrades,Vector<String> message)  throws RemoteException;
 	public Vector<Trade> getB2Btrades(Trade trade)  throws RemoteException;
 //	public Trade undo(Trade trade, int tradeVersion) throws RemoteException;
 	

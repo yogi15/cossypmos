@@ -200,7 +200,10 @@ public interface RemoteReferenceData extends Remote{
 	
 	public Users validateUser(Users user) throws RemoteException;
 	public DateRule getDateRule(String dateRuleID) throws RemoteException;
-	public int checkHolidayOrWeekend(String currency, String checkDate) throws RemoteException;
+	public int checkHolidayOrWeekend(String currency, String checkDate)
+			throws RemoteException;
+	public Vector getCurrencySplitConfig(int bookID, String currencyPair,
+			String currency) throws RemoteException;
 	
 	
 	
