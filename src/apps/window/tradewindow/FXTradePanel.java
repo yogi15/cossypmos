@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -67,7 +69,7 @@ import com.jidesoft.grid.CellEditorManager;
 import com.jidesoft.grid.CellRendererManager;
 import com.jidesoft.grouper.ObjectGrouperManager;
 import com.jidesoft.plaf.LookAndFeelFactory;
-	import com.standbysoft.component.date.swing.JDatePicker;
+import com.standbysoft.component.date.swing.JDatePicker;
 
 import constants.CommonConstants;
 	
@@ -79,6 +81,7 @@ import util.common.DateU;
 import apps.window.tradewindow.FXPanels.BasicData;
 import apps.window.tradewindow.FXPanels.FWDOptionPanel;
 import apps.window.tradewindow.FXPanels.FunctionalityD;
+import apps.window.tradewindow.FXPanels.Funtionality;
 import apps.window.tradewindow.FXPanels.JTableButtonRenderer;
 import apps.window.tradewindow.FXPanels.Swap;
 import apps.window.tradewindow.FXPanels.TakeUPWindow;
@@ -363,6 +366,7 @@ import dsServices.ServerConnectionUtil;
 		public FunctionalityD getFunctionality() {
 			if (functionality == null) {
 				functionality = new FunctionalityD();
+				functionality.setRemoteRef(remoteReference);
 				//functionality.setBorder(new LineBorder(Color.black, 1, false));
 			}
 			return functionality;
@@ -531,7 +535,7 @@ import dsServices.ServerConnectionUtil;
 		public void openTrade(Trade trade) {
 			// TODO Auto-generated method stubthis.trade = trade;
 			this.trade = trade; 
-			 Vector<Trade> routingTrades = null;
+			 Vector<Trade> routingTrades = new Vector<Trade>();
 			attributeDataValue.clear();
 			openTradeInWindow(trade);
 			functionality.jButton5.setText("SAVEASNEW");
@@ -541,14 +545,15 @@ import dsServices.ServerConnectionUtil;
 				String autoType = trade.getAutoType();
 				if(!commonUTIL.isEmpty(autoType)) {
 				// if(trade.getB2bid() >0 || trade.getAutoType().equalsIgnoreCase("Original") ) {
-					 routingTrades = remoteTrade.getB2Btrades(trade);
+					// routingTrades = remoteTrade.getB2Btrades(trade);
 				// }
-				
-				
-			
-				       if(routingTrades == null ) {
+				       if(commonUTIL.isEmpty(routingTrades)) {
+				    	
 				    		routingTrades  = remoteTrade.getSplitTrades(trade);
-				    	  
+				    		//  if(trade.getAutoType().equalsIgnoreCase("Original") ) {
+				    			
+				    		 //   routingTrades.add(0,trade);
+				    		//  } 
 				       }
 				}
 				/*if(rountingTrades == null) {
@@ -847,6 +852,7 @@ import dsServices.ServerConnectionUtil;
 			        	}
 			        	
 			        });
+			     
 			        takeupW.jTable0.addMouseListener(new java.awt.event.MouseAdapter() {
 	
 						@Override
@@ -1134,7 +1140,25 @@ import dsServices.ServerConnectionUtil;
 						        		trade.setMirrorID(0);
 						        		trade.setMirrorBookid(0);
 						        		trade.setFees(feesPanel.getFeesDataV());
-						               	 Vector tradestatus = 	remoteTrade.saveTrade(trade,message);
+						        		Vector tradestatus = null;
+						        		if(functionality.getRoutingData().size() > 0) {
+						        		   
+						        		   Vector<Trade> rountingTrades = FXSplitUtil.getRountingData(trade,remoteReference);
+											if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >0 ) {
+												try {
+													rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), trade,functionality.jTextField2.getDoubleValue(), functionality.jTextField3.getDoubleValue());
+													trade.setRountingTrades(rountingTrades);
+								        		    tradestatus  = 	remoteTrade.saveBatchSplitTrades(trade.getRountingTrades(),trade,message);
+												} catch (ParseException e1) {
+													// TODO Auto-generated catch block
+													e1.printStackTrace();
+												}
+											}
+											 
+						        		    
+						        		} else {
+						        			tradestatus  = 	remoteTrade.saveTrade(trade,message);
+						        		}
 						               	 if(commonUTIL.isEmpty(tradestatus)) {
 						               		commonUTIL.showAlertMessage("Error in ServerSide in saving Trade");
 						               		 return;
@@ -1177,26 +1201,37 @@ import dsServices.ServerConnectionUtil;
 			    	
 			    });
 			        // for currency split functionality. 
-			       /* out.jCheckBox2.addMouseListener(new java.awt.event.MouseAdapter() {
+			        out.jCheckBox2.addMouseListener(new java.awt.event.MouseAdapter() {
 	
 						@Override
 						public void mouseClicked(MouseEvent e) {
 							
 							if( out.jCheckBox2.isSelected()) {
-								if(trade == null) {
-									commonUTIL.showAlertMessage("Select Trade ");
-									out.jCheckBox2.setSelected(false);
-									return;
-								}
+							//	if(trade == null) {
+								//	commonUTIL.showAlertMessage("Select Trade ");
+								//	out.jCheckBox2.setSelected(false);
+								//	return;
+								//}
 								functionality.jPanel6.setVisible(false);
-								 functionality.jButton8.setEnabled(true);
+								// functionality.jButton8.setEnabled(true);
 								 functionality.jPanel2.setVisible(true);
-							//	 Vector vector = (Vector) remoteReference.getCurrencySplitConfig(trade.getBookId(), basicData.currencyPair.getText());
+								 try {
+								//	 basicData.book.getName() 
+									Vector vector = (Vector) remoteReference.getCurrencySplitConfig(Integer.parseInt(basicData.book.getName()), basicData.currencyPair.getText());
+									 if(!commonUTIL.isEmpty(vector)) {
+									  sconfig =  (CurrencySplitConfig)vector.elementAt(0);
+									  functionality.jLabel2.addItem(sconfig.getFirstCurrencySplit());
+									
+									functionality.jLabel3.addItem(sconfig.getSecondCurrencySPlit());
+									 } 
+								} catch (RemoteException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
 								//	if(vector == null || vector.isEmpty())
 									//	return;
 									 sconfig = null;// (CurrencySplitConfig)vector.elementAt(0);
-								  //  functionality.jLabel2.setText(sconfig.getFirstCurrencySplit());
-									//functionality.jLabel3.setText(sconfig.getSecondCurrencySPlit());
+								 
 									//Book firstbook = new Book();
 									//firstbook.setBookno(sconfig.getFirstSpotBook());
 								//	firstbook = (Book) remoteReference.selectBook(firstbook);
@@ -1204,7 +1239,7 @@ import dsServices.ServerConnectionUtil;
 								//	Book secbook = new Book();
 								//	secbook.setBookno(sconfig.getSecondSpotBook());
 								//	secbook = (Book) remoteReference.selectBook(secbook);
-									if(functionality.jCheckBox0.isSelected()) {
+								/*	if(functionality.jCheckBox0.isSelected()) {
 									      getDataForcurrencySplitOnBook();
 									      functionality.jLabel4.setText("First Spot Book");
 											functionality.jLabel5.setText("Second Spot Book");
@@ -1212,7 +1247,7 @@ import dsServices.ServerConnectionUtil;
 										getDataForcurrencySplitOnCp();
 										functionality.jLabel4.setText("First Legal Entity");
 										functionality.jLabel5.setText("Second Legal Entity");
-									}
+									}*/
 									//functionality.jTextField1.setText(secbook.getBook_name());
 							} else {
 								 functionality.jButton8.setEnabled(false);
@@ -1225,7 +1260,7 @@ import dsServices.ServerConnectionUtil;
 							}
 							
 						}
-			        });*/
+			        });
 			        
 			        functionality.jCheckBox0.addMouseListener(new java.awt.event.MouseAdapter() {
 	
@@ -1301,7 +1336,7 @@ import dsServices.ServerConnectionUtil;
 	
 						@Override
 						public void mouseClicked(MouseEvent e) {
-							boolean usedCP = true;
+						/*	boolean usedCP = true;
 							if(functionality.jCheckBox0.isSelected())
 								usedCP = false;
 							if(!functionality.jButton8.isEnabled())
@@ -1405,7 +1440,7 @@ import dsServices.ServerConnectionUtil;
 							}	catch (ParseException oe) {
 									// TODO Auto-generated catch block
 									oe.printStackTrace();
-								}
+								} */
 							
 						}
 						
@@ -1424,7 +1459,7 @@ import dsServices.ServerConnectionUtil;
 								return null;
 							}
 							
-							trades  = FXSplitUtil.splitTrade(xccY1,xccY2,trade,sconfig,frate,srate);
+							trades  = FXSplitUtil.splitTrade(xccY1,xccY2,trade,frate,srate);
 								} catch (ParseException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
@@ -1563,10 +1598,10 @@ import dsServices.ServerConnectionUtil;
 									
 									 double farAmt1 = amt1 * -1;
 							    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1));
-							    	 System.out.println("farAmt1 " + farAmt1);
-							    	 System.out.println("out.jTextField2"+ out.jTextField2.getText());
-							    	 System.out.println("out.jTextField1"+ out.jTextField1.getText());
-							    	 System.out.println("swap.jTextField2"+ swap.jTextField1.getText());
+							    	// System.out.println("farAmt1 " + farAmt1);
+							    	// System.out.println("out.jTextField2"+ out.jTextField2.getText());
+							    	 //System.out.println("out.jTextField1"+ out.jTextField1.getText());
+							    	 //System.out.println("swap.jTextField2"+ swap.jTextField1.getText());
 							    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText()) && (!swap.jTextField4.getText().equalsIgnoreCase("0"))) {
 							    		 
 							    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
@@ -1581,7 +1616,7 @@ import dsServices.ServerConnectionUtil;
 									double spot = (new Double(out.jTextField4.getText()).doubleValue());
 									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
 									double amt2 = Math.abs(amt1) * -1;		
-									System.out.println("------------- "+commonUTIL.getStringFromDoubleExp(amt2*spot));
+								//	System.out.println("------------- "+commonUTIL.getStringFromDoubleExp(amt2*spot));
 									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot));
 									
 									 double farAmt1 = amt1 * -1;
@@ -1596,8 +1631,8 @@ import dsServices.ServerConnectionUtil;
 							    	 }
 					    		 																
 					    	 }
-					    	 
 					    	
+					          	 populateRountingData();
 						
 					 }
 				 });
@@ -1671,7 +1706,7 @@ import dsServices.ServerConnectionUtil;
 									
 								 }
 							 
-							 
+							 populateRountingData();
 							 
 						 }
 					 });
@@ -1828,6 +1863,7 @@ import dsServices.ServerConnectionUtil;
 			 }
 			 
 		          });  
+					 
 			        
 			        swap.jTextField1.addActionListener(new java.awt.event.ActionListener() {
 					    public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -1852,6 +1888,7 @@ import dsServices.ServerConnectionUtil;
 									
 					    		 
 					    	 }
+					    	 populateRountingData();
 					    }catch(NumberFormatException e1) {
 	                		commonUTIL.showAlertMessage("Enter Number ");
 	                	}
@@ -1892,11 +1929,15 @@ import dsServices.ServerConnectionUtil;
 									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp((amt1 * -1) * spot).toString());
 					    		 
 					    	 }
+		                    	populateRountingData();
 		                    }catch(NumberFormatException e1) {
 	                    		commonUTIL.showAlertMessage("Enter Number ");
 	                    	}
+		                    	 
 		                    }
+		                  
 		                }
+		              
 		            });
 				 
 			        
@@ -1932,7 +1973,9 @@ import dsServices.ServerConnectionUtil;
 									double amt1 = Math.abs(amt2);								
 									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp((amt2 *-1)/ spot).toString());
 					    		 
-					    	 }}catch(NumberFormatException e1) {
+					    	 }
+		                    	populateRountingData();
+		                    	}catch(NumberFormatException e1) {
 		                    		commonUTIL.showAlertMessage("Enter Number ");
 		                    	}
 		                    }
@@ -1964,11 +2007,14 @@ import dsServices.ServerConnectionUtil;
 									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt1 * spot).toString());
 					    		 
 					    	 }
+		                    	populateRountingData();
 		                    	}catch(NumberFormatException e1) {
 		                    		commonUTIL.showAlertMessage("Enter Number ");
 		                    	}
 		                    }
 		                }
+		                
+		               
 		            });
 			        swap.jTextField4.addKeyListener(new KeyAdapter() {
 	
@@ -2042,6 +2088,7 @@ import dsServices.ServerConnectionUtil;
 	                    	}
 		                    }
 		                }
+		              
 		            });
 			        
 			        // caching can be done in this process. 
@@ -2366,7 +2413,22 @@ import dsServices.ServerConnectionUtil;
 					               	
 					               	trade.setAttributes(getAttributeValue());
 					               	trade.setFees(feesPanel.getFeesDataV());
-					               	 Vector tradestatus = 	remoteTrade.saveTrade(trade,message);
+					                Vector tradestatus = null;
+					               	if(functionality.getRoutingData().size() > 0) {
+						        		   
+						        		  Vector<Trade> rountingTrades = functionality.getRoutingData();
+											if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >0 ) {
+												
+												//	rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), trade,functionality.jTextField2.getDoubleValue(), functionality.jTextField3.getDoubleValue());
+													trade.setRountingTrades(rountingTrades);
+								        		    tradestatus  = 	remoteTrade.saveBatchSplitTrades(trade.getRountingTrades(),message);
+												
+											}
+											 
+						        		    
+						        		} else {
+						        			tradestatus	 = 	remoteTrade.saveTrade(trade,message);
+						        		}
 					               	if(commonUTIL.isEmpty(tradestatus)) {
 					               		commonUTIL.showAlertMessage("Error in ServerSide in saving Trade");
 					               		 return;
@@ -3044,6 +3106,7 @@ import dsServices.ServerConnectionUtil;
 				basicData.jRadioButton0.setSelected(false);
 				functionality.jButton2.setEnabled(true);
 				functionality.jButton3.setEnabled(true);
+				basicData.buysell.setText("BUY");
 			}
 			if(productSubType.equalsIgnoreCase(FXSWAP)) {
 				basicData.jRadioButton2.setSelected(true);
@@ -3052,6 +3115,7 @@ import dsServices.ServerConnectionUtil;
 				basicData.jRadioButton0.setSelected(false);
 				functionality.jButton2.setEnabled(true);
 				functionality.jButton3.setEnabled(true);
+				basicData.buysell.setText("BUY/SELL");
 				
 			}
 			if(productSubType.equalsIgnoreCase(FXFORWARDOPTION)) {
@@ -3061,6 +3125,7 @@ import dsServices.ServerConnectionUtil;
 				basicData.jRadioButton0.setSelected(false);
 				functionality.jButton2.setEnabled(false);
 				functionality.jButton3.setEnabled(false);
+				basicData.buysell.setText("BUY");
 				fwdOp.primaryC.setText("0");
 				fwdOp.quotingC.setText("0");
 			}
@@ -3071,6 +3136,7 @@ import dsServices.ServerConnectionUtil;
 				basicData.jRadioButton1.setSelected(false);
 				functionality.jButton2.setEnabled(false);
 				functionality.jButton3.setEnabled(false);
+				//basicData.buysell.setText("BUY");
 			}
 	        functionality.setRoutingData(null);
 	        b2bconfig = null;
@@ -3079,6 +3145,10 @@ import dsServices.ServerConnectionUtil;
 		   functionality.b2bCurrencyPair.setText("");
 		  //  functionality.b2bBook.setText("");
 		    functionality.b2bTransferTo.setText("");
+		    functionality.clearRounting();
+		    functionality.jLabel2.setSelectedIndex(-1);
+		    functionality.jLabel3.setSelectedIndex(-1);
+		    functionality.jPanel6.setVisible(false);
 	        
 		}
 		public int fillRollParitialOutRightTrade(Trade rolltrade,String type,int rollFROMID,boolean isParital,double rollAmt)  {
@@ -3494,8 +3564,72 @@ import dsServices.ServerConnectionUtil;
 		    
 		}
 		
-		
-		
+		// this method is used to populate currencysplit data
+		public void populateRountingData() {
+			Trade  originaltrade  = null;
+			if(trade == null) {
+				originaltrade = new Trade();
+			    fillTrade(originaltrade,"NEW");
+			}	else {
+				originaltrade = trade;
+				fillTrade(originaltrade,"NEW");
+				if(!basicData.buysell.getText().equalsIgnoreCase(originaltrade.getType())) {
+					originaltrade.setPrice(new Double(out.jTextField4.getText()).doubleValue());
+					originaltrade.setQuantity(new Double(out.jTextField1.getText()).doubleValue()); 
+					originaltrade.setNominal(new Double(out.jTextField2.getText()).doubleValue()); 
+				//	originaltrade.setType(basicData.buysell.getText());
+				}
+			}
+			double rate1 = 0;
+			double rate2 = 0;
+			
+			
+				try {
+					if(!commonUTIL.isEmpty(functionality.jTextField2.getText()) && commonUTIL.isNumeric(functionality.jTextField2.getText()))
+					rate1 = functionality.jTextField2.getDoubleValue();
+					if(!commonUTIL.isEmpty(functionality.jTextField3.getText()) && commonUTIL.isNumeric(functionality.jTextField3.getText()))
+						rate2 = functionality.jTextField3.getDoubleValue();
+				
+					
+					
+				 // Vector<Trade> rountingTrades =	FXSplitUtil.getRountingData(trade,remoteReference);
+					Vector<Trade> rountingTrades  =             functionality.getRoutingData();
+					if(commonUTIL.isEmpty(rountingTrades)) {
+						rountingTrades = FXSplitUtil.getRountingData(originaltrade,remoteReference);
+						if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >0 ) {
+							if(trade == null || trade.getId() == 0) {
+						                    rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2);
+							} else  {
+								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2);
+							}
+						}
+					} else {
+						if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >0 )
+						//rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2);
+							if(trade == null || trade.getId() == 0) {
+		                    rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2);
+						}	else  {
+							if(!basicData.buysell.getText().equalsIgnoreCase(trade.getType())) {
+								originaltrade.setType(basicData.buysell.getText());
+								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2,originaltrade); // add change done on the screen.
+							} else {
+								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2,originaltrade);
+							}
+						}
+					}
+               //  functionality.setRoutingData(rounting);
+				//  fillTrade(trade,"NEW");
+				
+				 
+				  if(!commonUTIL.isEmpty(rountingTrades)) {
+						functionality.setRoutingData(rountingTrades);
+					}
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+		}
 		
 		public void getDataFromTrade(int id,String name) { 
 			try {
@@ -3527,7 +3661,7 @@ import dsServices.ServerConnectionUtil;
 			//trade = new Trade();
 			if(trade == null)
 				return;
-			String s = "";
+			
 			int atRows = attributes.jTable1.getRowCount();
 			for(int t=0;t <atRows; t++) {
 			 
