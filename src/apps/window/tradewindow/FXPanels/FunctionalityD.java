@@ -2,9 +2,14 @@ package apps.window.tradewindow.FXPanels;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.rmi.RemoteException;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -42,7 +47,9 @@ import org.dyno.visual.swing.layouts.Trailing;
 
 import util.NumericTextField;
 import util.commonUTIL;
+import apps.window.tradewindow.util.FXSplitUtil;
 import beans.Book;
+import beans.CurrencySplitConfig;
 import beans.Favorities;
 import beans.LegalEntity;
 import beans.Openpos;
@@ -62,7 +69,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	 static private String hostName = "";
 	 ServerConnectionUtil de = null;
 	String positiongcol [] = {"DATE     ","primaryC","quotingC"};
-	 String routingCol [] =  {"TradeID","Book", "CP", "CurrencyPair","AutoType","Type","AMT1","AMT2"};
+	 String routingCol [] =  {"TradeID","Book",  "CurrencyPair","AutoType","Type","AMT1","AMT2"};
 	 Hashtable<Integer,Book> books = new  Hashtable<Integer,Book>();
 	 Hashtable<Integer,LegalEntity> legalentitys = new  Hashtable<Integer,LegalEntity>();
 	 DefaultComboBoxModel jtext0 = new DefaultComboBoxModel();
@@ -132,6 +139,14 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	        hostName = commonUTIL.getLocalHostName();
 	        init();
 	    }
+		
+		public void clearRounting() {
+			rounting.clear();
+		//	getJTableR2().removeAll();
+			routingModel.data.clear();
+			
+			
+		}
 	private void initComponents() {
 			setLayout(new GroupLayout());
 			add(getJPanel0(), new Constraints(new Leading(5, 833, 10, 10), new Leading(7, 240, 10, 10)));
@@ -214,6 +229,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	private JComboBox getJTextField1() {
 		if (jTextField1 == null) {
 			jTextField1 = new JComboBox();
+			jTextField1.setEditable(false);
 			//jTextField1.setText("jTextField1");
 		}
 		return jTextField1;
@@ -221,6 +237,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	private JComboBox getJTextField0() {
 		if (jTextField0 == null) {
 			jTextField0 = new JComboBox();
+			jTextField0.setEditable(false);
 			//jTextField0.setText("jTextField0");
 		}
 		return jTextField0;
@@ -229,7 +246,52 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 		if (jTextField2 == null) {
 			jTextField2 =  new NumericTextField(10,format);
 			jTextField2.setText("0");
+			jTextField2.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					try {
+						double rate1 = 0.0 ;
+						double rate2 = 0.0 ;	
+						if(!commonUTIL.isEmpty(jTextField2.getText()))
+							rate1 = jTextField2.getDoubleValue();
+						if(!commonUTIL.isEmpty(jTextField3.getText()))
+							rate2 = jTextField3.getDoubleValue();
+						
+						  
+						if(commonUTIL.isEmpty(rounting))
+							return;
+						if(rounting.size() > 4) {
+							Trade orignalTrade = rounting.get(0);
+							if( orignalTrade.getId() == 0) {
+									Trade xsplit1  =  rounting.get(1);									
+									Trade xsplit2  =  rounting.get(3);
+									rounting =     FXSplitUtil.splitTrade(xsplit1, xsplit2, rounting.get(0), rate1, rate2);
+		                             setRoutingData(rounting);
+							}  else {
+								rounting =  FXSplitUtil.splitTrade(rounting, rate1, rate2);
+								if(commonUTIL.isEmpty(rounting)) 
+									return;
+								 setRoutingData(rounting);
+								 jTextField3.setText(String.valueOf(rate2));
+								 jTextField2.setText(String.valueOf(rate1));
+							}
+		                 //  getJTable1().repaint();
+		                  
+						}
+		                   
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			
+				
+				
+			});
 		}
+		
 		return jTextField2;
 	}
 	private JLabel getJLabel4() {
@@ -249,6 +311,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	private JComboBox getJLabel3() {
 		if (jLabel3 == null) {
 			jLabel3 = new JComboBox<String>();
+			jLabel3.setEditable(false);
 			//jLabel3.setText("INR/EUR");
 		}
 		return jLabel3;
@@ -263,6 +326,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	private JComboBox getJLabel2() {
 		if (jLabel2 == null) {
 			jLabel2 = new JComboBox<String>();
+	//		jLabel2.setEditable(false);
 			//jLabel2.setText("USD/INR");
 		}
 		return jLabel2;
@@ -289,19 +353,21 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 			jPanel2.setLayout(new GroupLayout());
 			jPanel2.add(getJLabel0(), new Constraints(new Leading(3, 81, 10, 10), new Leading(8, 23, 10, 10)));
 			jPanel2.add(getJLabel2(), new Constraints(new Leading(5, 10, 10), new Leading(37, 12, 12)));
-			jPanel2.add(getJLabel4(), new Constraints(new Leading(5, 81, 12, 12), new Leading(61, 23, 12, 12)));
-			jPanel2.add(getJTextField0(), new Constraints(new Leading(3, 108, 30, 132), new Leading(86, 26, 12, 12)));
+		//	jPanel2.add(getJLabel4(), new Constraints(new Leading(5, 81, 12, 12), new Leading(61, 23, 12, 12)));
+		//	jPanel2.add(getJTextField0(), new Constraints(new Leading(3, 108, 30, 132), new Leading(86, 26, 12, 12)));
 			jPanel2.add(getJLabel6(), new Constraints(new Leading(8, 36, 12, 12), new Leading(120, 13, 12, 12)));
 			jPanel2.add(getJLabel1(), new Constraints(new Leading(123, 87, 10, 10), new Leading(10, 23, 10, 10)));
 			jPanel2.add(getJLabel3(), new Constraints(new Leading(123, 10, 10), new Leading(39, 10, 10)));
-			jPanel2.add(getJLabel5(), new Constraints(new Leading(123, 99, 10, 10), new Leading(63, 15, 12, 12)));
-			jPanel2.add(getJTextField1(), new Constraints(new Leading(123, 108, 12, 12), new Leading(88, 26, 12, 12)));
+	//		jPanel2.add(getJLabel5(), new Constraints(new Leading(123, 99, 10, 10), new Leading(63, 15, 12, 12)));
+			//jPanel2.add(getJTextField1(), new Constraints(new Leading(123, 108, 12, 12), new Leading(88, 26, 12, 12)));
 			jPanel2.add(getJLabel7(), new Constraints(new Leading(123, 36, 12, 12), new Leading(122, 13, 10, 10)));
 			jPanel2.add(getJTextField2(), new Constraints(new Leading(3, 108, 12, 12), new Leading(141, 26, 12, 12)));
 			jPanel2.add(getJTextField3(), new Constraints(new Leading(117, 108, 12, 12), new Leading(141, 26, 10, 10)));
 			jPanel2.add(getJCheckBox0(), new Constraints(new Leading(222, 31, 12, 12), new Leading(12, 12, 12)));
+			
+			jPanel2.setVisible(true);
 		}
-		jPanel2.setVisible(false);
+		//jPanel2.setVisible(false);
 		return jPanel2;
 	}
 	private JButton getJButton7() {
@@ -380,10 +446,13 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				
-				jTabbedPane1.setVisible(true);
-				jTabbedPane2.setVisible(false);
-			   
+				if(jTabbedPane2.isVisible()) {
+					jTabbedPane1.setVisible(true);
+					jTabbedPane2.setVisible(false);
+				}	else {
+					jTabbedPane1.setVisible(false);
+					jTabbedPane2.setVisible(true);
+					}
 			   
 				
 			}
@@ -425,6 +494,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 			jPanel6.add(getJLabel9(), new Constraints(new Leading(12, 55, 10, 10), new Leading(65, 10, 10)));
 			jPanel6.add(getJLabel10(), new Constraints(new Leading(10, 65, 10, 10), new Leading(108, 10, 10)));
 			jPanel6.add(getB2bTransferTo(), new Constraints(new Leading(93, 166, 12, 12), new Leading(103, 26, 12, 12)));
+			jPanel6.setVisible(false);
 		}
 		//jPanel6.setVisible(false);
 		return jPanel6;
@@ -554,14 +624,14 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	private JTable getJTable1() {
 		if (jTable1 == null) {
 			jTable1 = new JTable();
-			jTable1.setModel(new DefaultTableModel(new Object[][] { { "0x0", "0x1", }, { "1x0", "1x1", }, }, new String[] { "Title 0", "Title 1", }) {
+			/*jTable1.setModel(new DefaultTableModel(new Object[][] { { "0x0", "0x1", }, { "1x0", "1x1", }, }, new String[] { "Title 0", "Title 1", }) {
 				private static final long serialVersionUID = 1L;
 				Class<?>[] types = new Class<?>[] { Object.class, Object.class, };
 	
 				public Class<?> getColumnClass(int columnIndex) {
 					return types[columnIndex];
 				}
-			});
+			});*/
 		}
 		return jTable1;
 	}
@@ -578,7 +648,8 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
  		return jTableP1;
  	}
      private JTable getJTableR2() {
-  		
+  		  final int firstXccy = 0;
+  		 final  int secondXccy = 0;
   			
   			//jTableR2 = new JTable();
   		  routingModel = new TableModelUtil(rounting, routingCol,getRemoteRef());
@@ -592,15 +663,20 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 				if (!isRowSelected(row)) {
 					c.setBackground(getBackground());
 					int modelRow = convertRowIndexToModel(row);
-					String type = (String) getModel().getValueAt(modelRow,
-							4);
+					String autotype = (String) getModel().getValueAt(modelRow,
+							3);
 					
-					if ("Offset".equals(type))
+					if ("Offset".equals(autotype)) {
 						c.setBackground(Color.RED);
-					if ("XccySplit".equals(type))
-						c.setBackground(Color.yellow);
-					if ("Original".equals(type))
+					} else if ("XccySplit".equals(autotype)) {
+						
+						c.setBackground(Color.yellow); 
+					} if ("Original".equals(autotype)) {
 						c.setBackground(Color.pink);
+						Trade trade = routingModel.data.get(row);
+						
+						 
+					}
 
 				}
 
@@ -614,10 +690,35 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
   	}
      
      public void setRoutingData(Vector<Trade> splitTrades) {
-    	 if(splitTrades == null) 
-    		 splitTrades = new Vector<Trade>();
-    	 routingModel = new TableModelUtil(splitTrades, routingCol,getRemoteRef());
-    	 jTableR2.setModel(routingModel);
+    	 if(commonUTIL.isEmpty(splitTrades) || splitTrades == null) 
+    		 return;
+    		 rounting = splitTrades;
+    	
+    	Trade originalTrade =  FXSplitUtil.getOriginalTradeFromRountingTrades(rounting);
+    	 rounting.set(0,originalTrade);
+    	if(originalTrade.getId() >0 ) {
+    		int xxy1 = Integer.parseInt(originalTrade.getAttributeValue("FXccySplitID"));
+	    Trade xccy1 = FXSplitUtil.getSplitOrMirrorTradeFromRountingTrades(xxy1,rounting);
+	    rounting.set(1, xccy1);
+	    Trade mirror1 = FXSplitUtil. getSplitOrMirrorTradeFromRountingTrades( Integer.parseInt(xccy1.getAttributeValue("MirrorID")),rounting);
+	    rounting.set(2, mirror1);
+	    int xxy2 = Integer.parseInt(originalTrade.getAttributeValue("SXccySplitID"));
+	    Trade xccy2 = FXSplitUtil.getSplitOrMirrorTradeFromRountingTrades(xxy2,splitTrades);
+	    Trade mirror2 = FXSplitUtil. getSplitOrMirrorTradeFromRountingTrades( Integer.parseInt(xccy2.getAttributeValue("MirrorID")),rounting);
+	    rounting.set(3, xccy2);
+	    rounting.set(4, mirror2);
+	    
+	    if(xccy1 != null)
+	    jTextField2.setValue(xccy1.getPrice());
+	    if(xccy2 != null)
+	    jTextField3.setValue(xccy2.getPrice());
+    	}
+    	routingModel = new TableModelUtil(rounting, routingCol,getRemoteRef());
+   	 jTableR2.setModel(routingModel);
+    
+     }
+     public Vector<Trade> getRoutingData() {
+    	return rounting;
      }
 	private JScrollPane getJScrollPane0() {
 		if (jScrollPane0 == null) {
@@ -898,8 +999,11 @@ class TableModelUtil extends AbstractTableModel {
 	 }   
 	 public Object getValueAt(int row, int col) {   
 	     Object value = null;  	 
-	    
+	     
 	     Trade trade = (Trade) data.get(row);
+	     if(trade == null) 
+	    	 return null;
+	   //  System.out.println(" row " + row + " "+ trade.getId());
 	    
 		 switch (col) {
 		 case 0:
@@ -914,33 +1018,23 @@ class TableModelUtil extends AbstractTableModel {
 				e.printStackTrace();
 			}
 	         break;
+	    
 	     case 2:
-	         try {
-	        	 if(trade.isMirrorTrade()) 
-	        		 value =  getBook(trade.getCpID()).getBook_name();
-	        	 else
-				value =getLE(trade.getCpID()).getName();
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	         break;
-	     case 3:
 	         value =trade.getTradedesc();
 	         break;
-	     case 4:
+	     case 3:
 		    	
 		        value =  trade.getAutoType();
 		         break;
-	     case 5:
+	     case 4:
 		    	
 	        value =  trade.getType();
 	         break;
-	     case 6:
+	     case 5:
 	    	
 	         value =  trade.getQuantity();
 	         break;
-	     case 7:
+	     case 6:
 	         value =trade.getNominal();
 	         break;
 	    
@@ -971,6 +1065,14 @@ class TableModelUtil extends AbstractTableModel {
 	 this.fireTableDataChanged();   
 	   
 	 }   
+	 
+	 public void setData(Vector<Trade> trades) {
+		 this.data.clear();
+		 
+		 this.data = trades;
+		 
+		 this.fireTableDataChanged();  
+	 }
 	    
 	 public void delRow(int row) {   
 	    if(row != -1) {
@@ -981,7 +1083,8 @@ class TableModelUtil extends AbstractTableModel {
 	 }   
 	 
 	 public void udpateValueAt(Object value, int row, int col) {   
-	     
+	     if(value == null)
+	    	 return;
 	  
 	     data.set(row,(Trade) value) ;
 	     for(int i=0;i<columnNames.length;i++)
@@ -992,20 +1095,24 @@ class TableModelUtil extends AbstractTableModel {
 	    private Book getBook(int bookid) throws RemoteException {
 	    	Book le = new Book();
 	    	le.setBookno(bookid);
-	    	if(books.containsKey(bookid)) {
+	    	if(books.containsKey(bookid)) 
+	    	{
 	    		le = books.get(bookid);
 	    	} else {
-	    		le = (Book) remoteRef.selectBook(le);
+	    		le = (Book) getRemoteRef().selectBook(le);
+	    		if(le != null)
 	    		books.put(bookid, le);
 	    	}
 	    	return le;
 	    }
 	    private LegalEntity getLE(int legalID) throws RemoteException {
-	    LegalEntity le = null;
+	    	
+	    LegalEntity le = new LegalEntity();
 	    	if(legalentitys.containsKey(legalID)) {
 	    		le = legalentitys.get(legalID);
 	    	} else {
 	    		le = (LegalEntity) remoteRef.selectLE(legalID);
+	    		if(le != null)
 	    		legalentitys.put(legalID, le);
 	    	}
 	    	return le;
