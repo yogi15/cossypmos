@@ -37,6 +37,7 @@ import org.dyno.visual.swing.layouts.Trailing;
 
 import util.commonUTIL;
 import apps.window.tradewindow.BackOfficePanel;
+import apps.window.tradewindow.panelWindow.FeesPanel.TableModelUtil;
 import beans.NettingConfig;
 import beans.Product;
 import beans.Trade;
@@ -120,14 +121,17 @@ public class TransferPanel extends BackOfficePanel {
 		setFocusable(true);
 		setEnabled(true);
 		setVisible(true);
-		setVerifyInputWhenFocusTarget(true);
 		setDoubleBuffered(true);
+		setVerifyInputWhenFocusTarget(true);
 		setRequestFocusEnabled(true);
 		setOpaque(true);
 		setLayout(new GroupLayout());
-		add(getJPanel4(), new Constraints(new Bilateral(8, 8, 1129), new Bilateral(7, 323, 10, 282)));
-		add(getJTabbedPane0(), new Constraints(new Bilateral(8, 9, 0), new Trailing(8, 309, 329, 329)));
-		setSize(1062, 646);
+		add(getJPanel4(), new Constraints(new Bilateral(8, 8, 1129),
+				new Bilateral(7, 323, 10, 282)));
+		add(getJTabbedPane0(), new Constraints(new Bilateral(8, 9, 0),
+				new Trailing(8, 309, 329, 329)));
+		setSize(1062, 462);
+		popupMenu.add(actions);
 	}
 
 	private JPanel getJPanel4() {
@@ -353,8 +357,6 @@ public class TransferPanel extends BackOfficePanel {
 							c.setBackground(Color.orange);
 						if ("SETTLED".equals(type))
 							c.setBackground(Color.pink);
-						if ("REVERSED".equals(type))
-							c.setBackground(Color.red);
 
 					}
 
@@ -723,48 +725,80 @@ public class TransferPanel extends BackOfficePanel {
 	private JPanel getJPanel0() {
 		if (jPanel0 == null) {
 			jPanel0 = new JPanel();
+			jPanel0.setVisible(false);
 			jPanel0.setLayout(new GroupLayout());
-			jPanel0.add(getJTextField4(), new Constraints(new Leading(276, 137, 10, 10), new Leading(14, 12, 12)));
-			jPanel0.add(getJTextField6(), new Constraints(new Leading(276, 137, 12, 12), new Leading(96, 12, 12)));
-			jPanel0.add(getJLabel4(), new Constraints(new Leading(208, 65, 10, 10), new Leading(20, 12, 12)));
-			jPanel0.add(getJTextField2(), new Constraints(new Leading(93, 106, 10, 10), new Leading(68, 12, 12)));
-			jPanel0.add(getAmountTextField(), new Constraints(new Leading(95, 106, 10, 10), new Leading(42, 12, 12)));
-			jPanel0.add(getJTextField3(), new Constraints(new Leading(93, 106, 12, 12), new Leading(94, 12, 12)));
-			jPanel0.add(getJButton1(), new Constraints(new Leading(9, 46, 12, 12), new Leading(159, 12, 12)));
-			jPanel0.add(getJTextField11(), new Constraints(new Leading(91, 118, 10, 10), new Leading(160, 12, 12)));
-			jPanel0.add(getJScrollPane1(), new Constraints(new Leading(547, 477, 10, 10), new Leading(124, 72, 12, 12)));
-			jPanel0.add(getJLabel18(), new Constraints(new Leading(490, 12, 12), new Leading(126, 27, 12, 12)));
-			jPanel0.add(getJButton0(), new Constraints(new Leading(942, 10, 10), new Leading(7, 12, 12)));
-			jPanel0.add(getJTextField8(), new Constraints(new Leading(532, 137, 10, 10), new Leading(14, 12, 12)));
-			jPanel0.add(getSettlementAmountTextField(), new Constraints(new Leading(93, 106, 12, 12), new Leading(128, 12, 12)));
-			jPanel0.add(getRefreshButton(), new Constraints(new Leading(942, 85, 12, 12), new Leading(42, 12, 12)));
-			jPanel0.add(getJTextField5(), new Constraints(new Leading(276, 140, 10, 10), new Leading(42, 12, 12)));
-			jPanel0.add(getJTextField7(), new Constraints(new Leading(276, 38, 10, 10), new Leading(68, 12, 12)));
-			jPanel0.add(getSettlementAmountLabel(), new Constraints(new Leading(7, 77, 12, 12), new Leading(134, 12, 12)));
-			jPanel0.add(getJLabel3(), new Constraints(new Leading(5, 57, 12, 12), new Leading(102, 12, 12)));
-			jPanel0.add(getJLabel2(), new Constraints(new Leading(5, 66, 12, 12), new Leading(76, 12, 12)));
-			jPanel0.add(getAmountLabel(), new Constraints(new Leading(8, 49, 12, 12), new Leading(48, 12, 12)));
-			jPanel0.add(getJLabel0(), new Constraints(new Leading(5, 62, 12, 12), new Leading(18, 18, 12, 12)));
-			jPanel0.add(getJTextField1(), new Constraints(new Leading(95, 46, 10, 10), new Leading(14, 12, 12)));
-			jPanel0.add(getJLabel7(), new Constraints(new Leading(211, 56, 12, 12), new Leading(99, 20, 12, 12)));
-			jPanel0.add(getJLabel6(), new Constraints(new Leading(208, 56, 12, 12), new Leading(74, 12, 12)));
-			jPanel0.add(getJLabel5(), new Constraints(new Leading(208, 52, 12, 12), new Leading(48, 12, 12)));
-			jPanel0.add(getJLabel10(), new Constraints(new Leading(435, 93, 12, 12), new Leading(74, 17, 12, 12)));
-			jPanel0.add(getJLabel9(), new Constraints(new Leading(435, 48, 12, 12), new Leading(42, 19, 12, 12)));
-			jPanel0.add(getJLabel8(), new Constraints(new Leading(427, 93, 12, 12), new Leading(18, 12, 12)));
-			jPanel0.add(getJTextField10(), new Constraints(new Leading(534, 137, 12, 12), new Leading(73, 12, 12)));
-			jPanel0.add(getJTextField9(), new Constraints(new Leading(532, 137, 12, 12), new Leading(41, 12, 12)));
+			jPanel0.add(getJTextField1(), new Constraints(new Leading(95, 71,
+					12, 12), new Leading(14, 12, 12)));
+			jPanel0.add(getAmountLabel(), new Constraints(
+					new Leading(9, 49, 12, 12), new Leading(42, 12, 12)));
+			jPanel0.add(getJTextField4(), new Constraints(new Leading(276, 137,
+					10, 10), new Leading(14, 12, 12)));
+			jPanel0.add(getJTextField7(), new Constraints(new Leading(276, 137,
+					12, 12), new Leading(68, 12, 12)));
+			jPanel0.add(getJTextField6(), new Constraints(new Leading(276, 137,
+					12, 12), new Leading(96, 12, 12)));
+			jPanel0.add(getJLabel8(), new Constraints(new Leading(435, 93, 10,
+					10), new Leading(14, 12, 12)));
+			jPanel0.add(getJTextField10(), new Constraints(new Leading(524,
+					137, 12, 12), new Leading(66, 12, 12)));
+			jPanel0.add(getJLabel2(), new Constraints(
+					new Leading(7, 66, 10, 10), new Leading(72, 12, 12)));
+			jPanel0.add(getJLabel10(), new Constraints(new Leading(435, 93, 12,
+					12), new Leading(68, 12, 12)));
+			jPanel0.add(getJLabel4(), new Constraints(new Leading(208, 65, 10,
+					10), new Leading(20, 12, 12)));
+			jPanel0.add(getJLabel5(), new Constraints(new Leading(206, 52, 12,
+					12), new Leading(46, 12, 12)));
+			jPanel0.add(getJTextField2(), new Constraints(new Leading(93, 106,
+					10, 10), new Leading(68, 12, 12)));
+			jPanel0.add(getAmountTextField(), new Constraints(new Leading(95, 106,
+					10, 10), new Leading(42, 12, 12)));
+			jPanel0.add(getJTextField3(), new Constraints(new Leading(93, 106,
+					12, 12), new Leading(94, 12, 12)));
+			jPanel0.add(getJLabel6(), new Constraints(new Leading(208, 56, 12,
+					12), new Leading(70, 12, 12)));
+			jPanel0.add(getJLabel7(), new Constraints(new Leading(206, 56, 12,
+					12), new Leading(94, 20, 12, 12)));
+			jPanel0.add(getJButton1(), new Constraints(new Leading(9, 46, 12,
+					12), new Leading(159, 12, 12)));
+			jPanel0.add(getJTextField11(), new Constraints(new Leading(91, 118,
+					10, 10), new Leading(160, 12, 12)));
+			jPanel0.add(getJScrollPane1(), new Constraints(new Leading(547,
+					477, 10, 10), new Leading(124, 72, 12, 12)));
+			jPanel0.add(getJLabel18(), new Constraints(
+					new Leading(490, 12, 12), new Leading(126, 27, 12, 12)));
+			jPanel0.add(getJButton0(), new Constraints(
+					new Leading(942, 10, 10), new Leading(7, 12, 12)));
+			jPanel0.add(getJTextField8(), new Constraints(new Leading(532, 137,
+					10, 10), new Leading(14, 12, 12)));
+			jPanel0.add(getJLabel3(), new Constraints(
+					new Leading(7, 57, 12, 12), new Leading(99, 12, 12)));
+			jPanel0.add(getJLabel0(), new Constraints(
+					new Leading(9, 62, 12, 12), new Leading(12, 18, 12, 12)));
+			jPanel0.add(getSettlementAmountLabel(), new Constraints(new Leading(12, 77, 10,
+					10), new Leading(131, 12, 12)));
+			jPanel0.add(getSettlementAmountTextField(), new Constraints(new Leading(93, 106,
+					12, 12), new Leading(128, 12, 12)));
+			jPanel0.add(getRefreshButton(), new Constraints(new Leading(942,
+					85, 12, 12), new Leading(42, 12, 12)));
+			jPanel0.add(getJTextField9(), new Constraints(new Leading(640, 137,
+					10, 10), new Leading(40, 12, 12)));
+			jPanel0.add(getJLabel9(), new Constraints(new Leading(586, 48, 12,
+					12), new Leading(42, 19, 12, 12)));
+			jPanel0.add(getJTextField5(), new Constraints(new Leading(276, 306,
+					10, 10), new Leading(42, 12, 12)));
 			jPanel0.addFocusListener(new FocusAdapter() {
-	
+
+				public void focusLost(FocusEvent event) {
+				}
+
 				public void focusGained(FocusEvent event) {
 					try {
-						fillJTabel((Vector) remoteBO.queryWhere("Transfer", "tradeId = " + trade.getId()));
+						fillJTabel((Vector) remoteBO.queryWhere("Transfer",
+								"tradeId = " + trade.getId()));
 					} catch (RemoteException e1) {
 						e1.printStackTrace();
 					}
-				}
-	
-				public void focusLost(FocusEvent event) {
 				}
 			});
 		}
@@ -899,6 +933,8 @@ public class TransferPanel extends BackOfficePanel {
 	private JTable jTable3;
 	private JScrollPane jScrollPane3;
 	private JPanel jPanel4;
+	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+
 	private NettingConfig getNettingConfig(int counterParyID, String productType) {
 		String sql = "leid = " + counterParyID + " and productType ='"
 				+ productType + "'";
@@ -1118,7 +1154,6 @@ public class TransferPanel extends BackOfficePanel {
 	}
 
 	RemoteTrade remoteTrade = null;
-	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 
 	public void setRemoteTrade(RemoteTrade remoteTrade) {
 		// TODO Auto-generated method stub
