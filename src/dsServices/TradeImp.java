@@ -295,8 +295,38 @@ public class TradeImp implements RemoteTrade {
 		
 		
 	}
-
-
+  // this method is to save split trades only
+    private void saveSplitTrade(Trade trade) {
+    	try {
+    	int i =0;
+    	Vector statusTrade = new Vector();
+    	WFConfig wf = getStatusOnTradeAction(trade,trade.getStatus(),statusTrade);
+		
+		trade.setStatus(wf.getOrgStatus());
+    	i	=  TradeSQL.save(trade, dsSQL.getConn());
+    	trade = (Trade) TradeSQL.select(i, dsSQL.getConn());
+    	
+    	processAttribues(i, trade.getAttributes(),trade.getVersion());
+    	Trade oldTrade = trade;
+    	Task task = checkTask(trade,wf,oldTrade);
+		if(task  != null) {
+		    int taskID = TaskSQL.save(task,dsSQL.getConn());
+		    if(taskID >0 )
+		    	task.setId(taskID);
+		}
+		prcessAudit(trade);
+		if(task != null)
+				publishnewTrade("POS_NEWTRADE","Object",getTaskEvent(task, trade));
+			
+			//System.out.println("Publishing %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^    neew Event on TRADE_"+trade.getStatus() +  " for trade id " + trade.getId());
+		   publishnewTrade("POS_NEWTRADE","Object",getTradeEvent(trade));
+		  
+			commonUTIL.display("TradeImpl", "saveSplitTrade :: Method Trade save "+i);
+    	} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
 
 	@Override
 	public int saveTrade(Trade trade) throws RemoteException {
@@ -326,7 +356,7 @@ public class TradeImp implements RemoteTrade {
 					/*	if (oldTrade.getProductType().equals(TradeConstants.TRADE_TYPE_FUTURECONTRACT)) {
 							productType = TradeConstants.TRADE_TYPE_FUTURECONTRACT;
 						} else {*/
-							productType = ( ProductSQL.selectProduct(trade.getProductId(), dsSQL.getConn())).getProductType();
+						//	productType = ( ProductSQL.selectProduct(trade.getProductId(), dsSQL.getConn())).getProductType();
 							
 						//}
 						
@@ -1201,6 +1231,10 @@ return status;
 				if(splitTrades == null || splitTrades.isEmpty())
 					return null;
 				int cout =0;
+				
+				if(originalTrade.getId() > 0) 
+					return saveBatchUpdateSplitTrades(splitTrades,originalTrade,message);
+				 originalTrade.clearAttributes();
 				 Trade xccy1 = splitTrades.get(1);
 				 Trade xccy2 = splitTrades.get(3);
 				 Trade mirror1 = splitTrades.get(2);
@@ -1246,15 +1280,25 @@ return status;
 				 mirror1.setAttribute("MirrorFromTradeID", Integer.valueOf(allocateIDForxccy1).toString());
 				 mirror1.setParentID(allocateIDForOriginalTrade);
      			 mirror2.setAttribute("MirrorFromTradeID", Integer.valueOf(allocateIDForxccy2).toString());
-     			 mirror2.isMirrorTrade();
+     			
      			 mirror2.setParentID(allocateIDForOriginalTrade);
-     			 saveTrade(mirror2);
-     			saveTrade(mirror1);
-     			saveTrade(xccy2);
-     			saveTrade(xccy1);
+     			saveSplitTrade(mirror2);
+     			saveSplitTrade(mirror1);
+     			saveSplitTrade(xccy2);
+     			saveSplitTrade(xccy1);
+     			
      			return saveTrade(originalTrade,message);
 			//	return originalTrade;
 			}
+			private Vector<String> saveBatchUpdateSplitTrades(
+					Vector<Trade> splitTrades, Trade originalTrade,
+					Vector<String> message) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+
+
 			public Vector<String> saveBatchSplitTrades(Vector<Trade> splitTrades,Vector<String> message)
 					throws RemoteException {
 				// TODO Auto-generated method stub
@@ -1267,10 +1311,10 @@ return status;
 				 Trade mirror2 = splitTrades.get(4);
 				Trade originalTrade = FXSplitUtil.getOriginalTradeFromRountingTrades(splitTrades);
 			    
-     			 saveTrade(mirror2);
-     			saveTrade(mirror1);
-     			saveTrade(xccy2);
-     			saveTrade(xccy1);
+				saveSplitTrade(mirror2);
+				saveSplitTrade(mirror1);
+				saveSplitTrade(xccy2);
+				saveSplitTrade(xccy1);
      			return saveTrade(originalTrade,message);
 			//	return originalTrade;
 			}
@@ -1285,6 +1329,11 @@ return status;
 				return null;
 			 if (autoType.equalsIgnoreCase("Original") ) {
 			           trades =  (Vector) TradeSQL.getXccySplitOnParentID(trade.getId(), dsSQL.getConn());
+			           if(commonUTIL.isEmpty(trades)) {
+			        	   trades.add(0,trade);
+			        	   return trades;
+			           }
+			           trades.add(0,trade);
 			         //  trades.add(trade);
 			 }
 			 if (autoType.equalsIgnoreCase("Offset") ) {
