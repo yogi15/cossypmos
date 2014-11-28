@@ -175,7 +175,7 @@ public class FXSplitUtil {
 		}
 		return mirrorTrade;
 	}
-	public static Trade getMirrorTrade(Trade trade,Trade oldmirrorTrade) {
+	public static Trade getMirrorTrade(Trade trade,Trade oldmirrorTrade,boolean isupdate) {
 		Trade mirrorTrade=oldmirrorTrade;
 		
 		try {
@@ -196,6 +196,13 @@ public class FXSplitUtil {
 			mirrorTrade.setCpID(trade.getBookId());
 			mirrorTrade.setMirrorBookid(trade.getBookId());
 			mirrorTrade.setBookId(trade.getBookId());
+			if(isupdate) {
+				mirrorTrade.setAction(trade.getAction());
+				mirrorTrade.setStatus(trade.getStatus());			   
+				
+				mirrorTrade.setCurrency(mirrorTrade.getTradedesc().substring(4, 7));
+				mirrorTrade.setDelivertyDate(trade.getDelivertyDate());
+				 }
 		} catch (CloneNotSupportedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -231,27 +238,46 @@ public class FXSplitUtil {
 		    return Original;
 	  }
 	
-	  public static  Vector<Trade> splitTrade(Vector<Trade> routingTrade,double firstRate, double secondRate, Trade trade) {
+	  public static  Vector<Trade> splitTrade(Vector<Trade> routingTrade,double firstRate, double secondRate, Trade trade,boolean isupdated) {
 			// TODO Auto-generated method stub
+		  Trade originalTrade = null;
 		  if(commonUTIL.isEmpty(routingTrade) )
 		    	 return null;
+		  if(routingTrade.size() == 1) {
+			  return routingTrade;
+		  }
+		     if(trade.getAutoType().equalsIgnoreCase("Original"))
+		       originalTrade = trade;// getOriginalTradeFromRountingTrades(routingTrade);
+		     else 
+		    	 originalTrade =  getOriginalTradeFromRountingTrades(routingTrade);
 		     
-		    Trade originalTrade = trade;// getOriginalTradeFromRountingTrades(routingTrade);
 		    int xxy1 = Integer.parseInt(originalTrade.getAttributeValue("FXccySplitID"));
 		    Trade xccy1 = getSplitOrMirrorTradeFromRountingTrades(xxy1,routingTrade);
 		    int xxy2 = Integer.parseInt(originalTrade.getAttributeValue("SXccySplitID"));
 		    Trade xccy2 = getSplitOrMirrorTradeFromRountingTrades(xxy2,routingTrade);
+		    if(xccy1.getId() == trade.getId()) 
+		    	xccy1 = trade;
+		    if(xccy2.getId() == trade.getId()) 
+		    	xccy2 = trade;
+		    
 		   int mirr1 = Integer.parseInt(xccy1.getAttributeValue("MirrorID"));
 		   Trade mirror1 = getSplitOrMirrorTradeFromRountingTrades(mirr1,routingTrade);
 		   int mirr2 = Integer.parseInt(xccy2.getAttributeValue("MirrorID"));
 		   Trade mirror2 = getSplitOrMirrorTradeFromRountingTrades(mirr2,routingTrade);
-		   return  splitTrade(xccy1,xccy2,mirror1,mirror2,originalTrade,firstRate,secondRate) ;
+		   if(mirror1.getId() == trade.getId()) 
+			   mirror1 = trade;
+		   if(mirror2.getId() == trade.getId()) 
+			   mirror2 = trade;
+		   return  splitTrade(xccy1,xccy2,mirror1,mirror2,originalTrade,firstRate,secondRate,isupdated) ;
 			
 		}
+	  
 	  public static Vector<Trade> splitTrade(Vector<Trade> routingTrade,double firstRate, double secondRate)  {
 		     if(commonUTIL.isEmpty(routingTrade) )
 		    	 return null;
-		     
+		     if(routingTrade.size() == 1) {
+		    	return routingTrade;
+		     }
 		    Trade originalTrade =  getOriginalTradeFromRountingTrades(routingTrade);
 		    int xxy1 = Integer.parseInt(originalTrade.getAttributeValue("FXccySplitID"));
 		    Trade xccy1 = getSplitOrMirrorTradeFromRountingTrades(xxy1,routingTrade);
@@ -261,13 +287,13 @@ public class FXSplitUtil {
 		   Trade mirror1 = getSplitOrMirrorTradeFromRountingTrades(mirr1,routingTrade);
 		   int mirr2 = Integer.parseInt(xccy2.getAttributeValue("MirrorID"));
 		   Trade mirror2 = getSplitOrMirrorTradeFromRountingTrades(mirr2,routingTrade);
-		   return  splitTrade(xccy1,xccy2,mirror1,mirror2,originalTrade,firstRate,secondRate) ;
+		   return  splitTrade(xccy1,xccy2,mirror1,mirror2,originalTrade,firstRate,secondRate,false) ;
 		   
 		     
 	  }
 	 
 	   private static   Vector<Trade> splitTrade(Trade splitTrade1, Trade splitTrade2, Trade mirror1,
-			Trade mirror2, Trade orginalTrade, double firstRate, double secondRate) {
+			Trade mirror2, Trade orginalTrade, double firstRate, double secondRate,boolean isupdate) {
 		// TODO Auto-generated method stub
 		   Vector<Trade> splitsTrade = new Vector<Trade>();
 		   splitTrade1.setCpID(orginalTrade.getCpID());
@@ -283,8 +309,8 @@ public class FXSplitUtil {
 		   splitTrade2.setPrice(secondRate);
 		   splitTrade1.setCurrency(splitTrade1.getTradedesc().substring(4, 7));
 		   splitTrade2.setCurrency(splitTrade2.getTradedesc().substring(4, 7));
-		   splitTrade1.setAttribute("XccySplitFrom",  Integer.valueOf(orginalTrade.getId()).toString());
-		   splitTrade2.setAttribute("XccySplitFrom",  Integer.valueOf(orginalTrade.getId()).toString());
+		 //  splitTrade1.setAttribute("XccySplitFrom",  Integer.valueOf(orginalTrade.getId()).toString());
+		  // splitTrade2.setAttribute("XccySplitFrom",  Integer.valueOf(orginalTrade.getId()).toString());
 		   splitTrade1.setAutoType("XccySplit");
 		   splitTrade2.setAutoType("XccySplit");
 		   splitTrade1.setXccySPlitid(orginalTrade.getId());
@@ -349,11 +375,24 @@ public class FXSplitUtil {
 			   			}
 			   
 		   }
+		   if(isupdate) {
+			   splitTrade1.setAction(orginalTrade.getAction());
+			   splitTrade2.setAction(orginalTrade.getAction());
+			   
+			   splitTrade1.setStatus(orginalTrade.getStatus());
+			   splitTrade2.setStatus(orginalTrade.getStatus());
+			   
+			   splitTrade1.setCurrency(splitTrade1.getTradedesc().substring(4, 7));
+			   splitTrade2.setCurrency(splitTrade1.getTradedesc().substring(4, 7));
+			   splitTrade2.setDelivertyDate(orginalTrade.getDelivertyDate());
+			   splitTrade1.setDelivertyDate(orginalTrade.getDelivertyDate());
+			   
+		   }
 		   splitsTrade.add(0,orginalTrade);
 		   splitsTrade.add(1,splitTrade1);
-		   splitsTrade.add(2,getMirrorTrade(splitTrade1,mirror1));
+		   splitsTrade.add(2,getMirrorTrade(splitTrade1,mirror1,isupdate));
 		   splitsTrade.add(3,splitTrade2);
-		   splitsTrade.add(4,getMirrorTrade(splitTrade2,mirror2));
+		   splitsTrade.add(4,getMirrorTrade(splitTrade2,mirror2,isupdate));
 		  
 		  
 		   
@@ -366,6 +405,11 @@ public class FXSplitUtil {
 		   orginalTrade.setAutoType("Original");
 		   Trade mirrorTrade1 = null;
 		   Trade mirrorTrade2 = null;
+		   if(splitTrade1 == null) {
+			   splitsTrade.add(orginalTrade);
+			   return splitsTrade;
+			   
+		   }
 		   if(orginalTrade.getId() == 0) {
 			   
 		       splitTrade1.setId(0);
@@ -390,8 +434,8 @@ public class FXSplitUtil {
 		   splitTrade2.setPrice(secondRate);
 		   splitTrade1.setCurrency(splitTrade1.getTradedesc().substring(4, 7));
 		   splitTrade2.setCurrency(splitTrade2.getTradedesc().substring(4, 7));
-		   splitTrade1.setAttribute("XccySplitFrom",  Integer.valueOf(orginalTrade.getId()).toString());
-		   splitTrade2.setAttribute("XccySplitFrom",  Integer.valueOf(orginalTrade.getId()).toString());
+		 //  splitTrade1.setAttribute("XccySplitFrom",  Integer.valueOf(orginalTrade.getId()).toString());
+		//   splitTrade2.setAttribute("XccySplitFrom",  Integer.valueOf(orginalTrade.getId()).toString());
 		   splitTrade1.setAutoType("XccySplit");
 		   splitTrade2.setAutoType("XccySplit");
 		   splitTrade1.setXccySPlitid(orginalTrade.getId());
