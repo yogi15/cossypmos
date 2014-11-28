@@ -141,9 +141,18 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	    }
 		
 		public void clearRounting() {
-			rounting.clear();
-		//	getJTableR2().removeAll();
 			routingModel.data.clear();
+			
+			 
+		repaint();
+	//	 routingModel = new TableModelUtil(rounting, routingCol,getRemoteRef());
+		//	getJTableR2().setModel(routingModel);
+		//	repaint();
+			//routingModel.fireTableDataChanged();
+		//	routingModel.fireTableStructureChanged();
+			
+	//	
+			
 			
 			
 		}
@@ -696,7 +705,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
     	
     	Trade originalTrade =  FXSplitUtil.getOriginalTradeFromRountingTrades(rounting);
     	 rounting.set(0,originalTrade);
-    	if(originalTrade.getId() >0 ) {
+    	if(originalTrade.getId() >0 && rounting.size() > 4) {
     		int xxy1 = Integer.parseInt(originalTrade.getAttributeValue("FXccySplitID"));
 	    Trade xccy1 = FXSplitUtil.getSplitOrMirrorTradeFromRountingTrades(xxy1,rounting);
 	    rounting.set(1, xccy1);
@@ -1076,8 +1085,10 @@ class TableModelUtil extends AbstractTableModel {
 	    
 	 public void delRow(int row) {   
 	    if(row != -1) {
+	    	System.out.println(row);
 	 data.remove(row);          
-	 this.fireTableDataChanged();   
+	 this.fireTableDataChanged();  
+	// this.fir
 	    }
 	    
 	 }   
