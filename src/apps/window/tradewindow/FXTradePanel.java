@@ -26,6 +26,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 	
+import apps.window.operationwindow.jobpanl.FilterValues;
 	import apps.window.tradewindow.FXPanels.Swap;
 import apps.window.tradewindow.FXPanels.TradeAttributes;
 import apps.window.tradewindow.FXPanels.outRight;
@@ -544,26 +545,10 @@ import dsServices.ServerConnectionUtil;
 			try {
 				String autoType = trade.getAutoType();
 				if(!commonUTIL.isEmpty(autoType)) {
-				// if(trade.getB2bid() >0 || trade.getAutoType().equalsIgnoreCase("Original") ) {
-					// routingTrades = remoteTrade.getB2Btrades(trade);
-				// }
-				       if(commonUTIL.isEmpty(routingTrades)) {
-				    	
-				    		routingTrades  = remoteTrade.getSplitTrades(trade);
-				    		//  if(trade.getAutoType().equalsIgnoreCase("Original") ) {
-				    			
-				    		 //   routingTrades.add(0,trade);
-				    		//  } 
-				       }
-				}
-				/*if(rountingTrades == null) {
-					rountingTrades = new Vector<Trade>();
-					rountingTrades.add(trade);
-				}*/
 				
-			//	splitTrades.add(trade);
-				functionality.setRoutingData(routingTrades);
-			
+				    		routingTrades  = remoteTrade.getSplitTrades(trade);
+			      			functionality.setRoutingData(routingTrades);
+				}
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1141,10 +1126,10 @@ import dsServices.ServerConnectionUtil;
 						        		trade.setMirrorBookid(0);
 						        		trade.setFees(feesPanel.getFeesDataV());
 						        		Vector tradestatus = null;
-						        		if(functionality.getRoutingData().size() > 0) {
-						        		   
+						        		if(!commonUTIL.isEmpty(functionality.getRoutingData())  && functionality.getRoutingData().size() > 1) {
+						        		   trade.clearAttributes();
 						        		   Vector<Trade> rountingTrades = FXSplitUtil.getRountingData(trade,remoteReference);
-											if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >0 ) {
+											if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >1 ) {
 												try {
 													rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), trade,functionality.jTextField2.getDoubleValue(), functionality.jTextField3.getDoubleValue());
 													trade.setRountingTrades(rountingTrades);
@@ -1157,6 +1142,9 @@ import dsServices.ServerConnectionUtil;
 											 
 						        		    
 						        		} else {
+						        			
+						        			 trade.setAllocatedID(0);
+						        			 trade.setAutoType("Original");
 						        			tradestatus  = 	remoteTrade.saveTrade(trade,message);
 						        		}
 						               	 if(commonUTIL.isEmpty(tradestatus)) {
@@ -2414,12 +2402,17 @@ import dsServices.ServerConnectionUtil;
 					               	trade.setAttributes(getAttributeValue());
 					               	trade.setFees(feesPanel.getFeesDataV());
 					                Vector tradestatus = null;
-					               	if(functionality.getRoutingData().size() > 0) {
+					               	if(!commonUTIL.isEmpty(functionality.getRoutingData()) && functionality.getRoutingData().size() > 1) {
 						        		   
 						        		  Vector<Trade> rountingTrades = functionality.getRoutingData();
-											if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >0 ) {
+											if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >1 ) {
 												
-												//	rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), trade,functionality.jTextField2.getDoubleValue(), functionality.jTextField3.getDoubleValue());
+													try {
+														rountingTrades =     FXSplitUtil.splitTrade(rountingTrades, functionality.jTextField2.getDoubleValue(),functionality.jTextField3.getDoubleValue(), trade,true);
+													} catch (ParseException e1) {
+														// TODO Auto-generated catch block
+														e1.printStackTrace();
+													}
 													trade.setRountingTrades(rountingTrades);
 								        		    tradestatus  = 	remoteTrade.saveBatchSplitTrades(trade.getRountingTrades(),message);
 												
@@ -2427,6 +2420,8 @@ import dsServices.ServerConnectionUtil;
 											 
 						        		    
 						        		} else {
+						        			//trade = functionality.getRoutingData().get(0);
+						        		
 						        			tradestatus	 = 	remoteTrade.saveTrade(trade,message);
 						        		}
 					               	if(commonUTIL.isEmpty(tradestatus)) {
@@ -3148,6 +3143,9 @@ import dsServices.ServerConnectionUtil;
 		    functionality.clearRounting();
 		    functionality.jLabel2.setSelectedIndex(-1);
 		    functionality.jLabel3.setSelectedIndex(-1);
+		    functionality.jTextField2.setText("0");
+		    functionality.jTextField3.setText("0");
+		  
 		    functionality.jPanel6.setVisible(false);
 	        
 		}
@@ -3445,11 +3443,14 @@ import dsServices.ServerConnectionUtil;
 				  
 			    
 			} 
-		
+		/// to remove the attribute we this methods. 
 		
 		public void removeAttributeFromTrade(Trade trade) {
 			attributeDataValue.remove("rollOverTO");
 			attributeDataValue.remove("rollBackTo");
+			attributeDataValue.remove("FXccySplitID");
+			attributeDataValue.remove("SXccySplitID");
+			
 			
 		}
 		
@@ -3566,6 +3567,8 @@ import dsServices.ServerConnectionUtil;
 		
 		// this method is used to populate currencysplit data
 		public void populateRountingData() {
+			
+			//FilterValues.isavaliableForSplit(trade.getTradedesc(),trade.getBookId(),)
 			Trade  originaltrade  = null;
 			if(trade == null) {
 				originaltrade = new Trade();
@@ -3598,7 +3601,11 @@ import dsServices.ServerConnectionUtil;
 						rountingTrades = FXSplitUtil.getRountingData(originaltrade,remoteReference);
 						if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >0 ) {
 							if(trade == null || trade.getId() == 0) {
+								         if(rountingTrades.size() == 1) {
+								        	 FXSplitUtil.splitTrade(null, null, originaltrade, 0, 0);
+								         } else {
 						                    rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2);
+								         }
 							} else  {
 								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2);
 							}
@@ -3607,13 +3614,17 @@ import dsServices.ServerConnectionUtil;
 						if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >0 )
 						//rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2);
 							if(trade == null || trade.getId() == 0) {
-		                    rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2);
+								if(rountingTrades.size() == 1) {
+						        	 FXSplitUtil.splitTrade(null, null, originaltrade, 0, 0);
+						         } else {
+				                    rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2);
+						         }
 						}	else  {
 							if(!basicData.buysell.getText().equalsIgnoreCase(trade.getType())) {
 								originaltrade.setType(basicData.buysell.getText());
-								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2,originaltrade); // add change done on the screen.
+								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2,originaltrade,false); // add change done on the screen.
 							} else {
-								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2,originaltrade);
+								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2,originaltrade,false);
 							}
 						}
 					}
