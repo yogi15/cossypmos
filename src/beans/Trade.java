@@ -16,6 +16,7 @@ public class Trade implements Serializable,Cloneable {
 	boolean isFXSwap = false;
 	boolean isMirrorTrade = false;
 	boolean isPositionBased = true;
+	Vector<Trade> rountingTrades = new Vector<Trade>();
 	
 	/**
 	 * @return the isPositionBased
@@ -25,7 +26,10 @@ public class Trade implements Serializable,Cloneable {
 	}
 
 
-
+    public void clearAttributes() {
+        attributes = "";
+        setAttribute("TradeDate",commonUTIL.getCurrentDateTime());
+    }
 
 
 	/**
@@ -511,13 +515,14 @@ public int getUserID() {
 	                     ";Nominal="+getNominal() +
 	                     ";tradeamount= "+getTradeAmount() +
 	                      ";type="+getType().trim()+
-	                      ";Yield="+getYield()+
+	                      ";FarAmt2="+getYield()+
 	                      ";status="+getStatus().trim()+
 		                  ";ProductName="+getTradedesc().trim()+
 		                  ";productSubType="+getTradedesc1().trim()+
 		                  ";productType="+getProductType().trim()+
 		                  ";CpID="+getCpID()+
 		                  ";Amoritization="+getAmoritizationData()+
+		                  ";FarRate="+getSecondPrice()+
 		                  ";TraderID="+getTraderID();
 		}catch(Exception e) {
 			commonUTIL.displayError("Trade Object", "getValues  == " + values, e);
@@ -588,8 +593,15 @@ public int getUserID() {
 	public double getSecondPrice() {
 		return secondTradePrice;
 	}
-
-
+ 
+	public void  setRountingTrades(Vector<Trade> rountingTrades) {
+		this.rountingTrades = rountingTrades;
+	}
+	public Vector<Trade>   getRountingTrades() {
+		return rountingTrades;
+	}
+	
+	
 	public Hashtable<String,String> getAttributeH() {
 	
 	    Hashtable<String,String> attsh = new Hashtable<String,String>();
@@ -731,5 +743,38 @@ B2BConfig b2bConfig = null;
 	}
 	public B2BConfig getB2bConfig() {
 		return b2bConfig;
+	}
+
+
+int allocatedID = 0;
+public void setAllocatedID(int allocatedID) {
+	// TODO Auto-generated method stub
+	this.allocatedID =allocatedID ;
+}
+
+	public int getAllocatedID() {
+		// TODO Auto-generated method stub
+		return allocatedID;
+	}
+
+
+
+
+
+	public String getAttributeValue(String attributesDataName) {
+		// TODO Auto-generated method stub
+		String attr1 = getAttributes();
+		String attributes [] = attr1.split(";");
+		String value = "";
+		for(int i=0;i<attributes.length;i++) {
+		String attribute = 	attributes[i];
+		if(attribute.contains(attributesDataName)) {
+			value = attribute.substring(attribute.indexOf("=")+1, attribute.length());
+			if(!commonUTIL.isEmpty(value))
+				 break;
+		}
+		}
+		return value;
+		
 	}
 }
