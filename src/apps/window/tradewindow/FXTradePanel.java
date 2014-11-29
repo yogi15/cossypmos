@@ -1131,7 +1131,8 @@ import dsServices.ServerConnectionUtil;
 						        		   Vector<Trade> rountingTrades = FXSplitUtil.getRountingData(trade,remoteReference);
 											if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >1 ) {
 												try {
-													rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), trade,functionality.jTextField2.getDoubleValue(), functionality.jTextField3.getDoubleValue());
+													rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3),
+															trade,functionality.jTextField2.getDoubleValue(), functionality.jTextField3.getDoubleValue(),functionality.FarRate1.getDoubleValue(),functionality.FarRate2.getDoubleValue());
 													trade.setRountingTrades(rountingTrades);
 								        		    tradestatus  = 	remoteTrade.saveBatchSplitTrades(trade.getRountingTrades(),trade,message);
 												} catch (ParseException e1) {
@@ -1447,7 +1448,7 @@ import dsServices.ServerConnectionUtil;
 								return null;
 							}
 							
-							trades  = FXSplitUtil.splitTrade(xccY1,xccY2,trade,frate,srate);
+					//		trades  = FXSplitUtil.splitTrade(xccY1,xccY2,trade,frate,srate);
 								} catch (ParseException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
@@ -1640,10 +1641,12 @@ import dsServices.ServerConnectionUtil;
 							 
 							 if( basicData.buysell.getText().equalsIgnoreCase("BUY/SELL") ) {
 								 basicData. buysell.setText("SELL/BUY");
+								 basicData. buysell.setBackground(Color.red);
 								 
 							} else {
 								if(productSubType.equalsIgnoreCase("FXSWAP")) {
 								basicData.buysell.setText("BUY/SELL");
+								 basicData. buysell.setBackground(Color.green);
 								}
 								 
 													}
@@ -2408,7 +2411,8 @@ import dsServices.ServerConnectionUtil;
 											if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >1 ) {
 												
 													try {
-														rountingTrades =     FXSplitUtil.splitTrade(rountingTrades, functionality.jTextField2.getDoubleValue(),functionality.jTextField3.getDoubleValue(), trade,true);
+														rountingTrades =     FXSplitUtil.splitTrade(rountingTrades, functionality.jTextField2.getDoubleValue(),
+																functionality.jTextField3.getDoubleValue(), trade,functionality.FarRate1.getDoubleValue(),functionality.FarRate2.getDoubleValue(),true);
 													} catch (ParseException e1) {
 														// TODO Auto-generated catch block
 														e1.printStackTrace();
@@ -2492,9 +2496,11 @@ import dsServices.ServerConnectionUtil;
 							//out.jCheckBox1.setSelected(false);
 							if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL")) {
 								basicData.buysell.setText("BUY");
+								basicData.buysell.setBackground(Color.green);
 							}
 						if(basicData.buysell.getText().equalsIgnoreCase("SELL/BUY"))
 							basicData.buysell.setText("SELL"); 
+						basicData.buysell.setBackground(Color.red);
 							
 						} 
 							
@@ -2527,7 +2533,7 @@ import dsServices.ServerConnectionUtil;
 									
 							if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
 								basicData.buysell.setText("SELL/BUY");
-								
+								basicData.buysell.setBackground(Color.red);
 								double amt1 = Math.abs(new Double(out.jTextField1.getText()).doubleValue() );
 								
 								double amt2 = Math.abs(new Double(out.jTextField2.getText()).doubleValue()  * -1);
@@ -2540,7 +2546,8 @@ import dsServices.ServerConnectionUtil;
 							}
 						if(basicData.buysell.getText().equalsIgnoreCase("SELL")) {
 							basicData.buysell.setText("BUY/SELL");
-							
+							basicData.buysell.setBackground(Color.green
+									);
 							
 							
 							
@@ -3145,9 +3152,11 @@ import dsServices.ServerConnectionUtil;
 		    functionality.jLabel3.setSelectedIndex(-1);
 		    functionality.jTextField2.setText("0");
 		    functionality.jTextField3.setText("0");
-		  
+		    functionality.FarRate1.setText("0");
+		    functionality.FarRate2.setText("0");
 		    functionality.jPanel6.setVisible(false);
-	        
+		  //  functionality.jTabbedPane2.setVisible(false);
+		  //  functionality.jTabbedPane1.setVisible(true);
 		}
 		public int fillRollParitialOutRightTrade(Trade rolltrade,String type,int rollFROMID,boolean isParital,double rollAmt)  {
 			Trade newrolltrade = new Trade();
@@ -3477,6 +3486,8 @@ import dsServices.ServerConnectionUtil;
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}    
+			   if(commonUTIL.isEmpty(basicData.book.getName()))
+				   return;
 			trade.setBookId(new Integer(basicData.book.getName()).intValue());
 			if(mirrorBook.getBookno()> 0) {
 			//	trade.setCpID(counterPartyID);
@@ -3488,8 +3499,12 @@ import dsServices.ServerConnectionUtil;
 					commonUTIL.showAlertMessage("Select CounterParty");
 					return;
 				}
+				if(commonUTIL.isEmpty(basicData.counterPary.getName()))
+					   return;
 			trade.setCpID(new Integer(basicData.counterPary.getName()).intValue());
 			}
+			if(commonUTIL.isEmpty(basicData.jTextField7.getName()))
+				   return;
 			trade.setTraderID(new Integer(basicData.jTextField7.getName()).intValue());
 			trade.setTradeDate(commonUTIL.getCurrentDateTime());
 		    
@@ -3499,6 +3514,7 @@ import dsServices.ServerConnectionUtil;
 		   
 		    if(!(out.jComboBox1.getSelectedIndex() == -1))
 		        trade.setAction(out.jComboBox1.getSelectedItem().toString());
+		    if(!commonUTIL.isEmpty(basicData.currencyPair.getText()))
 		    trade.setCurrency((String)basicData.currencyPair.getText().substring(4, 7));  // negotiable curr ie. quote currency ie. settlementCurrency
 		    trade.setType(basicData.buysell.getText());
 		    trade.setTradedesc(basicData.currencyPair.getText()); 
@@ -3569,9 +3585,14 @@ import dsServices.ServerConnectionUtil;
 		public void populateRountingData() {
 			
 			//FilterValues.isavaliableForSplit(trade.getTradedesc(),trade.getBookId(),)
+			
 			Trade  originaltrade  = null;
 			if(trade == null) {
 				originaltrade = new Trade();
+				if(commonUTIL.isEmpty(basicData.book.getName()) || commonUTIL.isEmpty(basicData.currencyPair.getText()))
+				   return;
+				
+				
 			    fillTrade(originaltrade,"NEW");
 			}	else {
 				originaltrade = trade;
@@ -3583,8 +3604,12 @@ import dsServices.ServerConnectionUtil;
 				//	originaltrade.setType(basicData.buysell.getText());
 				}
 			}
+			if(commonUTIL.isEmpty(originaltrade.getTradedesc()) || originaltrade.getBookId() == 0)
+				 return;
 			double rate1 = 0;
 			double rate2 = 0;
+			double farrate1 =0;
+			double farrate2 = 0;
 			
 			
 				try {
@@ -3592,6 +3617,10 @@ import dsServices.ServerConnectionUtil;
 					rate1 = functionality.jTextField2.getDoubleValue();
 					if(!commonUTIL.isEmpty(functionality.jTextField3.getText()) && commonUTIL.isNumeric(functionality.jTextField3.getText()))
 						rate2 = functionality.jTextField3.getDoubleValue();
+					if(!commonUTIL.isEmpty(functionality.FarRate1.getText()) && commonUTIL.isNumeric(functionality.FarRate1.getText()))
+						farrate1 = functionality.FarRate2.getDoubleValue();
+					if(!commonUTIL.isEmpty(functionality.FarRate2.getText()) && commonUTIL.isNumeric(functionality.FarRate2.getText()))
+						farrate2 = functionality.FarRate1.getDoubleValue();
 				
 					
 					
@@ -3602,12 +3631,12 @@ import dsServices.ServerConnectionUtil;
 						if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >0 ) {
 							if(trade == null || trade.getId() == 0) {
 								         if(rountingTrades.size() == 1) {
-								        	 FXSplitUtil.splitTrade(null, null, originaltrade, 0, 0);
+								        	 FXSplitUtil.splitTrade(null, null, originaltrade, 0, 0,0,0);
 								         } else {
-						                    rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2);
+						                    rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2,farrate1,farrate2);
 								         }
 							} else  {
-								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2);
+								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2,farrate1,farrate2);
 							}
 						}
 					} else {
@@ -3615,16 +3644,16 @@ import dsServices.ServerConnectionUtil;
 						//rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2);
 							if(trade == null || trade.getId() == 0) {
 								if(rountingTrades.size() == 1) {
-						        	 FXSplitUtil.splitTrade(null, null, originaltrade, 0, 0);
+						        	 FXSplitUtil.splitTrade(null, null, originaltrade, 0, 0,0,0);
 						         } else {
-				                    rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2);
+				                    rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2,farrate1,farrate2);
 						         }
 						}	else  {
 							if(!basicData.buysell.getText().equalsIgnoreCase(trade.getType())) {
 								originaltrade.setType(basicData.buysell.getText());
-								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2,originaltrade,false); // add change done on the screen.
+								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2,originaltrade,farrate1,farrate2,false); // add change done on the screen.
 							} else {
-								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2,originaltrade,false);
+								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2,originaltrade,farrate1,farrate2,false);
 							}
 						}
 					}
@@ -3712,9 +3741,11 @@ import dsServices.ServerConnectionUtil;
 		    if(trade.getType().equalsIgnoreCase("BUY")) {
 		       out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(trade.getQuantity()).toString());
 		       out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(trade.getNominal()).toString());
+		       basicData.buysell.setBackground(Color.green);
 		    } else  {
 		    	out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(trade.getQuantity()).toString());
 		    	 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(trade.getNominal()).toString());
+		    	 basicData.buysell.setBackground(Color.red);
 		    }
 		    app.openTrade(trade,false);
 		   
@@ -3729,6 +3760,7 @@ import dsServices.ServerConnectionUtil;
 		    	swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(trade.getYield()).toString());
 		    	swap.swapDate.setSelectedDate(commonUTIL.stringToDate(trade.getEffectiveDate().toString(),true));
 		    	swap.jTextField4.setValue(trade.getSecondPrice());
+		    	
 		    	try {
 					System.out.println(swap.jTextField4.getDoubleValue());
 				} catch (ParseException e) {
