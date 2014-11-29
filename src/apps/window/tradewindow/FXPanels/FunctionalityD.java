@@ -45,6 +45,7 @@ import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 import org.dyno.visual.swing.layouts.Trailing;
 
+import swingUtils.TableColumnAdjuster;
 import util.NumericTextField;
 import util.commonUTIL;
 import apps.window.tradewindow.util.FXSplitUtil;
@@ -70,6 +71,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	 ServerConnectionUtil de = null;
 	String positiongcol [] = {"DATE     ","primaryC","quotingC"};
 	 String routingCol [] =  {"TradeID","Book",  "CurrencyPair","AutoType","Type","AMT1","AMT2"};
+	 String routingColSwap [] =  {"TradeID","Book",  "CurrencyPair","AutoType","Type","AMT1","AMT2","FARAMT1","FARAMT2"};
 	 Hashtable<Integer,Book> books = new  Hashtable<Integer,Book>();
 	 Hashtable<Integer,LegalEntity> legalentitys = new  Hashtable<Integer,LegalEntity>();
 	 DefaultComboBoxModel jtext0 = new DefaultComboBoxModel();
@@ -97,7 +99,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	public JButton jButton0;
 	public JPanel jPanel3;
 	public JPanel jPanel5;
-	JTabbedPane jTabbedPane2;
+	public JTabbedPane jTabbedPane2;
 	JScrollPane jScrollPaneR2;
 	JScrollPane jScrollPaneP1;
 	public JTable jTableP1;
@@ -123,6 +125,9 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 		public JLabel jLabel7;
 		public JPanel jPanel6;
 		public NumericTextField jTextField3;
+		public NumericTextField FarRate1;
+		public NumericTextField FarRate2;
+		
 		Vector<Trade> rounting = new Vector<Trade>();
 		RemoteReferenceData remoteRef;
 		
@@ -221,6 +226,20 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 		}
 		return jTextField3;
 	}
+	private NumericTextField getJTextFieldFarRate1() {
+		if (FarRate1 == null) {
+			FarRate1 = new NumericTextField(10,format);
+			FarRate1.setText("0");
+		}
+		return FarRate1;
+	}
+	private NumericTextField getJTextFieldFarRate2() {
+		if (FarRate2 == null) {
+			FarRate2 = new NumericTextField(10,format);
+			FarRate2.setText("0");
+		}
+		return FarRate2;
+	}
 	private JLabel getJLabel7() {
 		if (jLabel7 == null) {
 			jLabel7 = new JLabel();
@@ -263,10 +282,16 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 					try {
 						double rate1 = 0.0 ;
 						double rate2 = 0.0 ;	
+						double farRate1 = 0.0;
+						double farRate2 = 0.0;
 						if(!commonUTIL.isEmpty(jTextField2.getText()))
 							rate1 = jTextField2.getDoubleValue();
 						if(!commonUTIL.isEmpty(jTextField3.getText()))
 							rate2 = jTextField3.getDoubleValue();
+						if(!commonUTIL.isEmpty(jTextField2.getText()))
+							farRate1 = FarRate2.getDoubleValue();
+						if(!commonUTIL.isEmpty(jTextField3.getText()))
+							farRate2 = FarRate1.getDoubleValue();
 						
 						  
 						if(commonUTIL.isEmpty(rounting))
@@ -276,15 +301,17 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 							if( orignalTrade.getId() == 0) {
 									Trade xsplit1  =  rounting.get(1);									
 									Trade xsplit2  =  rounting.get(3);
-									rounting =     FXSplitUtil.splitTrade(xsplit1, xsplit2, rounting.get(0), rate1, rate2);
+									rounting =     FXSplitUtil.splitTrade(xsplit1, xsplit2, rounting.get(0), rate1, rate2,farRate1,farRate2);
 		                             setRoutingData(rounting);
 							}  else {
-								rounting =  FXSplitUtil.splitTrade(rounting, rate1, rate2);
+								rounting =  FXSplitUtil.splitTrade(rounting, rate1, rate2,farRate1,farRate2);
 								if(commonUTIL.isEmpty(rounting)) 
 									return;
 								 setRoutingData(rounting);
 								 jTextField3.setText(String.valueOf(rate2));
 								 jTextField2.setText(String.valueOf(rate1));
+								 FarRate1.setText(String.valueOf(farRate1));
+								 FarRate2.setText(String.valueOf(farRate2));
 							}
 		                 //  getJTable1().repaint();
 		                  
@@ -306,14 +333,14 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	private JLabel getJLabel4() {
 		if (jLabel4 == null) {
 			jLabel4 = new JLabel();
-			jLabel4.setText("First Spot Book");
+			jLabel4.setText("Far Rate ");
 		}
 		return jLabel4;
 	}
 	private JLabel getJLabel5() {
 		if (jLabel5 == null) {
 			jLabel5 = new JLabel();
-			jLabel5.setText("Second Spot Book");
+			jLabel5.setText("Far Rate");
 		}
 		return jLabel5;
 	}
@@ -360,19 +387,40 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 			jPanel2 = new JPanel();
 			jPanel2.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel2.setLayout(new GroupLayout());
-			jPanel2.add(getJLabel0(), new Constraints(new Leading(3, 81, 10, 10), new Leading(8, 23, 10, 10)));
-			jPanel2.add(getJLabel2(), new Constraints(new Leading(5, 10, 10), new Leading(37, 12, 12)));
+			jPanel2.add(getJLabel0(),   new Constraints(new Leading(15, 69, 10, 10), new Leading(7, 10, 10)));
+			
 		//	jPanel2.add(getJLabel4(), new Constraints(new Leading(5, 81, 12, 12), new Leading(61, 23, 12, 12)));
 		//	jPanel2.add(getJTextField0(), new Constraints(new Leading(3, 108, 30, 132), new Leading(86, 26, 12, 12)));
-			jPanel2.add(getJLabel6(), new Constraints(new Leading(8, 36, 12, 12), new Leading(120, 13, 12, 12)));
-			jPanel2.add(getJLabel1(), new Constraints(new Leading(123, 87, 10, 10), new Leading(10, 23, 10, 10)));
-			jPanel2.add(getJLabel3(), new Constraints(new Leading(123, 10, 10), new Leading(39, 10, 10)));
-	//		jPanel2.add(getJLabel5(), new Constraints(new Leading(123, 99, 10, 10), new Leading(63, 15, 12, 12)));
+		//	jPanel2.add(getJLabel6(), new Constraints(new Leading(8, 36, 12, 12), new Leading(120, 13, 12, 12)));
+			jPanel2.add(getJLabel1(), new Constraints(new Leading(119, 88, 10, 10), new Leading(7, 12, 12)));
+			jPanel2.add(getJLabel2(),  new Constraints(new Leading(12, 91, 10, 10), new Leading(30, 10, 10)));// dropdown
+			jPanel2.add(getJLabel3(),new Constraints(new Leading(119, 102, 10, 10), new Leading(30, 12, 12))); // dropdown
+			
+	//		jPanel2.add(getJLabel5(), new Constraints(new Leading(15, 54, 10, 10), new Leading(64, 10, 10)));
 			//jPanel2.add(getJTextField1(), new Constraints(new Leading(123, 108, 12, 12), new Leading(88, 26, 12, 12)));
-			jPanel2.add(getJLabel7(), new Constraints(new Leading(123, 36, 12, 12), new Leading(122, 13, 10, 10)));
-			jPanel2.add(getJTextField2(), new Constraints(new Leading(3, 108, 12, 12), new Leading(141, 26, 12, 12)));
-			jPanel2.add(getJTextField3(), new Constraints(new Leading(117, 108, 12, 12), new Leading(141, 26, 10, 10)));
-			jPanel2.add(getJCheckBox0(), new Constraints(new Leading(222, 31, 12, 12), new Leading(12, 12, 12)));
+			jPanel2.add(getJLabel7(), new Constraints(new Leading(15, 54, 10, 10), new Leading(64, 10, 10)));
+			jPanel2.add(getJTextField2(),new Constraints(new Leading(15, 68, 12, 12), new Leading(84, 12, 12)));
+			jPanel2.add(getJTextField3(),new Constraints(new Leading(123, 70, 10, 10), new Leading(84, 12, 12)));
+			jPanel2.add(getJLabel4(), new Constraints(new Leading(17, 10, 10), new Leading(112, 10, 10)));
+			jPanel2.add(getJLabel5(), new Constraints(new Leading(123, 12, 12), new Leading(112, 12, 12)));
+			jPanel2.add(getJTextFieldFarRate1(), new Constraints(new Leading(123, 66, 10, 10), new Leading(132, 12, 12)));
+			jPanel2.add(getJTextFieldFarRate2(), new Constraints(new Leading(15, 68, 12, 12), new Leading(134, 10, 10))); 
+			jPanel2.add(getJCheckBox0(), new Constraints(new Leading(222, 31, 12, 12), new Leading(12, 12, 12))); 
+			
+		/*	jPanel2.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
+			jPanel2.setLayout(new GroupLayout());
+			jPanel2.add(getJLabel2(), new Constraints(new Leading(12, 66, 12, 12), new Leading(30, 10, 10)));
+			jPanel2.add(getJLabel0(), new Constraints(new Leading(15, 69, 10, 10), new Leading(7, 10, 10)));
+			jPanel2.add(getJLabel1(), new Constraints(new Leading(119, 88, 10, 10), new Leading(7, 12, 12)));
+			jPanel2.add(getJLabel3(), new Constraints(new Leading(119, 64, 10, 10), new Leading(30, 12, 12)));
+			jPanel2.add(getJLabel2(), new Constraints(new Leading(15, 54, 10, 10), new Leading(64, 10, 10)));
+		//	jPanel2.add(getJLabel3(), new Constraints(new Leading(123, 10, 10), new Leading(62, 12, 12)));
+			jPanel2.add(getJTextField2(), new Constraints(new Leading(15, 68, 12, 12), new Leading(84, 12, 12)));
+			jPanel2.add(getJTextField3(), new Constraints(new Leading(123, 70, 10, 10), new Leading(84, 12, 12)));
+			jPanel2.add(getJLabel4(), new Constraints(new Leading(17, 10, 10), new Leading(112, 10, 10)));
+			jPanel2.add(getJLabel5(), new Constraints(new Leading(123, 12, 12), new Leading(112, 12, 12)));
+			jPanel2.add(getJTextFieldFarRate1(), new Constraints(new Leading(123, 66, 10, 10), new Leading(132, 12, 12)));
+			jPanel2.add(getJTextFieldFarRate2(), new Constraints(new Leading(15, 68, 12, 12), new Leading(134, 10, 10))); */
 			
 			jPanel2.setVisible(true);
 		}
@@ -661,8 +709,9 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
   		 final  int secondXccy = 0;
   			
   			//jTableR2 = new JTable();
-  		  routingModel = new TableModelUtil(rounting, routingCol,getRemoteRef());
+  		  routingModel = new TableModelUtil(rounting, routingColSwap,getRemoteRef());
   		 jTableR2 = new JTable(routingModel) {
+  		
 			public Component prepareRenderer(TableCellRenderer renderer,
 					int row, int column) {
 				Component c = super.prepareRenderer(renderer, row, column);
@@ -692,6 +741,9 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 					return c;
 				}
 			};
+			jTableR2.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+			TableColumnAdjuster tca = new TableColumnAdjuster(jTableR2);
+			tca.adjustColumns();
   		 jTableR2.setModel(routingModel);
   		   
   		
@@ -722,7 +774,15 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	    if(xccy2 != null)
 	    jTextField3.setValue(xccy2.getPrice());
     	}
+    	if(originalTrade.getTradedesc1().equalsIgnoreCase("FXSWAP")) {
+			jTableR2.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+			TableColumnAdjuster tca = new TableColumnAdjuster(jTableR2);
+			tca.adjustColumns();
+			routingModel = new TableModelUtil(rounting, routingColSwap,getRemoteRef());
+
+    	} else {
     	routingModel = new TableModelUtil(rounting, routingCol,getRemoteRef());
+    	}
    	 jTableR2.setModel(routingModel);
     
      }
@@ -1041,10 +1101,16 @@ class TableModelUtil extends AbstractTableModel {
 	         break;
 	     case 5:
 	    	
-	         value =  trade.getQuantity();
+	         value =  commonUTIL.convertToFinanceFormate(trade.getQuantity());
 	         break;
 	     case 6:
-	         value =trade.getNominal();
+	         value =commonUTIL.convertToFinanceFormate(trade.getNominal());
+	         break;
+	     case 7:
+	         value =commonUTIL.convertToFinanceFormate(trade.getTradeAmount());
+	         break;
+	     case 8:
+	         value =commonUTIL.convertToFinanceFormate(trade.getYield());
 	         break;
 	    
 	    
