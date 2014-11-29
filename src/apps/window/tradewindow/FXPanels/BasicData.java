@@ -1,5 +1,11 @@
 package apps.window.tradewindow.FXPanels;
 
+import java.awt.Color;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -163,6 +169,8 @@ public class BasicData extends JPanel {
 		if (buysell == null) {
 			buysell = new JTextField();
 			buysell.setText("BUY");
+			buysell.setBackground(Color.green);
+			
 		}
 		return buysell;
 	}
@@ -179,7 +187,50 @@ public class BasicData extends JPanel {
 		if (jLabel3 == null) {
 			jLabel3 = new JLabel();
 			jLabel3.setText("BUY/SELL");
-		}
+			 jLabel3.addMouseListener(new MouseListener() {
+				
+				
+				@Override
+				public void mouseClicked(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mousePressed(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					// TODO Auto-generated method stub
+					String buysellt = buysell.getText().toString();
+					if(buysellt.equalsIgnoreCase("BUY") || buysellt.equalsIgnoreCase("BUY/SELL")) 
+						buysell.setBackground(Color.red);
+						if(buysellt.equalsIgnoreCase("SELL") || buysellt.equalsIgnoreCase("SELL/BUY")) 
+							buysell.setBackground(Color.green);
+						
+						
+					
+				}
+			});
+
+				
+		} 
+		
 		return jLabel3;
 	}
 
