@@ -142,7 +142,7 @@ public class FWDOptionPanel extends JPanel {
 	private JLabel getJLabel0() {
 		if (jLabel0 == null) {
 			jLabel0 = new JLabel();
-			jLabel0.setText("StartDate");
+			jLabel0.setText("OptionEndDate");
 		}
 		return jLabel0;
 	}
