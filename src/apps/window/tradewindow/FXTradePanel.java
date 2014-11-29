@@ -1251,7 +1251,7 @@ import dsServices.ServerConnectionUtil;
 						}
 			        });
 			        
-			        functionality.jCheckBox0.addMouseListener(new java.awt.event.MouseAdapter() {
+			     /*   functionality.jCheckBox0.addMouseListener(new java.awt.event.MouseAdapter() {
 	
 						@Override
 						public void mouseClicked(MouseEvent e) {
@@ -1297,7 +1297,7 @@ import dsServices.ServerConnectionUtil;
 							}
 							
 						}
-			        });
+			        }); */
 			        
 			        functionality.jTableR2.addMouseListener(new java.awt.event.MouseAdapter() {
 			        	@Override
@@ -1306,6 +1306,8 @@ import dsServices.ServerConnectionUtil;
 			        		if(rowselected == -1)
 			        			return;
 			        		int tradeID = (Integer) functionality.jTableR2.getValueAt(rowselected,0);
+			        		if(tradeID == 0)
+			        			return;
 			        		app.trade = null;
 			        		Trade trade  = null;
 							try {
@@ -2488,6 +2490,7 @@ import dsServices.ServerConnectionUtil;
 							functionality.jButton2.setEnabled(true);
 							functionality.jButton3.setEnabled(true);
 							out.jCheckBox2.setEnabled(true);
+							out.jCheckBox0.setEnabled(false);
 							functionality.jButton2.setEnabled(true);
 							fwdOp.setVisible(false);
 							swap.setVisible(false);
@@ -2520,6 +2523,7 @@ import dsServices.ServerConnectionUtil;
 							
 							basicData.jRadioButton1.setSelected(false);
 							out.jCheckBox2.setEnabled(true);
+							out.jCheckBox0.setEnabled(false);
 							functionality.jButton2.setEnabled(true);
 							functionality.jButton3.setEnabled(true);
 							basicData.jRadioButton5.setSelected(false);
@@ -2609,7 +2613,7 @@ import dsServices.ServerConnectionUtil;
 								basicData.jRadioButton5.setSelected(false);
 								
 						    	basicData.jRadioButton0.setSelected(false);
-								//commonUTIL.showAlertMessage("Select Currency Pair");
+								commonUTIL.showAlertMessage("Select Currency Pair");
 								return;
 							}
 							out.jCheckBox2.setEnabled(false);
@@ -2618,6 +2622,7 @@ import dsServices.ServerConnectionUtil;
 							//functionality.jButton4.setEnabled(false);
 							productSubType = FXFORWARDOPTION;
 							 functionality.jButton0.setEnabled(true);
+							 out.jCheckBox0.setEnabled(true);
 							swap.setVisible(false);
 							fwdOp.setVisible(true);
 							fwdOp.primaryC.setValue(0);
@@ -2628,7 +2633,7 @@ import dsServices.ServerConnectionUtil;
 							if(!currP.isEmpty())
 							     fwdOp.jLabel2.setText(currP.substring(0, 3));
 							 fwdOp.jLabel3.setText(currP.substring(4, 7));
-							 fwdOp.startDate.setText(commonUTIL.getCurrentDateTime());
+							 fwdOp.startDate.setText(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
 							
 						} 
 							
@@ -3050,6 +3055,7 @@ import dsServices.ServerConnectionUtil;
 		public void newTradeView() {
 			app.trade = null;
 			out.jCheckBox2.setEnabled(true);
+			out.jCheckBox0.setEnabled(false);
 			functionality.jButton2.setEnabled(true);
 			basicData.currencyPair.setText("");
 			basicData.book.setText("");
@@ -3585,7 +3591,10 @@ import dsServices.ServerConnectionUtil;
 		public void populateRountingData() {
 			
 			//FilterValues.isavaliableForSplit(trade.getTradedesc(),trade.getBookId(),)
-			
+			if(productSubType.equalsIgnoreCase(FXFORWARDOPTION))
+				return;
+			if(productSubType.equalsIgnoreCase(FXTAKEUP))
+				return;
 			Trade  originaltrade  = null;
 			if(trade == null) {
 				originaltrade = new Trade();
@@ -3604,6 +3613,10 @@ import dsServices.ServerConnectionUtil;
 				//	originaltrade.setType(basicData.buysell.getText());
 				}
 			}
+			if(productSubType.equalsIgnoreCase(FXFORWARDOPTION))
+				return;
+			if(productSubType.equalsIgnoreCase(FXTAKEUP))
+				return;
 			if(commonUTIL.isEmpty(originaltrade.getTradedesc()) || originaltrade.getBookId() == 0)
 				 return;
 			double rate1 = 0;
