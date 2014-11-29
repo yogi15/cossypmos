@@ -749,7 +749,7 @@ public class FXSplitUtil {
 			   		if(secondRate > 0  )
 			   		splitTrade2.setQuantity(splitCurrencyValue / secondRate);
 			   		splitTrade2.setQuantity(splitCurrencyValue * -1);
-					   splitTrade2.setNominal(splitCurrencyValue * -1 * secondRate);
+					   splitTrade2.setNominal(splitTrade2.getQuantity() * -1 * secondRate);
 					  splitTrade2.setType("SELL");
 				   
 			   			}
@@ -864,7 +864,7 @@ public class FXSplitUtil {
 			   	 splitTrade1.setQuantity(orginalTrade.getQuantity() *-1);  //SELL 
 			  
 				 splitTrade1.setNominal((splitTrade1.getQuantity() * firstRate) * -1 ); //BUY 
-				 splitTrade1.setTradeAmount(orginalTrade.getYield() * -1); //BUY
+				 splitTrade1.setTradeAmount(orginalTrade.getTradeAmount() * -1); //BUY
 				 splitTrade1.setYield(splitTrade1.getTradeAmount() * -1 * firstFarRate); // sell
 				 	splitCurrencyValue = splitTrade1.getNominal(); 
 			   	
@@ -894,7 +894,8 @@ public class FXSplitUtil {
 			   }
 		   }  else {
 			   	if(orginalTrade.getType().equalsIgnoreCase("BUY/SELL")) { 
-			   	 splitTrade2.setType("SELL/BUY");
+			   	 splitTrade2.setType("BUY/SELL");
+			   //	 splitTrade2.setType("");
 			   	 splitTrade2.setQuantity(orginalTrade.getNominal() * -1); // BUY 
 				 splitTrade2.setNominal((splitTrade2.getQuantity() * -1) * secondRate); // SELL 
 				 splitTrade2.setTradeAmount(orginalTrade.getYield() * -1 ); //SELL
