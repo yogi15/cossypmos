@@ -405,23 +405,9 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 			jPanel2.add(getJLabel5(), new Constraints(new Leading(123, 12, 12), new Leading(112, 12, 12)));
 			jPanel2.add(getJTextFieldFarRate1(), new Constraints(new Leading(123, 66, 10, 10), new Leading(132, 12, 12)));
 			jPanel2.add(getJTextFieldFarRate2(), new Constraints(new Leading(15, 68, 12, 12), new Leading(134, 10, 10))); 
-			jPanel2.add(getJCheckBox0(), new Constraints(new Leading(222, 31, 12, 12), new Leading(12, 12, 12))); 
+		//	jPanel2.add(getJCheckBox0(), new Constraints(new Leading(222, 31, 12, 12), new Leading(12, 12, 12))); 
 			
-		/*	jPanel2.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
-			jPanel2.setLayout(new GroupLayout());
-			jPanel2.add(getJLabel2(), new Constraints(new Leading(12, 66, 12, 12), new Leading(30, 10, 10)));
-			jPanel2.add(getJLabel0(), new Constraints(new Leading(15, 69, 10, 10), new Leading(7, 10, 10)));
-			jPanel2.add(getJLabel1(), new Constraints(new Leading(119, 88, 10, 10), new Leading(7, 12, 12)));
-			jPanel2.add(getJLabel3(), new Constraints(new Leading(119, 64, 10, 10), new Leading(30, 12, 12)));
-			jPanel2.add(getJLabel2(), new Constraints(new Leading(15, 54, 10, 10), new Leading(64, 10, 10)));
-		//	jPanel2.add(getJLabel3(), new Constraints(new Leading(123, 10, 10), new Leading(62, 12, 12)));
-			jPanel2.add(getJTextField2(), new Constraints(new Leading(15, 68, 12, 12), new Leading(84, 12, 12)));
-			jPanel2.add(getJTextField3(), new Constraints(new Leading(123, 70, 10, 10), new Leading(84, 12, 12)));
-			jPanel2.add(getJLabel4(), new Constraints(new Leading(17, 10, 10), new Leading(112, 10, 10)));
-			jPanel2.add(getJLabel5(), new Constraints(new Leading(123, 12, 12), new Leading(112, 12, 12)));
-			jPanel2.add(getJTextFieldFarRate1(), new Constraints(new Leading(123, 66, 10, 10), new Leading(132, 12, 12)));
-			jPanel2.add(getJTextFieldFarRate2(), new Constraints(new Leading(15, 68, 12, 12), new Leading(134, 10, 10))); */
-			
+		
 			jPanel2.setVisible(true);
 		}
 		//jPanel2.setVisible(false);

@@ -18,7 +18,6 @@ import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
 import util.NumericTextField;
-import util.commonUTIL;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class outRight extends JPanel {
@@ -47,6 +46,7 @@ public class outRight extends JPanel {
 	public JComboBox jComboBox1;
 	public JCheckBox jCheckBox2;
 	public JCheckBox jCheckBox3;
+	public JCheckBox jCheckBox0;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	public outRight() {
 		initComponents();
@@ -56,6 +56,16 @@ public class outRight extends JPanel {
 		setLayout(new GroupLayout());
 		add(getJPanel0(), new Constraints(new Leading(6, 829, 10, 10), new Leading(5, 80, 10, 10)));
 		setSize(848, 93);
+	}
+
+	private JCheckBox getJCheckBox0() {
+		if (jCheckBox0 == null) {
+			jCheckBox0 = new JCheckBox();
+			jCheckBox0.setSelected(false);
+			jCheckBox0.setText("Float");
+			jCheckBox0.setEnabled(false);
+		}
+		return jCheckBox0;
 	}
 
 	private JCheckBox getJCheckBox3() {
@@ -251,10 +261,9 @@ public class outRight extends JPanel {
 			jPanel0.add(getJLabel6(), new Constraints(new Leading(314, 12, 12), new Leading(41, 24, 12, 12)));
 			jPanel0.add(getJTextField1(), new Constraints(new Leading(148, 150, 10, 10), new Leading(5, 25, 12, 12)));
 			jPanel0.add(getJTextField2(), new Constraints(new Leading(148, 150, 12, 12), new Leading(41, 25, 12, 12)));
-			//jPanel0.add(getJCheckBox0(), new Constraints(new Leading(746, 12, 12), new Leading(0, 17, 10, 10)));
 			jPanel0.add(getJCheckBox2(), new Constraints(new Leading(746, 12, 12), new Leading(16, 19, 12, 12)));
-			//jPanel0.add(getJCheckBox3(), new Constraints(new Leading(746, 69, 12, 12), new Leading(35, 19, 12, 12)));
 			jPanel0.add(getJTextField4(), new Constraints(new Leading(353, 159, 10, 10), new Leading(5, 25, 12, 12)));
+			jPanel0.add(getJCheckBox0(), new Constraints(new Leading(746, 12, 12), new Leading(39, 12, 12)));
 		}
 		return jPanel0;
 	}
