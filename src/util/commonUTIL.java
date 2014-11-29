@@ -1341,4 +1341,17 @@ public class commonUTIL {
 		
 		return dateTime.substring(0, 10);
 	}
+
+
+
+
+	public static Object convertToFinanceFormate(double quantity) {
+		// TODO Auto-generated method stub
+		String value = getStringFromDoubleExp(quantity);
+		if(value.contains("-")) {
+		 value = 	value.replace("-", "(") + ")";
+		}
+			
+		return value ;
+	}
 }
