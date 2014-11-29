@@ -229,7 +229,7 @@ protected static int selectMax(Connection con ) {
          PreparedStatement stmt = null;
    try {
     con.setAutoCommit(false);
-    System.out.println(con.getAutoCommit());
+//    System.out.println(con.getAutoCommit());
     stmt = dsSQL.newPreparedStatement(con, SELECT_MAX);
     commonUTIL.display("TradeSQL ::  selectMax", SELECT_MAX);
           ResultSet rs = stmt.executeQuery();
@@ -265,8 +265,10 @@ protected static int selectMax(Connection con ) {
       tradeId = inserTrade.getId();
     } else {
      con.setAutoCommit(false);
-    
-     tradeId = selectMax(con) +1;
+    if(inserTrade.getAllocatedID() == 0)
+         tradeId = selectMax(con) +1;
+    else 
+    	tradeId = inserTrade.getAllocatedID();
     
    //  System.out.println(con.getAutoCommit());
     int j = 1;
@@ -327,6 +329,11 @@ protected static int selectMax(Connection con ) {
     	 stmt.setString(41, inserTrade.getTradedesc());
     	 stmt.setDouble(42, inserTrade.getQuantity());
     	 stmt.setDouble(43, inserTrade.getNominal());
+    } else {
+    	stmt.setString(41, "");
+   	 stmt.setDouble(42, 0);
+   	 stmt.setDouble(43, 0);
+
     }
 
              stmt.executeUpdate();
@@ -929,6 +936,88 @@ public static Vector getXccySplitOnChild(int tradeID, Connection con) {
      }
      return Trades;
 }
+
+public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
+	   int j = 0;
+	      PreparedStatement stmt = null;
+	      Vector Trades = new Vector();
+	      String sql = SELECTXCCYSPLIT;
+	      
+	   try {
+		   sql = sql + "  parentID = " + tradeID ;
+	    con.setAutoCommit(false);
+	   
+	 
+	    stmt = dsSQL.newPreparedStatement(con, sql);
+	 //   stmt.setInt(1,parentID);
+	       ResultSet rs = stmt.executeQuery();
+	      
+	       while(rs.next()) {
+	    	   Trade trade = new Trade();
+	    	   trade.setId(rs.getInt(1));
+	           
+	           trade.setProductId(rs.getInt(2));
+	           trade.setCpID(rs.getInt(3));
+	           trade.setStatus(rs.getString(4));
+	           trade.setType(rs.getString(5));
+	         
+	           trade.setTradeDate(commonUTIL.convertSQLDatetoString(rs.getTimestamp((6))));
+	           trade.setBrokerID(rs.getInt(7))   ;
+	           trade.setTradeAmount(rs.getDouble(8))  ;
+	           trade.setEffectiveDate(rs.getString(9))  ;
+	           trade.setDelivertyDate(rs.getString(10)) ;
+	           trade.setBookId(rs.getInt(11))  ;
+	           trade.setQuantity(rs.getDouble(12))  ;
+	           trade.setPrice(rs.getDouble(13))  ;
+	           trade.setUserID(rs.getInt(14))  ;
+	           trade.setVersionID(rs.getInt(15))  ;
+	           trade.setCurrency(rs.getString(16));
+	           trade.setYield(rs.getDouble(17));
+	           trade.setAttributes(rs.getString(18));
+	           trade.setTradedesc(rs.getString(19));
+	           trade.setTraderID(rs.getInt(20))  ;
+	           trade.setNominal(rs.getDouble(21));
+	           trade.setAction(rs.getString(22));
+	           trade.setTradedesc1(rs.getString(23));
+	           trade.setProductType(rs.getString(24));
+	           trade.setAmoritizationData(rs.getString(25));
+	           trade.setMirrorID(rs.getInt(26));
+	           trade.setParentID(rs.getInt(27));
+	           trade.setAutoType(rs.getString(28));
+	           trade.setSecondPrice(rs.getDouble(29));
+	           trade.setRollOverTo(rs.getInt(30));
+	           trade.setRollOverFrom(rs.getInt(31));
+	           trade.setRollBackTo(rs.getInt(32));
+	           trade.setRollBackFrom(rs.getInt(33));
+	           trade.setOutstanding(rs.getDouble(34));
+	           if( rs.getInt( 35) == 1)
+	        	   trade.setParitial(true);
+	           trade.setOffsetid(rs.getInt(36));
+	           trade.setXccySPlitid(rs.getInt(37));
+	           trade.setMirrorBookid(rs.getInt(38));
+	           trade.setB2bid(rs.getInt(39));
+	           if(rs.getString(40).trim().equalsIgnoreCase("N")) {
+	           	   trade.setPositionBased(false);
+	             }
+	         Trades.add(trade);
+	        
+	       }
+	       commonUTIL.display("TradeSQL",sql);
+	   } catch (Exception e) {
+	    commonUTIL.displayError("TradeSQL"," getXccySplit " + sql,e);
+	    return Trades;
+	        
+	      }
+	      finally {
+	         try {
+	    stmt.close();
+	   } catch (SQLException e) {
+	    // TODO Auto-generated catch block
+	    commonUTIL.displayError("TradeSQL"," getRollOverHierarchies  " + sql,e);
+	   }
+	      }
+	      return Trades;
+	  }
   public static Collection getXccySplit(int tradeID,Connection con ) {
 	   int j = 0;
 	      PreparedStatement stmt = null;
