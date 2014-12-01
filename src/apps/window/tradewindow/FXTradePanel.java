@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.InputMethodEvent;
 import java.awt.event.InputMethodListener;
 import java.awt.event.ItemEvent;
@@ -27,7 +29,7 @@ import java.util.Iterator;
 import java.util.Vector;
 	
 import apps.window.operationwindow.jobpanl.FilterValues;
-	import apps.window.tradewindow.FXPanels.Swap;
+import apps.window.tradewindow.FXPanels.Swap;
 import apps.window.tradewindow.FXPanels.TradeAttributes;
 import apps.window.tradewindow.FXPanels.outRight;
 import apps.window.tradewindow.panelWindow.FeesPanel;
@@ -141,7 +143,7 @@ import dsServices.ServerConnectionUtil;
 		 Product product = null;
 		 RemoteProduct remoteProduct = null;
 		 Swap swap = null;
-		 outRight out = null;
+		 public outRight out = null;
 		 FWDOptionPanel fwdOp = null;
 		 TradeAttributesD attributes = null;
 		 RemoteBOProcess remoteBO;
@@ -344,9 +346,10 @@ import dsServices.ServerConnectionUtil;
 			this.out = out;
 		}
 	
-		public TradeAttributesD getAttributes() {
+		public TradeAttributesD getAttributes(FXTradePanel out) {
 			if (attributes == null) {
 				attributes = new TradeAttributesD();
+				attributes.setOutRight(out);
 				//attributes.setBorder(new LineBorder(Color.black, 1, false));
 			}
 			return attributes;
@@ -496,8 +499,9 @@ import dsServices.ServerConnectionUtil;
 			add(getSwap(), new Constraints(new Leading(7, 12, 12), new Leading(193, 89, 12, 12)));
 			add(getFwdOp(), new Constraints(new Leading(7, 512, 358, 358), new Leading(193, 89, 10, 10)));
 			add(getFunctionality(),  new Constraints(new Leading(7, 843, 10, 10), new Leading(294, 10, 10)));
-			add(getAttributes(),  new Constraints(new Leading(860, 329, 12, 12), new Leading(4, 536, 10, 10)));
+		
 			add(getOut(), new Constraints(new Leading(5, 838, 12, 12), new Leading(101, 87, 12, 12)));
+			add(getAttributes(this ),  new Constraints(new Leading(860, 329, 12, 12), new Leading(4, 536, 10, 10)));
 			add(getBasicData(), new Constraints(new Leading(7, 835, 10, 10), new Leading(8, 90, 10, 10)));
 			add(getRollPanel(),  new Constraints(new Leading(483, 360, 10, 10), new Leading(193, 89, 10, 10)));
 			
@@ -697,7 +701,11 @@ import dsServices.ServerConnectionUtil;
 			     //   attributeModel = new DefaultTableModel(attributeColumnName,0);
 			        processTableData(attributeDataValue,attributeModel);
 			        //attributes.jTable1.setModel(attributeModel);
-			        swap.setVisible(false);
+			       
+			        swap.jTextField1.setText("0.0");
+					swap.jTextField2.setText("0.0");
+					swap.jTextField4.setText("0.0");
+					 swap.setVisible(false);
 			        basicData.jRadioButton0.setSelected(false);
 			        basicData.jRadioButton1.setSelected(false);
 			        basicData.jRadioButton2.setSelected(false);
@@ -1206,13 +1214,33 @@ import dsServices.ServerConnectionUtil;
 								 functionality.jPanel2.setVisible(true);
 								 try {
 								//	 basicData.book.getName() 
+									 if(commonUTIL.isEmpty(basicData.book.getName()) && commonUTIL.isEmpty(basicData.currencyPair.getText())) {
+										 commonUTIL.showAlertMessage("Select Book & CurrencyPair");
+										 out.jCheckBox2.setSelected(false);
+										 return;
+									 }
+									 if(productType.equalsIgnoreCase(FXSWAP)) {
+										 functionality.FarRate1.setVisible(true);
+										 functionality.FarRate2.setVisible(true);
+										 functionality.jLabel4.setVisible(true);
+										 functionality.jLabel5.setVisible(true);
+									 } else {
+										 functionality.FarRate1.setVisible(false);
+										 functionality.FarRate2.setVisible(false);
+										 functionality.jLabel4.setVisible(false);
+										 functionality.jLabel5.setVisible(false);
+									 }
 									Vector vector = (Vector) remoteReference.getCurrencySplitConfig(Integer.parseInt(basicData.book.getName()), basicData.currencyPair.getText());
-									 if(!commonUTIL.isEmpty(vector)) {
+									 functionality.clearRounting();
+									if(!commonUTIL.isEmpty(vector)) {
 									  sconfig =  (CurrencySplitConfig)vector.elementAt(0);
-									  functionality.jLabel2.addItem(sconfig.getFirstCurrencySplit());
+									  functionality.jLabel2.setText(sconfig.getFirstCurrencySplit());
+									  populateRountingData();
 									
-									functionality.jLabel3.addItem(sconfig.getSecondCurrencySPlit());
-									 } 
+									functionality.jLabel3.setText(sconfig.getSecondCurrencySPlit());
+									 } else {
+										 out.jCheckBox2.setSelected(false);
+									 }
 								} catch (RemoteException e1) {
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
@@ -2483,6 +2511,10 @@ import dsServices.ServerConnectionUtil;
 						public void mouseClicked(MouseEvent e) {
 							if(!basicData.jRadioButton1.isEnabled())
 								return ;
+							 functionality.FarRate1.setVisible(false);
+							 functionality.FarRate2.setVisible(false);
+							 functionality.jLabel4.setVisible(false);
+							 functionality.jLabel5.setVisible(false);
 							basicData.jRadioButton2.setSelected(false);
 							basicData.jRadioButton1.setSelected(true);
 							basicData.jRadioButton5.setSelected(false);
@@ -2493,7 +2525,11 @@ import dsServices.ServerConnectionUtil;
 							out.jCheckBox0.setEnabled(false);
 							functionality.jButton2.setEnabled(true);
 							fwdOp.setVisible(false);
+							swap.jTextField1.setText("0.0");
+							swap.jTextField2.setText("0.0");
+							swap.jTextField4.setText("0.0");
 							swap.setVisible(false);
+							
 							functionality.jButton0.setEnabled(false);
 							productSubType = "FXFORWARD";
 							//out.jCheckBox1.setSelected(false);
@@ -2512,7 +2548,9 @@ import dsServices.ServerConnectionUtil;
 			    
 			    	
 			    });
+			        
 			       // swap  radio button 
+			        
 			        basicData.jRadioButton2.addMouseListener(new java.awt.event.MouseAdapter() {
 	
 						@Override
@@ -2520,7 +2558,10 @@ import dsServices.ServerConnectionUtil;
 							if(!basicData.jRadioButton2.isEnabled())
 								return ;
 							basicData.jRadioButton2.setSelected(true);
-							
+							 functionality.FarRate1.setVisible(true);
+							 functionality.FarRate2.setVisible(true);
+							 functionality.jLabel4.setVisible(true);
+							 functionality.jLabel5.setVisible(true);
 							basicData.jRadioButton1.setSelected(false);
 							out.jCheckBox2.setEnabled(true);
 							out.jCheckBox0.setEnabled(false);
@@ -2532,7 +2573,9 @@ import dsServices.ServerConnectionUtil;
 							fwdOp.setVisible(false);
 							productSubType = "FXSWAP";
 							swap.setVisible(true);
-							
+							swap.jTextField1.setText("0.0");
+							swap.jTextField2.setText("0.0");
+							swap.jTextField4.setText("0.0");
 							out.outRightDate.setSelectedDate(commonUTIL.addSubtractDate(commonUTIL.getCurrentDate(), 2));
 									
 							if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
@@ -2599,6 +2642,10 @@ import dsServices.ServerConnectionUtil;
 						public void mouseClicked(MouseEvent e) {
 							if(!basicData.jRadioButton5.isEnabled())
 								return ;
+							 functionality.FarRate1.setVisible(false);
+							 functionality.FarRate2.setVisible(false);
+							 functionality.jLabel4.setVisible(false);
+							 functionality.jLabel5.setVisible(false);
 							functionality.jButton2.setEnabled(false);
 							functionality.jButton3.setEnabled(false);
 							basicData.jRadioButton2.setSelected(false);
@@ -2609,6 +2656,10 @@ import dsServices.ServerConnectionUtil;
 							if(currP.isEmpty()) {
 								basicData.jRadioButton1.setSelected(true);
 								basicData.jRadioButton2.setSelected(false);
+								
+								swap.jTextField1.setText("0.0");
+								swap.jTextField2.setText("0.0");
+								swap.jTextField4.setText("0.0");
 								swap.setVisible(false);
 								basicData.jRadioButton5.setSelected(false);
 								
@@ -2623,6 +2674,10 @@ import dsServices.ServerConnectionUtil;
 							productSubType = FXFORWARDOPTION;
 							 functionality.jButton0.setEnabled(true);
 							 out.jCheckBox0.setEnabled(true);
+							
+							swap.jTextField1.setText("0.0");
+							swap.jTextField2.setText("0.0");
+							swap.jTextField4.setText("0.0");
 							swap.setVisible(false);
 							fwdOp.setVisible(true);
 							fwdOp.primaryC.setValue(0);
@@ -2648,6 +2703,10 @@ import dsServices.ServerConnectionUtil;
 						public void mouseClicked(MouseEvent e) {
 							if(!basicData.jRadioButton6.isEnabled())
 								return ;
+							 functionality.FarRate1.setVisible(false);
+							 functionality.FarRate2.setVisible(false);
+							 functionality.jLabel4.setVisible(false);
+							 functionality.jLabel5.setVisible(false);
 							if(basicData.jRadioButton6.isSelected()) {
 							String status = out.jTextField6.getText();
 							if(status.equalsIgnoreCase("ROLLOVER") || status.equalsIgnoreCase("ROLLBACK"))
@@ -2670,6 +2729,10 @@ import dsServices.ServerConnectionUtil;
 						public void mouseClicked(MouseEvent e) {
 							if(!basicData.jRadioButton7.isEnabled())
 								return ;
+							 functionality.FarRate1.setVisible(false);
+							 functionality.FarRate2.setVisible(false);
+							 functionality.jLabel4.setVisible(false);
+							 functionality.jLabel5.setVisible(false);
 							if(basicData.jRadioButton7.isSelected()) {
 								basicData.jRadioButton6.setSelected(false);
 								String status = out.jTextField6.getText();
@@ -3154,8 +3217,8 @@ import dsServices.ServerConnectionUtil;
 		  //  functionality.b2bBook.setText("");
 		    functionality.b2bTransferTo.setText("");
 		    functionality.clearRounting();
-		    functionality.jLabel2.setSelectedIndex(-1);
-		    functionality.jLabel3.setSelectedIndex(-1);
+		    functionality.jLabel2.setText("");
+		    functionality.jLabel3.setText("");
 		    functionality.jTextField2.setText("0");
 		    functionality.jTextField3.setText("0");
 		    functionality.FarRate1.setText("0");
@@ -3796,7 +3859,11 @@ import dsServices.ServerConnectionUtil;
 		    	rollpanel.setVisible(false);
 		    	productSubType = "FXSWAP";
 		    }if(trade.getTradedesc1().equalsIgnoreCase(FXFORWARDOPTION)) {
-		    	swap.setVisible(false);
+		    	
+		    	swap.jTextField1.setText("0.0");
+				swap.jTextField2.setText("0.0");
+				swap.jTextField4.setText("0.0");
+				swap.setVisible(false);
 		    	rollpanel.setVisible(false);
 		    	fwdOp.setVisible(true);
 		    	basicData.jRadioButton2.setEnabled(false);
@@ -3839,7 +3906,11 @@ import dsServices.ServerConnectionUtil;
 		    	
 		    	basicData.jRadioButton1.setSelected(true);
 		    	basicData.jRadioButton1.setEnabled(true);
-		    	swap.setVisible(false);
+		    	
+		    	swap.jTextField1.setText("0.0");
+				swap.jTextField2.setText("0.0");
+				swap.jTextField4.setText("0.0");
+				swap.setVisible(false);
 		    	basicData.jRadioButton5.setEnabled(false);
 		    	basicData.jRadioButton2.setEnabled(false);
 		    	basicData.jRadioButton2.setSelected(false);
@@ -3856,6 +3927,9 @@ import dsServices.ServerConnectionUtil;
 		    	basicData.jRadioButton1.setSelected(false);
 		    	basicData.jRadioButton1.setEnabled(false);
 		    	swap.setVisible(false);
+		    	swap.jTextField1.setText("0.0");
+				swap.jTextField2.setText("0.0");
+				swap.jTextField4.setText("0.0");
 		    	basicData.jRadioButton5.setEnabled(false);
 		    	basicData.jRadioButton2.setEnabled(false);
 		    	basicData.jRadioButton2.setSelected(false);
