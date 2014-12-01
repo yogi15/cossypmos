@@ -69,7 +69,7 @@ public class Swap extends JPanel {
 	private JTextField getJTextField2() {
 		if (jTextField2 == null) {
 			jTextField2 = new  NumericTextField(10,format);
-			jTextField2.setText("0");
+			jTextField2.setText("0.0");
 		}
 		return jTextField2;
 	}
@@ -85,7 +85,7 @@ public class Swap extends JPanel {
 	private JTextField getJTextField1() {
 		if (jTextField1 == null) {
 			jTextField1 = new  NumericTextField(10,format);
-			jTextField1.setText("0");
+			jTextField1.setText("0.0");
 		}
 		return jTextField1;
 	}
