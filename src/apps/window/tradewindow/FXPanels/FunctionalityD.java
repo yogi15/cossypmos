@@ -66,7 +66,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 
 	private static final long serialVersionUID = 1L;
 	RemoteMO remotemo = null;
-	DecimalFormat format = new DecimalFormat("##,###,#######");
+	DecimalFormat format = new DecimalFormat("##,###,#######.##");
 	 static private String hostName = "";
 	 ServerConnectionUtil de = null;
 	String positiongcol [] = {"DATE     ","primaryC","quotingC"};
@@ -113,9 +113,9 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 		public JPanel jPanel2;
 		public JButton jButton8;
 		public JLabel jLabel0;
-		public JComboBox<String> jLabel2;
+		public JTextField jLabel2;
 		public JLabel jLabel1;
-		public JComboBox<String> jLabel3;
+		public JTextField jLabel3;
 		public JLabel jLabel5;
 		public JLabel jLabel4;
 		public NumericTextField jTextField2;
@@ -223,7 +223,58 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 		if (jTextField3 == null) {
 			jTextField3 = new NumericTextField(10,format);
 			jTextField3.setText("0");
-		}
+		}jTextField3.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				try {
+					double rate1 = 0.0 ;
+					double rate2 = 0.0 ;	
+					double farRate1 = 0.0;
+					double farRate2 = 0.0;
+					if(!commonUTIL.isEmpty(jTextField2.getText()))
+						rate1 = jTextField2.getDoubleValue();
+					if(!commonUTIL.isEmpty(jTextField3.getText()))
+						rate2 = jTextField3.getDoubleValue();
+					if(!commonUTIL.isEmpty(jTextField2.getText()))
+						farRate1 = FarRate2.getDoubleValue();
+					if(!commonUTIL.isEmpty(jTextField3.getText()))
+						farRate2 = FarRate1.getDoubleValue();
+					
+					  
+					if(commonUTIL.isEmpty(rounting))
+						return;
+					if(rounting.size() > 4) {
+						Trade orignalTrade = rounting.get(0);
+						if( orignalTrade.getId() == 0) {
+								Trade xsplit1  =  rounting.get(1);									
+								Trade xsplit2  =  rounting.get(3);
+								rounting =     FXSplitUtil.splitTrade(xsplit1, xsplit2, rounting.get(0), rate1, rate2,farRate1,farRate2);
+	                             setRoutingData(rounting);
+						}  else {
+							rounting =  FXSplitUtil.splitTrade(rounting, rate1, rate2,farRate1,farRate2);
+							if(commonUTIL.isEmpty(rounting)) 
+								return;
+							 setRoutingData(rounting);
+							 jTextField3.setText(String.valueOf(rate2));
+							 jTextField2.setText(String.valueOf(rate1));
+							 FarRate1.setText(String.valueOf(farRate1));
+							 FarRate2.setText(String.valueOf(farRate2));
+						}
+	                 //  getJTable1().repaint();
+	                  
+					}
+	                   
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		
+			
+			
+		});
 		return jTextField3;
 	}
 	private NumericTextField getJTextFieldFarRate1() {
@@ -344,9 +395,9 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 		}
 		return jLabel5;
 	}
-	private JComboBox getJLabel3() {
+	private JTextField getJLabel3() {
 		if (jLabel3 == null) {
-			jLabel3 = new JComboBox<String>();
+			jLabel3 = new JTextField();
 			jLabel3.setEditable(false);
 			//jLabel3.setText("INR/EUR");
 		}
@@ -359,9 +410,9 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 		}
 		return jLabel1;
 	}
-	private JComboBox getJLabel2() {
+	private JTextField getJLabel2() {
 		if (jLabel2 == null) {
-			jLabel2 = new JComboBox<String>();
+			jLabel2 = new JTextField();
 	//		jLabel2.setEditable(false);
 			//jLabel2.setText("USD/INR");
 		}
@@ -827,8 +878,8 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
     	if(!commonUTIL.isEmpty(currencyPairs)) {
     		for(int i=0;i<currencyPairs.size();i++) {
     			 Favorities fav = (Favorities) currencyPairs.elementAt(i);
-    		 jLabel2.addItem(fav.getTypeName());
-    		 jLabel3.addItem(fav.getTypeName());
+    		 jLabel2.setText(fav.getTypeName());
+    		 jLabel3.setText(fav.getTypeName());
     		}
     	}
     }
