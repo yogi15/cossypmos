@@ -39,12 +39,13 @@ import util.commonUTIL;
 import com.jidesoft.combobox.MultiSelectListExComboBox;
 import com.jidesoft.grid.DateCellEditor;
 
+import apps.window.tradewindow.FXTradePanel;
 import beans.Attribute;
 import beans.StartUPData;
 
 
 //VS4E -- DO NOT REMOVE THIS LINE!
-public class TradeAttributesD extends JPanel {
+public class TradeAttributesD<OutRight> extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	public JTable jTable1;
@@ -239,10 +240,18 @@ public class TradeAttributesD extends JPanel {
 							// TODO Auto-generated method stub
 							String attributeName = criteriaC.getSelectedItem().toString();
 							int i = jTable1.getSelectedRow();
+							if(i == - 1)
+								return;
 							jTable1.setValueAt(attributeName, i, 1);
+							String type =(String) jTable1.getValueAt(i, 0);
+							if(type.equalsIgnoreCase("InstrumentType") ) {
+							   setCheckBox(type, attributeName);
+							}
 
 						}
 					}
+
+					
 				});
 				return criteriaC;
 			 
@@ -324,7 +333,7 @@ public class TradeAttributesD extends JPanel {
 			switch (col) {
 
 			case 0:
-				value = attribute.getName();
+				value = attribute.getName();	
 				break;
 			case 1:
 				value = attribute.getValue();
@@ -736,8 +745,24 @@ public void isCellEditable(int t, int i) {
 	// TODO Auto-generated method stub
 	
 }
+FXTradePanel out1 = null;
 
 
+private void setCheckBox(String type, String attributeName) {
+	// TODO Auto-generated method stub
+     if(attributeName.equalsIgnoreCase("FWD_PURCHASE") || attributeName.equalsIgnoreCase("FWD_SALE")) {
+       out1.out.jCheckBox0.setSelected(true);
+    	 
+     }
+    	 
+}
+
+public void setOutRight(FXTradePanel out) {
+	// TODO Auto-generated method stub
+	out1 = (FXTradePanel) out;
+	out1.out.jCheckBox0.setSelected(true);
+	
+}
 }
 
 
