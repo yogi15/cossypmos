@@ -125,7 +125,7 @@ import dsServices.ServerConnectionUtil;
 		  static String FXFORWARD = "FXFORWARD";
 		  static String FXTAKEUP = "FXTAKEUP";
 		  static String FX = "FX";
-		 
+		  static String FXFWDOPTION = "FXFWDOPTION";
 		 int bookId =0;
 		 int counterPartyID =0;
 		 boolean actionController = false;
@@ -143,7 +143,7 @@ import dsServices.ServerConnectionUtil;
 		 Product product = null;
 		 RemoteProduct remoteProduct = null;
 		 Swap swap = null;
-		 public outRight out = null;
+		 outRight out = null;
 		 FWDOptionPanel fwdOp = null;
 		 TradeAttributesD attributes = null;
 		 RemoteBOProcess remoteBO;
@@ -346,10 +346,10 @@ import dsServices.ServerConnectionUtil;
 			this.out = out;
 		}
 	
-		public TradeAttributesD getAttributes(FXTradePanel out) {
+		public TradeAttributesD getAttributes() {
 			if (attributes == null) {
 				attributes = new TradeAttributesD();
-				attributes.setOutRight(out);
+				attributes.setFXPanelObjs(fwdOp);
 				//attributes.setBorder(new LineBorder(Color.black, 1, false));
 			}
 			return attributes;
@@ -501,7 +501,8 @@ import dsServices.ServerConnectionUtil;
 			add(getFunctionality(),  new Constraints(new Leading(7, 843, 10, 10), new Leading(294, 10, 10)));
 		
 			add(getOut(), new Constraints(new Leading(5, 838, 12, 12), new Leading(101, 87, 12, 12)));
-			add(getAttributes(this ),  new Constraints(new Leading(860, 329, 12, 12), new Leading(4, 536, 10, 10)));
+			add(getAttributes(),  new Constraints(new Leading(860, 329, 12, 12), new Leading(4, 536, 10, 10)));
+			//add(getOut(), new Constraints(new Leading(5, 838, 12, 12), new Leading(101, 87, 12, 12)));
 			add(getBasicData(), new Constraints(new Leading(7, 835, 10, 10), new Leading(8, 90, 10, 10)));
 			add(getRollPanel(),  new Constraints(new Leading(483, 360, 10, 10), new Leading(193, 89, 10, 10)));
 			
@@ -549,9 +550,13 @@ import dsServices.ServerConnectionUtil;
 			try {
 				String autoType = trade.getAutoType();
 				if(!commonUTIL.isEmpty(autoType)) {
-				
-				    		routingTrades  = remoteTrade.getSplitTrades(trade);
-			      			functionality.setRoutingData(routingTrades);
+				        if(trade.getTradedesc1().equalsIgnoreCase(FX) || trade.getTradedesc1().equalsIgnoreCase(FXSWAP) || trade.getTradedesc1().equalsIgnoreCase(FXFORWARD) ) {
+				        	
+				        	routingTrades  = remoteTrade.getSplitTrades(trade);
+				        	functionality.setRoutingData(routingTrades);
+				        }
+				    		
+			      			
 				}
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
@@ -755,8 +760,19 @@ import dsServices.ServerConnectionUtil;
 			                     takeupW.jTextField5.setText(commonUTIL.getCurrentDateInString());
 			                     takeupW.jTextField5.setEditable(false);
 			                     takeupW.jTextField6.setDateFormat(commonUTIL.getDateTimeFormat());
-			                     takeupW.jTextField4.setText(trade.getTradeDate());
-			                     takeupW.jTextField7.setText(trade.getDelivertyDate());
+			                     
+			                     if (!commonUTIL.stringToDate(trade.getDelivertyDate(), true).equals(
+			                    		 commonUTIL.stringToDate(trade.getEffectiveDate(), true))) {
+			                    	 
+			                    	 takeupW.jTextField7.setText(trade.getEffectiveDate());
+			                    	 
+			                     } else {
+			                    	 
+			                    	 takeupW.jTextField7.setText(trade.getTradeDate());
+			                    	 
+			                     }
+			                     
+			                     takeupW.jTextField4.setText(trade.getDelivertyDate());
 			                   
 			                     takeupW.jTextField1.setValue(0);
 									takeupW.jTextField3.setValue(0);
@@ -916,6 +932,8 @@ import dsServices.ServerConnectionUtil;
 									tradeTakeUp.setTraderID(trade.getTraderID());
 									tradeTakeUp.setAttribute("ParentID",Integer.toString(trade.getId()));
 									
+									tradeTakeUp.setAttribute("TakeUpType", takeupW.typeComboBox.getSelectedItem().toString());
+									
 									tradeTakeUp.setUserID(user.getId());
 										double amt1 = takeupW.jTextField1.getDoubleValue();
 										double amt2 = takeupW.jTextField3.getDoubleValue();
@@ -1041,6 +1059,18 @@ import dsServices.ServerConnectionUtil;
 								}
 							}
 							}
+							
+							if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {
+								
+						    	if (commonUTIL.addSubtractDate(commonUTIL.stringToDate(trade.getDelivertyDate(), true), 31).before(
+										 commonUTIL.stringToDate(trade.getEffectiveDate(), true))) {
+						    		
+						    		commonUTIL.showAlertMessage("Option End date falls beyond 31 days after Trade end date");
+						    		 return;
+						    		
+						    	}
+							}
+							
 						    if(validdateALLFields("NEW")) {
 						    	trade = new Trade();
 						    	mirrorBook.setBookno(0);
@@ -2380,6 +2410,18 @@ import dsServices.ServerConnectionUtil;
 							if(!validdateALLFields("SAVE")) {
 								return;
 							}	else {
+								
+								if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {
+									
+							    	if (commonUTIL.addSubtractDate(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true), 31).before(
+											 commonUTIL.stringToDate(fwdOp.startDate.getText(), true))) {
+							    		
+							    		commonUTIL.showAlertMessage("Option End date falls beyond 31 days after Trade end date");
+							    		 return;
+							    		
+							    	}
+								}
+								
 								fillTrade(trade,"NEW");
 								
 								int isHoliday = 0;
@@ -2904,7 +2946,19 @@ import dsServices.ServerConnectionUtil;
 				newTradeView();
 			} else {
 				if(validdateALLFields("NEW")) {
-			             fillTrade(trade,"NEW");
+					if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {
+						
+				    	if (commonUTIL.addSubtractDate(commonUTIL.stringToDate(trade.getDelivertyDate(), true), 31).before(
+								 commonUTIL.stringToDate(trade.getEffectiveDate(), true))) {
+				    		
+				    		commonUTIL.showAlertMessage("Option End date falls beyond 31 days after Trade end date");
+				    		 return;
+				    		
+				    	}
+					}
+					
+			     fillTrade(trade,"NEW");
+			        
 				} else {
 					trade.setTradedesc1("");
 					//trade = null;
@@ -3118,7 +3172,7 @@ import dsServices.ServerConnectionUtil;
 		public void newTradeView() {
 			app.trade = null;
 			out.jCheckBox2.setEnabled(true);
-			out.jCheckBox0.setEnabled(false);
+			//out.jCheckBox0.setEnabled(false);
 			functionality.jButton2.setEnabled(true);
 			basicData.currencyPair.setText("");
 			basicData.book.setText("");
@@ -3590,7 +3644,13 @@ import dsServices.ServerConnectionUtil;
 		    trade.setUserID(user.getId());
 		    trade.setAttributes(getAttributeValue());
 		    trade.setPrice(new Double(out.jTextField4.getText()).doubleValue());
-		    trade.setEffectiveDate(trade.getTradeDate());  // use as FORWARD DATE for FXSWAP in FX. 
+		    
+		    if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {
+				trade.setEffectiveDate(fwdOp.startDate.getText().toString());
+			} else {
+				trade.setEffectiveDate(trade.getTradeDate());  // use as FORWARD DATE for FXSWAP in FX.
+			}
+		     
 		   trade.setQuantity(new Double(out.jTextField1.getText()).doubleValue());  // amt1 (negotiated amt for negotiable curr) 
 		  	trade.setNominal(new Double(out.jTextField2.getText()).doubleValue());  // amt2  (negotiated amt for non-negotiable curr) nominal =  quantity * price
 		    
@@ -3878,10 +3938,20 @@ import dsServices.ServerConnectionUtil;
 		    	String currP = trade.getTradedesc();
 		    	 fwdOp.jLabel2.setText(currP.substring(0, 3));
 				 fwdOp.jLabel3.setText(currP.substring(4, 7));
-				 
+				 fwdOp.startDate.setEnabled(false);	
 				 // attributeDataValue is set in setAttributes method
-				 fwdOp.startDate.setText(
-						commonUTIL.separteDateTime(attributeDataValue.get("Trade Date")));
+				 if (!commonUTIL.stringToDate(trade.getDelivertyDate(), true).equals(
+						 commonUTIL.stringToDate(trade.getEffectiveDate(), true))) {
+					 
+					 fwdOp.startDate.setText(trade.getEffectiveDate());
+					 fwdOp.startDate.setEnabled(true);		
+				 } else {
+					 
+					 fwdOp.startDate.setText(
+								commonUTIL.separteDateTime(attributeDataValue.get("Trade Date")));
+					 
+				 }
+				
 				 
 				 functionality.jButton0.setEnabled(true);
 				 fwdOp.primaryC.setValue(trade.getQuantity());
