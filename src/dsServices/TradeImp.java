@@ -1286,6 +1286,11 @@ return status;
      			saveSplitTrade(mirror1);
      			saveSplitTrade(xccy2);
      			saveSplitTrade(xccy1);
+     			originalTrade.setAttribute("splitBaseNearRate", String.valueOf(xccy1.getPrice()));
+     			originalTrade.setAttribute("splitQuoteNearRate", String.valueOf(xccy2.getPrice()));
+     			originalTrade.setAttribute("splitBaseFarRate", String.valueOf(xccy1.getSecondPrice()));
+
+     			originalTrade.setAttribute("splitQuoteFarRate", String.valueOf(xccy2.getSecondPrice()));
      			
      			return saveTrade(originalTrade,message);
 			//	return originalTrade;
