@@ -1,10 +1,16 @@
 package apps.window.tradewindow.FXPanels;
 
+import java.rmi.RemoteException;
 import java.text.DecimalFormat;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,9 +25,14 @@ import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
 import util.NumericTextField;
+import util.RemoteServiceUtil;
+import beans.LegalEntity;
+import beans.StartUPData;
 import beans.Trade;
 
 import com.standbysoft.component.date.swing.JDatePicker;
+
+import dsServices.RemoteReferenceData;
 
 
 //VS4E -- DO NOT REMOVE THIS LINE!
@@ -55,6 +66,12 @@ public class TakeUPWindow extends JFrame {
 	public Vector<Trade> tableData = new Vector<Trade>();
     String col [] = {"TradeID","PrimaryCurr","QuotingCurr","Quantity","Nomnial","TradeDate","SettleDate"};
    public TableModelUtil model = null;
+   private RemoteReferenceData remoteReference;
+   
+   javax.swing.DefaultComboBoxModel<String> typeData = new javax.swing.DefaultComboBoxModel<String>();
+   
+private JLabel jLabel3;
+public JComboBox typeComboBox;
 private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 public TakeUPWindow() {
 		initComponents();
@@ -64,6 +81,37 @@ public TakeUPWindow() {
 		setLayout(new GroupLayout());
 		add(getJPanel0(), new Constraints(new Leading(6, 970, 10, 10), new Leading(6, 418, 10, 10)));
 		setSize(987, 433);
+		init();
+	}
+	
+	private void init(){
+		
+		remoteReference = RemoteServiceUtil.getRemoteReferenceDataService();
+		
+		try {
+			
+			Vector startupDataInstrumentType = (Vector) remoteReference.getStartUPData("TakeupType");
+			processLEDataCombo1(typeData, startupDataInstrumentType);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	private JComboBox getTypeComboBox() {
+		if (typeComboBox == null) {
+			typeComboBox = new JComboBox();
+			typeComboBox.setModel(typeData);
+		}
+		return typeComboBox;
+	}
+
+	private JLabel getJLabel3() {
+		if (jLabel3 == null) {
+			jLabel3 = new JLabel();
+			jLabel3.setText("Type");
+		}
+		return jLabel3;
 	}
 
 	private JScrollPane getJScrollPane0() {
@@ -243,25 +291,27 @@ public TakeUPWindow() {
 			jPanel0.setLayout(new GroupLayout());
 			jPanel0.add(getJLabel5(), new Constraints(new Leading(100, 12, 12), new Leading(21, 23, 12, 12)));
 			jPanel0.add(getJLabel0(), new Constraints(new Leading(17, 73, 12, 12), new Leading(21, 23, 12, 12)));
-			jPanel0.add(getJLabel1(), new Constraints(new Leading(17, 58, 12, 12), new Leading(64, 23, 12, 12)));
-			jPanel0.add(getJLabel4(), new Constraints(new Leading(102, 10, 10), new Leading(64, 23, 12, 12)));
-			jPanel0.add(getJTextField1(), new Constraints(new Leading(153, 152, 12, 12), new Leading(59, 29, 12, 12)));
+			jPanel0.add(getJLabel1(), new Constraints(new Leading(17, 58, 12, 12), new Leading(69, 23, 12, 12)));
+			jPanel0.add(getJLabel4(), new Constraints(new Leading(102, 10, 10), new Leading(69, 23, 12, 12)));
+			jPanel0.add(getJTextField1(), new Constraints(new Leading(153, 152, 12, 12), new Leading(63, 29, 12, 12)));
 			jPanel0.add(getJTextField0(), new Constraints(new Leading(151, 154, 12, 12), new Leading(14, 30, 12, 12)));
 			jPanel0.add(getJLabel10(), new Constraints(new Leading(320, 10, 10), new Leading(21, 23, 12, 12)));
-			jPanel0.add(getJLabel11(), new Constraints(new Leading(317, 12, 12), new Leading(64, 23, 12, 12)));
+			jPanel0.add(getJLabel11(), new Constraints(new Leading(317, 12, 12), new Leading(69, 23, 12, 12)));
 			jPanel0.add(getJTextField2(), new Constraints(new Leading(374, 154, 10, 10), new Leading(14, 30, 12, 12)));
-			jPanel0.add(getJTextField3(), new Constraints(new Leading(374, 154, 12, 12), new Leading(59, 30, 12, 12)));
+			jPanel0.add(getJTextField3(), new Constraints(new Leading(374, 154, 12, 12), new Leading(62, 30, 12, 12)));
 			jPanel0.add(getJButton0(), new Constraints(new Leading(285, 10, 10), new Leading(146, 12, 12)));
 			jPanel0.add(getJButton1(), new Constraints(new Leading(367, 62, 10, 10), new Leading(146, 12, 12)));
 			jPanel0.add(getJScrollPane0(), new Constraints(new Leading(6, 955, 10, 10), new Leading(183, 229, 10, 10)));
-			jPanel0.add(getJLabel13(), new Constraints(new Leading(12, 12, 12), new Leading(106, 23, 12, 12)));
-			jPanel0.add(getJTextField5(), new Constraints(new Leading(155, 150, 12, 12), new Leading(101, 30, 12, 12)));
+			jPanel0.add(getJLabel13(), new Constraints(new Leading(12, 12, 12), new Leading(107, 23, 12, 12)));
 			jPanel0.add(getJLabel14(), new Constraints(new Leading(311, 62, 10, 10), new Leading(107, 23, 12, 12)));
-			jPanel0.add(getJTextField6(), new Constraints(new Leading(377, 148, 12, 12), new Leading(101, 30, 12, 12)));
 			jPanel0.add(getJTextField4(), new Constraints(new Leading(678, 162, 10, 10), new Leading(14, 30, 12, 12)));
 			jPanel0.add(getJLabel12(), new Constraints(new Leading(540, 124, 10, 10), new Leading(21, 23, 12, 12)));
-			jPanel0.add(getJLabel2(), new Constraints(new Leading(540, 119, 10, 10), new Leading(64, 23, 12, 12)));
+			jPanel0.add(getJLabel2(), new Constraints(new Leading(540, 119, 10, 10), new Leading(69, 23, 12, 12)));
 			jPanel0.add(getJTextField7(), new Constraints(new Leading(681, 156, 12, 12), new Leading(62, 30, 12, 12)));
+			jPanel0.add(getJLabel3(), new Constraints(new Leading(540, 68, 10, 10), new Leading(116, 12, 12)));
+			jPanel0.add(getJTextField5(), new Constraints(new Leading(155, 150, 12, 12), new Leading(106, 24, 12, 12)));
+			jPanel0.add(getJTextField6(), new Constraints(new Leading(377, 148, 12, 12), new Leading(107, 23, 12, 12)));
+			jPanel0.add(getTypeComboBox(), new Constraints(new Leading(685, 119, 10, 10), new Leading(110, 24, 12, 12)));
 		}
 		return jPanel0;
 	}
@@ -404,5 +454,18 @@ public class TableModelUtil extends AbstractTableModel {
 		}
 }
 
+	public void processLEDataCombo1(javax.swing.DefaultComboBoxModel combodata, Collection typeData) {
+		
+			Iterator it = typeData.iterator();
+			int p = 0;
+			
+			
+			while (it.hasNext()) {
 
+				StartUPData type = (StartUPData) it.next();
+
+				combodata.insertElementAt(type.getName(), p++);
+			
+			}
+	}
 }
