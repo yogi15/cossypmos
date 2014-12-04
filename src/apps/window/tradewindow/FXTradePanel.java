@@ -1178,7 +1178,7 @@ import dsServices.ServerConnectionUtil;
 						        		trade.setFees(feesPanel.getFeesDataV());
 						        		Vector tradestatus = null;
 						        		if(!commonUTIL.isEmpty(functionality.getRoutingData())  && functionality.getRoutingData().size() > 1) {
-						        		   trade.clearAttributes();
+						        		  // trade.clearAttributes();
 						        		   Vector<Trade> rountingTrades;
 						        		   try {
 											rountingTrades = FXSplitUtil.getRountingData(trade,remoteReference,functionality.FarRate2.getDoubleValue(),functionality.FarRate1.getDoubleValue());
