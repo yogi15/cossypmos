@@ -237,9 +237,9 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 						rate1 = jTextField2.getDoubleValue();
 					if(!commonUTIL.isEmpty(jTextField3.getText()))
 						rate2 = jTextField3.getDoubleValue();
-					if(!commonUTIL.isEmpty(jTextField2.getText()))
+					if(!commonUTIL.isEmpty(FarRate1.getText()))
 						farRate1 = FarRate2.getDoubleValue();
-					if(!commonUTIL.isEmpty(jTextField3.getText()))
+					if(!commonUTIL.isEmpty(FarRate2.getText()))
 						farRate2 = FarRate1.getDoubleValue();
 					
 					  
@@ -808,14 +808,18 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	    
 	    if(xccy1 != null)
 	    jTextField2.setValue(xccy1.getPrice());
+	    FarRate2.setValue(xccy1.getSecondPrice());
 	    if(xccy2 != null)
 	    jTextField3.setValue(xccy2.getPrice());
+	    FarRate1.setValue(xccy2.getSecondPrice());
     	}
+    	
     	if(originalTrade.getTradedesc1().equalsIgnoreCase("FXSWAP")) {
 			jTableR2.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 			TableColumnAdjuster tca = new TableColumnAdjuster(jTableR2);
 			tca.adjustColumns();
 			routingModel = new TableModelUtil(rounting, routingColSwap,getRemoteRef());
+		 
 
     	} else {
     	routingModel = new TableModelUtil(rounting, routingCol,getRemoteRef());
