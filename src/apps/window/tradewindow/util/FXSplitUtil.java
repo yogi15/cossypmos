@@ -65,9 +65,9 @@ public class FXSplitUtil {
 		return rountingTrade;
 		
 	}
-	public static Vector<Trade> getRountingData(Trade trade,RemoteReferenceData remoteRef) {
+	public static Vector<Trade> getRountingData(Trade trade,RemoteReferenceData remoteRef,double farRate1,double farRate2) {
 		if(trade.isFXSwap()) 
-			return getRountingDataForFXSWAP(trade,remoteRef);
+			return getRountingDataForFXSWAP(trade,remoteRef,farRate1,farRate2);
 		Vector<Trade> rountingTrade = new Vector<Trade>();
 		int bookID = trade.getBookId();
 		 trade.setAutoType("Original");
@@ -160,7 +160,7 @@ public class FXSplitUtil {
 		
 	}
 	private static Vector<Trade> getRountingDataForFXSWAP(Trade trade,
-			RemoteReferenceData remoteRef) {
+			RemoteReferenceData remoteRef,double farRate1,double farRate2) {
 		// TODO Auto-generated method stub
 		Vector<Trade> rountingTrade = new Vector<Trade>();
 		int bookID = trade.getBookId();
@@ -187,11 +187,12 @@ public class FXSplitUtil {
 			      Trade tradex1 = null;
 				
 					tradex1 = (Trade) trade.clone();
-				
+				tradex1.setSecondPrice(farRate1);
 			      tradex1.setBookId(splitConfig.getFirstSpotBook());
 			    //  tradex1.setTradedesc(splitConfig.getFirstCurrencySplit());
 			       Trade tradex2  = (Trade) trade.clone();
 			      tradex2.setBookId(splitConfig.getSecondSpotBook());
+			  	tradex2.setSecondPrice(farRate2);
 			   //   tradex2.setTradedesc(splitConfig.getSecondCurrencySPlit());
 			      if(buysell.equalsIgnoreCase("BUY/SELL")) {
 			    	//  tradex1.setType("SELL");
@@ -791,6 +792,8 @@ public class FXSplitUtil {
 			splitTrade2.setAction("NEW");
 		 	splitTrade1.setStatus("NONE");
 		 	splitTrade2.setStatus("NONE");
+		 	splitTrade1.setSecondPrice(firstFarRate);
+			splitTrade1.setSecondPrice(secondFarRate);
 		 	if(orginalTrade.getType().equalsIgnoreCase("SELL/BUY")) {
 		 		if(orginalTrade.getQuantity() > 0) {
 		 		   orginalTrade.setQuantity(orginalTrade.getQuantity() * -1);
@@ -899,7 +902,7 @@ public class FXSplitUtil {
 			   	 splitTrade2.setQuantity(orginalTrade.getNominal() * -1); // BUY 
 				 splitTrade2.setNominal((splitTrade2.getQuantity() * -1) * secondRate); // SELL 
 				 splitTrade2.setTradeAmount(orginalTrade.getYield() * -1 ); //SELL
-				 splitTrade2.setYield(orginalTrade.getTradeAmount() * -1 * secondFarRate); //SELL
+				 splitTrade2.setYield(splitTrade2.getTradeAmount() * -1 * secondFarRate); //SELL
 			   	
 			   	} else if(orginalTrade.getType().equalsIgnoreCase("SELL/BUY")) {
 			   		splitTrade2.setQuantity(orginalTrade.getNominal() * -1); //sell 
