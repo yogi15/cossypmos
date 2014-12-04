@@ -546,18 +546,31 @@ import dsServices.ServerConnectionUtil;
 			openTradeInWindow(trade);
 			functionality.jButton5.setText("SAVEASNEW");
 			functionality.jButton6.setEnabled(true);
+			
 			functionality.refreshTables(trade.getTradedesc(),basicData.book.getText(),new Integer(basicData.book.getName()).intValue());
 			try {
 				String autoType = trade.getAutoType();
 				if(!commonUTIL.isEmpty(autoType)) {
 				        if(trade.getTradedesc1().equalsIgnoreCase(FX) || trade.getTradedesc1().equalsIgnoreCase(FXSWAP) || trade.getTradedesc1().equalsIgnoreCase(FXFORWARD) ) {
 				        	
-				        	routingTrades  = remoteTrade.getSplitTrades(trade);
+				        	routingTrades  = remoteTrade.getSplitTrades(trade);  // i know only 5 records are going to come. 
+				        	if(routingTrades.size() == 5) {
+				        	out.jCheckBox2.setSelected(true);
+				        	functionality.jLabel2.setText(routingTrades.get(1).getTradedesc());
+				        	functionality.jLabel3.setText(routingTrades.get(3).getTradedesc()); 
+				        	functionality.jTextField2.setText(String.valueOf(routingTrades.get(1).getPrice())); // bad programming.
+				        	functionality.jTextField3.setText(String.valueOf(routingTrades.get(3).getPrice())); // bad programming.
+				        	if(trade.getTradedesc1().equalsIgnoreCase(FXSWAP)) {
+				        	functionality.FarRate1.setText(String.valueOf(routingTrades.get(1).getSecondPrice())); // bad programming.
+				        	functionality.FarRate2.setText(String.valueOf(routingTrades.get(3).getSecondPrice())); // bad programming.
+				        	}
+				        	}
 				        	functionality.setRoutingData(routingTrades);
 				        }
 				    		
 			      			
 				}
+				
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1166,17 +1179,22 @@ import dsServices.ServerConnectionUtil;
 						        		Vector tradestatus = null;
 						        		if(!commonUTIL.isEmpty(functionality.getRoutingData())  && functionality.getRoutingData().size() > 1) {
 						        		   trade.clearAttributes();
-						        		   Vector<Trade> rountingTrades = FXSplitUtil.getRountingData(trade,remoteReference);
+						        		   Vector<Trade> rountingTrades;
+						        		   try {
+											rountingTrades = FXSplitUtil.getRountingData(trade,remoteReference,functionality.FarRate2.getDoubleValue(),functionality.FarRate1.getDoubleValue());
+										
 											if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >1 ) {
-												try {
+												
 													rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3),
 															trade,functionality.jTextField2.getDoubleValue(), functionality.jTextField3.getDoubleValue(),functionality.FarRate1.getDoubleValue(),functionality.FarRate2.getDoubleValue());
 													trade.setRountingTrades(rountingTrades);
 								        		    tradestatus  = 	remoteTrade.saveBatchSplitTrades(trade.getRountingTrades(),trade,message);
-												} catch (ParseException e1) {
+												} 
+						        		   }
+												catch (ParseException e2) {
 													// TODO Auto-generated catch block
-													e1.printStackTrace();
-												}
+													e2.printStackTrace();
+												
 											}
 											 
 						        		    
@@ -1249,7 +1267,7 @@ import dsServices.ServerConnectionUtil;
 										 out.jCheckBox2.setSelected(false);
 										 return;
 									 }
-									 if(productType.equalsIgnoreCase(FXSWAP)) {
+									 if(productSubType.equalsIgnoreCase(FXSWAP)) {
 										 functionality.FarRate1.setVisible(true);
 										 functionality.FarRate2.setVisible(true);
 										 functionality.jLabel4.setVisible(true);
@@ -1261,13 +1279,16 @@ import dsServices.ServerConnectionUtil;
 										 functionality.jLabel5.setVisible(false);
 									 }
 									Vector vector = (Vector) remoteReference.getCurrencySplitConfig(Integer.parseInt(basicData.book.getName()), basicData.currencyPair.getText());
-									 functionality.clearRounting();
+									 
 									if(!commonUTIL.isEmpty(vector)) {
+										if(trade == null || trade.getId() == 0)
+										     functionality.clearRounting();
 									  sconfig =  (CurrencySplitConfig)vector.elementAt(0);
 									  functionality.jLabel2.setText(sconfig.getFirstCurrencySplit());
 									  populateRountingData();
 									
 									functionality.jLabel3.setText(sconfig.getSecondCurrencySPlit());
+									
 									 } else {
 										 out.jCheckBox2.setSelected(false);
 									 }
@@ -3763,7 +3784,7 @@ import dsServices.ServerConnectionUtil;
 				 // Vector<Trade> rountingTrades =	FXSplitUtil.getRountingData(trade,remoteReference);
 					Vector<Trade> rountingTrades  =             functionality.getRoutingData();
 					if(commonUTIL.isEmpty(rountingTrades)) {
-						rountingTrades = FXSplitUtil.getRountingData(originaltrade,remoteReference);
+						rountingTrades = FXSplitUtil.getRountingData(originaltrade,remoteReference,farrate1,farrate2);
 						if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >0 ) {
 							if(trade == null || trade.getId() == 0) {
 								         if(rountingTrades.size() == 1) {
@@ -3874,7 +3895,7 @@ import dsServices.ServerConnectionUtil;
 		  
 		   
 		    out.jTextField4.setText(commonUTIL.getStringFromDoubleExp(trade.getPrice()).toString());
-		    if(trade.getType().equalsIgnoreCase("BUY")) {
+		    if(trade.getType().equalsIgnoreCase("BUY") || trade.getType().equalsIgnoreCase("BUY/SELL")) {
 		       out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(trade.getQuantity()).toString());
 		       out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(trade.getNominal()).toString());
 		       basicData.buysell.setBackground(Color.green);
