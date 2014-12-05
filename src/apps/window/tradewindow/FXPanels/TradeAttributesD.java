@@ -61,6 +61,16 @@ public class TradeAttributesD extends JPanel {
 	public Vector<Attribute> getData() {
 		return data;
 	}
+	
+	public void changeXccySplitRate(String name,String value) {
+		for(int i=0;i<mod.getRowCount();i++) {
+			String columnName = (String) mod.getValueAt(i, 0);
+			if(columnName.equalsIgnoreCase(name)) {
+				mod.setValueAt(value, i, 1);
+				break;
+			}
+		}
+	}
 
 	/**
 	 * @param data the data to set
