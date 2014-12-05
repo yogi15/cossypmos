@@ -798,6 +798,124 @@ import dsServices.ServerConnectionUtil;
 							
 						}
 			        });
+			        
+			        
+			        // this is used only we press enter on NearRate of  Quoting Leg
+			        
+			        functionality.jTextField3.addActionListener(new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							// TODO Auto-generated method stub
+							try {
+								double rate1 = 0.0 ;
+								double rate2 = 0.0 ;	
+								double farRate1 = 0.0;
+								double farRate2 = 0.0;
+								if(!commonUTIL.isEmpty( functionality.jTextField2.getText()))
+									rate1 =  functionality.jTextField2.getDoubleValue();
+								if(!commonUTIL.isEmpty( functionality.jTextField3.getText()))
+									rate2 =  functionality.jTextField3.getDoubleValue();
+								if(!commonUTIL.isEmpty( functionality.FarRate1.getText()))
+									farRate1 =  functionality.FarRate1.getDoubleValue();
+								if(!commonUTIL.isEmpty( functionality.FarRate2.getText()))
+									farRate2 =  functionality.FarRate2.getDoubleValue();
+								
+								  
+								if(commonUTIL.isEmpty( functionality.getRoutingData()))
+									return;
+								if( functionality.getRoutingData().size() > 4) {
+									Trade orignalTrade = functionality.getRoutingData().get(0);
+									if( orignalTrade.getId() == 0) {
+											Trade xsplit1  =  functionality.getRoutingData().get(1);									
+											Trade xsplit2  =  functionality.getRoutingData().get(3);
+										Vector<Trade>	rounting =     FXSplitUtil.splitTrade(xsplit1, xsplit2, functionality.getRoutingData().get(0), rate1, rate2,farRate1,farRate2);
+										functionality.setRoutingData(rounting);
+									}  else {
+										Vector<Trade> rounting =  FXSplitUtil.splitTrade(functionality.getRoutingData(), rate1, rate2,farRate1,farRate2);
+										if(commonUTIL.isEmpty(rounting)) 
+											return;
+										functionality.setRoutingData(rounting);
+										functionality. jTextField3.setText(String.valueOf(rate2));
+										functionality. jTextField2.setText(String.valueOf(rate1));
+										functionality. FarRate1.setText(String.valueOf(farRate1));
+										functionality. FarRate2.setText(String.valueOf(farRate2));
+										attributes.changeXccySplitRate("splitBaseNearRate",String.valueOf(rate1));
+										attributes.changeXccySplitRate("splitQuoteNearRate",String.valueOf(rate2));
+										attributes.changeXccySplitRate("splitBaseFarRate",String.valueOf(farRate1));
+										attributes.changeXccySplitRate("splitQuoteFarRate",String.valueOf(farRate2));
+									}
+				                 //  getJTable1().repaint();
+				                  
+								}
+				                   
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					
+						
+						
+					});
+			        // this is used when we press enter on Near rate of base currency
+functionality.jTextField2.addActionListener(new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							// TODO Auto-generated method stub
+							try {
+								double rate1 = 0.0 ;
+								double rate2 = 0.0 ;	
+								double farRate1 = 0.0;
+								double farRate2 = 0.0;
+								if(!commonUTIL.isEmpty( functionality.jTextField2.getText()))
+									rate1 =  functionality.jTextField2.getDoubleValue();
+								if(!commonUTIL.isEmpty( functionality.jTextField3.getText()))
+									rate2 =  functionality.jTextField3.getDoubleValue();
+								if(!commonUTIL.isEmpty( functionality.FarRate1.getText()))
+									farRate1 =  functionality.FarRate1.getDoubleValue();
+								if(!commonUTIL.isEmpty( functionality.FarRate2.getText()))
+									farRate2 =  functionality.FarRate2.getDoubleValue();
+								
+								  
+								if(commonUTIL.isEmpty( functionality.getRoutingData()))
+									return;
+								if( functionality.getRoutingData().size() > 4) {
+									Trade orignalTrade = functionality.getRoutingData().get(0);
+									if( orignalTrade.getId() == 0) {
+											Trade xsplit1  =  functionality.getRoutingData().get(1);									
+											Trade xsplit2  =  functionality.getRoutingData().get(3);
+										Vector<Trade>	rounting =     FXSplitUtil.splitTrade(xsplit1, xsplit2, functionality.getRoutingData().get(0), rate1, rate2,farRate1,farRate2);
+										functionality.setRoutingData(rounting);
+									}  else {
+										Vector<Trade> rounting =  FXSplitUtil.splitTrade(functionality.getRoutingData(), rate1, rate2,farRate1,farRate2);
+										if(commonUTIL.isEmpty(rounting)) 
+											return;
+										functionality.setRoutingData(rounting);
+										functionality. jTextField3.setText(String.valueOf(rate2));
+										functionality. jTextField2.setText(String.valueOf(rate1));
+										functionality. FarRate1.setText(String.valueOf(farRate1));
+										functionality. FarRate2.setText(String.valueOf(farRate2));
+										attributes.changeXccySplitRate("splitBaseNearRate",String.valueOf(rate1));
+										attributes.changeXccySplitRate("splitQuoteNearRate",String.valueOf(rate2));
+										attributes.changeXccySplitRate("splitBaseFarRate",String.valueOf(farRate1));
+										attributes.changeXccySplitRate("splitQuoteFarRate",String.valueOf(farRate2));
+									}
+				                 //  getJTable1().repaint();
+				                  
+								}
+				                   
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					
+						
+						
+					});
+			        
 			        takeupW.jTextField1.addKeyListener(new KeyAdapter() { 
 			        	@Override		        
 			        	public void keyTyped(KeyEvent e) {
