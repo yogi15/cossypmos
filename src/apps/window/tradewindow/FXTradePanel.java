@@ -1155,18 +1155,18 @@ import dsServices.ServerConnectionUtil;
 						               	trade.setMirrorBookid(0);
 						        		trade.setMirrorID(0);
 						        		trade.setAutoType("");
-						        		trade.setAttribute("MirrorID","");	
-						        		trade.setAttribute("B2BID","");	
-						        		trade.setAttribute("B2BFlag","");		
-						        		trade.setAttribute("XCurrSOriginalTradeID","");		
+						        	//	trade.setAttribute("MirrorID","");	
+						        	//	trade.setAttribute("B2BID","");	
+						        	//	trade.setAttribute("B2BFlag","");		
+						        	//	trade.setAttribute("XCurrSOriginalTradeID","");		
 						        		trade.setAttribute("ParitialTo","");		
 						        		trade.setAttribute("SXccySplitID","");		
 						        		trade.setAttribute("ParitialFrom","");		
-						        		trade.setAttribute("XccySplitFrom","");		
-						        		trade.setAttribute("FXccySplitID","");		
-						        		trade.setAttribute("OffsetID","");		
-						        		trade.setAttribute("OriginalTradeID","");		
-										trade.setAttribute("MirrorFromTradeID","");	
+						        	//	trade.setAttribute("XccySplitFrom","");		
+						        	//	trade.setAttribute("FXccySplitID","");		
+						        	//	trade.setAttribute("OffsetID","");		
+						        	//	trade.setAttribute("OriginalTradeID","");		
+									//	trade.setAttribute("MirrorFromTradeID","");	
 										trade.setOffsetid(0);
 									//trade.seto
 						        		trade.setParentID(0);
@@ -1181,7 +1181,7 @@ import dsServices.ServerConnectionUtil;
 						        		  // trade.clearAttributes();
 						        		   Vector<Trade> rountingTrades;
 						        		   try {
-											rountingTrades = FXSplitUtil.getRountingData(trade,remoteReference,functionality.FarRate2.getDoubleValue(),functionality.FarRate1.getDoubleValue());
+											rountingTrades = FXSplitUtil.getRountingData(trade,remoteReference,functionality.FarRate1.getDoubleValue(),functionality.FarRate2.getDoubleValue());
 										
 											if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >1 ) {
 												
@@ -3775,9 +3775,9 @@ import dsServices.ServerConnectionUtil;
 					if(!commonUTIL.isEmpty(functionality.jTextField3.getText()) && commonUTIL.isNumeric(functionality.jTextField3.getText()))
 						rate2 = functionality.jTextField3.getDoubleValue();
 					if(!commonUTIL.isEmpty(functionality.FarRate1.getText()) && commonUTIL.isNumeric(functionality.FarRate1.getText()))
-						farrate1 = functionality.FarRate2.getDoubleValue();
+						farrate1 = functionality.FarRate1.getDoubleValue();
 					if(!commonUTIL.isEmpty(functionality.FarRate2.getText()) && commonUTIL.isNumeric(functionality.FarRate2.getText()))
-						farrate2 = functionality.FarRate1.getDoubleValue();
+						farrate2 = functionality.FarRate2.getDoubleValue();
 				
 					
 					
