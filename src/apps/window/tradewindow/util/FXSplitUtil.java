@@ -793,7 +793,7 @@ public class FXSplitUtil {
 		 	splitTrade1.setStatus("NONE");
 		 	splitTrade2.setStatus("NONE");
 		 	splitTrade1.setSecondPrice(firstFarRate);
-			splitTrade1.setSecondPrice(secondFarRate);
+			splitTrade2.setSecondPrice(secondFarRate);
 		 	if(orginalTrade.getType().equalsIgnoreCase("SELL/BUY")) {
 		 		if(orginalTrade.getQuantity() > 0) {
 		 		   orginalTrade.setQuantity(orginalTrade.getQuantity() * -1);
