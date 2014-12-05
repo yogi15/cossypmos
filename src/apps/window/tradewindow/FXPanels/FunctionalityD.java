@@ -238,9 +238,9 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 					if(!commonUTIL.isEmpty(jTextField3.getText()))
 						rate2 = jTextField3.getDoubleValue();
 					if(!commonUTIL.isEmpty(FarRate1.getText()))
-						farRate1 = FarRate2.getDoubleValue();
+						farRate1 = FarRate1.getDoubleValue();
 					if(!commonUTIL.isEmpty(FarRate2.getText()))
-						farRate2 = FarRate1.getDoubleValue();
+						farRate2 = FarRate2.getDoubleValue();
 					
 					  
 					if(commonUTIL.isEmpty(rounting))
@@ -280,14 +280,14 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	private NumericTextField getJTextFieldFarRate1() {
 		if (FarRate1 == null) {
 			FarRate1 = new NumericTextField(10,format);
-			FarRate1.setText("0");
+			FarRate1.setText("01");
 		}
 		return FarRate1;
 	}
 	private NumericTextField getJTextFieldFarRate2() {
 		if (FarRate2 == null) {
 			FarRate2 = new NumericTextField(10,format);
-			FarRate2.setText("0");
+			FarRate2.setText("02");
 		}
 		return FarRate2;
 	}
@@ -340,9 +340,9 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 						if(!commonUTIL.isEmpty(jTextField3.getText()))
 							rate2 = jTextField3.getDoubleValue();
 						if(!commonUTIL.isEmpty(jTextField2.getText()))
-							farRate1 = FarRate2.getDoubleValue();
+							farRate1 = FarRate1.getDoubleValue();
 						if(!commonUTIL.isEmpty(jTextField3.getText()))
-							farRate2 = FarRate1.getDoubleValue();
+							farRate2 = FarRate2.getDoubleValue();
 						
 						  
 						if(commonUTIL.isEmpty(rounting))
@@ -454,8 +454,8 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 			jPanel2.add(getJTextField3(),new Constraints(new Leading(123, 70, 10, 10), new Leading(84, 12, 12)));
 			jPanel2.add(getJLabel4(), new Constraints(new Leading(17, 10, 10), new Leading(112, 10, 10)));
 			jPanel2.add(getJLabel5(), new Constraints(new Leading(123, 12, 12), new Leading(112, 12, 12)));
-			jPanel2.add(getJTextFieldFarRate1(), new Constraints(new Leading(123, 66, 10, 10), new Leading(132, 12, 12)));
-			jPanel2.add(getJTextFieldFarRate2(), new Constraints(new Leading(15, 68, 12, 12), new Leading(134, 10, 10))); 
+			jPanel2.add(getJTextFieldFarRate2(), new Constraints(new Leading(123, 66, 10, 10), new Leading(132, 12, 12)));
+			jPanel2.add(getJTextFieldFarRate1(), new Constraints(new Leading(15, 68, 12, 12), new Leading(134, 10, 10))); 
 		//	jPanel2.add(getJCheckBox0(), new Constraints(new Leading(222, 31, 12, 12), new Leading(12, 12, 12))); 
 			
 		
@@ -808,10 +808,10 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	    
 	    if(xccy1 != null)
 	    jTextField2.setValue(xccy1.getPrice());
-	    FarRate2.setValue(xccy1.getSecondPrice());
+	    FarRate1.setValue(xccy1.getSecondPrice());
 	    if(xccy2 != null)
 	    jTextField3.setValue(xccy2.getPrice());
-	    FarRate1.setValue(xccy2.getSecondPrice());
+	    FarRate2.setValue(xccy2.getSecondPrice());
     	}
     	
     	if(originalTrade.getTradedesc1().equalsIgnoreCase("FXSWAP")) {
