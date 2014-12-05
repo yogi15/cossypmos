@@ -228,9 +228,9 @@ public class FXSplitUtil {
 			      tradex1.setAutoType("XccySplit");
 			      
 			      rountingTrade.add(tradex1);
-			      rountingTrade.add(getMirrorTradeONSWAP(tradex1));
+			      rountingTrade.add(getMirrorTradeONSWAP(tradex1,new Trade(),false));
 			      rountingTrade.add(tradex2);
-			      rountingTrade.add(getMirrorTradeONSWAP(tradex2));
+			      rountingTrade.add(getMirrorTradeONSWAP(tradex2,new Trade(),false));
 			      
 				
 			}
@@ -275,30 +275,31 @@ public class FXSplitUtil {
 		}
 		return mirrorTrade;
 	}
-	public static Trade getMirrorTradeONSWAP(Trade trade) {
-		Trade mirrorTrade = new Trade();
+	public static Trade getMirrorTradeONSWAP(Trade trade,Trade mirrorTrad,boolean isupdate) {
+		Trade mirrorTrade =mirrorTrad;
 		
 		try {
-			if(trade.getId() == 0) {
+			if(trade.getId() == 0 && (!isupdate)) {
 			   mirrorTrade = (Trade) trade.clone();
 			}
 			if(trade.getType().equalsIgnoreCase("BUY/SELL")) {
 				mirrorTrade.setType("SELL/BUY");
-				mirrorTrade.setQuantity(mirrorTrade.getQuantity() * -1); //sell
-				mirrorTrade.setNominal(mirrorTrade.getNominal() * -1);  //buy
-				mirrorTrade.setTradeAmount(mirrorTrade.getTradeAmount() * -1); //sell;
+				mirrorTrade.setQuantity(trade.getQuantity() * -1); //sell
+				mirrorTrade.setNominal(trade.getNominal() * -1);  //buy
+				mirrorTrade.setTradeAmount(trade.getTradeAmount() * -1); //sell;
 				mirrorTrade.setYield(trade.getYield() * -1); //BUY;
 			} else if(trade.getType().equalsIgnoreCase("SELL/BUY")) {
 				mirrorTrade.setType("BUY/SELL");
-				mirrorTrade.setQuantity(mirrorTrade.getQuantity() * -1); //BUY
-				mirrorTrade.setNominal(mirrorTrade.getNominal() * -1);   //SELL
-				mirrorTrade.setTradeAmount(mirrorTrade.getTradeAmount() * -1); //BUY
+				mirrorTrade.setQuantity(trade.getQuantity() * -1); //BUY
+				mirrorTrade.setNominal(trade.getNominal() * -1);   //SELL
+				mirrorTrade.setTradeAmount(trade.getTradeAmount() * -1); //BUY
 				mirrorTrade.setYield(trade.getYield() * -1);
 			}
 			mirrorTrade.setAutoType("Mirror");
 			mirrorTrade.setCpID(trade.getBookId());
 			mirrorTrade.setMirrorBookid(trade.getBookId());
 			mirrorTrade.setBookId(trade.getBookId());
+			mirrorTrade.setCurrency(mirrorTrade.getTradedesc().substring(4, 7));
 		} catch (CloneNotSupportedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -547,6 +548,8 @@ public class FXSplitUtil {
 		   String quotingCurrecy = getQuotingCurrency(orginalTrade.getTradedesc());
 		   splitTrade1.setPrice(firstRate);
 		   splitTrade2.setPrice(secondRate);
+		   splitTrade1.setSecondPrice(firstFarRate);
+		   splitTrade2.setSecondPrice(secondFarRate);
 		   splitTrade1.setCurrency(splitTrade1.getTradedesc().substring(4, 7));
 		   splitTrade2.setCurrency(splitTrade2.getTradedesc().substring(4, 7));
 		 //  splitTrade1.setAttribute("XccySplitFrom",  Integer.valueOf(orginalTrade.getId()).toString());
@@ -577,12 +580,17 @@ public class FXSplitUtil {
 			   	 splitTrade1.setQuantity(orginalTrade.getQuantity() *-1);
 			  
 				 splitTrade1.setNominal((splitTrade1.getQuantity() * firstRate) * -1 );
-				 	splitCurrencyValue = splitTrade1.getNominal();
+				 splitTrade1.setTradeAmount(orginalTrade.getTradeAmount() * -1); //BUY
+				 splitTrade1.setYield(splitTrade1.getTradeAmount() * -1 * firstFarRate); // sell
+				 	splitCurrencyValue = splitTrade1.getNominal(); 
+				
 			   	
 			   	} else if(orginalTrade.getType().equalsIgnoreCase("SELL/BUY")){
 			   		splitTrade1.setQuantity(orginalTrade.getQuantity() *  -1);  
 			   	
 					   splitTrade1.setNominal((splitTrade1.getQuantity() * firstRate) * -1);
+					   splitTrade1.setTradeAmount(splitTrade1.getQuantity() *-1); //sell
+					   splitTrade1.setYield(splitTrade1.getTradeAmount() *-1 * firstFarRate); //buy
 					   splitCurrencyValue = splitTrade1.getNominal();
 					   splitTrade1.setType("BUY/SELL");
 				   
@@ -606,10 +614,14 @@ public class FXSplitUtil {
 			   	 splitTrade2.setType("SELL/BUY");
 			   	 splitTrade2.setQuantity(orginalTrade.getNominal() * -1);
 				 splitTrade2.setNominal((splitTrade2.getQuantity() * -1) * secondRate);
+				 splitTrade2.setTradeAmount(orginalTrade.getYield() * -1 ); //SELL
+				 splitTrade2.setYield(splitTrade2.getTradeAmount() * -1 * secondFarRate); //SELL
 			   	
 			   	} else if(orginalTrade.getType().equalsIgnoreCase("SELL/BUY")) {
-			   		splitTrade2.setQuantity(splitCurrencyValue / secondRate);
-					   splitTrade2.setNominal(splitCurrencyValue * -1);
+			   		splitTrade2.setQuantity(orginalTrade.getNominal() * -1); //sell 
+					   splitTrade2.setNominal(splitTrade2.getQuantity() * secondRate *-1); // buy
+					   splitTrade2.setTradeAmount(orginalTrade.getYield() * -1); // buy
+					   splitTrade2.setYield(splitTrade2.getTradeAmount() * secondFarRate * -1); // sell
 					  splitTrade2.setType("BUY/SELL");
 				   
 			   			}
@@ -618,21 +630,23 @@ public class FXSplitUtil {
 		   if(isupdate) {
 			   splitTrade1.setAction(orginalTrade.getAction());
 			   splitTrade2.setAction(orginalTrade.getAction());
-			   
+			   mirror1.setAction(orginalTrade.getAction());
+			   mirror2.setAction(orginalTrade.getAction());
 			   splitTrade1.setStatus(orginalTrade.getStatus());
 			   splitTrade2.setStatus(orginalTrade.getStatus());
-			   
+			   mirror1.setStatus(orginalTrade.getStatus());
+			   mirror2.setStatus(orginalTrade.getStatus());
 			   splitTrade1.setCurrency(splitTrade1.getTradedesc().substring(4, 7));
-			   splitTrade2.setCurrency(splitTrade1.getTradedesc().substring(4, 7));
+			   splitTrade2.setCurrency(splitTrade2.getTradedesc().substring(4, 7));
 			   splitTrade2.setDelivertyDate(orginalTrade.getDelivertyDate());
 			   splitTrade1.setDelivertyDate(orginalTrade.getDelivertyDate());
 			   
 		   }
 		   splitsTrade.add(0,orginalTrade);
 		   splitsTrade.add(1,splitTrade1);
-		   splitsTrade.add(2,getMirrorTrade(splitTrade1,mirror1,isupdate));
+		   splitsTrade.add(2,getMirrorTradeONSWAP(splitTrade1,mirror1,isupdate));
 		   splitsTrade.add(3,splitTrade2);
-		   splitsTrade.add(4,getMirrorTrade(splitTrade2,mirror2,isupdate));
+		   splitsTrade.add(4,getMirrorTradeONSWAP(splitTrade2,mirror2,isupdate));
 		  
 		  
 		   
@@ -838,6 +852,8 @@ public class FXSplitUtil {
 		   String quotingCurrecy = getQuotingCurrency(orginalTrade.getTradedesc());
 		   splitTrade1.setPrice(firstRate);
 		   splitTrade2.setPrice(secondRate);
+		   splitTrade1.setSecondPrice(firstFarRate);
+		   splitTrade2.setSecondPrice(secondFarRate);
 		   splitTrade1.setCurrency(splitTrade1.getTradedesc().substring(4, 7));
 		   splitTrade2.setCurrency(splitTrade2.getTradedesc().substring(4, 7));
 		 //  splitTrade1.setAttribute("XccySplitFrom",  Integer.valueOf(orginalTrade.getId()).toString());
@@ -916,12 +932,12 @@ public class FXSplitUtil {
 		   }
 		   splitsTrade.add(0,orginalTrade);
 		   splitsTrade.add(1,splitTrade1);
-		   splitsTrade.add(2,getMirrorTradeONSWAP(splitTrade1));
+		   splitsTrade.add(2,getMirrorTradeONSWAP(splitTrade1,new Trade(),false));
 		   splitsTrade.add(3,splitTrade2);
 		   if(splitTrade2.getId() ==0) {
-		   splitsTrade.add(4,getMirrorTradeONSWAP(splitTrade2));
+		   splitsTrade.add(4,getMirrorTradeONSWAP(splitTrade2,new Trade(),false));
 		   } else {
-			   splitsTrade.add(4,getMirrorTradeONSWAP(splitTrade2));
+			   splitsTrade.add(4,getMirrorTradeONSWAP(splitTrade2,new Trade(),false));
 		   }
 		   return  splitsTrade;
 	}
