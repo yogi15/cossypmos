@@ -223,58 +223,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 		if (jTextField3 == null) {
 			jTextField3 = new NumericTextField(10,format);
 			jTextField3.setText("0");
-		}jTextField3.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				try {
-					double rate1 = 0.0 ;
-					double rate2 = 0.0 ;	
-					double farRate1 = 0.0;
-					double farRate2 = 0.0;
-					if(!commonUTIL.isEmpty(jTextField2.getText()))
-						rate1 = jTextField2.getDoubleValue();
-					if(!commonUTIL.isEmpty(jTextField3.getText()))
-						rate2 = jTextField3.getDoubleValue();
-					if(!commonUTIL.isEmpty(FarRate1.getText()))
-						farRate1 = FarRate1.getDoubleValue();
-					if(!commonUTIL.isEmpty(FarRate2.getText()))
-						farRate2 = FarRate2.getDoubleValue();
-					
-					  
-					if(commonUTIL.isEmpty(rounting))
-						return;
-					if(rounting.size() > 4) {
-						Trade orignalTrade = rounting.get(0);
-						if( orignalTrade.getId() == 0) {
-								Trade xsplit1  =  rounting.get(1);									
-								Trade xsplit2  =  rounting.get(3);
-								rounting =     FXSplitUtil.splitTrade(xsplit1, xsplit2, rounting.get(0), rate1, rate2,farRate1,farRate2);
-	                             setRoutingData(rounting);
-						}  else {
-							rounting =  FXSplitUtil.splitTrade(rounting, rate1, rate2,farRate1,farRate2);
-							if(commonUTIL.isEmpty(rounting)) 
-								return;
-							 setRoutingData(rounting);
-							 jTextField3.setText(String.valueOf(rate2));
-							 jTextField2.setText(String.valueOf(rate1));
-							 FarRate1.setText(String.valueOf(farRate1));
-							 FarRate2.setText(String.valueOf(farRate2));
-						}
-	                 //  getJTable1().repaint();
-	                  
-					}
-	                   
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		
-			
-			
-		});
+		}
 		return jTextField3;
 	}
 	private NumericTextField getJTextFieldFarRate1() {
@@ -325,7 +274,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 		if (jTextField2 == null) {
 			jTextField2 =  new NumericTextField(10,format);
 			jTextField2.setText("0");
-			jTextField2.addActionListener(new ActionListener() {
+		/*	jTextField2.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -376,7 +325,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 			
 				
 				
-			});
+			}); */
 		}
 		
 		return jTextField2;
