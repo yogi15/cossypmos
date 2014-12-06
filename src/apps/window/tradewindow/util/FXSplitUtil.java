@@ -537,10 +537,13 @@ public class FXSplitUtil {
 			Trade orginalTrade, double firstRate, double secondRate,double firstFarRate,double secondFarRate, boolean isupdate) {
 		// TODO Auto-generated method stub
 		Vector<Trade> splitsTrade = new Vector<Trade>();
-		   splitTrade1.setCpID(orginalTrade.getCpID());
+		   splitTrade1.setCpID(orginalTrade.getBookId());
+		   splitTrade1.setMirrorBookid(orginalTrade.getBookId());
 			 //	xccY1.setTradedesc(sconfig.getSecondCurrencySPlit());
 		 	//	xccY2.setBookId(sconfig.getSecondSpotBook());
-		   splitTrade2.setCpID(orginalTrade.getCpID());
+		   splitTrade2.setCpID(orginalTrade.getBookId());
+		   splitTrade1.setMirrorBookid(orginalTrade.getBookId());
+		   splitTrade2.setMirrorBookid(orginalTrade.getBookId());
 			 //	xccY2.setTradedesc(sconfig.getSecondCurrencySPlit());
 		   splitTrade2.setCurrency(splitTrade2.getTradedesc().substring(4, 7));
 			 	splitTrade1.setCurrency(splitTrade1.getTradedesc().substring(4, 7));
@@ -611,7 +614,7 @@ public class FXSplitUtil {
 			   }
 		   }  else {
 			   	if(orginalTrade.getType().equalsIgnoreCase("BUY/SELL")) { 
-			   	 splitTrade2.setType("SELL/BUY");
+			   	 splitTrade2.setType("BUY/SELL");
 			   	 splitTrade2.setQuantity(orginalTrade.getNominal() * -1);
 				 splitTrade2.setNominal((splitTrade2.getQuantity() * -1) * secondRate);
 				 splitTrade2.setTradeAmount(orginalTrade.getYield() * -1 ); //SELL
@@ -622,7 +625,7 @@ public class FXSplitUtil {
 					   splitTrade2.setNominal(splitTrade2.getQuantity() * secondRate *-1); // buy
 					   splitTrade2.setTradeAmount(orginalTrade.getYield() * -1); // buy
 					   splitTrade2.setYield(splitTrade2.getTradeAmount() * secondFarRate * -1); // sell
-					  splitTrade2.setType("BUY/SELL");
+					  splitTrade2.setType("SELL/BUY");
 				   
 			   			}
 			   
@@ -691,10 +694,10 @@ public class FXSplitUtil {
 	   }  
 		  
 		  
-		   splitTrade1.setCpID(orginalTrade.getCpID());
+		   splitTrade1.setCpID(orginalTrade.getBookId());
 			 //	xccY1.setTradedesc(sconfig.getSecondCurrencySPlit());
 		 	//	xccY2.setBookId(sconfig.getSecondSpotBook());
-		   splitTrade2.setCpID(orginalTrade.getCpID());
+		   splitTrade2.setCpID(orginalTrade.getBookId());
 			 //	xccY2.setTradedesc(sconfig.getSecondCurrencySPlit());
 		   splitTrade2.setCurrency(splitTrade2.getTradedesc().substring(4, 7));
 			 	splitTrade1.setCurrency(splitTrade1.getTradedesc().substring(4, 7));
@@ -841,10 +844,12 @@ public class FXSplitUtil {
 	   }  
 		  
 		  
-		   splitTrade1.setCpID(orginalTrade.getCpID());
+		   splitTrade1.setCpID(orginalTrade.getBookId());
 			 //	xccY1.setTradedesc(sconfig.getSecondCurrencySPlit());
 		 	//	xccY2.setBookId(sconfig.getSecondSpotBook());
-		   splitTrade2.setCpID(orginalTrade.getCpID());
+		   splitTrade2.setCpID(orginalTrade.getBookId());
+		   splitTrade1.setMirrorBookid(orginalTrade.getBookId());
+		   splitTrade2.setMirrorBookid(orginalTrade.getBookId());
 			 //	xccY2.setTradedesc(sconfig.getSecondCurrencySPlit());
 		   splitTrade2.setCurrency(splitTrade2.getTradedesc().substring(4, 7));
 			 	splitTrade1.setCurrency(splitTrade1.getTradedesc().substring(4, 7));
