@@ -1234,7 +1234,7 @@ return status;
 				
 				if(originalTrade.getId() > 0) 
 					return saveBatchUpdateSplitTrades(splitTrades,originalTrade,message);
-				 //originalTrade.clearAttributes();
+				 originalTrade.clearAttributes();
 				 Trade xccy1 = splitTrades.get(1);
 				 Trade xccy2 = splitTrades.get(3);
 				 Trade mirror1 = splitTrades.get(2);
@@ -1256,7 +1256,7 @@ return status;
 					commonUTIL.display("TradeImp", "saveBatchTrades  Saving Split trades " + t);
 				 } */
 				 originalTrade.setAutoType("Original");
-			//	 int t= saveTrade(originalTrade);
+				// int t= saveTrade(originalTrade);
 				 int allocateIDForOriginalTrade =  TradeSQL.selectMaxID(dsSQL.getConn()) + 1; 
 				 int allocateIDForxccy1 =  TradeSQL.selectMaxID(dsSQL.getConn()) + 1;
 				 int allocateIDFormirror1 =  TradeSQL.selectMaxID(dsSQL.getConn()) + 1;
@@ -1280,6 +1280,10 @@ return status;
 				 mirror1.setAttribute("MirrorFromTradeID", Integer.valueOf(allocateIDForxccy1).toString());
 				 mirror1.setParentID(allocateIDForOriginalTrade);
      			 mirror2.setAttribute("MirrorFromTradeID", Integer.valueOf(allocateIDForxccy2).toString());
+     			mirror2.setAttribute("ParentID",Integer.toString(allocateIDForOriginalTrade));
+     			mirror1.setAttribute("ParentID",Integer.toString(allocateIDForOriginalTrade));
+     			xccy1.setAttribute("ParentID",Integer.toString(allocateIDForOriginalTrade));
+     			xccy2.setAttribute("ParentID",Integer.toString(allocateIDForOriginalTrade));
      			
      			 mirror2.setParentID(allocateIDForOriginalTrade);
      			saveSplitTrade(mirror2);
