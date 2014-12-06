@@ -1268,17 +1268,20 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 						               	 trade.setAction("NEW");
 						               	 Vector<String> message = new Vector<String>();
 						               	
-						               	trade.setAttributes(getAttributeValue());
+						               	 //setAttribute is already done in fillTrade so commented 
+						               //trade.setAttributes(getAttributeValue());
 						               	trade.setMirrorBookid(0);
 						        		trade.setMirrorID(0);
 						        		trade.setAutoType("");
+						        		// No need to add attributes without any value. Below attributes can be set whenever it has value like been 
+						        		//done in tradeImp for swap split trade. so commented below
 						        	//	trade.setAttribute("MirrorID","");	
 						        	//	trade.setAttribute("B2BID","");	
 						        	//	trade.setAttribute("B2BFlag","");		
 						        	//	trade.setAttribute("XCurrSOriginalTradeID","");		
-						        		trade.setAttribute("ParitialTo","");		
-						        		trade.setAttribute("SXccySplitID","");		
-						        		trade.setAttribute("ParitialFrom","");		
+						        	//	trade.setAttribute("ParitialTo","");		
+						        	//	trade.setAttribute("SXccySplitID","");		
+						        	//	trade.setAttribute("ParitialFrom","");		
 						        	//	trade.setAttribute("XccySplitFrom","");		
 						        	//	trade.setAttribute("FXccySplitID","");		
 						        	//	trade.setAttribute("OffsetID","");		
@@ -1290,7 +1293,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 						        		trade.setB2Bflag(false);
 						        		trade.setB2bid(0);
 						        		trade.setXccySPlitid(0);
-						        		trade.setMirrorID(0);
+						      
 						        		trade.setMirrorBookid(0);
 						        		trade.setFees(feesPanel.getFeesDataV());
 						        		Vector tradestatus = null;
@@ -4408,18 +4411,18 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 						for(int i=0;i<attributesData.size();i++) {
 							Attribute att = attributesData.get(i);
 							String value = att.getValue();
-							
-							if (att.equals(strTradeDate)) {
+							System.out.println(att.getName());
+							/*if (att.getName().equals(strTradeDate)) {
 								
 								tradeDateRowno = i;
-							}
+							}*/
 							if(value != null ) {
 								
-								if (tradeDateRowno >= 0) {
+								/*if (tradeDateRowno >= 0) {
 									
 									tradeDateFilled = true;
 									tradeDateVal = value;
-								}
+								}*/
 								
 								if(value.trim().length() > 0)
 							    attributesV = attributesV + att.getName()+ "=" + att.getValue() + ";";
@@ -4427,13 +4430,13 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 							
 						}
 						
-						if (!tradeDateFilled) {
+						/*if (!tradeDateFilled) {
 							
 							tradeDateVal = commonUTIL.getCurrentDateTime();
 							attributesV = attributesV + strTradeDate+ "=" + tradeDateVal + ";";
 							attributes.jTable1.setValueAt(tradeDateVal, tradeDateRowno, 1);
 							
-						}
+						}*/
 					
 				
 				if(attributesV.trim().length() > 0)
