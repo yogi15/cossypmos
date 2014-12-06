@@ -377,7 +377,7 @@ public class FXSplitUtil {
 		  if(routingTrade.size() == 1) {
 			  return routingTrade;
 		  }
-		     if(trade.getAutoType().equalsIgnoreCase("Original"))
+		     if(trade.getId() == 0)
 		       originalTrade = trade;// getOriginalTradeFromRountingTrades(routingTrade);
 		     else 
 		    	 originalTrade =  getOriginalTradeFromRountingTrades(routingTrade);
