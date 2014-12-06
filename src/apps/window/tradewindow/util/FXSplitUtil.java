@@ -377,10 +377,22 @@ public class FXSplitUtil {
 		  if(routingTrade.size() == 1) {
 			  return routingTrade;
 		  }
+		  if(trade.getType().equalsIgnoreCase("BUY/SELL")) {
+		      if(trade.getQuantity() < 0) 
+		    	  trade.setQuantity(trade.getQuantity() * -1);
+		      if(trade.getNominal() > 0 )
+		    	  trade.setNominal(trade.getNominal() * -1);
+		 }
+	   if(trade.getType().equalsIgnoreCase("SELL/BUY")) {
+		      if(trade.getQuantity() > 0) 
+		    	  trade.setQuantity(trade.getQuantity() * -1);
+		      if(trade.getNominal() < 0 )
+		    	  trade.setNominal(trade.getNominal() * -1);
+		 }
 		     if(trade.getId() == 0)
 		       originalTrade = trade;// getOriginalTradeFromRountingTrades(routingTrade);
 		     else 
-		    	 originalTrade =  getOriginalTradeFromRountingTrades(routingTrade);
+		    	 originalTrade = trade;// getOriginalTradeFromRountingTrades(routingTrade);
 		     
 		    int xxy1 = Integer.parseInt(originalTrade.getAttributeValue("FXccySplitID"));
 		    Trade xccy1 = getSplitOrMirrorTradeFromRountingTrades(xxy1,routingTrade);
