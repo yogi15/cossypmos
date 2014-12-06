@@ -286,7 +286,6 @@ import dsServices.ServerConnectionUtil;
 			this.currencyPair = currencyPair;
 		}
 	
-		
 	
 		public Product getProduct() {
 			return product;
@@ -1273,17 +1272,17 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 						               	trade.setMirrorBookid(0);
 						        		trade.setMirrorID(0);
 						        		trade.setAutoType("");
-						            	trade.setAttribute("MirrorID","");	
-						        		trade.setAttribute("B2BID","");	
-						        		trade.setAttribute("B2BFlag","");		
-						        		trade.setAttribute("XCurrSOriginalTradeID","");		
+						        	//	trade.setAttribute("MirrorID","");	
+						        	//	trade.setAttribute("B2BID","");	
+						        	//	trade.setAttribute("B2BFlag","");		
+						        	//	trade.setAttribute("XCurrSOriginalTradeID","");		
 						        		trade.setAttribute("ParitialTo","");		
 						        		trade.setAttribute("SXccySplitID","");		
 						        		trade.setAttribute("ParitialFrom","");		
-						        		trade.setAttribute("XccySplitFrom","");		
-						        		trade.setAttribute("FXccySplitID","");		
-						        		trade.setAttribute("OffsetID","");		
-						        	trade.setAttribute("OriginalTradeID","");		
+						        	//	trade.setAttribute("XccySplitFrom","");		
+						        	//	trade.setAttribute("FXccySplitID","");		
+						        	//	trade.setAttribute("OffsetID","");		
+						        	//	trade.setAttribute("OriginalTradeID","");		
 									//	trade.setAttribute("MirrorFromTradeID","");	
 										trade.setOffsetid(0);
 									//trade.seto
@@ -2703,7 +2702,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 							functionality.jButton2.setEnabled(true);
 							functionality.jButton3.setEnabled(true);
 							out.jCheckBox2.setEnabled(true);
-							out.jCheckBox0.setEnabled(false);
+							//out.jCheckBox0.setEnabled(false);
 							functionality.jButton2.setEnabled(true);
 							fwdOp.setVisible(false);
 							swap.jTextField1.setText("0.0");
@@ -2745,7 +2744,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 							 functionality.jLabel5.setVisible(true);
 							basicData.jRadioButton1.setSelected(false);
 							out.jCheckBox2.setEnabled(true);
-							out.jCheckBox0.setEnabled(false);
+							//out.jCheckBox0.setEnabled(false);
 							functionality.jButton2.setEnabled(true);
 							functionality.jButton3.setEnabled(true);
 							basicData.jRadioButton5.setSelected(false);
@@ -2854,7 +2853,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 							//functionality.jButton4.setEnabled(false);
 							productSubType = FXFORWARDOPTION;
 							 functionality.jButton0.setEnabled(true);
-							 out.jCheckBox0.setEnabled(true);
+							 //out.jCheckBox0.setEnabled(true);
 							
 							swap.jTextField1.setText("0.0");
 							swap.jTextField2.setText("0.0");
@@ -3355,7 +3354,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 	        rollpanel.getJPanel0().setVisible(false);
 	        functionality.jButton7.setEnabled(false);
 	        trade = null;
-	        
+	      
 	     //   productSubType = "";
 	        basicData.jRadioButton5.setEnabled(true);
 	        basicData.jRadioButton1.setEnabled(true);
@@ -3419,6 +3418,8 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		    functionality.jPanel6.setVisible(false);
 		  //  functionality.jTabbedPane2.setVisible(false);
 		  //  functionality.jTabbedPane1.setVisible(true);
+		    fwdOp.startDate.setText(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
+		    fwdOp.startDate.setEnabled(false);	
 		}
 		public int fillRollParitialOutRightTrade(Trade rolltrade,String type,int rollFROMID,boolean isParital,double rollAmt)  {
 			Trade newrolltrade = new Trade();
@@ -4079,7 +4080,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				 fwdOp.jLabel3.setText(currP.substring(4, 7));
 				 fwdOp.startDate.setEnabled(false);	
 				 // attributeDataValue is set in setAttributes method
-				 if (!commonUTIL.stringToDate(trade.getDelivertyDate(), true).equals(
+				 if (commonUTIL.stringToDate(trade.getDelivertyDate(), true).equals(
 						 commonUTIL.stringToDate(trade.getEffectiveDate(), true))) {
 					 
 					 fwdOp.startDate.setText(trade.getEffectiveDate());
