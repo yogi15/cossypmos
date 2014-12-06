@@ -630,7 +630,7 @@ public int getUserID() {
 	
 	public void setAttribute(String attributeName, String Values) {
 		String att1 = getAttributes();
-		att1 = att1 + ";"+attributeName+"="+Values+";";
+		att1 = att1 + ";"+attributeName+"="+Values;
 		this.attributes = att1;
 		// TODO Auto-generated method stub
 		
