@@ -718,6 +718,9 @@ public class TradeImp implements RemoteTrade {
 		
 		if(trade != null) {
 		Vector fees = (Vector) FeesSQL.selectFeesOnTrades(tradeID, dsSQL.getConn());
+		
+		trade.setAttributes(selectTradeAttributesAsString(tradeID + ""));
+		
 		if(fees != null)
 		    trade.setFees(fees);
 		}
@@ -1572,6 +1575,15 @@ return status;
 				
 				
 				
+			}
+
+
+
+			@Override
+			public String selectTradeAttributesAsString(String tradeId)
+					throws RemoteException {
+				
+				return AttributSQL.selectTradeAttributes(tradeId, dsSQL.getConn());
 			}
 
 
