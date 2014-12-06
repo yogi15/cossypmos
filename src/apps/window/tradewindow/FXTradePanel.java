@@ -1273,17 +1273,17 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 						               	trade.setMirrorBookid(0);
 						        		trade.setMirrorID(0);
 						        		trade.setAutoType("");
-						        	//	trade.setAttribute("MirrorID","");	
-						        	//	trade.setAttribute("B2BID","");	
-						        	//	trade.setAttribute("B2BFlag","");		
-						        	//	trade.setAttribute("XCurrSOriginalTradeID","");		
+						            	trade.setAttribute("MirrorID","");	
+						        		trade.setAttribute("B2BID","");	
+						        		trade.setAttribute("B2BFlag","");		
+						        		trade.setAttribute("XCurrSOriginalTradeID","");		
 						        		trade.setAttribute("ParitialTo","");		
 						        		trade.setAttribute("SXccySplitID","");		
 						        		trade.setAttribute("ParitialFrom","");		
-						        	//	trade.setAttribute("XccySplitFrom","");		
-						        	//	trade.setAttribute("FXccySplitID","");		
-						        	//	trade.setAttribute("OffsetID","");		
-						        	//	trade.setAttribute("OriginalTradeID","");		
+						        		trade.setAttribute("XccySplitFrom","");		
+						        		trade.setAttribute("FXccySplitID","");		
+						        		trade.setAttribute("OffsetID","");		
+						        	trade.setAttribute("OriginalTradeID","");		
 									//	trade.setAttribute("MirrorFromTradeID","");	
 										trade.setOffsetid(0);
 									//trade.seto
