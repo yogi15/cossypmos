@@ -47,5 +47,5 @@ public interface RemoteTrade extends Remote {
 	public Vector<Trade> getB2Btrades(Trade trade)  throws RemoteException;
 //	public Trade undo(Trade trade, int tradeVersion) throws RemoteException;
 	
-
+	public String selectTradeAttributesAsString(String tradeId) throws RemoteException;
 }
