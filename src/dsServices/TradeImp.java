@@ -1234,7 +1234,7 @@ return status;
 				
 				if(originalTrade.getId() > 0) 
 					return saveBatchUpdateSplitTrades(splitTrades,originalTrade,message);
-				 originalTrade.clearAttributes();
+				 //originalTrade.clearAttributes();
 				 Trade xccy1 = splitTrades.get(1);
 				 Trade xccy2 = splitTrades.get(3);
 				 Trade mirror1 = splitTrades.get(2);
