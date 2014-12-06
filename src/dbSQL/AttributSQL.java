@@ -119,6 +119,50 @@ public class AttributSQL {
         	 return false;
          }
 	 }
+	 
+	 public static String selectTradeAttributes(String tradeId, Connection con) {
+		 try {
+             return selectTradeAttributesAsString(tradeId, con);
+         }catch(Exception e) {
+        	 commonUTIL.displayError("insertAttributeSQL","save",e);
+        	 return "";
+         }
+	 }
+	 protected static String selectTradeAttributesAsString(String tradeId, Connection con ) {
+		 
+		    PreparedStatement stmt = null;
+	       String attribute = "";
+	       
+		 try {
+			
+			 stmt = dsSQL.newPreparedStatement(con, SELECTONE + tradeId);
+	         
+	         ResultSet rs = stmt.executeQuery();
+	        
+	         while(rs.next()) {
+	        	 
+	        	 attribute = rs.getString(2) + "=" + rs.getString(4) + ";"+attribute;
+	        	
+	         }
+	         
+	         commonUTIL.display("AttributeSQL","SELECTONE "+SELECTONE + tradeId);
+	         return  attribute;
+	        
+		 } catch (Exception e) {
+			 commonUTIL.displayError("AttributeSQL","SELECTONE" + tradeId,e);
+			 return attribute;
+	           
+	        }
+	        finally {
+	           try {
+				stmt.close();
+			} catch (SQLException e) {
+				
+				commonUTIL.displayError("AttributeSQL","SELECTONE" + tradeId,e);
+			}
+	        }
+	       
+	 }
 	 public static Collection selectAttribute(int AttributeId, Connection con) {
 		 try {
              return  select(AttributeId, con);
