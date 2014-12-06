@@ -61,7 +61,6 @@ public class outRight extends JPanel {
 	private JCheckBox getJCheckBox0() {
 		if (jCheckBox0 == null) {
 			jCheckBox0 = new JCheckBox();
-			jCheckBox0.setSelected(false);
 			jCheckBox0.setText("Float");
 			jCheckBox0.setEnabled(false);
 		}
@@ -263,7 +262,7 @@ public class outRight extends JPanel {
 			jPanel0.add(getJTextField2(), new Constraints(new Leading(148, 150, 12, 12), new Leading(41, 25, 12, 12)));
 			jPanel0.add(getJCheckBox2(), new Constraints(new Leading(746, 12, 12), new Leading(16, 19, 12, 12)));
 			jPanel0.add(getJTextField4(), new Constraints(new Leading(353, 159, 10, 10), new Leading(5, 25, 12, 12)));
-			jPanel0.add(getJCheckBox0(), new Constraints(new Leading(746, 12, 12), new Leading(39, 12, 12)));
+			//jPanel0.add(getJCheckBox0(), new Constraints(new Leading(746, 12, 12), new Leading(39, 12, 12)));
 		}
 		return jPanel0;
 	}
