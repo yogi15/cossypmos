@@ -3773,9 +3773,8 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				   return;
 			trade.setTraderID(new Integer(basicData.jTextField7.getName()).intValue());
 			trade.setTradeDate(commonUTIL.getCurrentDateTime());
-		    
-			trade.setDelivertyDate(out.outRightDate.getSelectedDateAsText());
-		    trade.setStatus(out.jTextField6.getText());
+		    trade.setDelivertyDate(out.outRightDate.getSelectedDateAsText());
+			trade.setStatus(out.jTextField6.getText());
 		    trade.setProductType(productType);
 		   
 		    if(!(out.jComboBox1.getSelectedIndex() == -1))
@@ -3830,12 +3829,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				 
 				 trade.setEffectiveDate(fwdOp.startDate.getText().toString());
 				 
-			 } else {
-				 
-				 fwdOp.startDate.setText(
-							commonUTIL.separteDateTime(attributeDataValue.get("Trade Date")));
-				 
-			 }
+			 } 
 		    
 		    trade.setProductId(product.getId());
 		    if(b2bconfig != null) {
