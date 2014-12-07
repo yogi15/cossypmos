@@ -63,7 +63,7 @@ public class commonUTIL {
 	static protected String USER_HOME=null;
     static protected String USER_NAME=null;
 	static public void displayError(String name,String methodName, Exception e) {
-      System.out.println("Classname : " + name + " : MethodName : " +methodName + " :: "+ e);
+      System.err.println("Classname : " + name + " : MethodName : " +methodName + " :: "+ e);
        
     }
 	
@@ -197,8 +197,12 @@ public class commonUTIL {
 	
     static public String getStringFromDoubleExp(double amount) {
     	String value = BigDecimal.valueOf(amount).toPlainString();
+    	int len = value.length() -  value.indexOf(".") ;
     	if(value.contains(".")) {
+    		if(len == 2)
     		value = value.substring(0, value.indexOf(".")+2);
+    		if(len >= 3)
+    			value = value.substring(0, value.indexOf(".")+3);
     	} 
     	return value;
     }
