@@ -1192,8 +1192,8 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 							
 							if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {
 								
-						    	if (commonUTIL.addSubtractDate(commonUTIL.stringToDate(trade.getDelivertyDate(), true), 31).before(
-										 commonUTIL.stringToDate(trade.getEffectiveDate(), true))) {
+						    	if (commonUTIL.addSubtractDate(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true), 31).before(
+										 commonUTIL.stringToDate(fwdOp.startDate.getText(), true))) {
 						    		
 						    		commonUTIL.showAlertMessage("Option End date falls beyond 31 days after Trade end date");
 						    		 return;
