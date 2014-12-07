@@ -3787,12 +3787,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		    trade.setUserID(user.getId());
 		    trade.setAttributes(getAttributeValue());
 		    trade.setPrice(new Double(out.jTextField4.getText()).doubleValue());
-		    
-		    if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {
-				trade.setEffectiveDate(fwdOp.startDate.getText().toString());
-			} else {
-				trade.setEffectiveDate(trade.getTradeDate());  // use as FORWARD DATE for FXSWAP in FX.
-			}
+
 		     
 		   trade.setQuantity(new Double(out.jTextField1.getText()).doubleValue());  // amt1 (negotiated amt for negotiable curr) 
 		  	trade.setNominal(new Double(out.jTextField2.getText()).doubleValue());  // amt2  (negotiated amt for non-negotiable curr) nominal =  quantity * price
@@ -3827,6 +3822,21 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 			    trade.setYield(0);         // used as fwd amt 0 if not fxswap
 			    trade.setEffectiveDate(trade.getDelivertyDate());
 		    }
+		    
+		    // for merchant float trade effective date is fwdOp.start da
+		    String instrumentType = trade.getAttributeValue("InstrumentType");
+			 
+			 if (instrumentType.equals("FCNR")) {
+				 
+				 trade.setEffectiveDate(fwdOp.startDate.getText().toString());
+				 
+			 } else {
+				 
+				 fwdOp.startDate.setText(
+							commonUTIL.separteDateTime(attributeDataValue.get("Trade Date")));
+				 
+			 }
+		    
 		    trade.setProductId(product.getId());
 		    if(b2bconfig != null) {
 				trade.setAttribute("B2BFlag", "True"); 
@@ -4083,11 +4093,13 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				 fwdOp.jLabel3.setText(currP.substring(4, 7));
 				 fwdOp.startDate.setEnabled(false);	
 				 // attributeDataValue is set in setAttributes method
-				 if (commonUTIL.stringToDate(trade.getDelivertyDate(), true).equals(
-						 commonUTIL.stringToDate(trade.getEffectiveDate(), true))) {
+				 String instrumentType = trade.getAttributeValue("InstrumentType");
+				 
+				 if (instrumentType.equals("FCNR")) {
 					 
 					 fwdOp.startDate.setText(trade.getEffectiveDate());
 					 fwdOp.startDate.setEnabled(true);		
+					 
 				 } else {
 					 
 					 fwdOp.startDate.setText(
