@@ -12,6 +12,7 @@ import beans.Fees;
 import beans.Flows;
 import beans.NettingConfig;
 import beans.Product;
+import beans.Sdi;
 import beans.Trade;
 import beans.Transfer;
 import beans.TransferRule;
@@ -86,6 +87,10 @@ private Fees getFee(int id) {
 		    transfer.setTradeVersionID(trade.getVersion());
 			TransferRule rule = rulesI.next();
 			transfer.setBookId(rule.getBookId());
+			Sdi sd = rule.get__sMethod();
+			transfer.setReceiverInst(getLEName(sd.getAgentId()));
+
+			transfer.setPayerInst(getLEName(sd.getAgentId()));
 			if((rule.get_transferType().equalsIgnoreCase(fxTransferRule.transerTYPEPRINCIPAL)) && (rule.get_payReceive().equalsIgnoreCase(fxTransferRule.RECEIVE))) {
 				if(trade.getQuantity() > .0)
 				   transfer.setAmount(trade.getQuantity());
@@ -107,10 +112,13 @@ private Fees getFee(int id) {
 				transfer.setReceiverCode(getLEName(rule.get_receiverLegalEntityId()));
 				transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
 				transfer.setProductType(trade.getProductType());
+				transfer.setMethod(rule.get__sMethod().getMessageType());
+				transfer.setSettleAmount(transfer.getAmount());
 				transfer.addAttribues("PRINCIPAL", "RECEIVE");
 				transfers.addElement(transfer);
 			}
 			if((rule.get_transferType().equalsIgnoreCase(fxTransferRule.transerTYPEPRINCIPAL)) && (rule.get_payReceive().equalsIgnoreCase(fxTransferRule.PAY))) {
+				
 				if(trade.getQuantity() < .0)
 					   transfer.setAmount(trade.getQuantity());
 					else 
@@ -126,12 +134,15 @@ private Fees getFee(int id) {
 					transfer.setProductId(rule.get_productId());
 					transfer.setSettlecurrency(rule.get_settlementCurrency());
 					transfer.setValueDate(trade.getEffectiveDate());
+					transfer.setPayerInst(getLEName(sd.getAgentId()));
 					transfer.setPayerCode(getLEName(rule.get_payerLegalEntityId()));
 					transfer.setPayerRole(rule.get_payerLegalEntityRole());
 					transfer.setReceiverCode(getLEName(rule.get_receiverLegalEntityId()));
 					transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
+					transfer.setMethod(rule.get__sMethod().getMessageType());
 					transfer.addAttribues("PRINCIPAL", "PAY");
 					transfer.setProductType(trade.getProductType());
+					transfer.setSettleAmount(transfer.getAmount());
 					transfers.addElement(transfer);
 			
 			}if((rule.get_productType().equalsIgnoreCase(productType+fxTransferRule.transerTYPEFEES)) && (rule.get_payReceive().equalsIgnoreCase(fxTransferRule.PAY))) {
@@ -149,8 +160,9 @@ private Fees getFee(int id) {
 				transfer.setReceiverCode(getLEName(rule.get_receiverLegalEntityId()));
 				  transfer.setTradeId(trade.getId());
 				transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
+				transfer.setMethod(rule.get__sMethod().getMessageType());
 				transfer.setProductType(trade.getProductType());
-			    
+				transfer.setSettleAmount(transfer.getAmount());
 			    transfer.addAttribues("FEE_"+fee.getId(), "PAY");
 				transfers.addElement(transfer);
 				
@@ -169,8 +181,9 @@ private Fees getFee(int id) {
 				transfer.setReceiverCode(getLEName(rule.get_receiverLegalEntityId()));
 				transfer.setProductType(trade.getProductType());
 				transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
+				transfer.setMethod(rule.get__sMethod().getMessageType());
 				 transfer.addAttribues("FEE_"+fee.getId(), "RECEIVE");
-			   
+				 transfer.setSettleAmount(transfer.getAmount());
 			  
 				transfers.addElement(transfer);
 				
@@ -226,6 +239,8 @@ private Fees getFee(int id) {
 				transfer.setReceiverCode(getLEName(rule.get_receiverLegalEntityId()));
 				transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
 				transfer.setProductType(trade.getProductType());
+				transfer.setMethod(rule.get__sMethod().getMessageType());
+				transfer.setSettleAmount(transfer.getAmount());
 				transfer.addAttribues("PRINCIPAL", "RECEIVE");
 				if(swaptrade.getRollOverFrom() > 0 && trade.getFxSwapLeg().equalsIgnoreCase("SWAPLEG")) {
 					transfer.addAttribues("FARLEG", "NEW");
@@ -262,7 +277,9 @@ private Fees getFee(int id) {
 					transfer.setPayerRole(rule.get_payerLegalEntityRole());
 					transfer.setReceiverCode(getLEName(rule.get_receiverLegalEntityId()));
 					transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
+					transfer.setMethod(rule.get__sMethod().getMessageType());
 					transfer.addAttribues("PRINCIPAL", "PAY");
+					transfer.setSettleAmount(transfer.getAmount());
 					transfer.setProductType(trade.getProductType());
 					if(swaptrade.getRollOverFrom() > 0 && trade.getFxSwapLeg().equalsIgnoreCase("SWAPLEG")) {
 						transfer.addAttribues("FARLEG", "NEW");
@@ -294,7 +311,8 @@ private Fees getFee(int id) {
 				  transfer.setTradeId(trade.getId());
 				transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
 				transfer.setProductType(trade.getProductType());
-			    
+				transfer.setMethod(rule.get__sMethod().getMessageType());
+				transfer.setSettleAmount(transfer.getAmount());
 			    transfer.addAttribues("FEE_"+fee.getId(), "PAY");
 				transfers.addElement(transfer);
 				
@@ -314,7 +332,8 @@ private Fees getFee(int id) {
 				transfer.setProductType(trade.getProductType());
 				transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
 				 transfer.addAttribues("FEE_"+fee.getId(), "RECEIVE");
-			   
+				 transfer.setMethod(rule.get__sMethod().getMessageType());
+				 transfer.setSettleAmount(transfer.getAmount());
 			  
 				transfers.addElement(transfer);
 				
