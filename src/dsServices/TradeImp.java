@@ -152,7 +152,9 @@ public class TradeImp implements RemoteTrade {
 					WFConfig wf = getStatusOnTradeAction(trade,trade.getStatus(),returnStatus);
 					if(wf == null) {
 						returnStatus.add(new Integer(-10));
+						commonUTIL.displayError("TradeImp", "SaveTrade wf is null for trade "+trade.getId() + " at  " + trade.getStatus() + " on action " + trade.getAction() , new Exception());
 						returnStatus.add(new String(" Action "+ trade.getAction() + " not Valid on status "+ trade.getStatus()));
+						
 						return returnStatus;
 					}
 					if(returnStatus.size() > 0) {
@@ -193,10 +195,11 @@ public class TradeImp implements RemoteTrade {
 						
 						//processTask(trade,wf);
 					   //publishnewTrade("NEWTRADE","Text",null);
-						if(task != null)
-						 publishnewTrade("POS_NEWTRADE","Object",getTaskEvent(task, trade));
 						
 					   publishnewTrade("POS_NEWTRADE","Object",getTradeEvent(trade));
+					   if(task != null)
+							 publishnewTrade("POS_NEWTRADE","Object",getTaskEvent(task, trade));
+							
 					   if(originalTrade != null) {
 						 //  originalTrade.setAttribute("B2BID",  Integer.valueOf(i).toString());
 						 //  prcessAudit(originalTrade);
