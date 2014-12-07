@@ -35,6 +35,8 @@ import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 import org.dyno.visual.swing.layouts.Trailing;
 
+import com.lowagie.text.Font;
+
 import util.commonUTIL;
 import apps.window.tradewindow.BackOfficePanel;
 import apps.window.tradewindow.panelWindow.FeesPanel.TableModelUtil;
@@ -60,6 +62,7 @@ public class TransferPanel extends BackOfficePanel {
 		return popupMenu;
 	}
 	   Hashtable<String,JTable> dynTables = new  Hashtable<String,JTable>();
+	//   java.awt.Font f = new  java.awt.Font("ARIAL",Font.BOLD,11);
 	private JTable jTable0;
 	private JScrollPane jScrollPane0;
 	private JLabel jLabel0;
@@ -106,7 +109,7 @@ public class TransferPanel extends BackOfficePanel {
 	RemoteProduct remoteProduct;
 	String col[] = { "Transfer ID", "Trade id", "EventType", "TranferType",
 			"AMOUNT", "Settlement", "Quantity", "Product", "Status",
-			"SettlementDate", "Currency", "ValueDate", "Payer", "Receiver" };
+			"SettlementDate", "Currency", "ValueDate", "Payer", "Receiver","Method","PayerInst","RecInst" };
 
 	TransferEvtListener transferEvts = null;
 	public TransferPanel() {
@@ -610,6 +613,7 @@ public class TransferPanel extends BackOfficePanel {
 		if (jLabel9 == null) {
 			jLabel9 = new JLabel();
 			jLabel9.setText("Status");
+			//jLabel9.setFont(f);
 		}
 		return jLabel9;
 	}
@@ -683,8 +687,10 @@ public class TransferPanel extends BackOfficePanel {
 
 	private JLabel getJLabel7() {
 		if (jLabel7 == null) {
-			jLabel7 = new JLabel();
-			jLabel7.setText("Receiver");
+			jLabel7 = new JLabel("Receiver");
+			
+			//jLabel7.setf
+		//	jLabel7.setText("Receiver");
 		}
 		return jLabel7;
 	}
@@ -1051,6 +1057,15 @@ public class TransferPanel extends BackOfficePanel {
 				break;
 			case 13:
 				value = transfer.getReceiverCode();
+				break;
+			case 14:
+				value = transfer.getMethod();
+				break;
+			case 15:
+				value = transfer.getPayerInst();
+				break;
+			case 16:
+				value = transfer.getReceiverInst();
 				break;
 			
 			}
