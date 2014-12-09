@@ -35,7 +35,6 @@ import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 import org.dyno.visual.swing.layouts.Trailing;
 
-import com.lowagie.text.Font;
 
 import util.commonUTIL;
 import apps.window.tradewindow.BackOfficePanel;
