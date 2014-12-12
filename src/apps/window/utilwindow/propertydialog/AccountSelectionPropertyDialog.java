@@ -82,8 +82,9 @@ public class AccountSelectionPropertyDialog  extends JDialog  {
 	   }
 	   private Map<Integer, Account> contractAtRow = new HashMap<Integer, Account>(0);
 	   public Account getAccountAtRow(int row) {
-		   int id = (Integer) accountJTable.getValueAt(row, 0);
-		   return accounts.get(id);
+		   
+		   Account account = (Account) accounts.get(row);
+		   return account;
 	   }
 	   protected void setFutureContractList(Vector<Account> accounts){
 	    	this. accounts = accounts;
