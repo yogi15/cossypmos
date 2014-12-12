@@ -14,6 +14,156 @@ public class Sdi extends BOObject implements Serializable {
 	int accountID;
 	String messageType;
 	int id;
+	int preferred = 0;
+	int interMid1 =0;
+	/**
+	 * @return the interMid1
+	 */
+	public int getInterMid1() {
+		return interMid1;
+	}
+	/**
+	 * @param interMid1 the interMid1 to set
+	 */
+	public void setInterMid1(int interMid1) {
+		this.interMid1 = interMid1;
+	}
+	/**
+	 * @return the interMid2
+	 */
+	public int getInterMid2() {
+		return interMid2;
+	}
+	/**
+	 * @param interMid2 the interMid2 to set
+	 */
+	public void setInterMid2(int interMid2) {
+		this.interMid2 = interMid2;
+	}
+	/**
+	 * @return the interMid1account
+	 */
+	public int getInterMid1account() {
+		return interMid1account;
+	}
+	/**
+	 * @param interMid1account the interMid1account to set
+	 */
+	public void setInterMid1account(int interMid1account) {
+		this.interMid1account = interMid1account;
+	}
+	/**
+	 * @return the interMid2account
+	 */
+	public int getInterMid2account() {
+		return interMid2account;
+	}
+	/**
+	 * @param interMid2account the interMid2account to set
+	 */
+	public void setInterMid2account(int interMid2account) {
+		this.interMid2account = interMid2account;
+	}
+	/**
+	 * @return the interMid1Contact
+	 */
+	public String getInterMid1Contact() {
+		return interMid1Contact;
+	}
+	/**
+	 * @param interMid1Contact the interMid1Contact to set
+	 */
+	public void setInterMid1Contact(String interMid1Contact) {
+		this.interMid1Contact = interMid1Contact;
+	}
+	/**
+	 * @return the interMid2Contact
+	 */
+	public String getInterMid2Contact() {
+		return interMid2Contact;
+	}
+	/**
+	 * @param interMid2Contact the interMid2Contact to set
+	 */
+	public void setInterMid2Contact(String interMid2Contact) {
+		this.interMid2Contact = interMid2Contact;
+	}
+	/**
+	 * @return the interMid1glName
+	 */
+	public String getInterMid1glName() {
+		return interMid1glName;
+	}
+	/**
+	 * @param interMid1glName the interMid1glName to set
+	 */
+	public void setInterMid1glName(String interMid1glName) {
+		this.interMid1glName = interMid1glName;
+	}
+	/**
+	 * @return the interMid2glName
+	 */
+	public String getInterMid2glName() {
+		return interMid2glName;
+	}
+	/**
+	 * @param interMid2glName the interMid2glName to set
+	 */
+	public void setInterMid2glName(String interMid2glName) {
+		this.interMid2glName = interMid2glName;
+	}
+	int interMid2 =0;
+	int interMid1account =0;
+	int interMid2account =0;
+	String interMid1Contact = "";
+	String interMid2Contact ="";
+	String glName ="";
+	/**
+	 * @return the glName
+	 */
+	public String getGlName() {
+		return glName;
+	}
+	/**
+	 * @param glName the glName to set
+	 */
+	public void setGlName(String glName) {
+		this.glName = glName;
+	}
+	String interMid1glName = "";
+	String interMid2glName = "";
+	
+	
+	
+			
+	/**
+	 * @return the preferred
+	 */
+	public int getPreferred() {
+		return preferred;
+	}
+	/**
+	 * @param preferred the preferred to set
+	 */
+	public void setPreferred(int preferred) {
+		this.preferred = preferred;
+	}
+	/**
+	 * @return the priority
+	 */
+	public int getPriority() {
+		return priority;
+	}
+	/**
+	 * @param priority the priority to set
+	 */
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+	int priority =0;
+	
+	
+	
 	String sdiformat;
 	String attributes;
 	String leContacts;
