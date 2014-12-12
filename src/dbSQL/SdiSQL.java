@@ -20,22 +20,22 @@ public class SdiSQL {
 	final static private String DELETE =
 		"DELETE FROM " + tableName + "   where id =? ";
 	final static private String INSERT =
-		"INSERT into " + tableName + "(id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role ) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		"INSERT into " + tableName + "(id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME ) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	final static private String UPDATE =
 		"UPDATE " + tableName + " set agentId=?,cpId=?,accountID=?,messageType=?  where id = ? ";
 		//		",sdiformat=?,poid=?,attributes=?,leContacts=?,agentContacts=?,payrec=?,cash=?,method=?,products =?,currency=?,key=? where id = ? ";
 	final static private String SELECT_MAX =
 		"SELECT MAX(id) sdiformat_ID FROM " + tableName + " ";
 	final static private String SELECTALL =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role   FROM " + tableName + " ";
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role ,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME  FROM " + tableName + " ";
 	final static private String SELECT =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role   FROM " + tableName + " where id =  ?";
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME   FROM " + tableName + " where id =  ?";
 	final static private String SELECTWHERE =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role   FROM " + tableName + " where ";
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME   FROM " + tableName + " where ";
 	 static private String SELECTONE =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency ,key,role  FROM " + tableName + " where id =  ";
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency ,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME  FROM " + tableName + " where id =  ";
 	 static private String SELECTSDIKEY =
-				"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency ,key,role  FROM " + tableName + " where key =  ";
+				"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency ,key,role ,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME FROM " + tableName + " where key =  ";
 	 private static String getUpdateSQL(Sdi sdi) {
 	      String updateSQL = "UPDATE " + tableName + " set " +
 	      		" agentId= " + sdi.getAgentId() + 
@@ -113,7 +113,7 @@ public class SdiSQL {
 	 
 	 public static Vector selectSDI(int SdiId, Connection con) {
 		 try {
-          return (Vector) selectSDIOne(SdiId, con);
+          return (Vector<Sdi>) selectSDIOne(SdiId, con);
       }catch(Exception e) {
      	 commonUTIL.displayError("SdiSQL","selectSDI",e);
      	 return null;
@@ -229,7 +229,14 @@ protected static int selectMax(Connection con ) {
 	            stmt.setString(15, inserSdi.getCurrency());
 	            stmt.setString(16, inserSdi.getkey());
 	            stmt.setString(17, inserSdi.getRole());
-	            
+	            stmt.setInt(18, inserSdi.getPriority());
+	            stmt.setInt(19, inserSdi.getPreferred());
+	            stmt.setInt(20, inserSdi.getInterMid1());
+	            stmt.setInt(21, inserSdi.getInterMid2());
+	            stmt.setString(22, inserSdi.getInterMid1Contact());
+	            stmt.setString(23, inserSdi.getInterMid2Contact());
+	            stmt.setString(24, inserSdi.getInterMid1glName());
+	            stmt.setString(25, inserSdi.getInterMid2glName());
 	            stmt.executeUpdate();
 			    con.commit();
 			    commonUTIL.display("SdiSQL","insert " +INSERT );
@@ -287,6 +294,15 @@ protected static int selectMax(Connection con ) {
 			      Sdi.setCurrency(rs.getString(15));
 			      Sdi.setkey(rs.getString(16));
 			      Sdi.setRole(rs.getString(17));
+			      Sdi.setInterMid1(rs.getInt(20));
+			      Sdi.setInterMid2(rs.getInt(21));
+			      Sdi.setPriority(rs.getInt(18));
+			      Sdi.setPreferred(rs.getInt(19));
+			      Sdi.setInterMid1Contact(rs.getString(22));
+			      Sdi.setInterMid2Contact(rs.getString(23));
+			      Sdi.setInterMid1glName(rs.getString(24));
+			      Sdi.setInterMid2glName(rs.getString(25));
+			   
 			      
 			        Sdis.add(Sdi);
 	         
@@ -380,6 +396,14 @@ public static boolean SDIKeyWhere(String wherecon,Connection con ) {
 	             Sdi.setCurrency(rs.getString(15));
 	             Sdi.setkey(rs.getString(16));
 	             Sdi.setRole(rs.getString(17));
+	             Sdi.setInterMid1(rs.getInt(20));
+			      Sdi.setInterMid2(rs.getInt(21));
+			      Sdi.setPriority(rs.getInt(18));
+			      Sdi.setPreferred(rs.getInt(19));
+			      Sdi.setInterMid1Contact(rs.getString(22));
+			      Sdi.setInterMid2Contact(rs.getString(23));
+			      Sdi.setInterMid1glName(rs.getString(24));
+			      Sdi.setInterMid2glName(rs.getString(25));
 		        Sdis.add(Sdi);
 		     
 	      
@@ -406,8 +430,9 @@ public static boolean SDIKeyWhere(String wherecon,Connection con ) {
 	     Vector Sdis = new Vector();
 	     
 		 try {
-			 SELECTONE = SELECTONE + sdiId;
-			 stmt = dsSQL.newPreparedStatement(con, SELECTONE );
+			 String sql = SELECTONE;
+			sql  = sql + sdiId;
+			 stmt = dsSQL.newPreparedStatement(con, sql );
 	      
 	      ResultSet rs = stmt.executeQuery();
 	      
@@ -433,6 +458,14 @@ public static boolean SDIKeyWhere(String wherecon,Connection con ) {
 	             Sdi.setCurrency(rs.getString(15));
 	             Sdi.setkey(rs.getString(16));
 	             Sdi.setRole(rs.getString(17));
+	             Sdi.setInterMid1(rs.getInt(20));
+			      Sdi.setInterMid2(rs.getInt(21));
+			      Sdi.setPriority(rs.getInt(18));
+			      Sdi.setPreferred(rs.getInt(19));
+			      Sdi.setInterMid1Contact(rs.getString(22));
+			      Sdi.setInterMid2Contact(rs.getString(23));
+			      Sdi.setInterMid1glName(rs.getString(24));
+			      Sdi.setInterMid2glName(rs.getString(25));
 		        Sdis.add(Sdi);
 	      
 	      }
