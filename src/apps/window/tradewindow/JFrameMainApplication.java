@@ -67,7 +67,7 @@ public class JFrameMainApplication extends JFrame {
 	private static JMenuItem[] fxConfigItems = {
 			new JMenuItem("CurrencySplit"), new JMenuItem("B2BConfig"),
 			new JMenuItem("SpotRollOver") };
-	private static JMenuItem[] settlements = { new JMenuItem("SDI1"),
+	private static JMenuItem[] settlements = { new JMenuItem("SDI"),
 			new JMenuItem("NettingConfiguration") };
 	private static JMenuItem[] jobs = { new JMenuItem("Jobs"),
 			new JMenuItem("Deal Viewer"), new JMenuItem("Quick Look Up"),
@@ -409,8 +409,8 @@ public class JFrameMainApplication extends JFrame {
 					refWindow.setIconImage(Toolkit.getDefaultToolkit()
 							.getImage(imgURL));
 					if (arg0.getActionCommand().toString()
-							.equalsIgnoreCase("SDI1")) {
-						refWindow.setSize(900, 500);
+							.equalsIgnoreCase("SDI")) {
+					//	refWindow.setSize(1050, 540);
 					}
 					if (arg0.getActionCommand().toString()
 							.equalsIgnoreCase("NettingConfiguration")) {
