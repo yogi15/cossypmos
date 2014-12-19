@@ -16,6 +16,7 @@ import com.jidesoft.grid.CheckBoxListComboBoxCellEditor;
 import com.jidesoft.grid.EditorContext;
 
 
+import apps.window.referencewindow.SDIWindow;
 import beans.CurrencyPair;
 import beans.FutureContract;
 import beans.Holiday;
@@ -198,7 +199,7 @@ public enum SDIPropertyEnum {
 					
 				   }
 		   SDIProperty property = SDIProperty.createAutoCompleteComboBox(domainName, "Exchange", propertyValuesVec);
-			
+		   //property.addPropertyChangeListener(new SDIWindow());
 			return property;
 	}
 	public static SDIProperty getPropertyBeneficiaryOnRole(String role) {
