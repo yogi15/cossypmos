@@ -1398,19 +1398,25 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 										 functionality.jLabel4.setVisible(false);
 										 functionality.jLabel5.setVisible(false);
 									 }
+									System.out.println();
 									Vector vector = (Vector) remoteReference.getCurrencySplitConfig(Integer.parseInt(basicData.book.getName()), basicData.currencyPair.getText());
 									 
 									if(!commonUTIL.isEmpty(vector)) {
+										
 										if(trade == null || trade.getId() == 0)
 										     functionality.clearRounting();
-									  sconfig =  (CurrencySplitConfig)vector.elementAt(0);
-									  functionality.jLabel2.setText(sconfig.getFirstCurrencySplit());
-									  populateRountingData();
+										sconfig =  (CurrencySplitConfig)vector.elementAt(0);
+										functionality.jLabel2.setText(sconfig.getFirstCurrencySplit());
+										populateRountingData();
 									
 									functionality.jLabel3.setText(sconfig.getSecondCurrencySPlit());
 									
 									 } else {
+										 
+										 commonUTIL.
+										 showAlertMessage("Currency split config for selected Currency Pair and Book not found.");
 										 out.jCheckBox2.setSelected(false);
+										 functionality.jPanel2.setVisible(false);
 									 }
 								} catch (RemoteException e1) {
 									// TODO Auto-generated catch block
