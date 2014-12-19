@@ -5,23 +5,15 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.CellEditor;
 
-import apps.window.utilwindow.propertypane.Editor.LESelectionCellEditor;
-import apps.window.utilwindow.propertypane.enums.FutureContractProductPropertyListEnum;
 import apps.window.utilwindow.propertypane.enums.SDIPropertyListEnum;
 import beans.Account;
 import beans.LegalEntity;
 
-import com.jidesoft.grid.CellEditorFactory;
-import com.jidesoft.grid.CellEditorManager;
-import com.jidesoft.grid.CheckBoxListComboBoxCellEditor;
-import com.jidesoft.grid.EditorContext;
 import com.jidesoft.grid.Property;
 import com.jidesoft.grid.PropertyTable;
 import com.jidesoft.grid.PropertyTableModel;
 
-import constants.FuturesConstants;
 import constants.SDIConstants;
 
 
@@ -168,8 +160,7 @@ public class SDIPropertyTable extends PropertyTable implements PropertyChangeLis
 
 	}
 	
-	 public PropertyTable getSDIPropertyTable(LegalEntity le) {
-	     beneficiary = le;
+	 public PropertyTable getSDIPropertyTable() {
 		 sdiProductProperties = getSDIProperties();
 	//	 propertyTable = new PropertyTable();
 
@@ -182,6 +173,8 @@ public class SDIPropertyTable extends PropertyTable implements PropertyChangeLis
 		expandAll();
 		addPropertyChangeListener(this);
 		
+		 
+		 
 		//propertyTable.addPropertyChangeListener("Exchange", this);
 		return this;
     }
@@ -218,9 +211,9 @@ public class SDIPropertyTable extends PropertyTable implements PropertyChangeLis
 		}
 	 
 		private List<SDIProperty> getFUTURE_INTERMIDRY_Properties() {
-		// TODO Auto-generated method stub
-		return getSDI_Properties();
-	}
+			// TODO Auto-generated method stub
+			return getSDI_Properties();
+		}
 
 		private List<SDIProperty> getSDI_BENEFICIARY_Properties() {
 		// TODO Auto-generated method stub
@@ -235,17 +228,17 @@ public class SDIPropertyTable extends PropertyTable implements PropertyChangeLis
 
 		private List<SDIProperty> getSDI_Properties() {
 
-	List<SDIProperty> properties = new ArrayList<SDIProperty>();
+			List<SDIProperty> properties = new ArrayList<SDIProperty>();
 			
 			if (productName.equals(SDIConstants.SDI_BENEFICARY_PROPERTIES)) {
 					
-				properties = SDIPropertyListEnum.SDI_BENEFICARY_PROPERTIES.getPropertyList(SDIConstants.BENEFICIARY);
+				properties = SDIPropertyListEnum.SDI_BENEFICARY_PROPERTIES.getPropertyList(SDIConstants.SDI_BENEFICARY_PROPERTIES);
 				return properties;
 				
 			} if (productName.equals(SDIConstants.SDI_AGENT_PROPERTIES)) {
 				
-			properties = SDIPropertyListEnum.SDI_AGENT_PROPERTIES.getPropertyList(SDIConstants.SDI_AGENT_PROPERTIES);
-			return properties;
+				properties = SDIPropertyListEnum.SDI_AGENT_PROPERTIES.getPropertyList(SDIConstants.SDI_AGENT_PROPERTIES);
+				return properties;
 			
 		} 
 			return properties;
@@ -290,6 +283,10 @@ public class SDIPropertyTable extends PropertyTable implements PropertyChangeLis
 				 }
 			 }
 		}
+	
+			 
+						 
+	
 			 if(property.getName().equalsIgnoreCase(SDIConstants.BENEFICIARY)) {
 					if(property.getValue() == null)
 						return;
@@ -494,11 +491,17 @@ public class SDIPropertyTable extends PropertyTable implements PropertyChangeLis
 					 } */
 			 }
 			 if(property.getName().equalsIgnoreCase(SDIConstants.PREFERRED)) {
-					System.out.println(property.getValue());
-					setPreferredFlag((boolean) property.getValue());
+					
+					setPreferredFlag(((Boolean) property.getValue()).booleanValue());
 			 }
 			 if(property.getName().equalsIgnoreCase(SDIConstants.PRIORITY)) {
-				 setPriority((int) property.getValue());
+				 if(property.getName().equalsIgnoreCase(SDIConstants.PRIORITY)) {
+					 
+					// System.out.println("-------------- "+ property.getValue());
+					 setPriority(((Integer) property.getValue()).intValue());
+					 
+				 }
+				 
 				
 			 }
 			// table.getModel().setValueAt(proper, rowid, 1);
@@ -547,5 +550,5 @@ public class SDIPropertyTable extends PropertyTable implements PropertyChangeLis
 		this.account = account2;
 		
 	}
-
+	
 }
