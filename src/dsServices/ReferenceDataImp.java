@@ -413,9 +413,9 @@ public class ReferenceDataImp implements RemoteReferenceData {
 	}
 
 	@Override
-	public void removeSDI(Sdi sdi) throws RemoteException {
+	public boolean removeSDI(Sdi sdi) throws RemoteException {
 		
-		SdiSQL.delete(sdi, dsSQL.getConn());
+		return SdiSQL.delete(sdi, dsSQL.getConn());
 	}
 
 	@Override
