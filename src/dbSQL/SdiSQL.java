@@ -86,28 +86,38 @@ public class SdiSQL {
 	 
 	 protected static boolean remove(Sdi deleteSdi, Connection con ) {
 			
-	        PreparedStatement stmt = null;
-		 try {
-			 int j = 1;
-			 stmt = dsSQL.newPreparedStatement(con, DELETE);
-	            stmt.setInt(j++, deleteSdi.getId());
-	           
-	            stmt.executeUpdate();
+	     PreparedStatement stmt = null;
+		 
+	     try {
 			 
+	    	 int j = 1;
+			 stmt = dsSQL.newPreparedStatement(con, DELETE);
+	         stmt.setInt(j++, deleteSdi.getId());
+	           
+	         stmt.executeUpdate();
+			 
+	         commonUTIL.display("SdiSQL", DELETE +  deleteSdi.getId());
+	         
 		 } catch (Exception e) {
+			 
 			 commonUTIL.displayError("SdiSQL","remove",e);
 			 return false;
 	           
-	        }
-	        finally {
-	           try {
-				stmt.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
+	     } finally {
+	       
+	    	 try {
+			
+	    		 stmt.close();
+			
+	    	 } catch (SQLException e) {
+				
 				commonUTIL.displayError("SdiSQL","remove",e);
-			}
-	        }
-	        return true;
+			
+	    	 }
+	        
+	     }
+	     
+	     return true;
 	 }
 	 
 	 
