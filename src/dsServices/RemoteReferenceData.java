@@ -25,6 +25,7 @@ import beans.Users;
 import beans.WFConfig;
 
 import java.rmi.Remote;
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -112,7 +113,6 @@ public interface RemoteReferenceData extends Remote{
 	public Collection selectWhereAttribute(String sql) throws RemoteException;
 	public Collection update(Attribute att) throws RemoteException;
 	
-	
 	public int saveUser(Users user)throws RemoteException;
 	public Users selectUser(Users user,String group) throws RemoteException;
 	public int updateUser(Users user) throws RemoteException;
@@ -171,7 +171,7 @@ public interface RemoteReferenceData extends Remote{
 	public Sdi updateSDI(Sdi sdi)throws RemoteException;
 	public boolean checkSDIKey(Sdi sdi) throws RemoteException;
 	public Vector SDIWhere(String sql) throws RemoteException;
-	public void removeSDI(Sdi sdi) throws RemoteException;
+	public boolean removeSDI(Sdi sdi) throws RemoteException;
 	
 	public int saveWF(WFConfig wfc) throws RemoteException;
 	public Collection selectAllWF() throws RemoteException;
