@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,6 +42,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import apps.newDealInvoker;
+import beans.StartUPData;
 import beans.TransferRule;
 import util.common.DateU;
 
@@ -74,6 +76,22 @@ public class commonUTIL {
 		// TODO Auto-generated method stub
 		return new Color(232, 230, 215);
 	}
+	
+	static public String []  convertVectortoSringArray(Vector v) {
+    	String name [] = null;
+    	int i=0;
+    	if(v != null ) {
+    		name = new String[v.size()];
+    		Iterator its = v.iterator();
+    		while(its.hasNext()) {
+    			name [i] = ( (StartUPData) its.next()).getName();
+    			i++;
+    		}
+    	}
+		return name;                                           
+        // TODO add your handling code here:
+    }
+	
 	/**
 	 * Returns current date in the passed format
 	 *	@author yogesh
