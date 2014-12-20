@@ -77,6 +77,10 @@ public abstract class TradePanel extends CommonPanel  {
 	public abstract void processTask(TaskEventProcessor taskEvent,Users WindowUser);
 		// TODO Auto-generated method stub
 	public abstract  void setLimitBreachMarkOnAction(int i);
+	public void setSDIPanelInstruction() {
+		// TODO Auto-generated method stub
+		
+	}
 		
 		// TODO Auto-generated method stub
 		
