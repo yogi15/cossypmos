@@ -105,6 +105,7 @@ import beans.Product;
 import beans.StartUPData;
 import beans.Trade;
 import beans.Users;
+import bo.util.SDISelectorUtil;
 import dsEventProcessor.TaskEventProcessor;
 import dsServices.RemoteBOProcess;
 import dsServices.RemoteProduct;
@@ -117,7 +118,7 @@ import dsServices.ServerConnectionUtil;
 	//VS4E -- DO NOT REMOVE THIS LINE!
 	public class FXTradePanel extends  TradePanel {
 	
-		
+		  boolean isTradeProper = false;
 		  BasicData basicData = null;
 		  int instrumentType = 0;
 		  static String FXSWAP = "FXSWAP";
@@ -3257,17 +3258,31 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		@Override
 		public void setSDIPanel(BackOfficePanel panel) {
 	sdiPanel = (SDIPanel) panel;
+		}
+		public void setSDIPanelInstruction() {
+			if(trade != null) {
+			
+				sdiPanel.setTrade(trade);
+				 
+			} else {
+				Trade dummy = new Trade();
+				dummy.setId(0);
+				fillTrade(dummy,"NEW");
+				if(isTradeProper)  {
+					sdiPanel.setTrade(dummy);
+				}
+				isTradeProper = false;
+				
+			}
 			
 		}
 		 public void getTradeSDI(BackOfficePanel panel) {
-				try {
+				
 					//System.out.println(panel);
-					sdiPanel.setTrade(trade);
-					panel.fillJTabel((Vector) remoteTrade.getSDisOnTrade(trade));
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+					//sdiPanel.setTrade(trade);
+					//panel.fillJTabel((Vector) SDISelectorUtil.selectSdiOntrade(trade, remoteReference));
+			 setSDIPanelInstruction();
+				
 			}
 	
 		@Override
@@ -3738,7 +3753,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		
 		public void fillTrade(Trade trade,String type) {
 		//
-			
+			isTradeProper = false;
 			//trade.setId(0);
 			if(basicData.jRadioButton0.isSelected()) {
 				productSubType = FXTAKEUP;
@@ -3858,6 +3873,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				}
 				
 		    }
+		    isTradeProper = true;
 		   // trade.setVersionID(0);
 		    
 		    
@@ -3954,7 +3970,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 						functionality.setRoutingData(rountingTrades);
 					}
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
+					isTradeProper = false;
 					e.printStackTrace();
 				}
 			
