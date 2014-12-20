@@ -8,11 +8,17 @@ import productPricing.DefaultCashFlow;
 
 import util.common.DateU;
 
-public  class TransferRule implements Serializable {
+public  class TransferRule implements Serializable,Cloneable {
     int bookId =0;
     String fxSwapType;
     
-    
+    @Override
+
+	public Object clone() throws CloneNotSupportedException {
+
+	return super.clone();
+
+	}
     
 	public String getFxSwapType() {
 		return fxSwapType;
@@ -256,6 +262,32 @@ public  class TransferRule implements Serializable {
 	    protected int     _manualSDId;
 	    protected int     _intSDIVersion;
 	    protected int     _extSDIVersion;
+	    /**
+		 * @return the _receiverAgentID
+		 */
+		public int get_receiverAgentID() {
+			return _receiverAgentID;
+		}
+		/**
+		 * @param _receiverAgentID the _receiverAgentID to set
+		 */
+		public void set_receiverAgentID(int _receiverAgentID) {
+			this._receiverAgentID = _receiverAgentID;
+		}
+		/**S
+		 * @return the _payerAgentID
+		 */
+		public int get_payerAgentID() {
+			return _payerAgentID;
+		}
+		/**
+		 * @param _payerAgentID the _payerAgentID to set
+		 */
+		public void set_payerAgentID(int _payerAgentID) {
+			this._payerAgentID = _payerAgentID;
+		}
+		protected int     _receiverAgentID;
+	    protected int     _payerAgentID;
 	    protected DateU   _settleDate; //NEVER PUT IT IN THE EQUALS METHOD
 	    transient protected double __transferAmount;
 	    transient protected int __sdiSecurityId;    
