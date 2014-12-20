@@ -570,6 +570,7 @@ public class TradeApplication extends DefaultDockableHolder {
 						try {
 
 							trade = (Trade) remoteTrade.selectTrade(id);
+							System.out.println(trade.getAttributes());
 							tradeId = trade.getId();
 							// tradeW = trade; // used when task for same trade
 							// is publish
@@ -1003,7 +1004,19 @@ public class TradeApplication extends DefaultDockableHolder {
 			jTabbedPane0.addTab("Message ", messagePanel);
 			jTabbedPane0.addTab("Fees ", feesPanel);
 			jTabbedPane0.addTab("Limit ", limitPanel);
+			
 			commonUTIL.setLabelFont(jTabbedPane0);
+			jTabbedPane0.addMouseListener(new java.awt.event.MouseAdapter() {
+
+				@Override
+				public void mouseClicked(MouseEvent arg0) {
+					String title = jTabbedPane0.getTitleAt(jTabbedPane0.getSelectedIndex());
+					if(title.equalsIgnoreCase("Instruction")) {
+						tradeP.setSDIPanelInstruction();
+					}
+				}
+
+			});
 
 		}
 		return jTabbedPane0;
@@ -1330,7 +1343,11 @@ public class TradeApplication extends DefaultDockableHolder {
 			if(trade != null) {
 			panel.setTrade(trade);
 			Vector data = (Vector) remoteTrade.getSDisOnTrade(trade);
-			panel.fillJTabel((data));
+			if(!commonUTIL.isEmpty(data)) 
+			  panel.fillJTabel(data);
+			  else 
+				 commonUTIL.showAlertMessage("SDI Missing for " + trade.getId());
+			return;
 			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
