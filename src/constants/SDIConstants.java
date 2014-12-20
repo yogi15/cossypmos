@@ -8,6 +8,7 @@ public class SDIConstants {
 	public static final String CONTACT = "LEContacts";
 	public static final String CASH_SECURITY = "CASH_SECURITY";
 	public static final String PO = "PO";
+	public static final String COUNTERPARY = "CounterParty";
 	public static final String PRODUCT = "ProductType";
 	public static final String PAY_REC = "PAY_REC";
 	public static final String METHOD = "MessageFormateType";
