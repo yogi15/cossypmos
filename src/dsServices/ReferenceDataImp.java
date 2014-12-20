@@ -431,6 +431,8 @@ public class ReferenceDataImp implements RemoteReferenceData {
 	public Sdi selectSDI(Sdi sdi) throws RemoteException {
 		
 		Vector Sdis = (Vector) SdiSQL.selectSDI(sdi.getId(), dsSQL.getConn());
+		if(Sdis.isEmpty())
+			return null;
 		return (Sdi) Sdis.elementAt(0);
 	}
 
@@ -1347,5 +1349,30 @@ String sql = " quoting_currency = '"+cp.getQuoting_currency() + "'";
 		String sql = " bookid = "+bookID+" and CURRENCYTOSPLIT='"+currency+"' and CURRENCYPAIR='"+currencyPair+"'";
 		return CurrencySplitSQL.selectWhere(sql, dsSQL.getConn());
 	}
+
+	@Override
+	public Vector getSDIONLegalEntityRole(String role, int leID)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		String sql = " role ='" + role +"' and cpid = " + leID;
+		return SDIWhere(sql);
+	}
+/*	@Override
+	public Vector getPreferredSDIONLegalEntityRoleCurrencyProduct(String role, int leID)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		String sql = " role ='" + role +"' and cpid = " + leID;
+		return SDIWhere(sql);
+	}*/
+
+	@Override
+	public Vector getPreferredSDIONLegalEntityRoleCurrencyProduct(String role,
+			String productType, String Currency, int leID)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		String sql = " role ='" + role +"'and products = '"+productType+"' and currency = '"+Currency+"' and cpid = " + leID + " order by priority ";
+		return SDIWhere(sql);
+	}
+	
 
 }
