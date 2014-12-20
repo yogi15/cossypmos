@@ -282,7 +282,7 @@ public class commonUTIL {
 	        }
 	    }
 	 static public boolean isEmpty(String s) {
-		  return ((s == null) || (s.trim().length() == 0));
+		  return ((s == null) || (s.trim().length() == 0) || s.equalsIgnoreCase("null"));
 	  }
 	 /**
 	   * @param collection
