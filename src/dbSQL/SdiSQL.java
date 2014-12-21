@@ -20,22 +20,23 @@ public class SdiSQL {
 	final static private String DELETE =
 		"DELETE FROM " + tableName + "   where id =? ";
 	final static private String INSERT =
-		"INSERT into " + tableName + "(id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME ) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-	final static private String UPDATE =
+		"INSERT into " + tableName + "(id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, ACCOUNTNAME ) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+	/*final static private String UPDATE =
 		"UPDATE " + tableName + " set agentId=?,cpId=?,accountID=?,messageType=?  where id = ? ";
-		//		",sdiformat=?,poid=?,attributes=?,leContacts=?,agentContacts=?,payrec=?,cash=?,method=?,products =?,currency=?,key=? where id = ? ";
+	*/	
+	//		",sdiformat=?,poid=?,attributes=?,leContacts=?,agentContacts=?,payrec=?,cash=?,method=?,products =?,currency=?,key=? where id = ? ";
 	final static private String SELECT_MAX =
 		"SELECT MAX(id) sdiformat_ID FROM " + tableName + " ";
 	final static private String SELECTALL =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role ,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME  FROM " + tableName + " ";
-	final static private String SELECT =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME   FROM " + tableName + " where id =  ?";
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role ,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName  FROM " + tableName + " ";
+	/*final static private String SELECT =
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName    FROM " + tableName + " where id =  ?";*/
 	final static private String SELECTWHERE =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME   FROM " + tableName + " where ";
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName    FROM " + tableName + " where ";
 	 static private String SELECTONE =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency ,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME  FROM " + tableName + " where id =  ";
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency ,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName   FROM " + tableName + " where id =  ";
 	 static private String SELECTSDIKEY =
-				"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency ,key,role ,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME FROM " + tableName + " where key =  ";
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency ,key,role ,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName  FROM " + tableName + " where key =  ";
 	 private static String getUpdateSQL(Sdi sdi) {
 	      String updateSQL = "UPDATE " + tableName + " set " +
 	      		" agentId= " + sdi.getAgentId() + 
@@ -54,6 +55,14 @@ public class SdiSQL {
 	      		"',currency= '" + sdi.getCurrency() + 
 	      		"',key= '" + sdi.getkey() + 
 	      		"',role = '" + sdi.getRole() + 
+	      		"',ACCOUNTNAME = '" + sdi.getGlName() + 
+	      		" ',PRIORITY ='" + sdi.getPreferred() +
+	      		" ',INTERMEDFID ='" + sdi.getInterMid1() +
+	      		" ',INTERMEDSID = '" + sdi.getInterMid2()+
+	      		" ',INTERMEDFCONTACT ='" + sdi.getInterMid1Contact() + 
+	      		" ',INTERMEDSCONTACT ='" + sdi.getInterMid2Contact() +
+	      		" ',INTERMEDFACCOUNTNAME ='" + sdi.getInterMid1account() +
+	      		" ',INTERMEDSACCOUNTNAME ='" + sdi.getInterMid2Contact() +
 	      		"'  where id= " + sdi.getId();
 	      return updateSQL;
 	     }
@@ -103,25 +112,19 @@ public class SdiSQL {
 			 commonUTIL.displayError("SdiSQL","remove",e);
 			 return false;
 	           
-	     } finally {
-	       
-	    	 try {
-			
+	     } finally {	       
+	    	 try {			
 	    		 stmt.close();
-			
 	    	 } catch (SQLException e) {
-				
-				commonUTIL.displayError("SdiSQL","remove",e);
-			
-	    	 }
-	        
+	    		 commonUTIL.displayError("SdiSQL","remove",e);
+			 }	        
 	     }
 	     
 	     return true;
 	 }
 	 
 	 
-	 public static Vector selectSDI(int SdiId, Connection con) {
+	 public static Vector<Sdi> selectSDI(int SdiId, Connection con) {
 		 try {
           return (Vector<Sdi>) selectSDIOne(SdiId, con);
       }catch(Exception e) {
@@ -172,24 +175,24 @@ public class SdiSQL {
 			 commonUTIL.displayError("SdiSQL","edit",e);
 			 return null;
 	           
-	        }
-	        finally {
+	        } finally {
 	           try {
-				stmt.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				commonUTIL.displayError("SdiSQL  ","edit",e);
-			}
+	        	   stmt.close();
+	           } catch (SQLException e) {
+	        	   commonUTIL.displayError("SdiSQL  ","edit",e);
+	           }
 	        }
+	        
 	        return updateSdi;
 	 }
 	
 	 
-protected static int selectMax(Connection con ) {
+	 protected static int selectMax(Connection con ) {
 		 
 		 int j = 0;
-	        PreparedStatement stmt = null;
-		 try {
+	     PreparedStatement stmt = null;
+		 
+	     try {
 			
 			 stmt = dsSQL.newPreparedStatement(con, SELECT_MAX);
 	         
@@ -201,80 +204,85 @@ protected static int selectMax(Connection con ) {
 			 commonUTIL.displayError("SdiSQL","selectMax",e);
 			 return j;
 	           
+	        } finally {
+	          
+	        	try {
+	        		stmt.close();
+	        	} catch (SQLException e) {
+	        		commonUTIL.displayError("SdiSQL","selectMax",e);
+	        	}
 	        }
-	        finally {
-	           try {
-				stmt.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				commonUTIL.displayError("SdiSQL","selectMax",e);
-			}
-	        }
+	        
 	        return j;
 	 }
       
       protected static Sdi insert(Sdi inserSdi, Connection con ) {
 			
-	        PreparedStatement stmt = null;
+	     PreparedStatement stmt = null;
+	     
 		 try {
-			 int id = selectMax(con) +1;
-			 int j = 1;
-			 stmt = dsSQL.newPreparedStatement(con, INSERT);
-			 stmt.setInt(1,id);
 			
-	            stmt.setInt(2, inserSdi.getAgentId());
-	            
-	            stmt.setInt(3, inserSdi.getCpId());
-	            stmt.setInt(4, inserSdi.getAccountID());
-	            stmt.setString(5, inserSdi.getMessageType());
-	            stmt.setString(6, inserSdi.getsdiformat());
-	            stmt.setInt(7, inserSdi.getPoId());
-	            stmt.setString(8, inserSdi.getAttributes());
-	            stmt.setString(9, inserSdi.getLeContacts());
-	            stmt.setString(10, inserSdi.getAgentContacts());
-	            stmt.setString(11, inserSdi.getPayrec());
-	            stmt.setString(12, inserSdi.getCash());
-	            stmt.setString(13, inserSdi.getMessageType());
-	            stmt.setString(14, inserSdi.getProducts());
-	            stmt.setString(15, inserSdi.getCurrency());
-	            stmt.setString(16, inserSdi.getkey());
-	            stmt.setString(17, inserSdi.getRole());
-	            stmt.setInt(18, inserSdi.getPriority());
-	            stmt.setInt(19, inserSdi.getPreferred());
-	            stmt.setInt(20, inserSdi.getInterMid1());
-	            stmt.setInt(21, inserSdi.getInterMid2());
-	            stmt.setString(22, inserSdi.getInterMid1Contact());
-	            stmt.setString(23, inserSdi.getInterMid2Contact());
-	            stmt.setString(24, inserSdi.getInterMid1glName());
-	            stmt.setString(25, inserSdi.getInterMid2glName());
-	            stmt.executeUpdate();
-			    con.commit();
-			    commonUTIL.display("SdiSQL","insert " +INSERT );
-			    inserSdi.setId(id);
+			int id = selectMax(con) +1;
+			
+			stmt = dsSQL.newPreparedStatement(con, INSERT);
+			 
+			stmt.setInt(1,id);			
+	        stmt.setInt(2, inserSdi.getAgentId());	        
+            stmt.setInt(3, inserSdi.getCpId());
+            stmt.setInt(4, inserSdi.getAccountID());
+            stmt.setString(5, inserSdi.getMessageType());
+            stmt.setString(6, inserSdi.getsdiformat());
+            stmt.setInt(7, inserSdi.getPoId());
+            stmt.setString(8, inserSdi.getAttributes());
+            stmt.setString(9, inserSdi.getLeContacts());
+            stmt.setString(10, inserSdi.getAgentContacts());
+            stmt.setString(11, inserSdi.getPayrec());
+            stmt.setString(12, inserSdi.getCash());
+            stmt.setString(13, inserSdi.getMessageType());
+            stmt.setString(14, inserSdi.getProducts());
+            stmt.setString(15, inserSdi.getCurrency());
+            stmt.setString(16, inserSdi.getkey());
+            stmt.setString(17, inserSdi.getRole());
+            stmt.setInt(18, inserSdi.getPriority());
+            stmt.setInt(19, inserSdi.getPreferred());
+            stmt.setInt(20, inserSdi.getInterMid1());
+            stmt.setInt(21, inserSdi.getInterMid2());
+            stmt.setString(22, inserSdi.getInterMid1Contact());
+            stmt.setString(23, inserSdi.getInterMid2Contact());
+            stmt.setString(24, inserSdi.getInterMid1glName());
+            stmt.setString(25, inserSdi.getInterMid2glName());
+            stmt.setString(26, inserSdi.getGlName());
+            
+            stmt.executeUpdate();
+		    
+            con.commit();
+		    
+            commonUTIL.display("SdiSQL","insert " +INSERT );
+		    
+            inserSdi.setId(id);
 			  
 		 } catch (Exception e) {
 			 commonUTIL.displayError("SdiSQL","insert",e);
 			 return null;
 	           
-	        }
-	        finally {
-	           try {
+	     } finally {
+	           
+	    	 try {
 				stmt.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				commonUTIL.displayError("SdiSQL","insert",e);
-			}
-	        }
+	    	 } catch (SQLException e) {
+	    		 commonUTIL.displayError("SdiSQL","insert",e);
+			 }
+	        
+	     }
 	        return inserSdi;
 	 }
 	 
 	 public static Collection SDIWhere(String wherecon,Connection con ) {
 		 
-		 int j = 0;
-	        PreparedStatement stmt = null;
-	        Vector Sdis = new Vector();
-	        String sql = SELECTWHERE;
-	        sql = sql + wherecon;
+	     PreparedStatement stmt = null;
+	     Vector Sdis = new Vector();
+	     String sql = SELECTWHERE;
+	     sql = sql + wherecon;
 	        
 		 try {
 			
@@ -283,66 +291,65 @@ protected static int selectMax(Connection con ) {
 	         ResultSet rs = stmt.executeQuery();
 	         
 	         while(rs.next()) {
-	        	 Sdi Sdi = new Sdi();
-	        	 Sdi.setId(rs.getInt(1));
-			        
-			        Sdi.setAgentId(rs.getInt(2));
-			        Sdi.setCpId(rs.getInt(3));
-			        Sdi.setAccountID(rs.getInt(4));
-			        
-			        
-			        Sdi.setMessageType(rs.getString(5));
-			        Sdi.setsdiformat(rs.getString(6));
-			       Sdi.setPoId(rs.getInt(7));
-			        Sdi.setAttributes(rs.getString(8));
-		            Sdi.setLeContacts(rs.getString(9));
-		              Sdi.setAgentContacts(rs.getString(10));
-		              Sdi.setPayrec(rs.getString(11));
-		            Sdi.setCash(rs.getString(12));
-		             Sdi.setMessageType(rs.getString(13));
-		             Sdi.setProducts(rs.getString(14));
-			      Sdi.setCurrency(rs.getString(15));
-			      Sdi.setkey(rs.getString(16));
-			      Sdi.setRole(rs.getString(17));
-			      Sdi.setInterMid1(rs.getInt(20));
-			      Sdi.setInterMid2(rs.getInt(21));
-			      Sdi.setPriority(rs.getInt(18));
-			      Sdi.setPreferred(rs.getInt(19));
-			      Sdi.setInterMid1Contact(rs.getString(22));
-			      Sdi.setInterMid2Contact(rs.getString(23));
-			      Sdi.setInterMid1glName(rs.getString(24));
-			      Sdi.setInterMid2glName(rs.getString(25));
-			   
-			      
-			        Sdis.add(Sdi);
+	        	 
+				Sdi Sdi = new Sdi();
+				 
+				Sdi.setId(rs.getInt(1));
+				Sdi.setAgentId(rs.getInt(2));
+				Sdi.setCpId(rs.getInt(3));
+				Sdi.setAccountID(rs.getInt(4));			      		       
+				Sdi.setMessageType(rs.getString(5));
+				Sdi.setsdiformat(rs.getString(6));
+				Sdi.setPoId(rs.getInt(7));
+				Sdi.setAttributes(rs.getString(8));
+				Sdi.setLeContacts(rs.getString(9));
+				Sdi.setAgentContacts(rs.getString(10));
+				Sdi.setPayrec(rs.getString(11));
+				Sdi.setCash(rs.getString(12));
+				Sdi.setMessageType(rs.getString(13));
+				Sdi.setProducts(rs.getString(14));
+				Sdi.setCurrency(rs.getString(15));
+				Sdi.setkey(rs.getString(16));
+				Sdi.setRole(rs.getString(17));
+				Sdi.setInterMid1(rs.getInt(20));
+				Sdi.setInterMid2(rs.getInt(21));
+				Sdi.setPriority(rs.getInt(18));
+				Sdi.setPreferred(rs.getInt(19));
+				Sdi.setInterMid1Contact(rs.getString(22));
+				Sdi.setInterMid2Contact(rs.getString(23));
+				Sdi.setInterMid1glName(rs.getString(24));
+				Sdi.setInterMid2glName(rs.getString(25));
+				Sdi.setGlName(rs.getString(26));
+				Sdis.add(Sdi);
 	         
 	         }
+	         
 	         commonUTIL.display("SdiSQL","select " +sql );
+		 
 		 } catch (Exception e) {
+			 
 			 commonUTIL.displayError("SdiSQL","select" + sql,e);
 			 return Sdis;
 	           
+	        } finally {	          
+	        	try {	        		
+	        		stmt.close();
+			   	} catch (SQLException e) {
+	        		commonUTIL.displayError("SdiSQL","select",e);			
+	        	}
 	        }
-	        finally {
-	           try {
-				stmt.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				commonUTIL.displayError("SdiSQL","select",e);
-			}
-	        }
+	        
 	        return Sdis;
 	 }
      
-public static boolean SDIKeyWhere(String wherecon,Connection con ) {
+	 public static boolean SDIKeyWhere(String wherecon,Connection con ) {
 		 
-		 int j = 0;
-	        PreparedStatement stmt = null;
-	        Vector Sdis = new Vector();
-	        String key = SELECTSDIKEY ;
-	        key = key + "'" + wherecon +"'";
-	        boolean exists = false;
-		 try {
+        PreparedStatement stmt = null;
+        String key = SELECTSDIKEY ;
+        key = key + "'" + wherecon +"'";
+        boolean exists = false;
+		
+        try {
 			
 			 stmt = dsSQL.newPreparedStatement(con,key);
 	         
@@ -354,26 +361,27 @@ public static boolean SDIKeyWhere(String wherecon,Connection con ) {
 	         }else {
 	        	 exists = false;
 	         }
-	         commonUTIL.display("SdiSQL","SDIKeyWhere " + key);
+	        
+	        commonUTIL.display("SdiSQL","SDIKeyWhere " + key);
+		 
 		 } catch (Exception e) {
+			
 			 commonUTIL.displayError("SdiSQL","SDIKeyWhere ",e);
 			 return false;
-	           
-	        }
-	        finally {
-	           try {
-				stmt.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
+	        
+		 } finally {	           
+			 try {				
+				 stmt.close();
+			 } catch (SQLException e) {
 				commonUTIL.displayError("SdiSQL","selectMax",e);
-			}
-	        }
+			 }
+	      }
 	      return exists;
 	 }
 
 
 	 protected static Collection select(Connection con) { 
-		 int j = 0;
+
 	     PreparedStatement stmt = null;
 	     Vector Sdis = new Vector();
 	     
@@ -381,114 +389,113 @@ public static boolean SDIKeyWhere(String wherecon,Connection con ) {
 			
 			 stmt = dsSQL.newPreparedStatement(con, SELECTALL );
 	      
-	      ResultSet rs = stmt.executeQuery();
+			 ResultSet rs = stmt.executeQuery();
 	      
-	      while(rs.next()) {
-	    	  Sdi Sdi = new Sdi();
-	    	 
-	    	  Sdi.setId(rs.getInt(1));
-		        
-		        Sdi.setAgentId(rs.getInt(2));
-		        Sdi.setCpId(rs.getInt(3));
-		        Sdi.setAccountID(rs.getInt(4));
-		        
-		        
-		        Sdi.setMessageType(rs.getString(5));
-		        Sdi.setsdiformat(rs.getString(6));
-		        Sdi.setPoId(rs.getInt(7));
-		        Sdi.setAttributes(rs.getString(8));
-	            Sdi.setLeContacts(rs.getString(9));
-	              Sdi.setAgentContacts(rs.getString(10));
-	              Sdi.setPayrec(rs.getString(11));
-	            Sdi.setCash(rs.getString(12));
-	             Sdi.setMessageType(rs.getString(13));
-	             Sdi.setProducts(rs.getString(14));
-	             Sdi.setCurrency(rs.getString(15));
-	             Sdi.setkey(rs.getString(16));
-	             Sdi.setRole(rs.getString(17));
-	             Sdi.setInterMid1(rs.getInt(20));
-			      Sdi.setInterMid2(rs.getInt(21));
-			      Sdi.setPriority(rs.getInt(18));
-			      Sdi.setPreferred(rs.getInt(19));
-			      Sdi.setInterMid1Contact(rs.getString(22));
-			      Sdi.setInterMid2Contact(rs.getString(23));
-			      Sdi.setInterMid1glName(rs.getString(24));
-			      Sdi.setInterMid2glName(rs.getString(25));
-		        Sdis.add(Sdi);
-		     
-	      
-	      }
+		      while(rs.next()) {
+	
+				Sdi Sdi = new Sdi();
+				
+				Sdi.setId(rs.getInt(1));
+				Sdi.setAgentId(rs.getInt(2));
+				Sdi.setCpId(rs.getInt(3));
+				Sdi.setAccountID(rs.getInt(4));			      		       
+				Sdi.setMessageType(rs.getString(5));
+				Sdi.setsdiformat(rs.getString(6));
+				Sdi.setPoId(rs.getInt(7));
+				Sdi.setAttributes(rs.getString(8));
+				Sdi.setLeContacts(rs.getString(9));
+				Sdi.setAgentContacts(rs.getString(10));
+				Sdi.setPayrec(rs.getString(11));
+				Sdi.setCash(rs.getString(12));
+				Sdi.setMessageType(rs.getString(13));
+				Sdi.setProducts(rs.getString(14));
+				Sdi.setCurrency(rs.getString(15));
+				Sdi.setkey(rs.getString(16));
+				Sdi.setRole(rs.getString(17));
+				Sdi.setInterMid1(rs.getInt(20));
+				Sdi.setInterMid2(rs.getInt(21));
+				Sdi.setPriority(rs.getInt(18));
+				Sdi.setPreferred(rs.getInt(19));
+				Sdi.setInterMid1Contact(rs.getString(22));
+				Sdi.setInterMid2Contact(rs.getString(23));
+				Sdi.setInterMid1glName(rs.getString(24));
+				Sdi.setInterMid2glName(rs.getString(25));
+				Sdi.setGlName(rs.getString(26));
+				
+				Sdis.add(Sdi);
+		      
+		      }
 		 } catch (Exception e) {
+			 
 			 commonUTIL.displayError("SdiSQL","select",e);
 			 return Sdis;
 	        
-	     }
-	     finally {
-	        try {
-				stmt.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
+	     } finally {	       
+	    	 try {			
+	    		 stmt.close();
+			 } catch (SQLException e) {
 				commonUTIL.displayError("SdiSQL","selectMax",e);
-			}
-	     }
+			 }
+	     }	     
 	     return Sdis;
 	 }
 	 
 	 protected static Collection selectSDIOne(int sdiId,Connection con ) {
-		 int j = 0;
+	
 	     PreparedStatement stmt = null;
 	     Vector Sdis = new Vector();
 	     
 		 try {
+			
 			 String sql = SELECTONE;
-			sql  = sql + sdiId;
+			 sql  = sql + sdiId;
 			 stmt = dsSQL.newPreparedStatement(con, sql );
 	      
-	      ResultSet rs = stmt.executeQuery();
+			 ResultSet rs = stmt.executeQuery();
 	      
-	      while(rs.next()) {
-	    	  Sdi Sdi = new Sdi();
-		        Sdi.setId(rs.getInt(1));
-		        
-		        Sdi.setAgentId(rs.getInt(2));
-		        Sdi.setCpId(rs.getInt(3));
-		        Sdi.setAccountID(rs.getInt(4));
-		        
-		        
-		        Sdi.setMessageType(rs.getString(5));
-		        Sdi.setsdiformat(rs.getString(6));
-		        Sdi.setPoId(rs.getInt(7));
-		        Sdi.setAttributes(rs.getString(8));
-	            Sdi.setLeContacts(rs.getString(9));
-	              Sdi.setAgentContacts(rs.getString(10));
-	              Sdi.setPayrec(rs.getString(11));
-	            Sdi.setCash(rs.getString(12));
-	             Sdi.setMessageType(rs.getString(13));
-	             Sdi.setProducts(rs.getString(14));
-	             Sdi.setCurrency(rs.getString(15));
-	             Sdi.setkey(rs.getString(16));
-	             Sdi.setRole(rs.getString(17));
-	             Sdi.setInterMid1(rs.getInt(20));
-			      Sdi.setInterMid2(rs.getInt(21));
-			      Sdi.setPriority(rs.getInt(18));
-			      Sdi.setPreferred(rs.getInt(19));
-			      Sdi.setInterMid1Contact(rs.getString(22));
-			      Sdi.setInterMid2Contact(rs.getString(23));
-			      Sdi.setInterMid1glName(rs.getString(24));
-			      Sdi.setInterMid2glName(rs.getString(25));
-		        Sdis.add(Sdi);
-	      
-	      }
+		      while(rs.next()) {
+		    	  
+				Sdi Sdi = new Sdi();
+				
+				Sdi.setId(rs.getInt(1));
+				Sdi.setAgentId(rs.getInt(2));
+				Sdi.setCpId(rs.getInt(3));
+				Sdi.setAccountID(rs.getInt(4));			      		       
+				Sdi.setMessageType(rs.getString(5));
+				Sdi.setsdiformat(rs.getString(6));
+				Sdi.setPoId(rs.getInt(7));
+				Sdi.setAttributes(rs.getString(8));
+				Sdi.setLeContacts(rs.getString(9));
+				Sdi.setAgentContacts(rs.getString(10));
+				Sdi.setPayrec(rs.getString(11));
+				Sdi.setCash(rs.getString(12));
+				Sdi.setMessageType(rs.getString(13));
+				Sdi.setProducts(rs.getString(14));
+				Sdi.setCurrency(rs.getString(15));
+				Sdi.setkey(rs.getString(16));
+				Sdi.setRole(rs.getString(17));
+				Sdi.setInterMid1(rs.getInt(20));
+				Sdi.setInterMid2(rs.getInt(21));
+				Sdi.setPriority(rs.getInt(18));
+				Sdi.setPreferred(rs.getInt(19));
+				Sdi.setInterMid1Contact(rs.getString(22));
+				Sdi.setInterMid2Contact(rs.getString(23));
+				Sdi.setInterMid1glName(rs.getString(24));
+				Sdi.setInterMid2glName(rs.getString(25));
+				Sdi.setGlName(rs.getString(26));
+				
+				Sdis.add(Sdi);
+		      
+		      }
 		 } catch (Exception e) {
+			 
 			 commonUTIL.displayError("SdiSQL",SELECTONE,e);
 			 return Sdis;
 	        
-	     }
-	     finally {
-	        try {
+	     } finally {	        
+	    	 try {
 				stmt.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				commonUTIL.displayError("SdiSQL",SELECTONE,e);
 			}
 	     }
