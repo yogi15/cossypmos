@@ -1338,21 +1338,23 @@ public class TradeApplication extends DefaultDockableHolder {
 	}
 
 	public void getTradeSDI(BackOfficePanel panel) {
-		try {
+		//try {
 			// System.out.println(trade);
 			if(trade != null) {
 			panel.setTrade(trade);
-			Vector data = (Vector) remoteTrade.getSDisOnTrade(trade);
-			if(!commonUTIL.isEmpty(data)) 
-			  panel.fillJTabel(data);
-			  else 
-				 commonUTIL.showAlertMessage("SDI Missing for " + trade.getId());
-			return;
+			//Vector data = (Vector) remoteTrade.getSDisOnTrade(trade);
+	//.setSDIPanelInstruction();
 			}
-		} catch (RemoteException e) {
+			//if(!commonUTIL.isEmpty(data)) 
+			//  panel.fillJTabel(data);
+			//  else 
+			///	 commonUTIL.showAlertMessage("SDI Missing for " + trade.getId());
+			//return;
+		//	}
+		//} catch (RemoteException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//	e.printStackTrace();
+		//}
 	}
 
 	public void getTradeFees(BackOfficePanel panel) {
