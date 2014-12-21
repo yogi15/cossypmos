@@ -33,6 +33,8 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
+import constants.SDIConstants;
+
 import swingUtils.TableColumnAdjuster;
 import util.commonUTIL;
 import apps.window.referencewindow.JFrameReferenceWindow;
@@ -148,8 +150,12 @@ public class SDIPanel extends BackOfficePanel {
 					int r = receiverRole.getSelectedIndex() ;
 					if(r!= -1) {
 						String role = (String) payerRole.getSelectedItem();
-						
-								String payerKey =  role+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(trade.getCpID());
+						int leid = trade.getCpID();
+					    if(role.equalsIgnoreCase(SDIConstants.PO)) {
+					    	Book book =  getBook(trade.getBookId());
+					    	leid = book.getLe_id();
+					    }
+								String payerKey =  role+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(leid);
 								payerPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(payerKey);
 								processComboxData(payerPreferredSDIs,payerModel);
 					}
@@ -173,8 +179,12 @@ public class SDIPanel extends BackOfficePanel {
 					int r = receiverRole.getSelectedIndex() ;
 					if(r!= -1) {
 						String role = (String) receiverRole.getSelectedItem();
-						
-								String receiverKey =  role+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(trade.getCpID());
+						int leid = trade.getCpID();
+						    if(role.equalsIgnoreCase(SDIConstants.PO)) {
+						    	Book book =  getBook(trade.getBookId());
+						    	leid = book.getLe_id();
+						    }
+								String receiverKey =  role+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(leid);
 								receiverPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(receiverKey);
 								processComboxData(receiverPreferredSDIs,receiverModel);
 					}
@@ -184,6 +194,17 @@ public class SDIPanel extends BackOfficePanel {
 			
 		}
 		return receiverRole;
+	}
+	public Book getBook(int id) {
+		Book book = new Book(); 
+		book.setBookno(id);
+		try {
+			book =  (Book)  referenceData.selectBook(book);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return book;
 	}
 
 	private JTextField getReceiverSDI() {
