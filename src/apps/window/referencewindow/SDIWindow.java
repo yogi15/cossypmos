@@ -418,10 +418,11 @@ public class SDIWindow extends JPanel {
 			 
 			 propertyTable.setValueAt(sdidata.getPriority(), 12, 1);
 			 propertyTable.setValueAt(getLegalEntity(sdidata.getAgentId(),13), 13, 1);
-			 propertyTable.setValueAt(getAccountName(sdidata.getAccountID(),14), 14, 1);
-			 propertyTable.setValueAt(sdidata.getGlName(), 15, 1);
+			 propertyTable.setValueAt(getAccountName(sdidata.getAccountID(),14), 15, 1);
+			 propertyTable.setValueAt(sdidata.getGlName(), 14, 1);
 			 propertyTable.setValueAt(sdidata.getAgentContacts(), 16, 1);
-		     if(sdidata.getInterMid1() != 0) {
+		     
+			 if(sdidata.getInterMid1() != 0) {
 			 propertyTable.setValueAt(getLegalEntity(sdidata.getInterMid1(),17), 17, 1);
 			 propertyTable.setValueAt(getAccountName(sdidata.getInterMid1account(),18), 18, 1);
 			 propertyTable.setValueAt(sdidata.getInterMid1Contact(), 19, 1);
@@ -681,8 +682,8 @@ public class SDIWindow extends JPanel {
 			 return flag;
 			 
 		 }*/
-		 sdi.setGlName((String) propertyTable.getValueAt(15, 1));
-		 
+		
+		 		 
 		 /* if (((String) propertyTable.getValueAt( 16, 1)).equals("")) {
 			 	
 			 commonUTIL.showAlertMessage("Please select Agent Contact");
@@ -690,14 +691,16 @@ public class SDIWindow extends JPanel {
 			 
 		 }*/
 		
-		 if (!((String) propertyTable.getValueAt( 4, 1)).equals("")) {
-			
+		 if (!((String) propertyTable.getValueAt( 13, 1)).equals("")) {
+			 
+			 ///sdi.setAgentId(propertyTable.getAgent().getId());
+			 sdi.setGlName((String) propertyTable.getValueAt(14, 1));
 			 sdi.setAgentContacts((String) propertyTable.getValueAt(16, 1));
 			 
 		 }
 		 
 		 if(propertyTable.getAccount() != null) 
-             sdi.setAccountID(propertyTable.getAccount().getCpId());
+             sdi.setAccountID(propertyTable.getAccount().getId());
 	 
 		 if(propertyTable.getInterAgent1() != null) {
 		 
