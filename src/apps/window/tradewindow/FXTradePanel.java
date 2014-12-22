@@ -4431,10 +4431,10 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 							attributesV = attributesV + key+ "=" + value + ";";
 								
 					} */
-						int tradeDateRowno = -1;
-						String strTradeDate = "TradeModifiedDateTime";
-						String tradeDateVal="";
-						boolean tradeDateFilled = false;
+						//int tradeDateRowno = -1;
+						//String strTradeDate = "TradeModifiedDateTime";
+						//String tradeDateVal="";
+						//boolean tradeDateFilled = false;
 						Vector<Attribute> attributesData = attributes.getData();
 						for(int i=0;i<attributesData.size();i++) {
 							Attribute att = attributesData.get(i);
