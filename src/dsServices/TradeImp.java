@@ -270,10 +270,11 @@ public class TradeImp implements RemoteTrade {
 		// TODO Auto-generated method stub
 		
 		if (!commonUTIL.isEmpty(attributes)) {
+			Attribute deleteAt = new Attribute();
+			deleteAt.setId(tradeId);
+			AttributSQL.delete(deleteAt, dsSQL.getConn());
 			
-			String atttoken [] = attributes.trim().split(";"); 
-			
-			
+			String atttoken [] = attributes.trim().split(";"); 	
 			
 			for(int i =0;i<atttoken.length;i++) {
 				String att = (String) atttoken[i];
@@ -286,10 +287,13 @@ public class TradeImp implements RemoteTrade {
 						atBean.setValue(attvalue);
 						atBean.setType("Trade");
 						if(!commonUTIL.isEmpty(attvalue)) {
-							if(versionID == 1)
+							/*if(versionID == 1)
 						       AttributSQL.save(atBean, dsSQL.getConn());
 							else 
-								AttributSQL.update(atBean, dsSQL.getConn());
+								AttributSQL.update(atBean, dsSQL.getConn());*/
+							
+							
+							AttributSQL.save(atBean, dsSQL.getConn());
 						}
 				}
 				}
