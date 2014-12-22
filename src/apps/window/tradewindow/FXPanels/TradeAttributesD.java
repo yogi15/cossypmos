@@ -41,7 +41,7 @@ import com.jidesoft.grid.DateCellEditor;
 
 import beans.Attribute;
 import beans.StartUPData;
-import beans.Trade;
+
 
 
 //VS4E -- DO NOT REMOVE THIS LINE!
@@ -94,7 +94,7 @@ public class TradeAttributesD extends JPanel {
                  Attribute bean = new Attribute();
                  jTable1  = new JTable() ;
                  rowEditor = new EachRowEditor(jTable1);
-                
+                 jTable1.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
                 // mod.addRow(bean);
                  jTable1.setModel(mod);
                 setLayout(new GroupLayout());
