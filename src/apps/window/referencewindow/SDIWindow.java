@@ -8,10 +8,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.rmi.RemoteException;
 import java.text.ParseException;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -42,19 +41,17 @@ import beans.Book;
 import beans.FutureProduct;
 import beans.LegalEntity;
 import beans.Sdi;
+import beans.StartUPData;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.docking.DockContext;
 import com.jidesoft.docking.DockableFrame;
-import com.jidesoft.grid.Property;
-import com.jidesoft.grid.PropertyTableModel;
 import com.jidesoft.grid.RowStripeTableStyleProvider;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideScrollPane;
 import com.jidesoft.utils.Lm;
 import com.jidesoft.utils.SystemInfo;
 
-import constants.CommonConstants;
 import constants.SDIConstants;
 import dsServices.RemoteAccount;
 import dsServices.RemoteReferenceData;
@@ -132,15 +129,17 @@ public class SDIWindow extends JPanel {
 			return null;
 
 		}
-		 private void createPropertyTablesForSDI() {
-	
+		 private void createPropertyTablesForFutureContract() {
+			 
+
+				
+				
 				JPanel propertyTablePanel = getSDIPropertyTablePanel();
 				if (oldPropertyTablePanel != null) {
 					sdiTablePanel.remove(oldPropertyTablePanel);
 				}
 				oldPropertyTablePanel = propertyTablePanel;
 				sdiPropertiesPanel.add(oldPropertyTablePanel, BorderLayout.CENTER);
-			
 			}
 		 public JPanel getSDIPropertyTablePanel() {
 
@@ -155,37 +154,15 @@ public class SDIWindow extends JPanel {
 	         for(int i=0;i< propertyTable.getRowCount();i++) {
 	        	 propertyTable.setValueAt("", i, 1);
 	         }
-	         
-	       /*  propertyTable.addPropertyChangeListener(new PropertyChangeListener() {
-	             public void propertyChange(PropertyChangeEvent evt) {
-	            	 
-	            	 SDIPropertyTable propertyModel = (SDIPropertyTable) evt.getSource();
-	     	    	Property property = (Property) propertyModel.getProperty(evt.getPropertyName());
-	     	    	String propertyName = evt.getPropertyName();
-	     	    	
-	     	    	if (propertyName.equals("Roles") && property.getValue().equals("PO")) {
-	     	    		
-	     	    		propertyModel.getProperty("PO").setEditable(false);
-	     	    		
-	     	    	} else if (propertyName.equals("Roles") && !property.getValue().equals("PO")){
-	     	    		
-	     	    		if(!propertyModel.getProperty("PO").isEditable());
-	     	    			propertyModel.getProperty("PO").setEditable(true);
-	     	    		
-	     	    	}
-	     	    	
-	             }
-	         });
-	         */
-	         JPanel basePanel = new JPanel();
-			 JScrollPane tableScrollPane = new JScrollPane();
-			 tableScrollPane.getViewport().add(propertyTable);
-			 basePanel.setLayout(new BorderLayout());
-			 basePanel.add(tableScrollPane, BorderLayout.CENTER);
+				JPanel basePanel = new JPanel();
+				JScrollPane tableScrollPane = new JScrollPane();
+				tableScrollPane.getViewport().add(propertyTable);
+				basePanel.setLayout(new BorderLayout());
+				basePanel.add(tableScrollPane, BorderLayout.CENTER);
 
-			return basePanel;
+				return basePanel;
 
-		}
+			}
 		 
 		 private void createButtonsPanel() {
 
@@ -202,7 +179,9 @@ public class SDIWindow extends JPanel {
 				buttonsPanel.add(buttonPanel, JideBoxLayout.FLEXIBLE);
 
 			}
-
+		 
+		 
+		 
 		 private ButtonPanel buttons2Column(JButton topButton, JButton botButton) {
 
 				ButtonPanel buttonPanel = new ButtonPanel(SwingConstants.TOP);
@@ -231,9 +210,11 @@ public class SDIWindow extends JPanel {
 	      sdiTables.setModel(model);
 	      int v = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS; 
 			int h = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS;
-	      scrollPane  = new JScrollPane(v,h);
-	      scrollPane.setAutoscrolls(true);
-	      scrollPane.getViewport().add(sdiTables);
+	    
+			sdiTables.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	   //   scrollPane.getViewport().add();
+	      scrollPane  = new JScrollPane(sdiTables,v,h);
+	 //     scrollPane.setAutoscrolls(true);
 	      JPanel centerPanel = new JPanel(new BorderLayout());
 	      centerPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null,
 					null));
@@ -243,24 +224,20 @@ public class SDIWindow extends JPanel {
 	       JPanel tLeftPanel = new JPanel();
 	       tLeftPanel.setLayout(new BorderLayout());
 	       tLeftPanel.add(sdiStatusBar, BorderLayout.NORTH);
-	       tLeftPanel.add(sdiPropertiesPanel);
+	       JPanel tLeftPanel2 = new JPanel();
+	       tLeftPanel2.setLayout(new BorderLayout());
+	       tLeftPanel2.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null,
+					null));
+	       tLeftPanel2.add(new SDIInternalPanel(remoteRef), BorderLayout.CENTER);
+	       tLeftPanel.add(tLeftPanel2);
 	       tLeftPanel.add(buttonsPanel, BorderLayout.SOUTH);
 	       
 	      createButtonsPanel();
-	      createPropertyTablesForSDI();
+	      createPropertyTablesForFutureContract();
 	    
 	      setupMainComponents();
 	   
-	      final JFrame frame = new JFrame(" - JIDE " + Lm.getProductVersion() + " on JDK " + SystemInfo.getJavaVersion());      
-			frame.addWindowListener(new WindowAdapter() {        
-				@Override        
-				public void windowClosing(WindowEvent e) {         
-				//	if (demo instanceof AnimatedDemo) {                
-					//	((AnimatedDemo) demo).stopAnimation();      
-						//}               
-					//demo.dispose();    
-					}       
-				});
+	     
 			JPanel panel = new JPanel(new BorderLayout()); 
 			panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); 
 			panel.add(createSampleServerFrame(), BorderLayout.BEFORE_FIRST_LINE);
@@ -274,37 +251,38 @@ public class SDIWindow extends JPanel {
 				
 				@Override
 				public void mouseReleased(MouseEvent arg0) {
-					
+					// TODO Auto-generated method stub
 					
 				}
 				
 				@Override
 				public void mousePressed(MouseEvent arg0) {
-					
+					// TODO Auto-generated method stub
 					
 				}
 				
 				@Override
 				public void mouseExited(MouseEvent arg0) {
-					
+					// TODO Auto-generated method stub
 					
 				}
 				
 				@Override
 				public void mouseEntered(MouseEvent arg0) {
-					
+					// TODO Auto-generated method stub
 					
 				}
 				
 				@Override
 				public void mouseClicked(MouseEvent event) {
-					
+					// TODO Auto-generated method stub
 					if(sdiTables.getSelectedRow() == -1)
 						return;
 					int rowindex = sdiTables.getSelectedRow();
 
 					Sdi sdi = (Sdi) data.get(rowindex);
 					setAndShowSDI(sdi);
+					selectSDI.setText(String.valueOf(sdi.getId()));
 					
 				}
 			});
@@ -312,7 +290,11 @@ public class SDIWindow extends JPanel {
 			 add(mainPanel,BorderLayout.CENTER);
 			//return mainPanel;
 	 }
-
+	 
+	 
+	 
+	 
+	
 	 protected ActionListener getContractSelectorComboBoxActionListener(){
 	    	if(selectSDIActionListener == null){
 	    		selectSDIActionListener =new  selectSDIActionListener();
@@ -335,13 +317,18 @@ public class SDIWindow extends JPanel {
 					setAndShowSDI(sdi);
 					selectSDI.setText(String.valueOf(sdi.getId()));
 				} catch (ParseException e1) {
-					// 
+					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}  catch(RemoteException r) {
-					// 
+					// TODO Auto-generated catch block
 					r.printStackTrace();
 				}
+	    		
+	    		
+					
+				
 
+	    		
 	    	//	setAndShowFutureContract(futcon);
 	    	}
 
@@ -366,7 +353,7 @@ public class SDIWindow extends JPanel {
 			
 			name = le.getName();
 		} catch (RemoteException e) {
-			// 
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return name;
@@ -383,16 +370,19 @@ public class SDIWindow extends JPanel {
 				propertyTable.setInter2Account(acc);
 			name = acc.getAccountName();
 		} catch (RemoteException e) {
-			// 
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return name;
 	 }
 	 private void setAndShowSDI(Sdi sdidata) {
+			// TODO Auto-generated method stub
+		 
 		
+		
+			
 	//		 Sdi   sdidata = (Sdi) remoteRef.selectSDI(sdi);
 			// futureProduct =(FutureProduct) fproduct.get(0);
-		 	selectSDI.setText(String.valueOf(sdidata.getId()));
 			 propertyTable.setValueAt(sdidata.getRole(), 1, 1);
 			 
 			 propertyTable.setValueAt(getLegalEntity(sdidata.getCpId(),2), 2, 1);
@@ -418,11 +408,10 @@ public class SDIWindow extends JPanel {
 			 
 			 propertyTable.setValueAt(sdidata.getPriority(), 12, 1);
 			 propertyTable.setValueAt(getLegalEntity(sdidata.getAgentId(),13), 13, 1);
-			 propertyTable.setValueAt(getAccountName(sdidata.getAccountID(),14), 15, 1);
-			 propertyTable.setValueAt(sdidata.getGlName(), 14, 1);
+			 propertyTable.setValueAt(getAccountName(sdidata.getAccountID(),14), 14, 1);
+			 propertyTable.setValueAt(sdidata.getGlName(), 15, 1);
 			 propertyTable.setValueAt(sdidata.getAgentContacts(), 16, 1);
-		     
-			 if(sdidata.getInterMid1() != 0) {
+		     if(sdidata.getInterMid1() != 0) {
 			 propertyTable.setValueAt(getLegalEntity(sdidata.getInterMid1(),17), 17, 1);
 			 propertyTable.setValueAt(getAccountName(sdidata.getInterMid1account(),18), 18, 1);
 			 propertyTable.setValueAt(sdidata.getInterMid1Contact(), 19, 1);
@@ -462,46 +451,6 @@ public class SDIWindow extends JPanel {
 			saveButton.addActionListener(new java.awt.event.ActionListener() {
 
 				public void actionPerformed(java.awt.event.ActionEvent evt) {
-					System.out.println("Save");
-					
-					Sdi sdi = new Sdi();
-									
-					boolean isProper = validateAndFillSDI(sdi);
-					
-					if (isProper) {
-						
-						sdi.setId(Integer.parseInt(selectSDI.getText()));
-						
-						try {
-							sdi = (Sdi)  remoteRef.saveSDI(sdi)	;
-							if(sdi.getId() > 0 ) {
-								commonUTIL.showAlertMessage("SDI updated: " + sdi.getId());
-								selectSDI.setText(String.valueOf(sdi.getId()));
-							}
-						} catch (RemoteException e) {
-							e.printStackTrace();
-						}
-						
-					}
-					
-				}
-
-			});
-
-			closeButton.setToolTipText(closeButton.getName());
-			closeButton.addActionListener(new java.awt.event.ActionListener() {
-
-				public void actionPerformed(java.awt.event.ActionEvent evt) {
-					System.out.println("Close");
-				}
-
-			});
-
-			saveAsNewButton.setToolTipText(saveAsNewButton.getName());
-			saveAsNewButton.addActionListener(new java.awt.event.ActionListener() {
-
-				public void actionPerformed(java.awt.event.ActionEvent evt) {
-					//System.out.println("Save As New");
 					System.out.println(propertyTable.getValueAt(1, 1) + "++++++");
 					System.out.println(propertyTable.getValueAt(2, 1) +"----");
 					Sdi sdi = new Sdi();
@@ -523,14 +472,89 @@ public class SDIWindow extends JPanel {
 						}
 						
 					}
+
 				}
+
+			});
+
+			closeButton.setToolTipText(closeButton.getName());
+			closeButton.addActionListener(new java.awt.event.ActionListener() {
+
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
+					System.out.println("Close");
+				}
+
+			});
+
+			saveAsNewButton.setToolTipText(saveAsNewButton.getName());
+			saveAsNewButton.addActionListener(new java.awt.event.ActionListener() {
+
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
+					//System.out.println("Save As New");
+					System.out.println(propertyTable.getValueAt(1, 1) + "++++++");
+					System.out.println(propertyTable.getValueAt(2, 1) +"----");
+					Sdi sdi = new Sdi();
+					sdi.setCpId(propertyTable.getBeneficiary().getId());
+					if(propertyTable.getBeneficiary().getRole().equalsIgnoreCase("PO"))
+						 sdi.setPoId(0);
+					else 
+					    sdi.setPoId(propertyTable.getPo().getId());
+					sdi.setAgentId(propertyTable.getAgent().getId());
+					
+					sdi.setRole((String) propertyTable.getValueAt( 1, 1));
+			 
+			
+			sdi.setCurrency((String) propertyTable.getValueAt(3, 1));
+			sdi.setProducts((String) propertyTable.getValueAt(4, 1));
+			sdi.setLeContacts((String) propertyTable.getValueAt(5, 1));
+			sdi.setMessageType((String) propertyTable.getValueAt(6, 1));
+			sdi.setCash((String) propertyTable.getValueAt(7, 1));
+			sdi.setPayrec((String) propertyTable.getValueAt(8, 1));
+			if(propertyTable.isPreferredFlag())
+				 sdi.setPreferred(1);
+			else 
+				sdi.setPreferred(0);
+			sdi.setPriority( propertyTable.getPriority());
+		//	sdi.setPayrec((String) propertyTable.getValueAt(14, 1));
+		//	sdi.setPayrec((String) propertyTable.getValueAt(15, 1));
+			sdi.setGlName((String) propertyTable.getValueAt(15, 1));
+			sdi.setAgentContacts((String) propertyTable.getValueAt(16, 1));
+			if(propertyTable.getAccount() != null)
+                          sdi.setAccountID(propertyTable.getAccount().getCpId());
+			 if(propertyTable.getInterAgent1() != null) {
+				 sdi.setInterMid1Contact((String) propertyTable.getValueAt(19, 1));
+				 sdi.setInterMid1glName((String) propertyTable.getValueAt(20, 1));
+				
+				 sdi.setInterMid1(propertyTable.getInterAgent1().getId());
+			     } 
+			 if(propertyTable.getInterAgent2() != null) {
+				 sdi.setInterMid2Contact((String) propertyTable.getValueAt(21, 1));
+				 sdi.setInterMid2glName((String) propertyTable.getValueAt(23, 1));
+				
+				 sdi.setInterMid2(propertyTable.getInterAgent2().getId());
+			     } 
+			
+					// remoteProduct = RemoteServiceUtil.getRemoteProductService();
+			try {
+				sdi = (Sdi)  remoteRef.saveSDI(sdi)	;
+				if(sdi.getId() > 0 ) {
+					commonUTIL.showAlertMessage("SDI Saved With ID" + sdi.getId());
+					selectSDI.setText(String.valueOf(sdi.getId()));
+				}
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+					
+				}
+
 			});
 
 			deleteButton.setToolTipText(deleteButton.getName());
 			deleteButton.addActionListener(new java.awt.event.ActionListener() {
 
 				public void actionPerformed(java.awt.event.ActionEvent evt) {
-					System.out.println("delete");
+System.out.println("delete");
 					
 					Sdi sdi = new Sdi();
 					int id  = Integer.parseInt(selectSDI.getText());
@@ -550,6 +574,7 @@ public class SDIWindow extends JPanel {
 						} catch (RemoteException e) {
 							e.printStackTrace();
 						}
+				
 				}
 
 			});
@@ -573,155 +598,6 @@ public class SDIWindow extends JPanel {
 			});
 
 		}
-	 
-	 private void clearSDIWindow() {
-		 
-		selectSDI.setText("");
-		 
-		 for(int i=0;i< propertyTable.getRowCount();i++) {
-        	 propertyTable.setValueAt("", i, 1);
-         }
-	 }
-	 
-	 private boolean validateAndFillSDI(Sdi sdi) {
-		 
-		 boolean flag = false;
-		 
-		 if (((String) propertyTable.getValueAt( 1, 1)).equals("")) {
-			 
-			 commonUTIL.showAlertMessage("Please select Role");
-			 return flag;
-			 
-		 }
-		 sdi.setRole((String) propertyTable.getValueAt( 1, 1));
-		 		 
-		 if (propertyTable.getBeneficiary() == null) {
-			 
-			 commonUTIL.showAlertMessage("Please select Beneficiary");
-			 return flag;
-			 
-		 }
-		 sdi.setCpId(propertyTable.getBeneficiary().getId());
-		 
-		 if (((String) propertyTable.getValueAt( 3, 1)).equals("")) {
-			 
-			 commonUTIL.showAlertMessage("Please select Currency");
-			 return flag;
-			 
-		 }
-		 sdi.setCurrency((String) propertyTable.getValueAt(3, 1));
-		 
-		 if (((String) propertyTable.getValueAt( 4, 1)).equals("")) {
-			 
-			 commonUTIL.showAlertMessage("Please select Product");
-			 return flag;
-			 
-		 }
-		 sdi.setProducts((String) propertyTable.getValueAt(4, 1));
-		 
-		 if (((String) propertyTable.getValueAt( 5, 1)).equals("")) {
-			 
-			 commonUTIL.showAlertMessage("Please select LEContacts");
-			 return flag;
-			 
-		 }
-		 sdi.setLeContacts((String) propertyTable.getValueAt(5, 1));
-		 
-		 if (((String) propertyTable.getValueAt( 6, 1)).equals("")) {
-			 
-			 commonUTIL.showAlertMessage("Please select Message Type");
-			 return flag;
-			 
-		 }
-		 sdi.setMessageType((String) propertyTable.getValueAt(6, 1));
-		 
-		 if (((String) propertyTable.getValueAt( 7, 1)).equals("")) {
-			 
-			 commonUTIL.showAlertMessage("Please select CASH_SECURITY");
-			 return flag;
-			 
-		 }
-		 sdi.setCash((String) propertyTable.getValueAt(7, 1));
-		 
-		 if (((String) propertyTable.getValueAt( 8, 1)).equals("")) {
-			 
-			 commonUTIL.showAlertMessage("Please select PAY_REC");
-			 return flag;
-			 
-		 }
-		 sdi.setPayrec((String) propertyTable.getValueAt(8, 1));
-		 
-		 if (propertyTable.getPo() == null) {
-			 
-			/* commonUTIL.showAlertMessage("Please select PO");
-			 return flag;*/
-			 
-		 } else {
-			 
-			 sdi.setPoId(propertyTable.getPo().getId());
-			 
-		 }
-		 
-		 
-		 if(propertyTable.isPreferredFlag())
-			 sdi.setPreferred(1);
-		else 
-			sdi.setPreferred(0);
-		 
-		 if (propertyTable.getPriority() < 0) {
-			 
-			 commonUTIL.showAlertMessage("Priority should be greater then or equal to 0");
-			 return flag;
-			 
-		 }
-		 sdi.setPriority( propertyTable.getPriority());
-		 
-		 /*if (((String) propertyTable.getValueAt( 15, 1)).equals("")) {
-			 
-			 commonUTIL.showAlertMessage("Please select A/C");
-			 return flag;
-			 
-		 }*/
-		
-		 		 
-		 /* if (((String) propertyTable.getValueAt( 16, 1)).equals("")) {
-			 	
-			 commonUTIL.showAlertMessage("Please select Agent Contact");
-			 return flag;
-			 
-		 }*/
-		
-		 if (!((String) propertyTable.getValueAt( 13, 1)).equals("")) {
-			 
-			 ///sdi.setAgentId(propertyTable.getAgent().getId());
-			 sdi.setGlName((String) propertyTable.getValueAt(14, 1));
-			 sdi.setAgentContacts((String) propertyTable.getValueAt(16, 1));
-			 
-		 }
-		 
-		 if(propertyTable.getAccount() != null) 
-             sdi.setAccountID(propertyTable.getAccount().getId());
-	 
-		 if(propertyTable.getInterAgent1() != null) {
-		 
-			 sdi.setInterMid1Contact((String) propertyTable.getValueAt(19, 1));
-			 sdi.setInterMid1glName((String) propertyTable.getValueAt(20, 1));
-			
-			 sdi.setInterMid1(propertyTable.getInterAgent1().getId());
-		 
-		 } 
-	
-		 if(propertyTable.getInterAgent2() != null) {
-		 
-			 sdi.setInterMid2Contact((String) propertyTable.getValueAt(21, 1));
-			 sdi.setInterMid2glName((String) propertyTable.getValueAt(23, 1));
-			 sdi.setInterMid2(propertyTable.getInterAgent2().getId());
-	     
-		 } 
-		 
-		 return true;
-	 
-	 }
 	 public static void main(String args[]) {
 		// SDIWindowNewWindow c1 = new SDIWindowNewWindow();
 		 //c1.setSize(900, 900);
@@ -743,7 +619,6 @@ public class SDIWindow extends JPanel {
 	        if (selectSDI == null){
 	        	selectSDI = new NumericTextField();
 	        }
-	        selectSDI.enable(false);
 	        selectSDI.addActionListener(getContractSelectorComboBoxActionListener());
 	        selectSDI.setPreferredSize(new Dimension(100, selectSDI.getPreferredSize().height));
 	    	sdiStatusBar.add(selectSDI);
@@ -879,7 +754,7 @@ public class SDIWindow extends JPanel {
 			LegalEntity le = (LegalEntity )remoteRef.selectLE(id);
 			name = le.getName();
 		} catch (RemoteException e) {
-			// 
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		   return name;
@@ -896,7 +771,166 @@ public class SDIWindow extends JPanel {
 	            System.out.println( e);
 	        }
 
-	        return productWindow;	
+	        return productWindow;
 	    }
-	 
+	 private void clearSDIWindow() {
+		 
+			selectSDI.setText("");
+			 
+			 for(int i=0;i< propertyTable.getRowCount();i++) {
+	        	 propertyTable.setValueAt("", i, 1);
+	         }
+			 propertyTable.setRole("");
+			 propertyTable.setBeneficiary(null);
+			 propertyTable.setAccount(null);
+			 propertyTable.setPo(null);
+			 propertyTable.setCurrency("");
+			 propertyTable.setPriority(0);
+			 propertyTable.setInter1Account(null);
+			 propertyTable.setInter2Account(null);
+			 propertyTable.setInterAgent1(null);
+			 propertyTable.setInter2Account(null);
+			
+		 }
+		 
+		 private boolean validateAndFillSDI(Sdi sdi) {
+			 
+			 boolean flag = false;
+			 
+			 if (((String) propertyTable.getValueAt( 1, 1)).equals("")) {
+				 
+				 commonUTIL.showAlertMessage("Please select Role");
+				 return flag;
+				 
+			 }
+			 sdi.setRole((String) propertyTable.getValueAt( 1, 1));
+			 		 
+			 if (propertyTable.getBeneficiary() == null) {
+				 
+				 commonUTIL.showAlertMessage("Please select Beneficiary");
+				 return flag;
+				 
+			 }
+			 sdi.setCpId(propertyTable.getBeneficiary().getId());
+			 
+			 if (((String) propertyTable.getValueAt( 3, 1)).equals("")) {
+				 
+				 commonUTIL.showAlertMessage("Please select Currency");
+				 return flag;
+				 
+			 }
+			 sdi.setCurrency((String) propertyTable.getValueAt(3, 1));
+			 
+			 if (((String) propertyTable.getValueAt( 4, 1)).equals("")) {
+				 
+				 commonUTIL.showAlertMessage("Please select Product");
+				 return flag;
+				 
+			 }
+			 sdi.setProducts((String) propertyTable.getValueAt(4, 1));
+			 
+			 if (((String) propertyTable.getValueAt( 5, 1)).equals("")) {
+				 
+				 commonUTIL.showAlertMessage("Please select LEContacts");
+				 return flag;
+				 
+			 }
+			 sdi.setLeContacts((String) propertyTable.getValueAt(5, 1));
+			 
+			 if (((String) propertyTable.getValueAt( 6, 1)).equals("")) {
+				 
+				 commonUTIL.showAlertMessage("Please select Message Type");
+				 return flag;
+				 
+			 }
+			 sdi.setMessageType((String) propertyTable.getValueAt(6, 1));
+			 
+			 if (((String) propertyTable.getValueAt( 7, 1)).equals("")) {
+				 
+				 commonUTIL.showAlertMessage("Please select CASH_SECURITY");
+				 return flag;
+				 
+			 }
+			 sdi.setCash((String) propertyTable.getValueAt(7, 1));
+			 
+			 if (((String) propertyTable.getValueAt( 8, 1)).equals("")) {
+				 
+				 commonUTIL.showAlertMessage("Please select PAY_REC");
+				 return flag;
+				 
+			 }
+			 sdi.setPayrec((String) propertyTable.getValueAt(8, 1));
+			 
+			 if (propertyTable.getPo() == null) {
+				 
+				/* commonUTIL.showAlertMessage("Please select PO");
+				 return flag;*/
+				 
+			 } else {
+				 
+				 sdi.setPoId(propertyTable.getPo().getId());
+				 
+			 }
+			 
+			 
+			 if(propertyTable.isPreferredFlag())
+				 sdi.setPreferred(1);
+			else 
+				sdi.setPreferred(0);
+			 
+			 if (propertyTable.getPriority() < 0) {
+				 
+				 commonUTIL.showAlertMessage("Priority should be greater then or equal to 0");
+				 return flag;
+				 
+			 }
+			 sdi.setPriority( propertyTable.getPriority());
+			 
+			 /*if (((String) propertyTable.getValueAt( 15, 1)).equals("")) {
+				 
+				 commonUTIL.showAlertMessage("Please select A/C");
+				 return flag;
+				 
+			 }*/
+			
+			 		 
+			 /* if (((String) propertyTable.getValueAt( 16, 1)).equals("")) {
+				 	
+				 commonUTIL.showAlertMessage("Please select Agent Contact");
+				 return flag;
+				 
+			 }*/
+			
+			 if (!((String) propertyTable.getValueAt( 13, 1)).equals("")) {
+				 
+				 ///sdi.setAgentId(propertyTable.getAgent().getId());
+				 sdi.setGlName((String) propertyTable.getValueAt(14, 1));
+				 sdi.setAgentContacts((String) propertyTable.getValueAt(16, 1));
+				 
+			 }
+			 
+			 if(propertyTable.getAccount() != null) 
+	             sdi.setAccountID(propertyTable.getAccount().getId());
+		 
+			 if(propertyTable.getInterAgent1() != null) {
+			 
+				 sdi.setInterMid1Contact((String) propertyTable.getValueAt(19, 1));
+				 sdi.setInterMid1glName((String) propertyTable.getValueAt(20, 1));
+				
+				 sdi.setInterMid1(propertyTable.getInterAgent1().getId());
+			 
+			 } 
+		
+			 if(propertyTable.getInterAgent2() != null) {
+			 
+				 sdi.setInterMid2Contact((String) propertyTable.getValueAt(21, 1));
+				 sdi.setInterMid2glName((String) propertyTable.getValueAt(23, 1));
+				 sdi.setInterMid2(propertyTable.getInterAgent2().getId());
+		     
+			 } 
+			 
+			 return true;
+		 
+		 }
+		
 }
