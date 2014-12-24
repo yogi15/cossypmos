@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -33,59 +34,63 @@ import dsServices.RemoteReferenceData;
 public class SDIInternalPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private JComboBox rolesData;
-	private LESelectionPropertyCombox beneficiaryData;
+	public JComboBox rolesData;
+	public JComboBox<String> beneficiaryData;
 	private JLabel jLabel1;
 	private JLabel jLabel0;
 	private JLabel jLabel2;
 	private JLabel jLabel3;
-	private JComboBox productTypeData;
+	public JComboBox productTypeData;
 	private JLabel jLabel4;
-	private JComboBox beneficiaryLecontactsData;
-	private JComboBox currencyData;
+	public JComboBox beneficiaryLecontactsData;
+	public JComboBox currencyData;
 	private JLabel jLabel5;
-	private JComboBox payrecData;
+	public JComboBox payrecData;
 	private JLabel jLabel6;
-	private JComboBox cashsecurityData;
-	private JCheckBox jPreferred;
+	public JComboBox cashsecurityData;
+	public JCheckBox jPreferred;
 	private JLabel jLabel8;
 	private JPanel jPanel0;
 	private JLabel jLabel9;
 	private JLabel jLabel10;
-	private LESelectionPropertyCombox poData;
-	private JComboBox poContactData;
+	public LESelectionPropertyCombox poData;
+	public JComboBox poContactData;
 	private JPanel jPanel1;
 	private JPanel jPanel2;
 	private JLabel jLabel12;
 	private JLabel jLabel11;
 	private JPanel jPanel3;
 	private JLabel jLabel13;
-	private JComboBox glAccountData;
-	private LESelectionPropertyCombox agentNameData;
-	private JTextField jTextField0;
-	private JCheckBox jCheckBox0;
-	private JTextField jTextField1;
+	public JComboBox glAccountData;
+	public LESelectionPropertyCombox agentNameData;
+	public JTextField agentAcTextField;
+	public JCheckBox jCheckBox0;
+	public JTextField priorityTextField;
 	private JLabel jLabel14;
 	//private JComboBox jComboBox0;
 	private JLabel jLabel15;
-	private JComboBox agentContactData;
-	private JComboBox messsgeMethodData;
+	public JComboBox agentContactData;
+	public JComboBox messsgeMethodData;
 	private JLabel jLabel16;
-	private LESelectionPropertyCombox InterM1Data;
-	private LESelectionPropertyCombox InterM2Data;
+	public LESelectionPropertyCombox InterM1Data;
+	public LESelectionPropertyCombox InterM2Data;
 	private JPanel jPanel4;
-	private JTabbedPane jTabbedPane0;
+	public JTabbedPane jTabbedPane0;
 	private JLabel jLabel17;
 	private JLabel jLabel19;
 	private JLabel jLabel20;
-	private JTextField jTextField2;
+	public JTextField im1AccountTextField;
 	private JLabel jLabel18;
 	private JLabel  jLabel21;
-	private JComboBox InterM1Contacts;
+	public JComboBox InterM1Contacts;
 	private JPanel jPanel5;
-	private JComboBox InterM2Contacts;
-	JTextField jTextField3;
+	public JComboBox InterM2Contacts;
+	public JTextField im2AccountTextField;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+	
+	DefaultComboBoxModel<String> leModel = new DefaultComboBoxModel<String>();
+	Collection<LegalEntity> le = new Vector<LegalEntity>();
+	
 	public SDIInternalPanel(RemoteReferenceData remoteD) {
 		remoteR = remoteD;
 		initComponents();
@@ -94,6 +99,13 @@ public class SDIInternalPanel extends JPanel {
 	private void initComponents() {
 		add(getJPanel0());
 		setSize(372, 574);
+		
+		try {
+			le = remoteR.selectAllLs();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private JComboBox getInterM1Contacts() {
@@ -129,20 +141,20 @@ public class SDIInternalPanel extends JPanel {
 		}
 		return jLabel20;
 	}
-	private JTextField getJTextField2() {
-		if (jTextField2 == null) {
-			jTextField2 = new JTextField();
-			jTextField2.setText("jTextField2");
+	private JTextField getIm1AccountTextField() {
+		if (im1AccountTextField == null) {
+			im1AccountTextField = new JTextField();
+			im1AccountTextField.setText("");
 		}
-		return jTextField2;
+		return im1AccountTextField;
 	}
-	private JTextField getJTextField3() {
+	private JTextField getIm2AccountTextField() {
 		
-		if (jTextField3 == null) {
-			jTextField3 = new JTextField();
-			jTextField3.setText("jTextField2");
+		if (im2AccountTextField == null) {
+			im2AccountTextField = new JTextField();
+			im2AccountTextField.setText("");
 		}
-		return jTextField3;
+		return im2AccountTextField;
 	}
 	private JLabel getJLabel17() {
 		if (jLabel17 == null) {
@@ -169,7 +181,7 @@ public class SDIInternalPanel extends JPanel {
 			jPanel4.add(getJLabel16(), new Constraints(new Leading(9, 108, 10, 10), new Leading(12, 12, 12)));
 			jPanel4.add(getInterM1Data(), new Constraints(new Leading(137, 174, 10, 10), new Leading(8, 24, 12, 12)));
 			jPanel4.add(getJLabel17(), new Constraints(new Leading(9, 85, 10, 10), new Leading(50, 14, 12, 12)));
-			jPanel4.add(getJTextField2(), new Constraints(new Leading(137, 165, 12, 12), new Leading(46, 12, 12)));
+			jPanel4.add(getIm1AccountTextField(), new Constraints(new Leading(137, 165, 12, 12), new Leading(46, 12, 12)));
 			jPanel4.add(getJLabel18(), new Constraints(new Leading(16, 88, 10, 10), new Leading(80, 20, 12, 12)));
 			jPanel4.add(getInterM1Contacts(), new Constraints(new Leading(137, 171, 10, 10), new Leading(82, 28, 10, 10)));
 		}
@@ -182,7 +194,7 @@ public class SDIInternalPanel extends JPanel {
 			jPanel5.add(getJLabel21(), new Constraints(new Leading(9, 108, 10, 10), new Leading(12, 12, 12)));
 			jPanel5.add(getInterM2Data(), new Constraints(new Leading(137, 174, 10, 10), new Leading(8, 24, 12, 12)));
 			jPanel5.add(getJLabel19(), new Constraints(new Leading(9, 85, 10, 10), new Leading(50, 14, 12, 12)));
-			jPanel5.add(getJTextField3(), new Constraints(new Leading(137, 165, 12, 12), new Leading(46, 12, 12)));
+			jPanel5.add(getIm2AccountTextField(), new Constraints(new Leading(137, 165, 12, 12), new Leading(46, 12, 12)));
 			jPanel5.add(getJLabel20(), new Constraints(new Leading(16, 88, 10, 10), new Leading(80, 20, 12, 12)));
 			jPanel5.add(getInterM2Contacts(), new Constraints(new Leading(137, 171, 10, 10), new Leading(82, 28, 10, 10)));
 		}
@@ -252,12 +264,12 @@ public class SDIInternalPanel extends JPanel {
 		return jLabel14;
 	}
 
-	private JTextField getJTextField1() {
-		if (jTextField1 == null) {
-			jTextField1 = new JTextField();
-			jTextField1.setText("Message");
+	private JTextField getPriorityTextField() {
+		if (priorityTextField == null) {
+			priorityTextField = new JTextField();
+			priorityTextField.setText("");
 		}
-		return jTextField1;
+		return priorityTextField;
 	}
 
 	private JCheckBox getJCheckBox0() {
@@ -268,11 +280,11 @@ public class SDIInternalPanel extends JPanel {
 		return jCheckBox0;
 	}
 
-	private JTextField getJTextField0() {
-		if (jTextField0 == null) {
-			jTextField0 = new JTextField();
+	private JTextField getAgentAcTextField() {
+		if (agentAcTextField == null) {
+			agentAcTextField = new JTextField("");
 		}
-		return jTextField0;
+		return agentAcTextField;
 	}
 
 	private LESelectionPropertyCombox getAgentNameData() {
@@ -289,7 +301,7 @@ public class SDIInternalPanel extends JPanel {
 	private JComboBox getGlAccountData() {
 		if (glAccountData == null) {
 			glAccountData = new JComboBox();
-			glAccountData.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+			glAccountData.setModel(new DefaultComboBoxModel(new Object[] { "0" }));
 		}
 		return glAccountData;
 	}
@@ -309,7 +321,7 @@ public class SDIInternalPanel extends JPanel {
 			jPanel3.setLayout(new GroupLayout());
 			jPanel3.add(getJLabel12(), new Constraints(new Leading(9, 10, 10), new Leading(13, 12, 12)));
 			jPanel3.add(getJCheckBox0(), new Constraints(new Leading(245, 82, 10, 10), new Leading(79, 12, 12)));
-			jPanel3.add(getJTextField0(), new Constraints(new Leading(110, 165, 10, 10), new Leading(47, 12, 12)));
+			jPanel3.add(getAgentAcTextField(), new Constraints(new Leading(110, 165, 10, 10), new Leading(47, 12, 12)));
 			jPanel3.add(getJLabel15(), new Constraints(new Leading(9, 60, 12, 12), new Leading(79, 20, 12, 12)));
 			jPanel3.add(getJLabel11(), new Constraints(new Leading(9, 10, 10), new Leading(47, 14, 10, 10)));
 			jPanel3.add(getAgentContactData(), new Constraints(new Leading(110, 133, 12, 12), new Leading(77, 28, 12, 12)));
@@ -410,7 +422,7 @@ RemoteReferenceData remoteR = null;
 			jPanel0.add(getJLabel7(), new Constraints(new Leading(181, 86, 12, 12), new Leading(195, 17, 12, 12)));
 			jPanel0.add(getJLabel14(), new Constraints(new Leading(183, 10, 10), new Leading(232, 17, 12, 12)));
 			jPanel0.add(getMessageData(), new Constraints(new Leading(230, 12, 12), new Leading(232, 27, 12, 12)));
-			jPanel0.add(getJTextField1(), new Constraints(new Leading(93, 70, 10, 10), new Leading(230, 12, 12)));
+			jPanel0.add(getPriorityTextField(), new Constraints(new Leading(93, 70, 10, 10), new Leading(230, 12, 12)));
 			jPanel0.add(getJTabbedPane0(), new Constraints(new Leading(7, 337, 12, 12), new Leading(387, 163, 10, 10)));
 		}
 		return jPanel0;
@@ -551,12 +563,16 @@ RemoteReferenceData remoteR = null;
 		return jLabel1;
 	}
 
-	private LESelectionPropertyCombox getBeneficiaryData() {
+	private JComboBox<String> getBeneficiaryData() {
 		if (beneficiaryData == null) {
-			beneficiaryData = new LESelectionPropertyCombox("CounterParty");
+			/*beneficiaryData = new LESelectionPropertyCombox("CounterParty");
 			beneficiaryData.addActionListener(new agentComboxSelecterComboBoxListener());
-			beneficiaryData.setPreferredSize(new Dimension(200, beneficiaryData.getPreferredSize().height));
-		
+			beneficiaryData.setPreferredSize(new Dimension(200, beneficiaryData.getPreferredSize().height));*/
+			
+			beneficiaryData = new JComboBox<String>();
+			getLeOnComboBox(leModel,"CounterParty");
+			beneficiaryData.setModel(leModel);		
+			
 		}
 		return beneficiaryData;
 	}
@@ -572,12 +588,21 @@ RemoteReferenceData remoteR = null;
 				@Override
 				public void itemStateChanged(ItemEvent arg0) {
 					// TODO Auto-generated method stub
-					String roledata = (String) rolesData.getSelectedItem().toString();
-					beneficiaryData = null;
-					beneficiaryData = new LESelectionPropertyCombox(roledata);
-					beneficiaryData.addActionListener(new agentComboxSelecterComboBoxListener());
-					beneficiaryData.setPreferredSize(new Dimension(200, beneficiaryData.getPreferredSize().height));
+					if (rolesData.getSelectedIndex() > -1) {
+						
+						String roledata = rolesData.getSelectedItem().toString();
+						
+						if (beneficiaryData == null) {
+							beneficiaryData = new JComboBox<String>();
+						}
+						leModel.removeAllElements();
+						getLeOnComboBox(leModel,roledata);
+						beneficiaryData.setModel(leModel);
+						
+					} 					
 					
+					//beneficiaryData.addActionListener(new agentComboxSelecterComboBoxListener());
+					//beneficiaryData.setPreferredSize(new Dimension(200, beneficiaryData.getPreferredSize().height));					
 				}
 			});
 		}
@@ -686,11 +711,53 @@ RemoteReferenceData remoteR = null;
 		    	
 				}
 			}catch (RemoteException e) {
-						// TODO Auto-generated catch block
 					
 			commonUTIL.displayError("SDIWIndow","getMasterDataOnComboBox", e);
 			}
 		}
 
-
+	 private final void getLeOnComboBox(javax.swing.DefaultComboBoxModel combodata,String role) {
+			
+			Iterator<LegalEntity> it = le.iterator();
+			
+			int i =0;
+			
+			while(it.hasNext()) {
+				
+				LegalEntity data = (LegalEntity) it.next();
+				
+				if (data.getRole().equals(role)) {
+					
+					combodata.insertElementAt(data.getAlias(), i++);
+					
+				}
+				
+				data = null;
+			}	
+			
+			it = null;
+		}	
+	 
+	 public int getLeId(String leName){
+		 
+		 Iterator<LegalEntity> it = le.iterator();
+			
+			int id =0;
+			
+			while(it.hasNext()) {
+				
+				LegalEntity data = (LegalEntity) it.next();
+				
+				if (data.getName().equals(leName)) {
+					
+					id= data.getId();
+					break;
+				}
+				
+			}	
+			
+			it = null;
+			
+			return id;
+	 }
 }
