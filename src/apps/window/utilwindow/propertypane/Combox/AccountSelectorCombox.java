@@ -15,6 +15,30 @@ import com.jidesoft.combobox.AbstractComboBox.EditorComponent;
 public class AccountSelectorCombox  extends AbstractComboBox {
 	String _selectedObjType = null;
 	LegalEntity accountHolder = null;
+	/**
+	 * @return the accountHolder
+	 */
+	public LegalEntity getAccountHolder() {
+		return accountHolder;
+	}
+	/**
+	 * @param accountHolder the accountHolder to set
+	 */
+	public void setAccountHolder(LegalEntity accountHolder) {
+		this.accountHolder = accountHolder;
+	}
+	/**
+	 * @return the currency
+	 */
+	public String getCurrency() {
+		return currency;
+	}
+	/**
+	 * @param currency the currency to set
+	 */
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
 	String currency = null;
 	AccountSelectorCellEditor  _accountSelectCellEditor = null;
 	@Override
@@ -38,6 +62,15 @@ public class AccountSelectorCombox  extends AbstractComboBox {
 		// TODO Auto-generated method stub
 	
 	}
+	public AccountSelectorCombox(String currency,LegalEntity accountHolder) {
+		this.currency = currency;
+		this.accountHolder = accountHolder;
+		setCurrency(currency);
+		setAccountHolder(accountHolder);
+		setEditable(false);
+		initComponent();
+		
+	}
 	private void setAccount(Account value) {
 		// TODO Auto-generated method stub
 	//	this._
@@ -48,7 +81,7 @@ public class AccountSelectorCombox  extends AbstractComboBox {
 	@Override
 	public PopupPanel createPopupComponent() {
 		// TODO Auto-generated method stub
-		return new AccountSelectionPropertyPanel(this,_accountSelectCellEditor.get_currency(),_accountSelectCellEditor.getBeneficiary());
+		return new AccountSelectionPropertyPanel(this,getCurrency(),getAccountHolder());
 	}
 	public AccountSelectorCombox(String displayObj){
 		_selectedObjType = displayObj;
