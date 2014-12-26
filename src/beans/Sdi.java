@@ -168,6 +168,13 @@ public class Sdi extends BOObject implements Serializable {
 	String attributes;
 	String leContacts;
 	String payrec;
+	
+	public String getPoContact() {
+		return poContact;
+	}
+	public void setPoContact(String poContact) {
+		this.poContact = poContact;
+	}
 	String cash;
 	String currency;
 	String products;
@@ -176,6 +183,7 @@ public class Sdi extends BOObject implements Serializable {
 	String role;
 	SwiftSdi swiftSDI = null;
 	int agentSDIid = 0;
+	String poContact = "";
 	
 	public int getAgentSDI(int agentID) {
 		return agentSDIid;
