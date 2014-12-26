@@ -645,6 +645,7 @@ public class MessageConfigWindow extends JPanel {
 				jReceiver.setText(messLeg.get(messConfig.getPoid()).getName());
 				POContactType.setSelectedItem(messConfig.getPoContactType());
 				jComboBox1.setSelectedItem(messConfig.getReceiverContactType());
+				rolesData.setSelectedItem(messConfig.getReceiverRole());
 				
 			
 				
@@ -868,6 +869,7 @@ public class MessageConfigWindow extends JPanel {
 		messConfig.setReceiverID(receiverID);
 		messConfig.setPoContactType(POContactType.getSelectedItem().toString());
 	      messConfig.setReceiverContactType(jComboBox1.getSelectedItem().toString());
+	      messConfig.setReceiverRole(rolesData.getSelectedItem().toString());
 		String productSubType =  jSubType.getSelectedItem().toString();
 		String eventType =  jList0.getSelectedValue().toString();
 		flag = true;
@@ -1009,13 +1011,17 @@ class TableModelUtil extends AbstractTableModel {
 	         break;
 	     case 9:
 		    	
-	         value =currSplit.getFormatType();
+	         value =currSplit.getReceiverRole();
 	         break;
 	     case 10:
 		    	
-	         value =currSplit.getGateWay();
+	         value =currSplit.getFormatType();
 	         break;
 	     case 11:
+		    	
+	         value =currSplit.getGateWay();
+	         break;
+	     case 12:
 		    	
 	         value =currSplit.getTemplateName();
 	         break;
