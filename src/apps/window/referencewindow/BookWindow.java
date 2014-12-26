@@ -23,6 +23,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 
+import org.dyno.visual.swing.layouts.Bilateral;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
@@ -68,6 +69,7 @@ public class BookWindow extends JPanel {
 	TableModelBookUtil model;
 	String bookcol[] = { "BookNo", "Book Name ", "Legal Entity", "Folder Name" };
 	String attr[] = { "AttributeName", "AttributeValue" };
+	private JPanel jPanel0;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	public BookWindow() {
 		initData();
@@ -77,22 +79,32 @@ public class BookWindow extends JPanel {
 	private void initComponents() {
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 		setLayout(new GroupLayout());
-		add(getBookIdLabel(), new Constraints(new Leading(37, 99, 10, 10), new Leading(72, 10, 10)));
-		add(getBookNameLabel(), new Constraints(new Leading(37, 99, 12, 12), new Leading(102, 10, 10)));
-		add(getLeLabel(), new Constraints(new Leading(37, 99, 12, 12), new Leading(134, 10, 10)));
-		add(getBookIdTextField(), new Constraints(new Leading(144, 45, 10, 10), new Leading(68, 12, 12)));
-		add(getBookNameTextField(), new Constraints(new Leading(144, 147, 12, 12), new Leading(98, 12, 12)));
-		add(getLeComboBox(), new Constraints(new Leading(146, 142, 12, 12), new Leading(130, 12, 12)));
-		add(getFolderLabel(), new Constraints(new Leading(37, 99, 12, 12), new Leading(168, 12, 12)));
-		add(getFolderComboBox(), new Constraints(new Leading(146, 142, 12, 12), new Leading(165, 10, 10)));
-		add(getJScrollPane0(), new Constraints(new Leading(440, 277, 10, 10), new Leading(61, 150, 10, 10)));
-		add(getJLabel5(), new Constraints(new Leading(443, 120, 10, 10), new Leading(34, 12, 12)));
-		add(getSaveAsNewButton(), new Constraints(new Leading(80, 10, 10), new Leading(229, 20, 12, 12)));
-		add(getSaveButton(), new Constraints(new Leading(204, 84, 12, 12), new Leading(229, 20, 12, 12)));
-		add(getDeleteButton(), new Constraints(new Leading(306, 84, 12, 12), new Leading(229, 20, 12, 12)));
-		add(getClearButton(), new Constraints(new Leading(406, 84, 10, 10), new Leading(229, 20, 10, 10)));
-		add(getJScrollPane1(), new Constraints(new Leading(15, 1199, 10, 10), new Leading(262, 191, 10, 10)));
-		setSize(1222, 469);
+		add(getJPanel0(), new Constraints(new Bilateral(10, 12, 0), new Leading(5, 253, 10, 10)));
+		add(getJScrollPane1(), new Constraints(new Leading(15, 1270, 10, 10), new Leading(262, 403, 10, 10)));
+		setSize(1294, 683);
+	}
+
+	private JPanel getJPanel0() {
+		if (jPanel0 == null) {
+			jPanel0 = new JPanel();
+			jPanel0.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
+			jPanel0.setLayout(new GroupLayout());
+			jPanel0.add(getLeLabel(), new Constraints(new Leading(37, 99, 12, 12), new Leading(134, 10, 10)));
+			jPanel0.add(getJLabel5(), new Constraints(new Leading(443, 120, 10, 10), new Leading(34, 12, 12)));
+			jPanel0.add(getLeComboBox(), new Constraints(new Leading(146, 190, 12, 12), new Leading(130, 29, 10, 10)));
+			jPanel0.add(getBookIdLabel(), new Constraints(new Leading(37, 99, 12, 12), new Leading(61, 12, 12)));
+			jPanel0.add(getBookIdTextField(), new Constraints(new Leading(148, 97, 10, 10), new Leading(55, 25, 10, 10)));
+			jPanel0.add(getBookNameTextField(), new Constraints(new Leading(148, 183, 10, 10), new Leading(90, 28, 10, 10)));
+			jPanel0.add(getBookNameLabel(), new Constraints(new Leading(37, 99, 12, 12), new Leading(96, 12, 12)));
+			jPanel0.add(getSaveAsNewButton(), new Constraints(new Leading(80, 10, 10), new Leading(220, 29, 12, 12)));
+			jPanel0.add(getSaveButton(), new Constraints(new Leading(210, 107, 12, 12), new Leading(220, 29, 12, 12)));
+			jPanel0.add(getClearButton(), new Constraints(new Leading(438, 107, 10, 10), new Leading(220, 29, 12, 12)));
+			jPanel0.add(getDeleteButton(), new Constraints(new Leading(325, 107, 12, 12), new Leading(220, 29, 12, 12)));
+			jPanel0.add(getFolderComboBox(), new Constraints(new Leading(146, 190, 12, 12), new Leading(171, 29, 12, 12)));
+			jPanel0.add(getFolderLabel(), new Constraints(new Leading(41, 99, 12, 12), new Leading(175, 10, 10)));
+			jPanel0.add(getJScrollPane0(), new Constraints(new Leading(440, 819, 10, 10), new Leading(61, 151, 10, 10)));
+		}
+		return jPanel0;
 	}
 
 	private JButton getClearButton() {
