@@ -225,7 +225,7 @@ public class AttributSQL {
 	            stmt.setInt(j++, deleteAttribute.getId());
 	           
 	            stmt.executeUpdate();
-			 
+	            commonUTIL.display("AttributeSQL","remove"+ DELETE_FROM_ATTRIBUTE + " "+ deleteAttribute.getId());
 		 } catch (Exception e) {
 			 commonUTIL.displayError("AttributeSQL","remove",e);
 			 return false;
