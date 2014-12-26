@@ -20,7 +20,7 @@ public class SdiSQL {
 	final static private String DELETE =
 		"DELETE FROM " + tableName + "   where id =? ";
 	final static private String INSERT =
-		"INSERT into " + tableName + "(id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, ACCOUNTNAME ) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		"INSERT into " + tableName + "(id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, ACCOUNTNAME, POCONTACTS ) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	/*final static private String UPDATE =
 		"UPDATE " + tableName + " set agentId=?,cpId=?,accountID=?,messageType=?  where id = ? ";
 	*/	
@@ -28,15 +28,15 @@ public class SdiSQL {
 	final static private String SELECT_MAX =
 		"SELECT MAX(id) sdiformat_ID FROM " + tableName + " ";
 	final static private String SELECTALL =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role ,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName  FROM " + tableName + " ";
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role ,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName, pocontacts  FROM " + tableName + " ";
 	/*final static private String SELECT =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName    FROM " + tableName + " where id =  ?";*/
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName, pocontacts    FROM " + tableName + " where id =  ?";*/
 	final static private String SELECTWHERE =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName    FROM " + tableName + " where ";
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName, pocontacts    FROM " + tableName + " where ";
 	 static private String SELECTONE =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency ,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName   FROM " + tableName + " where id =  ";
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency ,key,role,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDSID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName, pocontacts   FROM " + tableName + " where id =  ";
 	 static private String SELECTSDIKEY =
-		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency ,key,role ,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName  FROM " + tableName + " where key =  ";
+		"SELECT id,agentId,cpId,accountID,messageType,sdiformat,poid,attributes,leContacts,agentContacts,payrec,cash,method,products,currency ,key,role ,PRIORITY,PREFERRED,INTERMEDFID,INTERMEDFCONTACT,INTERMEDSCONTACT,INTERMEDFCONTACT,INTERMEDFACCOUNTNAME,INTERMEDSACCOUNTNAME, accountName, pocontacts  FROM " + tableName + " where key =  ";
 	 private static String getUpdateSQL(Sdi sdi) {
 	      String updateSQL = "UPDATE " + tableName + " set " +
 	      		" agentId= " + sdi.getAgentId() + 
@@ -56,13 +56,15 @@ public class SdiSQL {
 	      		"',key= '" + sdi.getkey() + 
 	      		"',role = '" + sdi.getRole() + 
 	      		"',ACCOUNTNAME = '" + sdi.getGlName() + 
-	      		" ',PRIORITY ='" + sdi.getPreferred() +
+	      		" ',PRIORITY ='" + sdi.getPriority() + 
+	      		" ',PREFERRED ='" + sdi.getPreferred() +
 	      		" ',INTERMEDFID ='" + sdi.getInterMid1() +
 	      		" ',INTERMEDSID = '" + sdi.getInterMid2()+
 	      		" ',INTERMEDFCONTACT ='" + sdi.getInterMid1Contact() + 
 	      		" ',INTERMEDSCONTACT ='" + sdi.getInterMid2Contact() +
-	      		" ',INTERMEDFACCOUNTNAME ='" + sdi.getInterMid1account() +
-	      		" ',INTERMEDSACCOUNTNAME ='" + sdi.getInterMid2Contact() +
+	      		" ',INTERMEDFACCOUNTNAME ='" + sdi.getInterMid1glName() +
+	      		" ',INTERMEDSACCOUNTNAME ='" + sdi.getInterMid2glName() +
+	      		"', pocontacts = '" + sdi.getPoContact() +
 	      		"'  where id= " + sdi.getId();
 	      return updateSQL;
 	     }
@@ -252,6 +254,7 @@ public class SdiSQL {
             stmt.setString(24, inserSdi.getInterMid1glName());
             stmt.setString(25, inserSdi.getInterMid2glName());
             stmt.setString(26, inserSdi.getGlName());
+            stmt.setString(27, inserSdi.getPoContact());
             
             stmt.executeUpdate();
 		    
@@ -320,6 +323,7 @@ public class SdiSQL {
 				Sdi.setInterMid1glName(rs.getString(24));
 				Sdi.setInterMid2glName(rs.getString(25));
 				Sdi.setGlName(rs.getString(26));
+				Sdi.setPoContact(rs.getString(27));
 				Sdis.add(Sdi);
 	         
 	         }
@@ -421,6 +425,7 @@ public class SdiSQL {
 				Sdi.setInterMid1glName(rs.getString(24));
 				Sdi.setInterMid2glName(rs.getString(25));
 				Sdi.setGlName(rs.getString(26));
+				Sdi.setPoContact(rs.getString(27));
 				
 				Sdis.add(Sdi);
 		      
@@ -483,6 +488,7 @@ public class SdiSQL {
 				Sdi.setInterMid1glName(rs.getString(24));
 				Sdi.setInterMid2glName(rs.getString(25));
 				Sdi.setGlName(rs.getString(26));
+				Sdi.setPoContact(rs.getString(27));
 				
 				Sdis.add(Sdi);
 		      
