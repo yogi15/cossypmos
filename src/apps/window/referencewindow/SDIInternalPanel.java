@@ -1,5 +1,6 @@
 package apps.window.referencewindow;
 
+
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -23,18 +24,25 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
+import constants.CommonConstants;
+
+import scala.collection.mutable.StringBuilder;
+import util.RemoteServiceUtil;
 import util.commonUTIL;
+import apps.window.utilwindow.propertypane.Combox.AccountSelectorCombox;
 import apps.window.utilwindow.propertypane.Combox.LESelectionPropertyCombox;
+import beans.Account;
 import beans.LegalEntity;
 import beans.StartUPData;
 
+import dsServices.RemoteAccount;
 import dsServices.RemoteReferenceData;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class SDIInternalPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	public JComboBox rolesData;
+	public JComboBox<String> rolesData;
 	public JComboBox<String> beneficiaryData;
 	private JLabel jLabel1;
 	private JLabel jLabel0;
@@ -42,38 +50,38 @@ public class SDIInternalPanel extends JPanel {
 	private JLabel jLabel3;
 	public JComboBox productTypeData;
 	private JLabel jLabel4;
-	public JComboBox beneficiaryLecontactsData;
-	public JComboBox currencyData;
+	public JComboBox<String> beneficiaryLecontactsData;
+	public JComboBox<String> currencyData;
 	private JLabel jLabel5;
-	public JComboBox payrecData;
+	public JComboBox<String> payrecData;
 	private JLabel jLabel6;
-	public JComboBox cashsecurityData;
+	public JComboBox<String> cashsecurityData;
 	public JCheckBox jPreferred;
 	private JLabel jLabel8;
 	private JPanel jPanel0;
 	private JLabel jLabel9;
 	private JLabel jLabel10;
-	public LESelectionPropertyCombox poData;
-	public JComboBox poContactData;
+	public JComboBox<String> poData;
+	public JComboBox<String> poContactData;
 	private JPanel jPanel1;
 	private JPanel jPanel2;
 	private JLabel jLabel12;
 	private JLabel jLabel11;
 	private JPanel jPanel3;
 	private JLabel jLabel13;
-	public JComboBox glAccountData;
-	public LESelectionPropertyCombox agentNameData;
+	public JComboBox<String> glAccountData;
+	public JComboBox<String> agentNameData;
 	public JTextField agentAcTextField;
 	public JCheckBox jCheckBox0;
 	public JTextField priorityTextField;
 	private JLabel jLabel14;
 	//private JComboBox jComboBox0;
 	private JLabel jLabel15;
-	public JComboBox agentContactData;
+	public JComboBox<String> agentContactData;
 	public JComboBox messsgeMethodData;
 	private JLabel jLabel16;
-	public LESelectionPropertyCombox InterM1Data;
-	public LESelectionPropertyCombox InterM2Data;
+	public JComboBox<String> InterM1Data;
+	public JComboBox<String> InterM2Data;
 	private JPanel jPanel4;
 	public JTabbedPane jTabbedPane0;
 	private JLabel jLabel17;
@@ -86,10 +94,16 @@ public class SDIInternalPanel extends JPanel {
 	private JPanel jPanel5;
 	public JComboBox InterM2Contacts;
 	public JTextField im2AccountTextField;
+	public Account account;
+	private Collection acc = null;
+	
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	
+	DefaultComboBoxModel<String> agentLeDatamodel = new DefaultComboBoxModel<String>();
 	DefaultComboBoxModel<String> leModel = new DefaultComboBoxModel<String>();
 	Collection<LegalEntity> le = new Vector<LegalEntity>();
+	private RemoteAccount remoteAccount = null;
+	private RemoteReferenceData remoteR = null;
 	
 	public SDIInternalPanel(RemoteReferenceData remoteD) {
 		remoteR = remoteD;
@@ -97,15 +111,18 @@ public class SDIInternalPanel extends JPanel {
 	}
 
 	private void initComponents() {
-		add(getJPanel0());
-		setSize(372, 574);
 		
 		try {
 			le = remoteR.selectAllLs();
+			
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		add(getJPanel0());
+		setSize(372, 574);
+		
 	}
 
 	private JComboBox getInterM1Contacts() {
@@ -221,27 +238,31 @@ public class SDIInternalPanel extends JPanel {
 		}
 		return jLabel19;
 	}
-	private LESelectionPropertyCombox getInterM1Data() {
-		if (InterM1Data == null) {
-			
-			InterM1Data = new LESelectionPropertyCombox("Agent");
+	private JComboBox<String> getInterM1Data() {
+		if (InterM1Data == null) {			
+			/*InterM1Data = new LESelectionPropertyCombox("Agent");
 			InterM1Data.addActionListener(new agentComboxSelecterComboBoxListener());
-			InterM1Data.setPreferredSize(new Dimension(200, InterM1Data.getPreferredSize().height));
+			InterM1Data.setPreferredSize(new Dimension(200, InterM1Data.getPreferredSize().height));*/
+			InterM1Data = new JComboBox<String>();
+			DefaultComboBoxModel<String> InterM1LeDatamodel = new DefaultComboBoxModel<String>();
+			getLeOnComboBox(InterM1LeDatamodel,"Agent");
+			InterM1Data.setModel(InterM1LeDatamodel);
 		}
 		return InterM1Data;
 	}
-	private LESelectionPropertyCombox getInterM2Data() {
+	private JComboBox<String> getInterM2Data() {
 		if (InterM2Data == null) {
-			InterM2Data = new LESelectionPropertyCombox("Agent");
-			InterM2Data.addActionListener(new agentComboxSelecterComboBoxListener());
-			InterM2Data.setPreferredSize(new Dimension(200, InterM2Data.getPreferredSize().height));
+			InterM2Data = new JComboBox<String>();
+			DefaultComboBoxModel<String> InterM2LeDatamodel = new DefaultComboBoxModel<String>();
+			getLeOnComboBox(InterM2LeDatamodel,"Agent");
+			InterM2Data.setModel(InterM2LeDatamodel);
 		}
 		return InterM2Data;
 	}
-	private JComboBox getAgentContactData() {
+	private JComboBox<String> getAgentContactData() {
 		if (agentContactData == null) {
-			agentContactData = new JComboBox();
-			DefaultComboBoxModel agentContactDatamodel = new DefaultComboBoxModel();
+			agentContactData = new JComboBox<String>();
+			DefaultComboBoxModel<String> agentContactDatamodel = new DefaultComboBoxModel<String>();
 			getMasterDataOnComboBox(agentContactDatamodel,"LEContacts");
 			agentContactData.setModel(agentContactDatamodel);
 		}
@@ -287,25 +308,39 @@ public class SDIInternalPanel extends JPanel {
 		return agentAcTextField;
 	}
 
-	private LESelectionPropertyCombox getAgentNameData() {
+	private JComboBox<String> getAgentNameData() {
 		if (agentNameData == null) {
 			
-			agentNameData = new LESelectionPropertyCombox("Agent");
-			agentNameData.addActionListener(new agentComboxSelecterComboBoxListener());
-			agentNameData.setPreferredSize(new Dimension(200, agentNameData.getPreferredSize().height));
-		
+			agentNameData = new JComboBox<String>();
+			/*agentNameData.addActionListener(new agentComboxSelecterComboBoxListener());
+			agentNameData.setPreferredSize(new Dimension(200, agentNameData.getPreferredSize().height));*/
+			DefaultComboBoxModel<String> agentNameDatamodel = new DefaultComboBoxModel<String>();
+			getLeOnComboBox(agentNameDatamodel,"Agent");
+			agentNameData.setModel(agentNameDatamodel);
 		}
 		return agentNameData;
 	}
 
-	private JComboBox getGlAccountData() {
+	private JComboBox<String> getGlAccountData() {
 		if (glAccountData == null) {
-			glAccountData = new JComboBox();
-			glAccountData.setModel(new DefaultComboBoxModel(new Object[] { "0" }));
+			glAccountData = new JComboBox<String>();
+			glAccountData.setModel(agentLeDatamodel);
 		}
 		return glAccountData;
 	}
-
+	
+	/*public AccountSelectorCombox  getGlAccountData() {
+		if (glAccountData == null) {
+			LegalEntity le = new LegalEntity();
+			le.setId(0);
+			glAccountData = new AccountSelectorCombox("INR",le);
+			glAccountData.addActionListener(new accountComboxSelecterComboBoxListener());
+			glAccountData.setPreferredSize(new Dimension(200, glAccountData.getPreferredSize().height));
+		}
+		
+		return glAccountData;
+		
+	}*/
 	private JLabel getJLabel13() {
 		if (jLabel13 == null) {
 			jLabel13 = new JLabel();
@@ -361,26 +396,53 @@ public class SDIInternalPanel extends JPanel {
 		return jPanel1;
 	}
 
-	private JComboBox getPoContactData() {
+	private JComboBox<String> getPoContactData() {
 		if (poContactData == null) {
-			poContactData = new JComboBox();
+			poContactData = new JComboBox<String>();
 			
-			DefaultComboBoxModel poContactDataDatamodel = new DefaultComboBoxModel();
+			DefaultComboBoxModel<String> poContactDataDatamodel = new DefaultComboBoxModel<String>();
 			getMasterDataOnComboBox(poContactDataDatamodel,"LEContacts");
 			poContactData.setModel(poContactDataDatamodel);
 		}
 		return poContactData;
 	}
 
-	private LESelectionPropertyCombox getPoData() {
+	private JComboBox<String> getPoData() {
 		if (poData == null) {
-			poData = new LESelectionPropertyCombox("PO");
+			/*poData = new LESelectionPropertyCombox("PO");
 			poData.addActionListener(new agentComboxSelecterComboBoxListener());
-			poData.setPreferredSize(new Dimension(200, poData.getPreferredSize().height));
+			poData.setPreferredSize(new Dimension(200, poData.getPreferredSize().height));*/
+			
+			poData = new JComboBox<String>();
+			DefaultComboBoxModel<String> poLeDatamodel = new DefaultComboBoxModel<String>();
+			getLeOnComboBox(poLeDatamodel,"PO");
+			poData.setModel(poLeDatamodel);
+			
+			poData.addItemListener(new ItemListener() {
+				
+				@Override
+				public void itemStateChanged(ItemEvent arg0) {
+					
+					selectAccount();
+				}
+			});
+			
 		}
 		return poData;
 	}
-
+	
+	private void selectAccount(){		
+		
+		if (poData.getSelectedIndex() > -1 && currencyData.getSelectedIndex() > -1) {			
+			agentLeDatamodel.removeAllElements();
+			getAgentBasedOnPoCurrency(agentLeDatamodel, "PO");
+			glAccountData.setModel(agentLeDatamodel);						
+		} else if (rolesData.getSelectedIndex() > -1 && rolesData.getSelectedItem().equals("PO") && beneficiaryData.getSelectedIndex() > -1 && currencyData.getSelectedIndex() > -1){
+			agentLeDatamodel.removeAllElements();
+			getAgentBasedOnPoCurrency(agentLeDatamodel, "nonPO");
+			glAccountData.setModel(agentLeDatamodel);
+		}
+	}
 	private JLabel getJLabel10() {
 		if (jLabel10 == null) {
 			jLabel10 = new JLabel();
@@ -396,7 +458,7 @@ public class SDIInternalPanel extends JPanel {
 		}
 		return jLabel9;
 	}
-RemoteReferenceData remoteR = null;
+
 	public JPanel getJPanel0() {
 		if (jPanel0 == null) {
 			jPanel0 = new JPanel();
@@ -482,21 +544,28 @@ RemoteReferenceData remoteR = null;
 		return jLabel5;
 	}
 
-	private JComboBox getCurrencyData() {
+	private JComboBox<String> getCurrencyData() {
 		if (currencyData == null) {
-			currencyData = new JComboBox();
-			DefaultComboBoxModel currencymodel = new DefaultComboBoxModel();
+			currencyData = new JComboBox<String>();
+			DefaultComboBoxModel<String> currencymodel = new DefaultComboBoxModel<String>();
 			getMasterDataOnComboBox(currencymodel,"Currency");
 			currencyData.setModel(currencymodel);
+			
+			currencyData.addItemListener(new ItemListener() {				
+				@Override
+				public void itemStateChanged(ItemEvent arg0) {					
+					selectAccount();
+				}
+			});
 		}
 		return currencyData;
 	}
 
-	private JComboBox getBeneficiaryLecontactsData() {
+	private JComboBox<String> getBeneficiaryLecontactsData() {
 		if (beneficiaryLecontactsData == null) {
 			beneficiaryLecontactsData = new JComboBox();
 			//beneficiaryLecontactsData.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
-			DefaultComboBoxModel beneficiaryLecontactsDatamodel = new DefaultComboBoxModel();
+			DefaultComboBoxModel<String> beneficiaryLecontactsDatamodel = new DefaultComboBoxModel<String>();
 			getMasterDataOnComboBox(beneficiaryLecontactsDatamodel,"LEContacts");
 			beneficiaryLecontactsData.setModel(beneficiaryLecontactsDatamodel);
 		}
@@ -573,28 +642,44 @@ RemoteReferenceData remoteR = null;
 			getLeOnComboBox(leModel,"CounterParty");
 			beneficiaryData.setModel(leModel);		
 			
+			beneficiaryData.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent arg0) {
+					selectAccount();
+				}				
+			});
 		}
 		return beneficiaryData;
 	}
 
-	private JComboBox getRolesData() {
+	private JComboBox<String> getRolesData() {
 		if (rolesData == null) {
-			rolesData = new JComboBox();
-			DefaultComboBoxModel rolesTypemodel = new DefaultComboBoxModel();
+			rolesData = new JComboBox<String>();
+			DefaultComboBoxModel<String> rolesTypemodel = new DefaultComboBoxModel<String>();
 			getMasterDataOnComboBox(rolesTypemodel,"Roles");
 			rolesData.setModel(rolesTypemodel);
 			rolesData.addItemListener(new ItemListener() {
 				
 				@Override
 				public void itemStateChanged(ItemEvent arg0) {
-					// TODO Auto-generated method stub
 					if (rolesData.getSelectedIndex() > -1) {
-						
 						String roledata = rolesData.getSelectedItem().toString();
+						
+						if (roledata.equals("PO")) {						
+							poData.setSelectedIndex(-1);
+							poData.setEnabled(false);	
+							poContactData.setSelectedIndex(-1);
+							poContactData.setEnabled(false);							
+						} else {
+							poData.setEnabled(true);
+							poContactData.setEnabled(true);
+							glAccountData.removeAllItems();
+						}
 						
 						if (beneficiaryData == null) {
 							beneficiaryData = new JComboBox<String>();
 						}
+						
 						leModel.removeAllElements();
 						getLeOnComboBox(leModel,roledata);
 						beneficiaryData.setModel(leModel);
@@ -611,39 +696,48 @@ RemoteReferenceData remoteR = null;
 	class beneficiaryComboxSelecterComboBoxListener implements ActionListener{
     	public void actionPerformed(java.awt.event.ActionEvent event) {
     		Object object=event.getSource();
-    		if (!(object instanceof LESelectionPropertyCombox)) return;
+    		if (!(object instanceof LESelectionPropertyCombox)) 
+    			return;
     		LESelectionPropertyCombox obj = (LESelectionPropertyCombox)object;
-    		 beneficiaryl = (LegalEntity)obj.getSelectedItem();
-                  
-    		
-    		   	}
-
-		
+    		if (!obj.getSelectedItem().toString().equals(CommonConstants.BLANKSTRING)) {
+    			beneficiaryl = (LegalEntity)obj.getSelectedItem();
+    		} 
+    	}	
     }
 	class agentComboxSelecterComboBoxListener implements ActionListener{
     	public void actionPerformed(java.awt.event.ActionEvent event) {
     		Object object=event.getSource();
-    		if (!(object instanceof LESelectionPropertyCombox)) return;
+    		if (!(object instanceof LESelectionPropertyCombox)) 
+    			return;
     		LESelectionPropertyCombox obj = (LESelectionPropertyCombox)object;
-    		agentl = (LegalEntity)obj.getSelectedItem();
-
-    		
-    		   	}
-
-		
+    		if (!obj.getSelectedItem().toString().equals(CommonConstants.BLANKSTRING)) {
+    			agentl = (LegalEntity)obj.getSelectedItem();
+    		}
+    	}	
     }
 	class poComboxSelecterComboBoxListener implements ActionListener{
     	public void actionPerformed(java.awt.event.ActionEvent event) {
     		Object object=event.getSource();
-    		if (!(object instanceof LESelectionPropertyCombox)) return;
+    		if (!(object instanceof LESelectionPropertyCombox)) 
+    			return;
     		LESelectionPropertyCombox obj = (LESelectionPropertyCombox)object;
-    		pol = (LegalEntity)obj.getSelectedItem();
-
-    		
-    		   	}
-
-		
+    		if (!obj.getSelectedItem().toString().equals(CommonConstants.BLANKSTRING)) {
+    			pol = (LegalEntity)obj.getSelectedItem();
+    		}
+    	}		
     }
+	
+	/*class accountComboxSelecterComboBoxListener implements ActionListener{
+	     public void actionPerformed(java.awt.event.ActionEvent event) {
+	    	 Object object=event.getSource();
+	    	 if (!(object instanceof AccountSelectorCombox)) 
+	    		 return;	    	 
+	    	 AccountSelectorCombox obj = (AccountSelectorCombox)object;
+	    	 account = (Account) obj.getSelectedItem();
+      
+	     }
+	 }*/
+	
 	LegalEntity beneficiaryl;
 
 	LegalEntity pol;
@@ -716,7 +810,7 @@ RemoteReferenceData remoteR = null;
 			}
 		}
 
-	 private final void getLeOnComboBox(javax.swing.DefaultComboBoxModel combodata,String role) {
+	 private final void getLeOnComboBox(javax.swing.DefaultComboBoxModel<String> combodata,String role) {
 			
 			Iterator<LegalEntity> it = le.iterator();
 			
@@ -726,7 +820,7 @@ RemoteReferenceData remoteR = null;
 				
 				LegalEntity data = (LegalEntity) it.next();
 				
-				if (data.getRole().equals(role)) {
+				if (data.getRole().contains(role)) {
 					
 					combodata.insertElementAt(data.getAlias(), i++);
 					
@@ -737,6 +831,65 @@ RemoteReferenceData remoteR = null;
 			
 			it = null;
 		}	
+	 
+	 private final void getAgentBasedOnPoCurrency(javax.swing.DefaultComboBoxModel<String> combodata, String role) {
+			
+			int i =0;
+
+			String currency = currencyData.getSelectedItem().toString();
+			
+			StringBuilder where = new StringBuilder()
+									.append("poid = ");
+			
+			if (role.equals("PO")) {
+				where.append(getLeId(poData.getSelectedItem().toString()));
+			} else{
+				where.append(getLeId(beneficiaryData.getSelectedItem().toString()));
+			}
+			
+			where.append(" And Currency = '")
+				 .append(currency)
+				 .append("'");
+			
+			try {
+				acc = RemoteServiceUtil.getRemoteAccountService().getAccountonWhereClause(where.toString());
+			} catch (RemoteException e) {				
+				e.printStackTrace();
+			}
+			
+			Iterator<Account> it = acc.iterator();
+			
+			while(it.hasNext()) {
+				
+				Account data = (Account) it.next();					
+				combodata.insertElementAt(data.getAccountName(), i++);
+								
+				data = null;
+			}	
+			
+			it = null;
+	}
+	
+	 public int getAgentId(String agentName){
+		 
+		Iterator<Account> it = acc.iterator();
+		int id =0;	
+		while(it.hasNext()) {
+			
+			Account data = (Account) it.next();					
+
+			if (data.getAccountName().equals(agentName)) {
+				
+				id = data.getId();
+				break;
+			}
+							
+			data = null;
+		}	
+			
+			it = null;
+			return id;
+	 }
 	 
 	 public int getLeId(String leName){
 		 
@@ -759,5 +912,28 @@ RemoteReferenceData remoteR = null;
 			it = null;
 			
 			return id;
+	 }
+	 
+	 public String getLeName(int id){
+		 
+		 Iterator<LegalEntity> it = le.iterator();
+			
+			String name = "";
+			
+			while(it.hasNext()) {
+				
+				LegalEntity data = (LegalEntity) it.next();
+				
+				if (data.getId() == id) {
+					
+					name= data.getName();
+					break;
+				}
+				
+			}	
+			
+			it = null;
+			
+			return name;
 	 }
 }
