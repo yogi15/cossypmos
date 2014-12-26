@@ -32,6 +32,7 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
+import swingUtils.TableColumnAdjuster;
 import util.commonUTIL;
 import apps.window.utilwindow.JDialogBoxForChoice;
 import apps.window.utilwindow.JDialogTable;
@@ -114,6 +115,7 @@ public class MessageConfigWindow extends JPanel {
 		DefaultTableModel potablemodel = new DefaultTableModel(poCOL,0);
 		private JButton jButton6;
 		private JButton jButton7;
+		private JButton jButton8;
 		private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 		public MessageConfigWindow() {
 		init();
@@ -157,6 +159,44 @@ public class MessageConfigWindow extends JPanel {
 		setLayout(new GroupLayout());
 		add(getJPanel0(), new Constraints(new Leading(7, 1323, 10, 10), new Leading(6, 623, 10, 10)));
 		setSize(1338, 634);
+	}
+	private JButton getJButton8() {
+		if (jButton8 == null) {
+			jButton8 = new JButton();
+			jButton8.setText("Load");
+			
+			jButton8.addActionListener(new java.awt.event.ActionListener() {
+				 public void actionPerformed(java.awt.event.ActionEvent evt) {
+					 try {
+						 String productType = (String) jProductType.getSelectedItem().toString();
+						 String productsubType = (String) jSubType.getSelectedItem().toString();
+						 data =  (Vector) referenceData.getMessageConfigsonProductype(productType, productsubType);
+						 model = new TableModelUtil(data, cols, messLeg);
+							jTable0.setModel(model);
+						jTable0.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+						 jTable0.getColumnModel().getColumn(0).setPreferredWidth(100); 
+						 jTable0.getColumnModel().getColumn(1).setPreferredWidth(150); 
+						 jTable0.getColumnModel().getColumn(2).setPreferredWidth(150); 
+						 jTable0.getColumnModel().getColumn(3).setPreferredWidth(150); 
+						 jTable0.getColumnModel().getColumn(4).setPreferredWidth(150); 
+						 jTable0.getColumnModel().getColumn(5).setPreferredWidth(180); 
+						 jTable0.getColumnModel().getColumn(6).setPreferredWidth(130); 
+						 jTable0.getColumnModel().getColumn(7).setPreferredWidth(130); 
+						 jTable0.getColumnModel().getColumn(8).setPreferredWidth(230); 
+						 jTable0.getColumnModel().getColumn(9).setPreferredWidth(200); 
+						 jTable0.getColumnModel().getColumn(10).setPreferredWidth(140); 
+						 jTable0.getColumnModel().getColumn(11).setPreferredWidth(300); 
+						 TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
+							tca.adjustColumns();
+						
+					 } catch (RemoteException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+				 }
+			});
+		}
+		return jButton8;
 	}
 	private JButton getJButton7() {
 		if (jButton7 == null) {
@@ -519,6 +559,25 @@ public class MessageConfigWindow extends JPanel {
 		if (jTable0 == null) {
 			jTable0 = new JTable();
 			jTable0.setModel(model);
+			jTable0.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+			 jTable0.getColumnModel().getColumn(0).setPreferredWidth(100); 
+			 jTable0.getColumnModel().getColumn(1).setPreferredWidth(150); 
+			 jTable0.getColumnModel().getColumn(2).setPreferredWidth(150); 
+			 jTable0.getColumnModel().getColumn(3).setPreferredWidth(150); 
+			 jTable0.getColumnModel().getColumn(4).setPreferredWidth(150); 
+			 jTable0.getColumnModel().getColumn(5).setPreferredWidth(180); 
+			 jTable0.getColumnModel().getColumn(6).setPreferredWidth(130); 
+			 jTable0.getColumnModel().getColumn(7).setPreferredWidth(130); 
+			 jTable0.getColumnModel().getColumn(8).setPreferredWidth(230); 
+			 jTable0.getColumnModel().getColumn(9).setPreferredWidth(200); 
+			 jTable0.getColumnModel().getColumn(10).setPreferredWidth(140); 
+			 jTable0.getColumnModel().getColumn(11).setPreferredWidth(300); 
+			// jTable0.getColumnModel().getColumn(12).setPreferredWidth(500); 
+			// jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); 
+
+		
+			TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
+			tca.adjustColumns();
 		}jTable0.addMouseListener(new java.awt.event.MouseAdapter() {
 
 			@Override
@@ -607,9 +666,10 @@ public class MessageConfigWindow extends JPanel {
 			jPanel1.add(getJLabel0(), new Constraints(new Leading(5, 77, 10, 10), new Leading(13, 22, 12, 12)));
 			jPanel1.add(getJSubtype(), new Constraints(new Leading(85, 166, 12, 12), new Leading(47, 27, 12, 12)));
 			jPanel1.add(getJLabel1(), new Constraints(new Leading(5, 76, 12, 12), new Leading(47, 22, 12, 12)));
-			jPanel1.add(getJScrollPane0(), new Constraints(new Leading(11, 246, 10, 10), new Bilateral(123, 12, 22)));
 			jPanel1.add(getJComboBox2(), new Constraints(new Leading(86, 164, 12, 12), new Leading(82, 26, 41, 148)));
 			jPanel1.add(getJLabel2(), new Constraints(new Leading(5, 76, 12, 12), new Leading(86, 22, 41, 148)));
+			jPanel1.add(getJScrollPane0(), new Constraints(new Leading(14, 246, 10, 10), new Leading(164, 438, 10, 10)));
+			jPanel1.add(getJButton8(), new Constraints(new Leading(8, 10, 10), new Leading(123, 10, 10)));
 		}
 		return jPanel1;
 	}
