@@ -100,4 +100,13 @@ public class MessageConfig implements Serializable {
 		// TODO Auto-generated method stub
 		this.addressType = addressType;
 	}
+	String receiverRole ="";
+	public String getReceiverRole() {
+		// TODO Auto-generated method stub
+		return receiverRole;
+	}
+	public void setReceiverRole(String receiverRole) {
+		// TODO Auto-generated method stub
+		this.receiverRole = receiverRole;
+	}
 }
