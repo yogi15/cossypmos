@@ -69,47 +69,30 @@ public class BookWindow extends JPanel {
 	String bookcol[] = { "BookNo", "Book Name ", "Legal Entity", "Folder Name" };
 	String attr[] = { "AttributeName", "AttributeValue" };
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-
 	public BookWindow() {
 		initData();
 		initComponents();
 	}
 
 	private void initComponents() {
-		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null,
-				null));
+		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 		setLayout(new GroupLayout());
-		add(getBookIdLabel(), new Constraints(new Leading(37, 99, 10, 10),
-				new Leading(72, 10, 10)));
-		add(getBookNameLabel(), new Constraints(new Leading(37, 99, 12, 12),
-				new Leading(102, 10, 10)));
-		add(getLeLabel(), new Constraints(new Leading(37, 99, 12, 12),
-				new Leading(134, 10, 10)));
-		add(getBookIdTextField(), new Constraints(new Leading(144, 45, 10, 10),
-				new Leading(68, 12, 12)));
-		add(getBookNameTextField(), new Constraints(new Leading(144, 147, 12,
-				12), new Leading(98, 12, 12)));
-		add(getLeComboBox(), new Constraints(new Leading(146, 142, 12, 12),
-				new Leading(130, 20, 12, 12)));
-		add(getFolderLabel(), new Constraints(new Leading(37, 99, 12, 12),
-				new Leading(168, 12, 12)));
-		add(getFolderComboBox(), new Constraints(new Leading(146, 142, 12, 12),
-				new Leading(165, 20, 10, 10)));
-		add(getJScrollPane0(), new Constraints(new Leading(440, 277, 10, 10),
-				new Leading(61, 150, 10, 10)));
-		add(getJScrollPane1(), new Constraints(new Leading(15, 702, 10, 10),
-				new Leading(262, 191, 10, 10)));
-		add(getJLabel5(), new Constraints(new Leading(443, 120, 10, 10),
-				new Leading(34, 12, 12)));
-		add(getSaveAsNewButton(), new Constraints(new Leading(80, 10, 10),
-				new Leading(229, 20, 12, 12)));
-		add(getSaveButton(), new Constraints(new Leading(204, 84, 12, 12),
-				new Leading(229, 20, 12, 12)));
-		add(getDeleteButton(), new Constraints(new Leading(306, 84, 12, 12),
-				new Leading(229, 20, 12, 12)));
-		add(getClearButton(), new Constraints(new Leading(406, 84, 10, 10),
-				new Leading(229, 20, 10, 10)));
-		setSize(742, 469);
+		add(getBookIdLabel(), new Constraints(new Leading(37, 99, 10, 10), new Leading(72, 10, 10)));
+		add(getBookNameLabel(), new Constraints(new Leading(37, 99, 12, 12), new Leading(102, 10, 10)));
+		add(getLeLabel(), new Constraints(new Leading(37, 99, 12, 12), new Leading(134, 10, 10)));
+		add(getBookIdTextField(), new Constraints(new Leading(144, 45, 10, 10), new Leading(68, 12, 12)));
+		add(getBookNameTextField(), new Constraints(new Leading(144, 147, 12, 12), new Leading(98, 12, 12)));
+		add(getLeComboBox(), new Constraints(new Leading(146, 142, 12, 12), new Leading(130, 12, 12)));
+		add(getFolderLabel(), new Constraints(new Leading(37, 99, 12, 12), new Leading(168, 12, 12)));
+		add(getFolderComboBox(), new Constraints(new Leading(146, 142, 12, 12), new Leading(165, 10, 10)));
+		add(getJScrollPane0(), new Constraints(new Leading(440, 277, 10, 10), new Leading(61, 150, 10, 10)));
+		add(getJLabel5(), new Constraints(new Leading(443, 120, 10, 10), new Leading(34, 12, 12)));
+		add(getSaveAsNewButton(), new Constraints(new Leading(80, 10, 10), new Leading(229, 20, 12, 12)));
+		add(getSaveButton(), new Constraints(new Leading(204, 84, 12, 12), new Leading(229, 20, 12, 12)));
+		add(getDeleteButton(), new Constraints(new Leading(306, 84, 12, 12), new Leading(229, 20, 12, 12)));
+		add(getClearButton(), new Constraints(new Leading(406, 84, 10, 10), new Leading(229, 20, 10, 10)));
+		add(getJScrollPane1(), new Constraints(new Leading(15, 1199, 10, 10), new Leading(262, 191, 10, 10)));
+		setSize(1222, 469);
 	}
 
 	private JButton getClearButton() {
@@ -555,7 +538,7 @@ public class BookWindow extends JPanel {
 		
 		try {
 			
-			String roleType = " role like 'PO' ";
+			String roleType = " role like '%PO%' ";
 			ledata = (Vector) remoteBORef.selectLEonWhereClause(roleType);
 
 			Iterator it = ledata.iterator();
