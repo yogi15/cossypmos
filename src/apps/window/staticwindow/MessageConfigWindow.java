@@ -124,7 +124,7 @@ public class MessageConfigWindow extends JPanel {
 	private JButton jButton5;
 	int receiverID =0;
 		 int poid = 0;
-		 String cols [] = {"id","ProductType","ProductSubType","TriggerEvent","MessageType","PO","PO Contact","Receiver","Receiver Contact","FormatType","GateWay","TemplateName"};
+		 String cols [] = {"id","ProductType","ProductSubType","TriggerEvent","MessageType","PO","PO Contact","Receiver","Receiver Contact","ReceiverRole","FormatType","GateWay","TemplateName"};
 	 String s [] = {"id","LegalEntityName"};
 		DefaultTableModel letablemodel = new DefaultTableModel(s,0);
 		String poCOL [] = {"id","POName"};
