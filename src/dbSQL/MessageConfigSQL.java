@@ -16,23 +16,23 @@ public class MessageConfigSQL {
 	
 	final static private String INSERT_FROM_message = "INSERT into messageConfig("
 			+ " id,  poid,  eventType, productType, productsubtype, receiverrole, formatType, "
-			+ " receiverID, templateName, pocontacttype, messageType,Gateway,addressType) " 
+			+ " receiverID, templateName, pocontacttype, messageType,Gateway,addressType,receivercontact) " 
 			+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	
 	final static private String SELECT_MAX = "SELECT MESSAGECONFIG_SEQ.NEXTVAL  DESC_ID  FROM dual ";
 	
 	final static private String SELECTALL = "SELECT id,  poid,  eventType, productType, productsubtype, " +
-			" receiverrole, formatType, receiverID, templateName, pocontacttype, messageType,Gateway,addressType " +
+			" receiverrole, formatType, receiverID, templateName, pocontacttype, messageType,Gateway,addressType,receivercontact " +
 			" FROM messageConfig order by id";
 	final static private String SELECT = "SELECT tradeid FROM messageConfig where id =  ?";
 	static private String SELECTONE = "SELECT id,  poid,  eventType, productType, productsubtype, " +
-	" receiverrole, formatType, receiverID, templateName, pocontacttype, messageType,Gateway,addressType " +
+	" receiverrole, formatType, receiverID, templateName, pocontacttype, messageType,Gateway,addressType,receivercontact " +
 	" FROM messageConfig order by id";
 	final static private String SELECTONPRODUCT = "SELECT id,  poid,  eventType, productType, productsubtype, " +
-	" receiverrole, formatType, receiverID, templateName, pocontacttype, messageType,Gateway,addressType " +
+	" receiverrole, formatType, receiverID, templateName, pocontacttype, messageType,Gateway,addressType,receivercontact " +
 	" FROM messageConfig order by id";
 	private static final String SELECTWHERE = "SELECT id,  poid,  eventType, productType, productsubtype, " +
-	" receiverrole, formatType, receiverID, templateName, pocontacttype, messageType,Gateway,addressType " +
+	" receiverrole, formatType, receiverID, templateName, pocontacttype, messageType,Gateway,addressType,receivercontact " +
 	" FROM messageConfig  where ";
 
 	private static String getUpdateSQL(MessageConfig messasgeconfig) {
@@ -43,7 +43,7 @@ public class MessageConfigSQL {
 				.append(" eventType = '").append(messasgeconfig.getEventType()).append("',")
 				.append(" productType = '").append(messasgeconfig.getProductType()).append("',")
 				.append(" productsubtype = '").append(messasgeconfig.getProductSubType()).append("',")
-				.append(" receiverRole ='").append(messasgeconfig.getReceiverContactType()).append("',")
+				.append(" receiverRole ='").append(messasgeconfig.getReceiverRole()).append("',")
 				.append(" formatType ='").append(messasgeconfig.getFormatType()).append("',")
 				.append(" receiverID = '").append(messasgeconfig.getReceiverID()).append("',")
 				.append(" templateName = '").append(messasgeconfig.getTemplateName()).append("',")
@@ -51,6 +51,7 @@ public class MessageConfigSQL {
 				.append(" messageType = '").append(messasgeconfig.getMessageType()).append("',")
 				.append(" Gateway = '").append(messasgeconfig.getGateWay()).append("',")
 				.append(" addressway = '").append(messasgeconfig.getGateWay()).append("'")
+				.append(" receivercontact = '").append(messasgeconfig.getReceiverContactType()).append("'")
 				.toString();
 
 		return updateSQL;
@@ -219,7 +220,7 @@ public class MessageConfigSQL {
 			stmt.setString(3, inserMessage.getEventType());
 			stmt.setString(4, inserMessage.getProductType());
 			stmt.setString(5, inserMessage.getProductSubType());
-			stmt.setString(6, inserMessage.getReceiverContactType());
+			stmt.setString(6, inserMessage.getReceiverRole());
 			stmt.setString(7, inserMessage.getFormatType());
 			stmt.setInt(8, inserMessage.getReceiverID());
 			stmt.setString(9, inserMessage.getTemplateName());
@@ -227,7 +228,7 @@ public class MessageConfigSQL {
 			stmt.setString(11, inserMessage.getMessageType());
 			stmt.setString(12, inserMessage.getGateWay());
 			stmt.setString(13, inserMessage.getAddressType());
-			
+			stmt.setString(14, inserMessage.getReceiverContactType());
 			if (stmt.executeUpdate() > 0) {
 
 				con.commit();
@@ -273,7 +274,7 @@ public class MessageConfigSQL {
 				messasgeconfig.setEventType(rs.getString(3));
 				messasgeconfig.setProductType(rs.getString(4));
 				messasgeconfig.setProductSubType(rs.getString(5));
-				messasgeconfig.setReceiverContactType(rs.getString(6));
+				messasgeconfig.setReceiverRole(rs.getString(6));
 				messasgeconfig.setFormatType(rs.getString(7));
 				messasgeconfig.setReceiverID(rs.getInt(8));
 				messasgeconfig.setTemplateName(rs.getString(9));
@@ -281,6 +282,7 @@ public class MessageConfigSQL {
 				messasgeconfig.setMessageType(rs.getString(11));
 				messasgeconfig.setGateWay(rs.getString(12));
 				messasgeconfig.setAddressType(rs.getString(13));
+				messasgeconfig.setReceiverContactType(rs.getString(14));
 				return messasgeconfig;
 
 			}
@@ -319,7 +321,7 @@ public class MessageConfigSQL {
 				messasgeconfig.setEventType(rs.getString(3));
 				messasgeconfig.setProductType(rs.getString(4));
 				messasgeconfig.setProductSubType(rs.getString(5));
-				messasgeconfig.setReceiverContactType(rs.getString(6));
+				messasgeconfig.setReceiverRole(rs.getString(6));
 				messasgeconfig.setFormatType(rs.getString(7));
 				messasgeconfig.setReceiverID(rs.getInt(8));
 				messasgeconfig.setTemplateName(rs.getString(9));
@@ -327,6 +329,7 @@ public class MessageConfigSQL {
 				messasgeconfig.setMessageType(rs.getString(11));
 				messasgeconfig.setGateWay(rs.getString(12));
 				messasgeconfig.setAddressType(rs.getString(13));
+				messasgeconfig.setReceiverContactType(rs.getString(14));
 				
 				messages.add(messasgeconfig);
 
@@ -365,7 +368,7 @@ public class MessageConfigSQL {
 				messasgeconfig.setEventType(rs.getString(3));
 				messasgeconfig.setProductType(rs.getString(4));
 				messasgeconfig.setProductSubType(rs.getString(5));
-				messasgeconfig.setReceiverContactType(rs.getString(6));
+				messasgeconfig.setReceiverRole(rs.getString(6));
 				messasgeconfig.setFormatType(rs.getString(7));
 				messasgeconfig.setReceiverID(rs.getInt(8));
 				messasgeconfig.setTemplateName(rs.getString(9));
@@ -373,6 +376,7 @@ public class MessageConfigSQL {
 				messasgeconfig.setMessageType(rs.getString(11));
 				messasgeconfig.setGateWay(rs.getString(12));
 				messasgeconfig.setAddressType(rs.getString(13));
+				messasgeconfig.setReceiverContactType(rs.getString(14));
 				messages.add(messasgeconfig);
 
 			}
@@ -412,7 +416,7 @@ public class MessageConfigSQL {
 				messasgeconfig.setEventType(rs.getString(3));
 				messasgeconfig.setProductType(rs.getString(4));
 				messasgeconfig.setProductSubType(rs.getString(5));
-				messasgeconfig.setReceiverContactType(rs.getString(6));
+				messasgeconfig.setReceiverRole(rs.getString(6));
 				messasgeconfig.setFormatType(rs.getString(7));
 				messasgeconfig.setReceiverID(rs.getInt(8));
 				messasgeconfig.setTemplateName(rs.getString(9));
@@ -420,6 +424,7 @@ public class MessageConfigSQL {
 				messasgeconfig.setMessageType(rs.getString(11));
 				messasgeconfig.setGateWay(rs.getString(12));
 				messasgeconfig.setAddressType(rs.getString(13));
+				messasgeconfig.setReceiverContactType(rs.getString(14));
 				messages.add(messasgeconfig);
 
 			}
@@ -461,7 +466,7 @@ public class MessageConfigSQL {
 				messasgeconfig.setEventType(rs.getString(3));
 				messasgeconfig.setProductType(rs.getString(4));
 				messasgeconfig.setProductSubType(rs.getString(5));
-				messasgeconfig.setReceiverContactType(rs.getString(6));
+				messasgeconfig.setReceiverRole(rs.getString(6));
 				messasgeconfig.setFormatType(rs.getString(7));
 				messasgeconfig.setReceiverID(rs.getInt(8));
 				messasgeconfig.setTemplateName(rs.getString(9));
@@ -469,6 +474,7 @@ public class MessageConfigSQL {
 				messasgeconfig.setMessageType(rs.getString(11));
 				messasgeconfig.setGateWay(rs.getString(12));
 				messasgeconfig.setAddressType(rs.getString(13));
+				messasgeconfig.setReceiverContactType(rs.getString(14));
 				messages.add(messasgeconfig);
 
 			}
