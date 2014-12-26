@@ -281,7 +281,7 @@ public class LegalEntitySQL {
 			stmt = dsSQL.newPreparedStatement(con, SELECTALL);
 
 			ResultSet rs = stmt.executeQuery();
-
+			
 			while (rs.next()) {
 				
 				LegalEntity LegalEntity = new LegalEntity();
@@ -298,6 +298,9 @@ public class LegalEntitySQL {
 				LegalEntitys.add(LegalEntity);
 
 			}
+			
+			commonUTIL.display("LegalEntitySQL", SELECTALL);
+			
 		} catch (Exception e) {
 			commonUTIL.displayError("LegalEntitySQL", SELECTALL, e);
 			return LegalEntitys;
