@@ -25,6 +25,7 @@ import dbSQL.LeContactsSql;
 import dbSQL.LegalEntitySQL;
 import dbSQL.LiquidationConfigSQL;
 import dbSQL.MessageConfigSQL;
+import dbSQL.MessageSQL;
 import dbSQL.NettingSQL;
 import dbSQL.SdiSQL;
 import dbSQL.SearchCriteriaSQL;
@@ -1301,7 +1302,7 @@ String sql = " quoting_currency = '"+cp.getQuoting_currency() + "'";
 	public Collection getLegalEntityDataOnRole(String role)
 			throws RemoteException {
 		// TODO Auto-generated method stub
-		String roleSQL = " role = '"+role.trim()+"'";
+		String roleSQL = " role like '%"+role.trim()+"%'";
 		return LegalEntitySQL.selectLEOnWhereClause(roleSQL, dsSQL.getConn());
 	}
 	@Override
@@ -1372,6 +1373,15 @@ String sql = " quoting_currency = '"+cp.getQuoting_currency() + "'";
 		// TODO Auto-generated method stub
 		String sql = " role ='" + role +"'and products = '"+productType+"' and currency = '"+Currency+"' and cpid = " + leID + " order by priority ";
 		return SDIWhere(sql);
+	}
+
+	@Override
+	public Collection getMessageConfigsonProductype(String productype,
+			String productSubtype) throws RemoteException {
+		// TODO Auto-generated method stub
+		String sql =  " producttype = '"+ productype + "' and productsubtype ='" + productSubtype +"'";
+		Vector messConfig = (Vector) MessageConfigSQL.selectMessageConfigOn(sql, dsSQL.getConn());
+		return messConfig;
 	}
 	
 
