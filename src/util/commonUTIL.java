@@ -70,7 +70,14 @@ public class commonUTIL {
     }
 	
 	
-	
+	static public boolean getBooleanValue(int value) {
+		
+		if(value == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	static public  Color getColors() {
 		// TODO Auto-generated method stub
