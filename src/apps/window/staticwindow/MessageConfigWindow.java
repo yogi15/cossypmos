@@ -74,7 +74,7 @@ public class MessageConfigWindow extends JPanel {
 	private JLabel jLabel6;
 	private JLabel jLabel7;
 	private JComboBox jTextField2;
-	private JTextField jTextField3;
+	private JTextField subtypeTextField;
 	private JComboBox messageType;
 	private JTextField PO;
 	private JComboBox POContactType;
@@ -115,7 +115,7 @@ public class MessageConfigWindow extends JPanel {
 	}
 
 
-	String role = "CounterParty";
+	String role = "Exchange";
 	 DefaultListModel<String> triggerEvts = new DefaultListModel<String>();
 	 Hashtable<Integer,LegalEntity> messLeg = new Hashtable<Integer,LegalEntity>();
 	 Vector<MessageConfig> data = new Vector<MessageConfig>();
@@ -129,9 +129,9 @@ public class MessageConfigWindow extends JPanel {
 		DefaultTableModel letablemodel = new DefaultTableModel(s,0);
 		String poCOL [] = {"id","POName"};
 		DefaultTableModel potablemodel = new DefaultTableModel(poCOL,0);
-		private JButton jButton6;
-		private JButton jButton7;
-		private JButton jButton8;
+		private JButton receiverButton;
+		private JButton templateNameButton;
+		private JButton loadButton;
 		private JLabel jLabel13;
 		private JComboBox rolesData;
 		private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
@@ -185,17 +185,15 @@ public class MessageConfigWindow extends JPanel {
 			rolesData = new JComboBox();
 			rolesData.setModel(rolesdefaulatModel);
 		}
-		rolesData.addItemListener(new ItemListener() {
-			
+		rolesData.addItemListener(new ItemListener() {			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				// TODO Auto-generated method stub
 				if(rolesData.getSelectedIndex() != -1) {
-				role = rolesData.getSelectedItem().toString();
-				setRole(role);
-				getLEDataCombo1(letablemodel,getRole());
-				}
-				
+					role = rolesData.getSelectedItem().toString();
+					setRole(role);
+					letablemodel.setRowCount(0);
+					getLEDataCombo1(letablemodel,getRole());
+				}				
 			}
 		});
 		return rolesData;
@@ -207,20 +205,20 @@ public class MessageConfigWindow extends JPanel {
 		}
 		return jLabel13;
 	}
-	private JButton getJButton8() {
-		if (jButton8 == null) {
-			jButton8 = new JButton();
-			jButton8.setText("Load");
+	private JButton getLoadButton() {
+		if (loadButton == null) {
+			loadButton = new JButton();
+			loadButton.setText("Load");
 			
-			jButton8.addActionListener(new java.awt.event.ActionListener() {
+			loadButton.addActionListener(new java.awt.event.ActionListener() {
 				 public void actionPerformed(java.awt.event.ActionEvent evt) {
 					 try {
 						 String productType = (String) jProductType.getSelectedItem().toString();
 						 String productsubType = (String) jSubType.getSelectedItem().toString();
 						 data =  (Vector) referenceData.getMessageConfigsonProductype(productType, productsubType);
 						 model = new TableModelUtil(data, cols, messLeg);
-							jTable0.setModel(model);
-						jTable0.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+						 jTable0.setModel(model);
+						 jTable0.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 						 jTable0.getColumnModel().getColumn(0).setPreferredWidth(100); 
 						 jTable0.getColumnModel().getColumn(1).setPreferredWidth(150); 
 						 jTable0.getColumnModel().getColumn(2).setPreferredWidth(150); 
@@ -243,14 +241,14 @@ public class MessageConfigWindow extends JPanel {
 				 }
 			});
 		}
-		return jButton8;
+		return loadButton;
 	}
-	private JButton getJButton7() {
-		if (jButton7 == null) {
-			jButton7 = new JButton();
-			jButton7.setText("jButton7");
+	private JButton getTemplateNameButton() {
+		if (templateNameButton == null) {
+			templateNameButton = new JButton();
+			templateNameButton.setText("templateNameButton");
 		}
-		 jButton7.addActionListener(new java.awt.event.ActionListener() {
+		 templateNameButton.addActionListener(new java.awt.event.ActionListener() {
 			 public void actionPerformed(java.awt.event.ActionEvent evt) {
 				 try {
 						
@@ -288,20 +286,25 @@ public class MessageConfigWindow extends JPanel {
 			 }
 		 });
 	
-		return jButton7;
+		return templateNameButton;
 	}
-	private JButton getJButton6() {
-		if (jButton6 == null) {
-			jButton6 = new JButton();
-			jButton6.setText("jButton6");
-		}getLEDataCombo1(letablemodel,getRole());
+	private JButton getReceiverButton() {
+		if (receiverButton == null) {
+			receiverButton = new JButton();
+			receiverButton.setText("receiverButton");
+		}
+		
+		getLEDataCombo1(letablemodel,getRole());
         final  JDialogTable showLE = new JDialogTable(letablemodel);
         showLE.setLocationRelativeTo(this);
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        
+        receiverButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	showLE.setVisible(true);
-            	}
-        }); showLE.jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            }
+        }); 
+        
+        showLE.jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
         	@Override
 			public void mouseClicked(MouseEvent e) {
 				int id  = ((Integer)	showLE.jTable1.getValueAt(showLE.jTable1.getSelectedRow(),0)).intValue();
@@ -309,12 +312,10 @@ public class MessageConfigWindow extends JPanel {
 				 jReceiver.setText(ss);
 				 receiverID= id;
 				 showLE.dispose();
-			}
-			
-    
-    	
-    });   
-		return jButton6;
+			}    	
+        });
+        
+		return receiverButton;
 	}
 	private JButton getJButton5() {
 		if (jButton5 == null) {
@@ -486,12 +487,12 @@ public class MessageConfigWindow extends JPanel {
 		return messageType;
 	}
 
-	private JTextField getJTextField3() {
-		if (jTextField3 == null) {
-			jTextField3 = new JTextField();
-			jTextField3.setText("subtype");
+	private JTextField getSubtypeTextField() {
+		if (subtypeTextField == null) {
+			subtypeTextField = new JTextField();
+			subtypeTextField.setText("subtype");
 		}
-		return jTextField3;
+		return subtypeTextField;
 	}
 
 	private JComboBox getJTextField2() {
@@ -657,34 +658,34 @@ public class MessageConfigWindow extends JPanel {
 			jPanel3 = new JPanel();
 			jPanel3.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel3.setLayout(new GroupLayout());
-			jPanel3.add(getJLabel5(), new Constraints(new Leading(7, 89, 12, 12), new Leading(73, 24, 12, 12)));
-			jPanel3.add(getJLabel4(), new Constraints(new Leading(10, 89, 12, 12), new Leading(41, 24, 12, 12)));
-			jPanel3.add(getJLabel6(), new Constraints(new Leading(7, 89, 12, 12), new Leading(114, 24, 12, 12)));
-			jPanel3.add(getJButton0(), new Constraints(new Leading(278, 41, 10, 10), new Leading(113, 12, 12)));
-			jPanel3.add(getJLabel9(), new Constraints(new Leading(352, 10, 10), new Leading(49, 12, 12)));
-			jPanel3.add(getJLabel10(), new Constraints(new Leading(352, 105, 12, 12), new Leading(81, 12, 12)));
-			jPanel3.add(getJButton2(), new Constraints(new Leading(165, 12, 12), new Leading(222, 26, 12, 12)));
-			jPanel3.add(getJButton3(), new Constraints(new Leading(248, 68, 10, 10), new Leading(222, 26, 12, 12)));
-			jPanel3.add(getJLabel12(), new Constraints(new Leading(352, 132, 10, 10), new Leading(200, 12, 12)));
+			jPanel3.add(getJLabel5(), new Constraints(new Leading(7, 89, 12, 12), new Leading(78, 24, 12, 12)));
+			jPanel3.add(getJLabel4(), new Constraints(new Leading(7, 89, 12, 12), new Leading(41, 24, 12, 12)));
+			jPanel3.add(getJLabel9(), new Constraints(new Leading(352, 10, 10), new Leading(51, 12, 12)));
+			jPanel3.add(getJLabel10(), new Constraints(new Leading(352, 105, 12, 12), new Leading(88, 12, 12)));
 			jPanel3.add(getJGateWay(), new Constraints(new Leading(495, 166, 10, 10), new Leading(38, 27, 12, 12)));
-			jPanel3.add(getJTemplateName(), new Constraints(new Leading(495, 192, 10, 10), new Leading(76, 27, 12, 12)));
-			jPanel3.add(getJComboBox1(), new Constraints(new Leading(496, 166, 12, 12), new Leading(192, 29, 12, 12)));
-			jPanel3.add(getJButton7(), new Constraints(new Leading(706, 42, 12, 12), new Leading(77, 12, 12)));
-			jPanel3.add(getJTextField3(), new Constraints(new Leading(94, 180, 12, 12), new Leading(38, 27, 12, 12)));
-			jPanel3.add(getMessageType(), new Constraints(new Leading(94, 180, 12, 12), new Leading(68, 29, 10, 10)));
-			jPanel3.add(getPO(), new Constraints(new Leading(94, 180, 12, 12), new Leading(109, 29, 12, 12)));
-			jPanel3.add(getPOContactType(), new Constraints(new Leading(97, 180, 10, 10), new Leading(187, 29, 12, 12)));
-			jPanel3.add(getJLabel7(), new Constraints(new Leading(10, 75, 12, 12), new Leading(192, 24, 12, 12)));
-			jPanel3.add(getJLabel11(), new Constraints(new Leading(352, 96, 12, 12), new Leading(159, 12, 12)));
-			jPanel3.add(getJReceiver(), new Constraints(new Leading(495, 190, 12, 12), new Leading(153, 29, 12, 12)));
-			jPanel3.add(getJButton6(), new Constraints(new Leading(706, 43, 12, 12), new Leading(157, 12, 12)));
-			jPanel3.add(getJLabel13(), new Constraints(new Leading(352, 96, 12, 12), new Leading(125, 12, 12)));
-			jPanel3.add(getJComboBox0(), new Constraints(new Leading(498, 166, 10, 10), new Leading(111, 29, 12, 12)));
-			jPanel3.add(getJLabel3(), new Constraints(new Leading(10, 89, 12, 12), new Leading(5, 24, 12, 12)));
+			jPanel3.add(getJTemplateName(), new Constraints(new Leading(495, 192, 10, 10), new Leading(75, 27, 12, 12)));
+			jPanel3.add(getJComboBox1(), new Constraints(new Leading(495, 166, 12, 12), new Leading(192, 29, 12, 12)));
+			jPanel3.add(getTemplateNameButton(), new Constraints(new Leading(706, 42, 12, 12), new Leading(79, 12, 12)));
+			jPanel3.add(getSubtypeTextField(), new Constraints(new Leading(94, 180, 12, 12), new Leading(38, 27, 12, 12)));
+			jPanel3.add(getJLabel11(), new Constraints(new Leading(352, 96, 12, 12), new Leading(169, 12, 12)));
+			jPanel3.add(getJReceiver(), new Constraints(new Leading(495, 190, 12, 12), new Leading(154, 29, 12, 12)));
+			jPanel3.add(getReceiverButton(), new Constraints(new Leading(706, 43, 12, 12), new Leading(160, 12, 12)));
+			jPanel3.add(getJLabel3(), new Constraints(new Leading(7, 89, 12, 12), new Leading(3, 24, 12, 12)));
 			jPanel3.add(getJLabel8(), new Constraints(new Leading(352, 80, 12, 12), new Leading(13, 12, 12)));
-			jPanel3.add(getJFormatType(), new Constraints(new Leading(495, 166, 12, 12), new Leading(2, 27, 12, 12)));
-			jPanel3.add(getJTextField2(), new Constraints(new Leading(94, 180, 12, 12), new Leading(2, 27, 12, 12)));
-			jPanel3.add(getJButton4(), new Constraints(new Leading(342, 81, 10, 10), new Leading(222, 26, 12, 12)));
+			jPanel3.add(getJFormatType(), new Constraints(new Leading(495, 166, 12, 12), new Leading(0, 27, 12, 12)));
+			jPanel3.add(getJTextField2(), new Constraints(new Leading(94, 180, 12, 12), new Leading(0, 27, 12, 12)));
+			jPanel3.add(getPOContactType(), new Constraints(new Leading(94, 180, 12, 12), new Leading(154, 29, 12, 12)));
+			jPanel3.add(getJLabel7(), new Constraints(new Leading(7, 75, 12, 12), new Leading(159, 24, 12, 12)));
+			jPanel3.add(getJButton2(), new Constraints(new Leading(15, 10, 10), new Leading(220, 26, 10, 10)));
+			jPanel3.add(getJButton3(), new Constraints(new Leading(94, 68, 12, 12), new Leading(220, 26, 12, 12)));
+			jPanel3.add(getJButton4(), new Constraints(new Leading(185, 81, 10, 10), new Leading(220, 26, 12, 12)));
+			jPanel3.add(getJLabel12(), new Constraints(new Leading(352, 132, 12, 12), new Leading(205, 16, 12, 12)));
+			jPanel3.add(getMessageType(), new Constraints(new Leading(94, 180, 12, 12), new Leading(73, 29, 12, 12)));
+			jPanel3.add(getPO(), new Constraints(new Leading(94, 180, 12, 12), new Leading(118, 24, 12, 12)));
+			jPanel3.add(getJButton0(), new Constraints(new Leading(280, 41, 12, 12), new Leading(119, 12, 12)));
+			jPanel3.add(getJComboBox0(), new Constraints(new Leading(495, 166, 12, 12), new Leading(113, 29, 12, 12)));
+			jPanel3.add(getJLabel13(), new Constraints(new Leading(356, 96, 12, 12), new Leading(126, 16, 12, 12)));
+			jPanel3.add(getJLabel6(), new Constraints(new Leading(3, 89, 10, 10), new Leading(118, 24, 12, 12)));
 		}
 		return jPanel3;
 	}
@@ -718,7 +719,7 @@ public class MessageConfigWindow extends JPanel {
 			jPanel1.add(getJComboBox2(), new Constraints(new Leading(86, 164, 12, 12), new Leading(82, 26, 41, 148)));
 			jPanel1.add(getJLabel2(), new Constraints(new Leading(5, 76, 12, 12), new Leading(86, 22, 41, 148)));
 			jPanel1.add(getJScrollPane0(), new Constraints(new Leading(14, 246, 10, 10), new Leading(164, 438, 10, 10)));
-			jPanel1.add(getJButton8(), new Constraints(new Leading(8, 10, 10), new Leading(123, 10, 10)));
+			jPanel1.add(getLoadButton(), new Constraints(new Leading(8, 10, 10), new Leading(123, 10, 10)));
 		}
 		return jPanel1;
 	}
@@ -904,23 +905,21 @@ public class MessageConfigWindow extends JPanel {
     }
 	public void getLEDataCombo1(DefaultTableModel model,String leRole) {
 		Vector vector;
-		try {
-			
-				vector = (Vector) referenceData.selectLEonWhereClause(" role like '%"+leRole + "%'");
-			   Iterator it = vector.iterator();
-	    	   int i =0;
+		try {			
+			vector = (Vector) referenceData.selectLEonWhereClause(" role like '%"+leRole + "%'");
+			Iterator it = vector.iterator();
+	    	
+			int i =0;
+	    	
 	    	while(it.hasNext()) {
 	    		
 	    		LegalEntity le =	(LegalEntity) it.next();
 	    		model.insertRow(i, new Object[]{le.getId(),le.getName()});
 	    		i++;
-		}	
+	    	}	
 		}catch (RemoteException e) {
-					// TODO Auto-generated catch block
 			commonUTIL.displayError("AccountWindow","getLEDataCombo1", e);
-				}
-		
-		
+		}		
 	}
 	
 	public void getLEDataCombo1(Vector ledata,Hashtable<Integer,LegalEntity> legalEntitys) {
