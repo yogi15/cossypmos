@@ -53,11 +53,11 @@ public class MessageConfigWindow extends JPanel {
 	private JComboBox jProductType;
 	private JButton productbut;
 	private JLabel jLabel0;
-	private JComboBox jSubType;
+	private JComboBox productSubtypeCombobox;
 	private JLabel jLabel1;
 	private JButton subtypebut;
 	private JLabel jLabel2;
-	private JList jList0;
+	private JList eventTypeList;
 	private JScrollPane jScrollPane0;
 	private JPanel jPanel1;
 	private JSplitPane jSplitPane0;
@@ -65,9 +65,9 @@ public class MessageConfigWindow extends JPanel {
 	private JTable jTable0;
 	private JScrollPane jScrollPane1;
 	private JPanel jPanel2;
-	private JButton jButton2;
-	private JButton jButton3;
-	private JButton jButton4;
+	private JButton addButton;
+	private JButton editButton;
+	private JButton deleteButton;
 	private JLabel jLabel3;
 	private JLabel jLabel4;
 	private JLabel jLabel5;
@@ -81,13 +81,13 @@ public class MessageConfigWindow extends JPanel {
 	private JLabel jLabel8;
 	private JLabel jLabel9;
 	private JLabel jLabel11;
-	private JComboBox jFormatType;
-	private JComboBox jGateWay;
-	private JTextField jTemplateName;
+	private JComboBox formatTypeComboBox;
+	private JComboBox gateWayText;
+	private JTextField templateNameText;
 	private JLabel jLabel10;
 	private JLabel jLabel12;
-	private JTextField jReceiver;
-	private JComboBox jComboBox1;
+	private JTextField receiverLe;
+	private JComboBox receiverContactTypeCombobBox;
 	private JComboBox jComboBox2;
 	Vector formatTemplateTypes = null;
 	javax.swing.DefaultComboBoxModel productModel = new javax.swing.DefaultComboBoxModel();
@@ -100,6 +100,7 @@ public class MessageConfigWindow extends JPanel {
 	 javax.swing.DefaultComboBoxModel ledefaulatContactModel = new javax.swing.DefaultComboBoxModel();
 	 javax.swing.DefaultComboBoxModel addressdefaulatContactModel = new javax.swing.DefaultComboBoxModel();
 	 javax.swing.DefaultComboBoxModel rolesdefaulatModel = new javax.swing.DefaultComboBoxModel();
+	 javax.swing.DefaultComboBoxModel posearchdefaulatModel = new javax.swing.DefaultComboBoxModel();
 	 DefaultListModel templates = new DefaultListModel();
 	 /**
 	 * @return the role
@@ -115,7 +116,7 @@ public class MessageConfigWindow extends JPanel {
 	}
 
 
-	String role = "Exchange";
+	 String role = "Exchange";
 	 DefaultListModel<String> triggerEvts = new DefaultListModel<String>();
 	 Hashtable<Integer,LegalEntity> messLeg = new Hashtable<Integer,LegalEntity>();
 	 Vector<MessageConfig> data = new Vector<MessageConfig>();
@@ -124,6 +125,7 @@ public class MessageConfigWindow extends JPanel {
 	private JButton jButton5;
 	int receiverID =0;
 		 int poid = 0;
+		 int poSearchID = 0;
 		 String cols [] = {"id","ProductType","ProductSubType","TriggerEvent","MessageType","PO","PO Contact","Receiver","Receiver Contact","ReceiverRole","FormatType","GateWay","TemplateName"};
 	 String s [] = {"id","LegalEntityName"};
 		DefaultTableModel letablemodel = new DefaultTableModel(s,0);
@@ -134,6 +136,9 @@ public class MessageConfigWindow extends JPanel {
 		private JButton loadButton;
 		private JLabel jLabel13;
 		private JComboBox rolesData;
+		private JLabel jLabel14;
+		private JTextField poSearch;
+		private JButton jButton6;
 		private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 		public MessageConfigWindow() {
 		init();
@@ -180,7 +185,55 @@ public class MessageConfigWindow extends JPanel {
 		add(getJPanel0(), new Constraints(new Leading(7, 1323, 10, 10), new Leading(6, 623, 10, 10)));
 		setSize(1338, 634);
 	}
-	private JComboBox getJComboBox0() {
+	private JButton getJButton6() {
+		if (jButton6 == null) {
+			jButton6 = new JButton();
+			jButton6.setText("jButton6");
+			getLEDataCombo1(potablemodel,"PO");
+	        final  JDialogTable showPO = new JDialogTable(potablemodel);
+	        showPO.setLocationRelativeTo(this);
+	        jButton6.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            	
+	            
+	            	
+	            	showPO.setVisible(true);
+	            	
+	            }
+	        }); showPO.jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					int id  = ((Integer)	showPO.jTable1.getValueAt(showPO.jTable1.getSelectedRow(),0)).intValue();
+				
+					 String ss = (String)	showPO.jTable1.getValueAt(showPO.jTable1.getSelectedRow(),1);
+					 poSearch.setText(ss);
+					 poSearchID= id;
+					 showPO.dispose();
+				}
+				
+	    
+	    	
+	    });   
+			
+		}
+		return jButton6;
+	}
+	private JTextField getPoSearch() {
+		if (poSearch == null) {
+			poSearch = new JTextField();
+			//poSearch.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+		}
+		return poSearch;
+	}
+	private JLabel getJLabel14() {
+		if (jLabel14 == null) {
+			jLabel14 = new JLabel();
+			jLabel14.setText("PO");
+		}
+		return jLabel14;
+	}
+	private JComboBox getReceiverRoleComboBox() {
 		if (rolesData == null) {
 			rolesData = new JComboBox();
 			rolesData.setModel(rolesdefaulatModel);
@@ -214,7 +267,7 @@ public class MessageConfigWindow extends JPanel {
 				 public void actionPerformed(java.awt.event.ActionEvent evt) {
 					 try {
 						 String productType = (String) jProductType.getSelectedItem().toString();
-						 String productsubType = (String) jSubType.getSelectedItem().toString();
+						 String productsubType = (String) productSubtypeCombobox.getSelectedItem().toString();
 						 data =  (Vector) referenceData.getMessageConfigsonProductype(productType, productsubType);
 						 model = new TableModelUtil(data, cols, messLeg);
 						 jTable0.setModel(model);
@@ -252,7 +305,7 @@ public class MessageConfigWindow extends JPanel {
 			 public void actionPerformed(java.awt.event.ActionEvent evt) {
 				 try {
 						
-						String formatType = jFormatType.getSelectedItem().toString();
+						String formatType = formatTypeComboBox.getSelectedItem().toString();
 						 formatTemplateTypes = (Vector)	  referenceData.getStartUPData(formatType.toUpperCase()+"Template");
 						  processlistchoice(templates,formatTemplateTypes);
 						  
@@ -277,7 +330,7 @@ public class MessageConfigWindow extends JPanel {
 		                  if(obj != null && obj.length == 0) 
 		                	  return;
 		                  if(obj != null || obj.length > 0) 
-		                	jTemplateName.setText((String) obj[0]) ;
+		                	templateNameText.setText((String) obj[0]) ;
 		                  choice12.cmodList2.clear();
 		                  choice12.cmodList3.clear();
 		            } 
@@ -309,7 +362,7 @@ public class MessageConfigWindow extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				int id  = ((Integer)	showLE.jTable1.getValueAt(showLE.jTable1.getSelectedRow(),0)).intValue();
 				String ss = (String)	showLE.jTable1.getValueAt(showLE.jTable1.getSelectedRow(),1);
-				 jReceiver.setText(ss);
+				 receiverLe.setText(ss);
 				 receiverID= id;
 				 showLE.dispose();
 			}    	
@@ -334,20 +387,20 @@ public class MessageConfigWindow extends JPanel {
 		return jComboBox2;
 	}
 
-	private JComboBox getJComboBox1() {
-		if (jComboBox1 == null) {
-			jComboBox1 = new JComboBox();
-			jComboBox1.setModel(ledefaulatContactModel);
+	private JComboBox getReceiverContactTypeCombobBox() {
+		if (receiverContactTypeCombobBox == null) {
+			receiverContactTypeCombobBox = new JComboBox();
+			receiverContactTypeCombobBox.setModel(ledefaulatContactModel);
 		}
-		return jComboBox1;
+		return receiverContactTypeCombobBox;
 	}
 
-	private JTextField getJReceiver() {
-		if (jReceiver == null) {
-			jReceiver = new JTextField();
-			jReceiver.setText("");
+	private JTextField getReceiverLe() {
+		if (receiverLe == null) {
+			receiverLe = new JTextField();
+			receiverLe.setText("");
 		}
-		return jReceiver;
+		return receiverLe;
 	}
 
 	private JComboBox getJProductType() {
@@ -370,7 +423,7 @@ public class MessageConfigWindow extends JPanel {
 				subTpe = (Vector)	  referenceData.getStartUPData(productType+".subType");
 				
 				  processBookData(subTpe, productSubModel, false);
-				  jSubType.setModel(productSubModel);
+				  productSubtypeCombobox.setModel(productSubModel);
 			} catch (RemoteException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -401,27 +454,27 @@ public class MessageConfigWindow extends JPanel {
 		return jLabel10;
 	}
 
-	private JTextField getJTemplateName() {
-		if (jTemplateName == null) {
-			jTemplateName = new JTextField();
-			//jTemplateName.setModel(MessageTemplateModel);
+	private JTextField getTemplateNameText() {
+		if (templateNameText == null) {
+			templateNameText = new JTextField();
+			//templateNameText.setModel(MessageTemplateModel);
 		}
-		return jTemplateName;
+		return templateNameText;
 	}
 
-	private JComboBox getJGateWay() {
-		if (jGateWay == null) {
-			jGateWay = new JComboBox();
-			jGateWay.setModel(MessageGatewayModel);
+	private JComboBox getGateWayText() {
+		if (gateWayText == null) {
+			gateWayText = new JComboBox();
+			gateWayText.setModel(MessageGatewayModel);
 		}
-		return jGateWay;
+		return gateWayText;
 	}
 
-	private JComboBox getJFormatType() {
-		if (jFormatType == null) {
-			jFormatType = new JComboBox();
-			jFormatType.setModel(MessageFormateModel);
-		}jFormatType.addItemListener( new ItemListener() {
+	private JComboBox getFormatTypeComboBox() {
+		if (formatTypeComboBox == null) {
+			formatTypeComboBox = new JComboBox();
+			formatTypeComboBox.setModel(MessageFormateModel);
+		}formatTypeComboBox.addItemListener( new ItemListener() {
 
         	public void itemStateChanged(ItemEvent e) {
         		// TODO Auto-generated method stub
@@ -429,13 +482,13 @@ public class MessageConfigWindow extends JPanel {
         	
         	
         	
-			jTemplateName.setText("");
+			templateNameText.setText("");
         		
         		
         	}
         	   
            });
-		return jFormatType;
+		return formatTypeComboBox;
 	}
 
 	private JLabel getJLabel11() {
@@ -542,27 +595,55 @@ public class MessageConfigWindow extends JPanel {
 		}
 		return jLabel3;
 	}
-	private JButton getJButton4() {
-		if (jButton4 == null) {
-			jButton4 = new JButton();
-			jButton4.setText("DELETE");
+	private JButton getDeleteButton() {
+		if (deleteButton == null) {
+			deleteButton = new JButton();
+			deleteButton.setText("DELETE");
 		}
-		return jButton4;
+		return deleteButton;
 	}
 
-	private JButton getJButton3() {
-		if (jButton3 == null) {
-			jButton3 = new JButton();
-			jButton3.setText("EDIT");
+	private JButton getEditButton() {
+		if (editButton == null) {
+			editButton = new JButton();
+			editButton.setText("EDIT");
 		}
-		return jButton3;
+		
+		editButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {            	
+                MessageConfig messConfig = new MessageConfig();             
+				
+                if(fillConfig(messConfig)) {
+                	boolean isUpdated = false;
+                	try {
+                		int id = data.get(jTable0.getSelectedRow()).getId();
+                		messConfig.setId(id);
+                		
+                		isUpdated = referenceData.updateMessageConfig(messConfig);
+					   
+                		if (isUpdated) {
+                			commonUTIL.showAlertMessage("Message Config update");
+                		} else {
+                			commonUTIL.showAlertMessage("Message Config not updated");
+                		}
+                		
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					}
+                }          	
+            }
+        }); 
+		
+		return editButton;
 	}
 
-	private JButton getJButton2() {
-		if (jButton2 == null) {
-			jButton2 = new JButton();
-			jButton2.setText("ADD");
-		}jButton2.addActionListener(new java.awt.event.ActionListener() {
+	private JButton getAddButton() {
+		if (addButton == null) {
+			addButton = new JButton();
+			addButton.setText("ADD");
+		}
+		
+		addButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	
                  MessageConfig messConfig = new MessageConfig();
@@ -573,15 +654,12 @@ public class MessageConfigWindow extends JPanel {
 						messConfig.setId(id);
 					    model.addRow(messConfig);
 					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-                }
-            	
-            	            	
+                }          	
             }
         }); 
-		return jButton2;
+		return addButton;
 	}
 
 	private JPanel getJPanel2() {
@@ -632,25 +710,22 @@ public class MessageConfigWindow extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				int selectID = jTable0.getSelectedRow();
 				MessageConfig messConfig = (MessageConfig)	data.get(jTable0.getSelectedRow());
-				jSubType.setSelectedItem(messConfig.getProductSubType());
+				productSubtypeCombobox.setSelectedItem(messConfig.getProductSubType());
 				jProductType.setSelectedItem(messConfig.getProductType());
-				jList0.setSelectedValue(messConfig.getEventType(), true);
+				eventTypeList.setSelectedValue(messConfig.getEventType(), true);
 				messageType.setSelectedItem(messConfig.getMessageType());
-				jFormatType.setSelectedItem(messConfig.getFormatType());
-				jTemplateName.setText(messConfig.getTemplateName());
-				jGateWay.setSelectedItem(messConfig.getGateWay());
+				formatTypeComboBox.setSelectedItem(messConfig.getFormatType());
+				templateNameText.setText(messConfig.getTemplateName());
+				gateWayText.setSelectedItem(messConfig.getGateWay());
 				PO.setText(messLeg.get(messConfig.getPoid()).getName());
 				poid = messConfig.getPoid();
 				receiverID = messConfig.getReceiverID();
-				jReceiver.setText(messLeg.get(messConfig.getPoid()).getName());
-				POContactType.setSelectedItem(messConfig.getPoContactType());
-				jComboBox1.setSelectedItem(messConfig.getReceiverContactType());
 				rolesData.setSelectedItem(messConfig.getReceiverRole());
-				
-			
-				
+				receiverLe.setText(messLeg.get(messConfig.getReceiverID()).getName());
+				POContactType.setSelectedItem(messConfig.getPoContactType());
+				receiverContactTypeCombobBox.setSelectedItem(messConfig.getReceiverContactType());
 			}
-			  });
+		});
 		return jTable0;
 	}
 
@@ -663,28 +738,28 @@ public class MessageConfigWindow extends JPanel {
 			jPanel3.add(getJLabel4(), new Constraints(new Leading(7, 89, 12, 12), new Leading(41, 24, 12, 12)));
 			jPanel3.add(getJLabel9(), new Constraints(new Leading(352, 10, 10), new Leading(51, 12, 12)));
 			jPanel3.add(getJLabel10(), new Constraints(new Leading(352, 105, 12, 12), new Leading(88, 12, 12)));
-			jPanel3.add(getJGateWay(), new Constraints(new Leading(495, 166, 10, 10), new Leading(38, 27, 12, 12)));
-			jPanel3.add(getJTemplateName(), new Constraints(new Leading(495, 192, 10, 10), new Leading(75, 27, 12, 12)));
-			jPanel3.add(getJComboBox1(), new Constraints(new Leading(495, 166, 12, 12), new Leading(192, 29, 12, 12)));
+			jPanel3.add(getGateWayText(), new Constraints(new Leading(495, 166, 10, 10), new Leading(38, 27, 12, 12)));
+			jPanel3.add(getTemplateNameText(), new Constraints(new Leading(495, 192, 10, 10), new Leading(75, 27, 12, 12)));
+			jPanel3.add(getReceiverContactTypeCombobBox(), new Constraints(new Leading(495, 166, 12, 12), new Leading(192, 29, 12, 12)));
 			jPanel3.add(getTemplateNameButton(), new Constraints(new Leading(706, 42, 12, 12), new Leading(79, 12, 12)));
 			jPanel3.add(getSubtypeTextField(), new Constraints(new Leading(94, 180, 12, 12), new Leading(38, 27, 12, 12)));
 			jPanel3.add(getJLabel11(), new Constraints(new Leading(352, 96, 12, 12), new Leading(169, 12, 12)));
-			jPanel3.add(getJReceiver(), new Constraints(new Leading(495, 190, 12, 12), new Leading(154, 29, 12, 12)));
+			jPanel3.add(getReceiverLe(), new Constraints(new Leading(495, 190, 12, 12), new Leading(154, 29, 12, 12)));
 			jPanel3.add(getReceiverButton(), new Constraints(new Leading(706, 43, 12, 12), new Leading(160, 12, 12)));
 			jPanel3.add(getJLabel3(), new Constraints(new Leading(7, 89, 12, 12), new Leading(3, 24, 12, 12)));
 			jPanel3.add(getJLabel8(), new Constraints(new Leading(352, 80, 12, 12), new Leading(13, 12, 12)));
-			jPanel3.add(getJFormatType(), new Constraints(new Leading(495, 166, 12, 12), new Leading(0, 27, 12, 12)));
+			jPanel3.add(getFormatTypeComboBox(), new Constraints(new Leading(495, 166, 12, 12), new Leading(0, 27, 12, 12)));
 			jPanel3.add(getJTextField2(), new Constraints(new Leading(94, 180, 12, 12), new Leading(0, 27, 12, 12)));
 			jPanel3.add(getPOContactType(), new Constraints(new Leading(94, 180, 12, 12), new Leading(154, 29, 12, 12)));
 			jPanel3.add(getJLabel7(), new Constraints(new Leading(7, 75, 12, 12), new Leading(159, 24, 12, 12)));
-			jPanel3.add(getJButton2(), new Constraints(new Leading(15, 10, 10), new Leading(220, 26, 10, 10)));
-			jPanel3.add(getJButton3(), new Constraints(new Leading(94, 68, 12, 12), new Leading(220, 26, 12, 12)));
-			jPanel3.add(getJButton4(), new Constraints(new Leading(185, 81, 10, 10), new Leading(220, 26, 12, 12)));
+			jPanel3.add(getAddButton(), new Constraints(new Leading(15, 10, 10), new Leading(220, 26, 10, 10)));
+			jPanel3.add(getEditButton(), new Constraints(new Leading(94, 68, 12, 12), new Leading(220, 26, 12, 12)));
+			jPanel3.add(getDeleteButton(), new Constraints(new Leading(185, 81, 10, 10), new Leading(220, 26, 12, 12)));
 			jPanel3.add(getJLabel12(), new Constraints(new Leading(352, 132, 12, 12), new Leading(205, 16, 12, 12)));
 			jPanel3.add(getMessageType(), new Constraints(new Leading(94, 180, 12, 12), new Leading(73, 29, 12, 12)));
 			jPanel3.add(getPO(), new Constraints(new Leading(94, 180, 12, 12), new Leading(118, 24, 12, 12)));
 			jPanel3.add(getJButton0(), new Constraints(new Leading(280, 41, 12, 12), new Leading(119, 12, 12)));
-			jPanel3.add(getJComboBox0(), new Constraints(new Leading(495, 166, 12, 12), new Leading(113, 29, 12, 12)));
+			jPanel3.add(getReceiverRoleComboBox(), new Constraints(new Leading(495, 166, 12, 12), new Leading(113, 29, 12, 12)));
 			jPanel3.add(getJLabel13(), new Constraints(new Leading(356, 96, 12, 12), new Leading(126, 16, 12, 12)));
 			jPanel3.add(getJLabel6(), new Constraints(new Leading(3, 89, 10, 10), new Leading(118, 24, 12, 12)));
 		}
@@ -715,32 +790,33 @@ public class MessageConfigWindow extends JPanel {
 			jPanel1.setLayout(new GroupLayout());
 			jPanel1.add(getJProductType(), new Constraints(new Leading(85, 166, 10, 10), new Leading(10, 27, 10, 10)));
 			jPanel1.add(getJLabel0(), new Constraints(new Leading(5, 77, 10, 10), new Leading(13, 22, 12, 12)));
-			jPanel1.add(getJSubtype(), new Constraints(new Leading(85, 166, 12, 12), new Leading(47, 27, 12, 12)));
+			jPanel1.add(getProductSubtypeCombobox(), new Constraints(new Leading(85, 166, 12, 12), new Leading(47, 27, 12, 12)));
 			jPanel1.add(getJLabel1(), new Constraints(new Leading(5, 76, 12, 12), new Leading(47, 22, 12, 12)));
 			jPanel1.add(getJComboBox2(), new Constraints(new Leading(86, 164, 12, 12), new Leading(82, 26, 41, 148)));
 			jPanel1.add(getJLabel2(), new Constraints(new Leading(5, 76, 12, 12), new Leading(86, 22, 41, 148)));
-			jPanel1.add(getJScrollPane0(), new Constraints(new Leading(14, 246, 10, 10), new Leading(164, 438, 10, 10)));
-			jPanel1.add(getLoadButton(), new Constraints(new Leading(8, 10, 10), new Leading(123, 10, 10)));
+			jPanel1.add(getJScrollPane0(), new Constraints(new Leading(14, 246, 10, 10), new Leading(217, 385, 10, 10)));
+			jPanel1.add(getLoadButton(), new Constraints(new Leading(8, 10, 10), new Leading(157, 10, 10)));
+			jPanel1.add(getJLabel14(), new Constraints(new Leading(5, 76, 12, 12), new Leading(123, 22, 12, 12)));
+			jPanel1.add(getPoSearch(), new Constraints(new Leading(85, 163, 10, 10), new Leading(120, 28, 12, 12)));
+			jPanel1.add(getJButton6(), new Constraints(new Leading(260, 42, 12, 12), new Leading(123, 12, 12)));
 		}
 		return jPanel1;
 	}
 	private JScrollPane getJScrollPane0() {
 		if (jScrollPane0 == null) {
 			jScrollPane0 = new JScrollPane();
-			jScrollPane0.setViewportView(getJList0());
+			jScrollPane0.setViewportView(getEventTypeList());
 		}
 		return jScrollPane0;
 	}
 
-	private JList getJList0() {
-		if (jList0 == null) {
-			jList0 = new JList();
-			jList0.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			
-			
-			jList0.setModel(triggerEvts);
+	private JList getEventTypeList() {
+		if (eventTypeList == null) {
+			eventTypeList = new JList();
+			eventTypeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			eventTypeList.setModel(triggerEvts);
 		}
-		return jList0;
+		return eventTypeList;
 	}
 	private JLabel getJLabel2() {
 		if (jLabel2 == null) {
@@ -766,12 +842,12 @@ public class MessageConfigWindow extends JPanel {
 		return jLabel1;
 	}
 
-	private JComboBox getJSubtype() {
-		if (jSubType == null) {
-			jSubType = new JComboBox();
-			jSubType.setModel(productSubModel);
+	private JComboBox getProductSubtypeCombobox() {
+		if (productSubtypeCombobox == null) {
+			productSubtypeCombobox = new JComboBox();
+			productSubtypeCombobox.setModel(productSubModel);
 		}
-		return jSubType;
+		return productSubtypeCombobox;
 	}
 
 	private JLabel getJLabel0() {
@@ -822,57 +898,63 @@ public class MessageConfigWindow extends JPanel {
 		boolean flag = false;
 		String productType = jProductType.getSelectedItem().toString();
 		String addressType = jTextField2.getSelectedItem().toString();
-	   messConfig.setAddressType(addressType);
-		if(jSubType.getSelectedIndex() == -1) {
+		messConfig.setProductType(productType);
+		messConfig.setAddressType(addressType);
+		if(productSubtypeCombobox.getSelectedIndex() == -1) {
 			commonUTIL.showAlertMessage("Select Product SubType");
 			return flag;
 		}
-		messConfig.setProductType(productType);
+		messConfig.setProductSubType(productSubtypeCombobox.getSelectedItem().toString());
 		
-		messConfig.setProductSubType(jSubType.getSelectedItem().toString());
-		if(jList0.isSelectionEmpty()) {
+		if(eventTypeList.isSelectionEmpty()) {
 			commonUTIL.showAlertMessage("Select Triggering Event");
 			return flag;
 		}
-		messConfig.setEventType(jList0.getSelectedValue().toString());
+		messConfig.setEventType(eventTypeList.getSelectedValue().toString());
+		
 		if(messageType.getSelectedIndex() == -1) {
-			commonUTIL.showAlertMessage("Select messageType ");
+			commonUTIL.showAlertMessage("Select MessageType");
 			return flag;
 		}
 		messConfig.setMessageType(messageType.getSelectedItem().toString());
-		if(jFormatType.getSelectedIndex() == -1) {
-			commonUTIL.showAlertMessage("Select Format Type ");
+		
+		if(formatTypeComboBox.getSelectedIndex() == -1) {
+			commonUTIL.showAlertMessage("Select Format Type");
 			return flag;
 		}
-		messConfig.setFormatType(jFormatType.getSelectedItem().toString());
-		if(commonUTIL.isEmpty(jTemplateName.getText())) {
-			commonUTIL.showAlertMessage("Select  TemplateName ");
+		messConfig.setFormatType(formatTypeComboBox.getSelectedItem().toString());
+		
+		if(commonUTIL.isEmpty(templateNameText.getText())) {
+			commonUTIL.showAlertMessage("Select TemplateName");
 			return flag;
 		}
-		messConfig.setTemplateName(jTemplateName.getText());
-		if(jGateWay.getSelectedIndex() == -1) {
-			commonUTIL.showAlertMessage("Select  GateWay ");
+		messConfig.setTemplateName(templateNameText.getText());
+		
+		if(gateWayText.getSelectedIndex() == -1) {
+			commonUTIL.showAlertMessage("Select GateWay");
 			return flag;
 		}
-		messConfig.setGateWay(jGateWay.getSelectedItem().toString());
+		messConfig.setGateWay(gateWayText.getSelectedItem().toString());
+		
 		if(poid == 0) {
-			commonUTIL.showAlertMessage("Select  Po ");
-			return flag;
-			
+			commonUTIL.showAlertMessage("Select Po");
+			return flag;			
 		}
 		messConfig.setPoid(poid);
+		
 		if(receiverID == 0) {
-			commonUTIL.showAlertMessage("Select  Receiver ");
-			return flag;
-			
+			commonUTIL.showAlertMessage("Select Receiver");
+			return flag;			
 		}
 		messConfig.setReceiverID(receiverID);
-		messConfig.setPoContactType(POContactType.getSelectedItem().toString());
-	      messConfig.setReceiverContactType(jComboBox1.getSelectedItem().toString());
-	      messConfig.setReceiverRole(rolesData.getSelectedItem().toString());
-		String productSubType =  jSubType.getSelectedItem().toString();
-		String eventType =  jList0.getSelectedValue().toString();
+		messConfig.setReceiverRole(rolesData.getSelectedItem().toString());
+		messConfig.setReceiverContactType(receiverContactTypeCombobBox.getSelectedItem().toString());
+		messConfig.setPoContactType(POContactType.getSelectedItem().toString());    
+		String productSubType =  productSubtypeCombobox.getSelectedItem().toString();
+		String eventType =  eventTypeList.getSelectedValue().toString();
+		
 		flag = true;
+		
 		return flag;
 	}
 	
