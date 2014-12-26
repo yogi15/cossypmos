@@ -962,6 +962,8 @@ public class SDIPanel extends BackOfficePanel {
 		 jTable0.getColumnModel().getColumn(11).setPreferredWidth(200); 
 		 jTable0.getColumnModel().getColumn(12).setPreferredWidth(200); 
 		 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); 
+		 TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
+			tca.adjustColumns();
 		 TransferRule rule = rules.get(0); // for first time it will be first record only. 
 			receiverSDI.setText(getLEName(rule.get_receiverLegalEntityId()));
 			payerSDI.setText(getLEName(rule.get_payerLegalEntityId()));
