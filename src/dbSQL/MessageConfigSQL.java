@@ -50,7 +50,7 @@ public class MessageConfigSQL {
 				.append(" pocontacttype = '").append(messasgeconfig.getPoContactType()).append("',")
 				.append(" messageType = '").append(messasgeconfig.getMessageType()).append("',")
 				.append(" Gateway = '").append(messasgeconfig.getGateWay()).append("',")
-				.append(" addressway = '").append(messasgeconfig.getGateWay()).append("'")
+				.append(" addressway = '").append(messasgeconfig.getGateWay()).append("', ")
 				.append(" receivercontact = '").append(messasgeconfig.getReceiverContactType()).append("'")
 				.toString();
 
