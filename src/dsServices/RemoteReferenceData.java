@@ -25,7 +25,6 @@ import beans.Users;
 import beans.WFConfig;
 
 import java.rmi.Remote;
-import java.sql.Connection;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -38,6 +37,7 @@ public interface RemoteReferenceData extends Remote{
 	public boolean deleteMessageConfig(MessageConfig messConfig)throws RemoteException;
 	public boolean updateMessageConfig(MessageConfig messConfig) throws RemoteException;
 	public Collection  selectALLMessageConfigs() throws RemoteException;
+	public Collection  getMessageConfigsonProductype(String productype,String productSubtype) throws RemoteException;
 	public int saveDateRule(DateRule dateRule) throws RemoteException;
 	public boolean updateDateRule(DateRule dateRule) throws RemoteException;
 	public DateRule getDateRule(int dateRuleID)  throws RemoteException;
@@ -112,6 +112,7 @@ public interface RemoteReferenceData extends Remote{
 	public Collection  selectALLAttribute() throws RemoteException;
 	public Collection selectWhereAttribute(String sql) throws RemoteException;
 	public Collection update(Attribute att) throws RemoteException;
+	
 	
 	public int saveUser(Users user)throws RemoteException;
 	public Users selectUser(Users user,String group) throws RemoteException;
@@ -208,6 +209,8 @@ public interface RemoteReferenceData extends Remote{
 	public Vector getSDIONLegalEntityRole(String role,int leID) throws RemoteException;
 	
 	public Vector getPreferredSDIONLegalEntityRoleCurrencyProduct(String role,String productType,String Currency,int leID) throws RemoteException;
+	
+	
 	
 	
 	
