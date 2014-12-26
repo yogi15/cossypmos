@@ -255,7 +255,7 @@ public class StartUPDataSQL {
 		 try {
 			 con.setAutoCommit(false);
 			 stmt = dsSQL.newPreparedStatement(con, sql );
-	      
+			 commonUTIL.display("getStartUPDataName",sql);
 	      ResultSet rs = stmt.executeQuery();
 	      
 	      while(rs.next()) {
@@ -266,7 +266,7 @@ public class StartUPDataSQL {
 	      
 	      }
 	      
-	      commonUTIL.display("getStartUPDataName",sql);
+	      
 		 } catch (Exception e) {
 			 commonUTIL.displayError("getStartUPDataName",sql,e);
 			 return StartUPDatas;
