@@ -157,6 +157,8 @@ public class SDIPanel extends BackOfficePanel {
 					    }
 								String payerKey =  role+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(leid);
 								payerPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(payerKey);
+								payerInstr.removeAllItems();
+								payerModel.removeAllElements();
 								processComboxData(payerPreferredSDIs,payerModel);
 					}
 					
@@ -186,6 +188,8 @@ public class SDIPanel extends BackOfficePanel {
 						    }
 								String receiverKey =  role+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(leid);
 								receiverPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(receiverKey);
+								receiverInstr.removeAllItems();
+								receiverModel.removeAllElements();
 								processComboxData(receiverPreferredSDIs,receiverModel);
 					}
 					
@@ -547,6 +551,11 @@ public class SDIPanel extends BackOfficePanel {
 				String recKey = rule.get_receiverLegalEntityRole()+"|"+rule.get_settlementCurrency()+"|"+rule.get_productType()+"|"+String.valueOf(rule.get_receiverLegalEntityId());
 				payerPreferredSDIs	 = SDISelectorUtil.getPreferredSdisOnKey(payKey);
 			    receiverPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(recKey);
+			     payerInstr.removeAllItems();
+			     receiverInstr.removeAllItems();
+			     payerModel.removeAllElements();
+			     receiverModel.removeAllElements();
+			     
 			     processComboxData(payerPreferredSDIs,payerModel);
 			     processComboxData(receiverPreferredSDIs,receiverModel);
 			     payerInstr.setModel(payerModel);
