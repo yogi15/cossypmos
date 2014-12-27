@@ -360,7 +360,7 @@ public class SDIWindow extends JPanel {
 		 sdiInternal.rolesData.setSelectedItem(sdi.getRole());
 		 sdiInternal.beneficiaryData.setSelectedItem((sdiInternal.getLeName(sdi.getCpId())));
 		 sdiInternal.currencyData.setSelectedItem(sdi.getCurrency()); 
-		 //sdiInternal.payrecData.setSelectedIndex(-1);
+		 sdiInternal.payrecData.setSelectedItem(sdi.getPayrec());
 		 sdiInternal.productTypeData.setSelectedItem(sdi.getProducts());
 		 sdiInternal.beneficiaryLecontactsData.setSelectedItem(sdi.getLeContacts());
 		 sdiInternal.cashsecurityData.setSelectedItem(sdi.getCash());
@@ -411,8 +411,7 @@ public class SDIWindow extends JPanel {
 			saveButton.setToolTipText(saveButton.getName());
 			saveButton.addActionListener(new java.awt.event.ActionListener() {
 
-				public void actionPerformed(java.awt.event.ActionEvent evt) {
-					
+				public void actionPerformed(java.awt.event.ActionEvent evt) {					
 					Sdi sdi = new Sdi();
 				
 					boolean isProper = validateAndFillSDI(sdi);
@@ -426,7 +425,6 @@ public class SDIWindow extends JPanel {
 							
 							if(sdi.getId() > 0 ) {
 								commonUTIL.showAlertMessage("SDI Saved With ID: " + sdi.getId());
-								selectSDI.setText(String.valueOf(sdi.getId()));
 							}
 							
 						} catch (RemoteException e) {
@@ -451,8 +449,7 @@ public class SDIWindow extends JPanel {
 			saveAsNewButton.setToolTipText(saveAsNewButton.getName());
 			saveAsNewButton.addActionListener(new java.awt.event.ActionListener() {
 
-				public void actionPerformed(java.awt.event.ActionEvent evt) {
-		
+				public void actionPerformed(java.awt.event.ActionEvent evt) {		
 					Sdi sdi = new Sdi();
 					
 					boolean fieldsOK = validateAndFillSDI(sdi);
@@ -478,8 +475,7 @@ public class SDIWindow extends JPanel {
 			deleteButton.setToolTipText(deleteButton.getName());
 			deleteButton.addActionListener(new java.awt.event.ActionListener() {
 
-				public void actionPerformed(java.awt.event.ActionEvent evt) {
-					
+				public void actionPerformed(java.awt.event.ActionEvent evt) {					
 					Sdi sdi = new Sdi();
 					int id  = Integer.parseInt(selectSDI.getText());
 					
