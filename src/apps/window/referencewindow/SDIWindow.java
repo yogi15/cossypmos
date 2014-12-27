@@ -374,9 +374,9 @@ public class SDIWindow extends JPanel {
 		 } else {
 			 sdiInternal.poData.enable(false);
 		 }
-		 sdiInternal.glAccountData.setSelectedItem(sdi.getGlName().trim());		 			 
+		 sdiInternal.glAccountData.setSelectedItem(sdi.getAccountID());		 			 
 		 sdiInternal.agentNameData.setSelectedItem(sdiInternal.getLeName(sdi.getAgentId()));		
-		 sdiInternal.agentAcTextField.setText(String.valueOf(sdi.getAccountID()));
+		 sdiInternal.agentAcTextField.setText(String.valueOf(sdi.getGlName().trim()));
 		 sdiInternal.agentContactData.setSelectedItem(sdi.getAgentContacts());
 		 sdiInternal.InterM1Data.setSelectedItem(sdiInternal.getLeName(sdi.getInterMid1()));
 		 sdiInternal.InterM1Contacts.setSelectedItem(sdi.getInterMid1Contact());
@@ -818,7 +818,7 @@ public class SDIWindow extends JPanel {
 				 
 			 if (sdiInternal.glAccountData.getSelectedIndex() > -1) {
 				 				 
-				 sdi.setGlName(sdiInternal.glAccountData.getSelectedItem().toString());
+				 sdi.setAccountID(Integer.parseInt((sdiInternal.glAccountData.getSelectedItem().toString())));
 				 
 			 }
 			 
@@ -832,7 +832,7 @@ public class SDIWindow extends JPanel {
 			 
 			if (!sdiInternal.agentAcTextField.getText().toString().equals(CommonConstants.BLANKSTRING)) {
 				
-				sdi.setAccountID(Integer.parseInt(sdiInternal.agentAcTextField.getText().toString()));
+				sdi.setGlName((sdiInternal.agentAcTextField.getText().toString()));
 			}
 			 
 			 if (sdiInternal.agentContactData.getSelectedIndex() > -1){
