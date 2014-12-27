@@ -25,8 +25,6 @@ import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
 import constants.CommonConstants;
-
-import scala.collection.mutable.StringBuilder;
 import util.RemoteServiceUtil;
 import util.commonUTIL;
 import apps.window.utilwindow.propertypane.Combox.AccountSelectorCombox;
@@ -878,8 +876,7 @@ public class SDIInternalPanel extends JPanel {
 			
 			Account data = (Account) it.next();					
 
-			if (data.getAccountName().equals(agentName)) {
-				
+			if (data.getAccountName().equals(agentName)) {				
 				id = data.getId();
 				break;
 			}
@@ -897,16 +894,13 @@ public class SDIInternalPanel extends JPanel {
 			
 			int id =0;
 			
-			while(it.hasNext()) {
-				
+			while(it.hasNext()) {				
 				LegalEntity data = (LegalEntity) it.next();
 				
-				if (data.getName().equals(leName)) {
-					
+				if (data.getAlias().equals(leName)) {				
 					id= data.getId();
 					break;
-				}
-				
+				}				
 			}	
 			
 			it = null;
@@ -920,20 +914,16 @@ public class SDIInternalPanel extends JPanel {
 			
 			String name = "";
 			
-			while(it.hasNext()) {
-				
+			while(it.hasNext()) {				
 				LegalEntity data = (LegalEntity) it.next();
 				
-				if (data.getId() == id) {
-					
-					name= data.getName();
+				if (data.getId() == id) {					
+					name= data.getAlias();
 					break;
-				}
-				
+				}				
 			}	
 			
-			it = null;
-			
+			it = null;			
 			return name;
 	 }
 }
