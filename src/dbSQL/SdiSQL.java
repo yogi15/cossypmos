@@ -134,7 +134,7 @@ public class SdiSQL {
      	 return null;
       }
 	 }
-	 public static Collection selectSDIWhere(String where, Connection con) {
+	 public static Collection<Sdi>  selectSDIWhere(String where, Connection con) {
 		 try {
           return  SDIWhere(where,  con);
       }catch(Exception e) {
@@ -142,7 +142,7 @@ public class SdiSQL {
      	 return null;
       }
 	 }
-	 public static Collection selectALL(Connection con) {
+	 public static Collection<Sdi>  selectALL(Connection con) {
 		 try {
           return select(con);
       }catch(Exception e) {
@@ -165,8 +165,7 @@ public class SdiSQL {
 	        PreparedStatement stmt = null;
 	        String sql = getUpdateSQL(updateSdi);
 		 try {
-			 int j = 1;
-			 con.setAutoCommit(false);
+			 //con.setAutoCommit(false);
 			 
 			 stmt = dsSQL.newPreparedStatement(con, sql);            
               stmt.executeUpdate(sql);
@@ -280,10 +279,10 @@ public class SdiSQL {
 	        return inserSdi;
 	 }
 	 
-	 public static Collection SDIWhere(String wherecon,Connection con ) {
+	 public static Collection<Sdi>  SDIWhere(String wherecon,Connection con ) {
 		 
 	     PreparedStatement stmt = null;
-	     Vector Sdis = new Vector();
+	     Vector<Sdi> Sdis = new Vector<Sdi> ();
 	     String sql = SELECTWHERE;
 	     sql = sql + wherecon;
 	        
@@ -384,10 +383,10 @@ public class SdiSQL {
 	 }
 
 
-	 protected static Collection select(Connection con) { 
+	 protected static Collection<Sdi>  select(Connection con) { 
 
 	     PreparedStatement stmt = null;
-	     Vector Sdis = new Vector();
+	     Vector<Sdi>  Sdis = new Vector<Sdi> ();
 	     
 		 try {
 			
@@ -445,10 +444,10 @@ public class SdiSQL {
 	     return Sdis;
 	 }
 	 
-	 protected static Collection selectSDIOne(int sdiId,Connection con ) {
+	 protected static Collection<Sdi>  selectSDIOne(int sdiId,Connection con ) {
 	
 	     PreparedStatement stmt = null;
-	     Vector Sdis = new Vector();
+	     Vector<Sdi>  Sdis = new Vector<Sdi> ();
 	     
 		 try {
 			
