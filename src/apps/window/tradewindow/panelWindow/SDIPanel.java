@@ -881,10 +881,13 @@ public class SDIPanel extends BackOfficePanel {
 			for(int i=0;i<preferredSDis.size();i++) {
 				Sdi sdi = preferredSDis.get(i);
 				String key = "";
+				/*
 				if(commonUTIL.isEmpty(sdi.getGlName()))
 					key = sdi.getCurrency()+"/"+sdi.getProducts();
 				else
 				 key = sdi.getCurrency()+"/"+sdi.getGlName()+"/"+sdi.getProducts();
+				*/
+				key = getLEName(sdi.getAgentId());
 				model.addElement(key);
 			}
 		}
