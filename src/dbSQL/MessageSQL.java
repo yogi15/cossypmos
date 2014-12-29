@@ -17,30 +17,30 @@ public class MessageSQL {
 	final static private String INSERT_FROM_message = "INSERT into message("
 			+ " id,  tradeid,  transferid, messagetype, sendername, senderRole, receiverName, "
 			+ " receiverRole, tradeversion, transferversion, action, status, addresstype, templateName, "
-			+ " linkid,messagedate, tradedate, messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID" + ") " 
-			+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			+ " linkid,messagedate, tradedate, messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction" + ") " 
+			+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	
 	final static private String SELECT_MAX = "SELECT MESSAGE_SEQ.NEXTVAL DESC_ID FROM dual ";
 	
 	final static private String SELECTALL = "SELECT id, tradeid, transferid, messageType, sendername, senderRole, " 
 			+ " receiverName, receiverRole, tradeversion, "
 			+ " transferversion, action, status, addresstype, templateName, linkid, messagedate, tradedate,"
-			+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID FROM message order by id";
+			+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction FROM message order by id";
 	final static private String SELECT = "SELECT tradeid FROM message where id =  ?";
 	static private String SELECTONE = "SELECT id, tradeid, transferid, messageType, sendername, senderRole, " 
 		+ " receiverName, receiverRole, tradeversion, "
 		+ " transferversion, action, status, addresstype, templateName, linkid, messagedate, tradedate,"
-		+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID  FROM message order by id";
+		+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction FROM message order by id";
 	final static private String SELECTONPRODUCT = "SELECT id, tradeid, transferid, messageType, sendername, senderRole, " 
 		+ " receiverName, receiverRole, tradeversion, "
 		+ " transferversion, action, status, addresstype, templateName, linkid, messagedate, tradedate,"
-		+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID  FROM message order by id";
+		+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction  FROM message order by id";
 
 	
 	final static private String SELECTWHERE = "SELECT id, tradeid, transferid, messageType, sendername, senderRole, " 
 			+ " receiverName, receiverRole, tradeversion, "
 			+ " transferversion, action, status, addresstype, templateName, linkid, messagedate, tradedate,"
-			+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID  FROM message  where ";
+			+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction  FROM message  where ";
 	
 	
 	private static String getUpdateSQL(Message message) {
@@ -49,8 +49,8 @@ public class MessageSQL {
 				.append(" set id = ").append(message.getId()).append(",")
 				.append(" tradeid = ").append(message.getTradeId()).append(",")
 				.append(" transferid = ").append(message.getTransferId()).append(",")
-				.append(" messageType = '").append(message.getSenderName()).append("',")
-				.append(" sendername = '").append(message.getSenderRole()).append("',")
+				.append(" messageType = '").append(message.getMessageType()).append("',")
+				.append(" sendername = '").append(message.getSenderName()).append("',")
 				.append(" senderRole = '").append(message.getSenderRole()).append("',")
 				.append(" receiverName ='").append(message.getReceiverName()).append("',")
 				.append(" receiverRole ='").append(message.getReceiverRole()).append("',")
@@ -74,7 +74,9 @@ public class MessageSQL {
 				.append(" senderContactType = '").append(message.getSenderContactType()).append("',")
 				.append(" receiverContactType = '").append(message.getReceiverContactType()).append("',")
 				.append(" senderID = ").append(message.getSenderId()).append(",")
-				.append(" receiverID = ").append(message.getReceiverId()).append("")
+				.append(" receiverID = ").append(message.getReceiverId()).append(",")
+				.append(" messConfigID = ").append(message.getMessageConfigID()).append(",")
+				.append(" subAction = ").append(message.getSubAction()).append("")
 				.toString();
         updateSQL = updateSQL = " where id = "+message.getId();
 		System.out.println(updateSQL);
@@ -277,6 +279,8 @@ public class MessageSQL {
 			stmt.setString(27, inserMessage.getReceiverContactType());
 			stmt.setInt(28, inserMessage.getSenderId());
 			stmt.setInt(29, inserMessage.getReceiverId());
+			stmt.setInt(30, inserMessage.getMessageConfigID());
+			stmt.setString(31, inserMessage.getSubAction());
 			newMessage = inserMessage;
 			if (stmt.executeUpdate() > 0) {
 				newMessage = inserMessage;
@@ -370,6 +374,8 @@ public class MessageSQL {
 				message.setReceiverContactType(rs.getString(27));
 				message.setSenderId(rs.getInt(28));
 				message.setReceiverId(rs.getInt(29));
+				message.setMessageConfigID(rs.getInt(30));
+				message.setSubAction(rs.getString(31));
 				return message;
 
 			}
@@ -432,6 +438,8 @@ public class MessageSQL {
 				message.setReceiverContactType(rs.getString(27));
 				message.setSenderId(rs.getInt(28));
 				message.setReceiverId(rs.getInt(29));
+				message.setMessageConfigID(rs.getInt(30));
+				message.setSubAction(rs.getString(31));
 				messages.add(message);
 
 			}
@@ -493,6 +501,8 @@ public class MessageSQL {
 				message.setReceiverContactType(rs.getString(27));
 				message.setSenderId(rs.getInt(28));
 				message.setReceiverId(rs.getInt(29));
+				message.setMessageConfigID(rs.getInt(30));
+				message.setSubAction(rs.getString(31));
 				messages.add(message);
 
 			}
@@ -556,6 +566,8 @@ public class MessageSQL {
 				message.setReceiverContactType(rs.getString(27));
 				message.setSenderId(rs.getInt(28));
 				message.setReceiverId(rs.getInt(29));
+				message.setMessageConfigID(rs.getInt(30));
+				message.setSubAction(rs.getString(31));
 				messages.add(message);
 
 			}
@@ -622,6 +634,8 @@ public class MessageSQL {
 				message.setReceiverContactType(rs.getString(27));
 				message.setSenderId(rs.getInt(28));
 				message.setReceiverId(rs.getInt(29));
+				message.setMessageConfigID(rs.getInt(30));
+				message.setSubAction(rs.getString(31));
 				messages.add(message);
 
 			}
@@ -641,6 +655,8 @@ public class MessageSQL {
 		}
 		return messages;
 	}
+
+	
 	
 	
 }
