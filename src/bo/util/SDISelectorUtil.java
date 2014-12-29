@@ -135,7 +135,7 @@ public class SDISelectorUtil {
        int indexID = 0;
     	Vector<Sdi>	sdis = preferredSdis.get(key);
 		
-		if(sdis != null) {
+		if(sdis != null) {	
 			
 			for(int i=0;i<sdis.size();i++) {
 				Sdi s = sdis.get(i);
