@@ -32,6 +32,7 @@ public interface RemoteBOProcess  extends Remote {
 	public Vector<Message> saveMesage(Vector<Message> mess,String sqlType)  throws RemoteException;
 	public Vector<Message> getMessagesOnWhere(String where) throws RemoteException;
 	public Vector<Message> getMessages(int tradeID,String eventType,String triggerON) throws RemoteException;
+	public Vector<Message> getMessages(int messageConfigid,int tradeID,String eventType,String triggerON) throws RemoteException;
 	public Message selectMessage(Message message) throws RemoteException;
 	public Collection getMessageOnTrade(int tradeID)  throws RemoteException;
 	public Collection getMessageOnTransfer(int transferID)  throws RemoteException;
