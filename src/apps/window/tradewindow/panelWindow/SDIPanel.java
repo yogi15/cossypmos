@@ -889,6 +889,9 @@ public class SDIPanel extends BackOfficePanel {
 				*/
 				key = getLEName(sdi.getAgentId());
 				model.addElement(key);
+				/*if (!sdi.getkey().equals("")) {
+					model.setSelectedItem(key);
+				}*/
 			}
 		}
 		return model;
