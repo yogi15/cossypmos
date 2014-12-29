@@ -17,7 +17,7 @@ public class MessageConfigSQL {
 	final static private String INSERT_FROM_message = "INSERT into messageConfig("
 			+ " id,  poid,  eventType, productType, productsubtype, receiverrole, formatType, "
 			+ " receiverID, templateName, pocontacttype, messageType,Gateway,addressType,receivercontact) " 
-			+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	
 	final static private String SELECT_MAX = "SELECT MESSAGECONFIG_SEQ.NEXTVAL  DESC_ID  FROM dual ";
 	
@@ -212,8 +212,8 @@ public class MessageConfigSQL {
 		try {
 			stmt = dsSQL.newPreparedStatement(con, INSERT_FROM_message);
 			commonUTIL.display("MessageConfigSQL", INSERT_FROM_message);
-			
-			con.setAutoCommit(false);
+
+			//con.setAutoCommit(false);
 			id =selectMax(con);
 			stmt.setInt(1, id);
 			stmt.setInt(2, inserMessage.getPoid());
@@ -238,6 +238,7 @@ public class MessageConfigSQL {
 
 		} catch (Exception e) {
 			
+			commonUTIL.displayError("MessageConfigSQL", INSERT_FROM_message, e);
 			return 0;
 
 		} finally {
