@@ -350,12 +350,7 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 	
 	public WFConfig getStatusOnTransferAction(Transfer transfer,String status,Vector<String> statusMessages,Trade trade) {
 		Product product = ProductSQL.selectProduct(transfer.getProductId(), dsSQL.getConn());
-		String whereClause = "productType ='" + product.getProductType() 
-								+ "' and productSubType = '"+ product.getProdcutShortName() 
-								+ "' and currentstatus = '" + transfer.getStatus() 
-								+ "' and action = '" + transfer.getAction() 
-								+ "' and type ='TRANSFER'";
-		
+		String whereClause = "productType ='" + product.getProductType() + "' and productSubType = '"+ product.getProdcutShortName() + "' and currentstatus = '" + transfer.getStatus() + "' and action = '" + transfer.getAction() + "' and type ='TRANSFER'";
 		Vector  wfs = (Vector) WFConfigSQL.selectWhere(whereClause, dsSQL.getConn());// this must alway retunr one transition which is unique .
 		WFConfig wf = (WFConfig) wfs.elementAt(0);
 		if(!commonUTIL.isEmpty(wf.getRule())) {
@@ -1117,9 +1112,15 @@ return status;
 			   Message message = messages.get(i);
 			   message.setAction("NEW");
 			   message.setStatus("NONE");
+			 //  message.setSubAction("NEW");
+			   
 			   Vector<String> statusMessages = new Vector<String>();
 			   WFConfig wf =  getStatusOnMessageAction(message, message.getStatus(), statusMessages, trade, transfer);
 			   message.setStatus(wf.getOrgStatus());
+			   if(message.getStatus().equalsIgnoreCase("CANCELLED")) {
+				   message.setSubAction("CANCEL");
+			   }
+			  
 			   messsageWithStatus.add(message);
 		   }
 		   
@@ -1130,7 +1131,7 @@ return status;
 	public Vector<Message> getMessagesOnWhere(String where)
 			throws RemoteException {
 		// TODO Auto-generated method stub
-		return null;
+		return (Vector<Message>) MessageSQL.getMessageOnWhere(where,dsSQL.getConn());
 	}
 	@Override
 	public Vector<Message> getMessages(int tradeID, String eventType,
@@ -1170,6 +1171,14 @@ return status;
 	public Message selectMessageOnLinkid(int linkId) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	@Override
+	public Vector<Message> getMessages(int messageConfigid, int tradeID,
+			String eventType, String triggerON) throws RemoteException {
+		// TODO Auto-generated method stub
+		String sql = " messConfigID="+messageConfigid+" and tradeID ="+tradeID+" and eventType='"+eventType+"' and triggerON ='"+triggerON+"' order by id desc";
+		 return  getMessagesOnWhere(sql);
+		
 	}
 
 }
