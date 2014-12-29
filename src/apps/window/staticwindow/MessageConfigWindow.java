@@ -661,7 +661,9 @@ public class MessageConfigWindow extends JPanel {
 					    model.addRow(messConfig);
 					    commonUTIL.showAlertMessage("MessageConfig Saved with ID " + id);
 					    
-                	}
+						} else {
+							commonUTIL.showAlertMessage("MessageConfig Not Saved");
+						}
 					} catch (RemoteException e) {
 						e.printStackTrace();
 					}
@@ -712,7 +714,7 @@ public class MessageConfigWindow extends JPanel {
 
 		
 			TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
-			tca.adjustColumns();
+			//tca.adjustColumns();
 		}jTable0.addMouseListener(new java.awt.event.MouseAdapter() {
 
 			@Override
@@ -1088,7 +1090,9 @@ class TableModelUtil extends AbstractTableModel {
 	         break;
 	     case 5:
 	    	 LegalEntity le = getLegalEntity(currSplit.getPoid());
-	         value = le.getName();
+	    	 if (le== null)
+	    		 return "";
+	    	 value = le.getName();
 	         break;
 	     case 6:
 	    		
