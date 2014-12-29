@@ -847,13 +847,14 @@ public class SwiftUtil {
 			if(poB) {
 				sdi = prule.getSdi("PO");
 			} else {
-				sdi = prule.getSdi("CounterParty");
+				
+								sdi = prule.getSdi("CounterParty");
 			}
 			  
 	//	}
 		String option = null;
 		String value = null;
-		Sdi agentSDI = prule.getAgentSdi();
+		Sdi agentSDI = sdi.getAgentSdi(); // prule.getAgentSdi();
 		ValueTag tagValue = getTagValue(agentSDI,
 				trade,
 				transfer,
@@ -2638,14 +2639,15 @@ final static String EMPTYSTRING = "";
 		Sdi partySDI;
 		String acctName = null;
 		if (isDirectRelationship) {
-			partySDI = psdi.getBeneficiary();
-			Account acc = BackOfficeCache.getAccount(sdi.getAccountID());
-			acctName = acc.getAccountName();
+			partySDI = sdi.getAgentSdi();
+			
+		//	Account acc = BackOfficeCache.getAccount(sdi.getAccountID());
+			acctName = partySDI.getGlName();
 		}
 		else {
 			partySDI = sdi.getAgentSdi();
-			Account acc = BackOfficeCache.getAccount(partySDI.getAccountID());
-			acctName = acc.getAccountName();
+			//Account acc = BackOfficeCache.getAccount(partySDI.getAccountID());
+			acctName = partySDI.getGlName();//.getAccountName();
 		}
 
 		// Enhance Template to take into account cpty having its
@@ -2654,8 +2656,8 @@ final static String EMPTYSTRING = "";
 			if ((psdi.getBeneficiary()).getCpId() ==
 				(sdi.getIntermediary()).getCpId()) {
 				partySDI = sdi.getIntermediary();
-				Account acc = BackOfficeCache.getAccount(sdi.getIntermediary().getAccountID());
-				acctName = acc.getAccountName();
+				//Account acc = BackOfficeCache.getAccount(sdi.getIntermediary().getAccountID());
+				acctName =partySDI.getGlName();
 			}
 		}
 
