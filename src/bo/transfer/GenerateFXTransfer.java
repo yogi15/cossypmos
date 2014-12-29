@@ -87,10 +87,10 @@ private Fees getFee(int id) {
 		    transfer.setTradeVersionID(trade.getVersion());
 			TransferRule rule = rulesI.next();
 			transfer.setBookId(rule.getBookId());
-			Sdi sd = rule.get__sMethod();
-			transfer.setReceiverInst(getLEName(sd.getAgentId()));
+			//Sdi sd = rule.get__sMethod();
+			transfer.setReceiverInst(getLEName(rule.get_receiverAgentID()));
 
-			transfer.setPayerInst(getLEName(sd.getAgentId()));
+			transfer.setPayerInst(getLEName(rule.get_payerAgentID()));
 			if((rule.get_transferType().equalsIgnoreCase(fxTransferRule.transerTYPEPRINCIPAL)) && (rule.get_payReceive().equalsIgnoreCase(fxTransferRule.RECEIVE))) {
 				if(trade.getQuantity() > .0)
 				   transfer.setAmount(trade.getQuantity());
@@ -134,7 +134,7 @@ private Fees getFee(int id) {
 					transfer.setProductId(rule.get_productId());
 					transfer.setSettlecurrency(rule.get_settlementCurrency());
 					transfer.setValueDate(trade.getEffectiveDate());
-					transfer.setPayerInst(getLEName(sd.getAgentId()));
+					//transfer.setPayerInst(getLEName(rule.get_payerAgentID()));
 					transfer.setPayerCode(getLEName(rule.get_payerLegalEntityId()));
 					transfer.setPayerRole(rule.get_payerLegalEntityRole());
 					transfer.setReceiverCode(getLEName(rule.get_receiverLegalEntityId()));
