@@ -89,13 +89,13 @@ public class MessageProcessor {
 			if(event instanceof TradeEventProcessor) {
 			    message = boHandler.fillMessage(trade, null, messConfig,"TRADE",null,(TradeEventProcessor) event,receiver,sender);
 			    messages.add(message); 
-			    filterOldMessages(trade.getId(),messages,"TRADE",filterMessages);
+			    filterOldMessages(message.getMessageConfigID(),trade.getId(),messages,"TRADE",filterMessages);
 				saveFilterMessages(filterMessages,trade,transfer);
 			}
 			if(event instanceof TransferEventProcessor) {
 				 message = boHandler.fillMessage(trade, transfer, messConfig,"TRANSFER",(TransferEventProcessor) event,null,receiver,sender);
 				 messages.add(message); 
-				 filterOldMessages(transfer.getId(),messages,"TRANSFER",filterMessages);
+				 filterOldMessages(message.getMessageConfigID(),transfer.getId(),messages,"TRANSFER",filterMessages);
 					saveFilterMessages(filterMessages,trade,transfer);
 			}
 			  
@@ -147,7 +147,7 @@ public class MessageProcessor {
 		
 	} */
 	
-	private void filterOldMessages(int objectID,Vector<Message> messages,String eventTriggerON,Hashtable<String,Vector<Message>> filterMessages) {
+	private void filterOldMessages(int messageConfigid,int objectID,Vector<Message> messages,String eventTriggerON,Hashtable<String,Vector<Message>> filterMessages) {
 		// TODO Auto-generated method stub
 		Vector<Message> insertMessages = new Vector<Message>();
 		Vector<Message> updatetMessages = new Vector<Message>();
@@ -155,11 +155,27 @@ public class MessageProcessor {
 			return;
 		for(int i=0;i<messages.size();i++) {
 			Message message = messages.get(i);
-			Vector<Message> oldmess = getOLDMessage(objectID,message.getEventType(),eventTriggerON);
-			if(oldmess == null) {
+			Vector<Message> oldmess = getOLDMessage(messageConfigid,objectID,message.getEventType(),eventTriggerON);
+			if(commonUTIL.isEmpty(oldmess)) {
+				message.setSubAction("NEW");
 				insertMessages.add(message);
 			} else {
 				// checkout code need to added.
+			    if(!commonUTIL.isEmpty(oldmess) && oldmess !=null) {
+			    	
+			    		Message oldMessage = oldmess.get(0);  // always going to first record bz of we have used order id by in where clause.
+			    		
+			    			
+			    		if(oldMessage.getSubAction().equalsIgnoreCase("NEW") && oldMessage.getStatus().equalsIgnoreCase("SEND")) {
+			    			message.setSubAction("AMEND");
+			    		} else {
+			    			message.setSubAction("NEW");
+			    		}
+			    		message.setLinkId(oldMessage.getId());
+			    		
+			    		insertMessages.add(message);
+			    	
+			    }
 			}
 		}
 		filterMessages.put("insert",insertMessages);
@@ -167,8 +183,14 @@ public class MessageProcessor {
 	}
 
 	
-	private Vector<Message> getOLDMessage(int ID,String eventType,String messageOn) {
+	private Vector<Message> getOLDMessage(int messageConfig,int tradeID,String eventType,String messageOn) {
 		Vector<Message> message = null;
+		try {
+			message = remoteBO.getMessages(messageConfig,tradeID, eventType, messageOn);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return message;
 		
 	}
