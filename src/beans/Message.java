@@ -268,5 +268,22 @@ public class Message implements Serializable, Cloneable {
 		// TODO Auto-generated method stub
 		return "English";
 	}
+	int messageConfigID = 0;
+	public void setMessageConfigID(int messageConfig) {
+		// TODO Auto-generated method stub
+		messageConfigID = messageConfig;
+		
+	}
+	public int getMessageConfigID() {
+		return messageConfigID;
+	}
+	String subAction = "NEW";
+	public void setSubAction(String subAction) {
+		this.subAction = subAction;
+	}
+	public String getSubAction() {
+		return subAction;
+	}
+	
 	
 }
