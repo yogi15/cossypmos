@@ -1383,6 +1383,15 @@ String sql = " quoting_currency = '"+cp.getQuoting_currency() + "'";
 		Vector messConfig = (Vector) MessageConfigSQL.selectMessageConfigOn(sql, dsSQL.getConn());
 		return messConfig;
 	}
+
+	@Override
+	public Collection getMessageConfigsonProductype(String productype,
+			String productSubtype, int poID) throws RemoteException {
+		// TODO Auto-generated method stub
+		String sql =  " producttype = '"+ productype + "' and productsubtype ='" + productSubtype +"' and poid = "+poID;
+		Vector messConfig = (Vector) MessageConfigSQL.selectMessageConfigOn(sql, dsSQL.getConn());
+		return messConfig;
+	}
 	
 
 }

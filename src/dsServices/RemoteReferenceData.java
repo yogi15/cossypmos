@@ -38,6 +38,7 @@ public interface RemoteReferenceData extends Remote{
 	public boolean updateMessageConfig(MessageConfig messConfig) throws RemoteException;
 	public Collection  selectALLMessageConfigs() throws RemoteException;
 	public Collection  getMessageConfigsonProductype(String productype,String productSubtype) throws RemoteException;
+	public Collection  getMessageConfigsonProductype(String productype,String productSubtype,int poID) throws RemoteException;
 	public int saveDateRule(DateRule dateRule) throws RemoteException;
 	public boolean updateDateRule(DateRule dateRule) throws RemoteException;
 	public DateRule getDateRule(int dateRuleID)  throws RemoteException;
