@@ -116,7 +116,7 @@ public class MessageConfigWindow extends JPanel {
 	}
 
 
-	 String role = "Exchange";
+	String role = "Exchange";
 	 DefaultListModel<String> triggerEvts = new DefaultListModel<String>();
 	 Hashtable<Integer,LegalEntity> messLeg = new Hashtable<Integer,LegalEntity>();
 	 Vector<MessageConfig> data = new Vector<MessageConfig>();
@@ -268,7 +268,12 @@ public class MessageConfigWindow extends JPanel {
 					 try {
 						 String productType = (String) jProductType.getSelectedItem().toString();
 						 String productsubType = (String) productSubtypeCombobox.getSelectedItem().toString();
+						 if(poSearchID > 0) {
+							 data = 	 (Vector) referenceData.getMessageConfigsonProductype(productType, productsubType,poSearchID);
+						 } else {
 						 data =  (Vector) referenceData.getMessageConfigsonProductype(productType, productsubType);
+						 }
+						 
 						 model = new TableModelUtil(data, cols, messLeg);
 						 jTable0.setModel(model);
 						 jTable0.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -651,8 +656,12 @@ public class MessageConfigWindow extends JPanel {
                 if( fillConfig(messConfig)) {
                 	try {
 						int id = referenceData.saveMessageConfig(messConfig);
+						if(id > 0) {
 						messConfig.setId(id);
 					    model.addRow(messConfig);
+					    commonUTIL.showAlertMessage("MessageConfig Saved with ID " + id);
+					    
+                	}
 					} catch (RemoteException e) {
 						e.printStackTrace();
 					}
@@ -721,7 +730,10 @@ public class MessageConfigWindow extends JPanel {
 				poid = messConfig.getPoid();
 				receiverID = messConfig.getReceiverID();
 				rolesData.setSelectedItem(messConfig.getReceiverRole());
+				if(messConfig.getReceiverID() != 0)
 				receiverLe.setText(messLeg.get(messConfig.getReceiverID()).getName());
+				else 
+					receiverLe.setText("");
 				POContactType.setSelectedItem(messConfig.getPoContactType());
 				receiverContactTypeCombobBox.setSelectedItem(messConfig.getReceiverContactType());
 			}
@@ -943,8 +955,8 @@ public class MessageConfigWindow extends JPanel {
 		messConfig.setPoid(poid);
 		
 		if(receiverID == 0) {
-			commonUTIL.showAlertMessage("Select Receiver");
-			return flag;			
+		//	commonUTIL.showAlertMessage("Select Receiver");
+			//return flag;			
 		}
 		messConfig.setReceiverID(receiverID);
 		messConfig.setReceiverRole(rolesData.getSelectedItem().toString());
@@ -1085,6 +1097,8 @@ class TableModelUtil extends AbstractTableModel {
 	     case 7:
 	    	
 	    	 LegalEntity reciver = getLegalEntity(currSplit.getReceiverID());
+	    	 if(reciver == null)
+	    		 return 0;
 	         value = reciver.getName();
 	         break;
 	     case 8:
