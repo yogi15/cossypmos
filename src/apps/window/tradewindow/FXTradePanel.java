@@ -1063,7 +1063,12 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 									tradeTakeUp.setTraderID(trade.getTraderID());
 									tradeTakeUp.setAttribute("ParentID",Integer.toString(trade.getId()));
 									
-									tradeTakeUp.setAttribute("TakeUpType", takeupW.typeComboBox.getSelectedItem().toString());
+									if ( takeupW.typeComboBox.getSelectedItem() == null) {
+										commonUTIL.showAlertMessage("Please select Takeup Type");
+									} else{
+										tradeTakeUp.setAttribute("TakeUpType", takeupW.typeComboBox.getSelectedItem().toString());	
+									}
+									
 									
 									tradeTakeUp.setUserID(user.getId());
 										double amt1 = takeupW.jTextField1.getDoubleValue();
