@@ -18,6 +18,7 @@ import beans.Trade;
 import beans.Transfer;
 import beans.TransferRule;
 import bo.transfer.rule.GenerateFXTransferRule;
+import bo.util.SDISelectorUtil;
 public class FXConfirmSwiftGenerator extends SwiftGenerator {
 
 	
@@ -35,13 +36,22 @@ public class FXConfirmSwiftGenerator extends SwiftGenerator {
 		      return null;
 	}
 		GenerateFXTransferRule fxTransferRule =   new GenerateFXTransferRule();
+		
+		
+		
 		fxTransferRule.setRemoteTrade(remoteTrade);
 		fxTransferRule.setRefDate(remoteRef);
 		Vector<TransferRule> transferRules =  fxTransferRule.generateRules(trade);
 		String type = "MT300";
 		refeCache = ReferenceDataCache.getSingleInstatnce();
 		LegalEntity po = refeCache.getPO(trade.getBookId());
-	
+		String poKey = "PO|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+po.getId();
+		String cpKey =  "CounterParty|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+trade.getCpID();
+		Vector<Sdi> poPerferedSdis = SDISelectorUtil.getPreferredSdisOnKey(poKey);
+		fxTransferRule.setPOSdi(poPerferedSdis.elementAt(0));
+		Vector<Sdi> cpPerferedSdis = SDISelectorUtil.getPreferredSdisOnKey(cpKey);
+		fxTransferRule.setCounterPartySDI(cpPerferedSdis.elementAt(0));
+		
 		String senderMessageCode = ReferenceDataCache.getSenderMessageCode(message.getSenderRole(),po.getId(),trade.getProductType(),message.getAddressType(),message.getSenderContactType());
 		String receiverMessageCode = ReferenceDataCache.getSenderMessageCode(message.getReceiverRole(),message.getReceiverId(),trade.getProductType(),message.getAddressType(),message.getReceiverContactType());
 		message.setSenderAddressCode(senderMessageCode);
@@ -89,16 +99,16 @@ public class FXConfirmSwiftGenerator extends SwiftGenerator {
         field.setStatus((byte)'M');
         field.setTAG(":22A:");
         field.setName("Type of Operation");
-        if (message.getAction().equals("NONE")){
+        if (message.getAction().equals("NEW")){
             field.setValue("NEWT");
            // if (trade.getKeywordValue(Trade.EXERCISE_OPTION) != null) {
-                field.setValue("EXOP");
+              //  field.setValue("EXOP");
            // }
         }
-        else if (message.getAction().equals("AMEND"))
+       
+        else if (message.getSubAction().equals("AMEND"))
             field.setValue("AMND");
-        else if (message.getAction().equals("COPY"))
-            field.setValue("DUPL");
+      
         else field.setValue("CANC");
         //PB - Add support for Exercise of Option.
 
@@ -303,7 +313,7 @@ public class FXConfirmSwiftGenerator extends SwiftGenerator {
        // field = SwiftUtil.getTAG56(fxTransferRule,"PAY", trade,null,"Intermediary",false,message,transferRules,dsCon);
       //  if (field != null) fields.addElement(field);
 
-        field = SwiftUtil.getTAG57(fxTransferRule,"PAY", trade,null,"Receiving Agent",false,message,transferRules,null);
+        field = SwiftUtil.getTAG57(fxTransferRule,"PAY", trade,null,"Receiving Agent",true,message,transferRules,null);
         if (field != null) fields.addElement(field);
         field = new SwiftFieldMessage();
         field.setStatus((byte)'M');
