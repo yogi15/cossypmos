@@ -8,6 +8,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.EventObject;
 import java.util.Hashtable;
@@ -34,10 +36,13 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
+import util.RemoteServiceUtil;
 import util.commonUTIL;
 
 import com.jidesoft.combobox.MultiSelectListExComboBox;
 import com.jidesoft.grid.DateCellEditor;
+
+import dsServices.RemoteReferenceData;
 
 import beans.Attribute;
 import beans.StartUPData;
@@ -54,6 +59,9 @@ public class TradeAttributesD extends JPanel {
         public static String tradeAction = "";
         private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
         FWDOptionPanel fwdOp;
+        RemoteReferenceData remoteReferenceData;
+        Collection instrumenTypeVal = new Vector();
+        Collection instrumenTypeStartupData = new Vector();
         
         Vector<Attribute> data = new Vector<Attribute>();
          /**
@@ -62,18 +70,16 @@ public class TradeAttributesD extends JPanel {
         public Vector<Attribute> getData() {
                 return data;
         }
-        
-    
-	
-	public void changeXccySplitRate(String name,String value) {
-		for(int i=0;i<mod.getRowCount();i++) {
-			String columnName = (String) mod.getValueAt(i, 0);
-			if(columnName.equalsIgnoreCase(name)) {
-				mod.setValueAt(value, i, 1);
-				break;
+
+		public void changeXccySplitRate(String name,String value) {
+			for(int i=0;i<mod.getRowCount();i++) {
+				String columnName = (String) mod.getValueAt(i, 0);
+				if(columnName.equalsIgnoreCase(name)) {
+					mod.setValueAt(value, i, 1);
+					break;
+				}
 			}
 		}
-	}
 
         /**
          * @param data the data to set
@@ -82,257 +88,233 @@ public class TradeAttributesD extends JPanel {
                 this.data = data;
         }
         TableModelUtil mod;
-         String col[] = { "Attributes", "Values" };
-         public EachRowEditor rowEditor;
+        String col[] = { "Attributes", "Values" };
+        public EachRowEditor rowEditor;
 
         public TradeAttributesD() {
-                initComponents();
+        	initComponents();
         }
-
-        private void initComponents() {
-                 mod = new TableModelUtil(data,col);
-                 Attribute bean = new Attribute();
-                 jTable1  = new JTable() ;
-                 rowEditor = new EachRowEditor(jTable1);
-                 jTable1.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-                // mod.addRow(bean);
-                 jTable1.setModel(mod);
-                setLayout(new GroupLayout());
-                add(getJTabbedPane0(), new Constraints(new Leading(5, 309, 10, 10), new Leading(4, 470, 10, 10)));
-                setSize(327, 484);
+        private void getInstrumentVal() {
+        	Iterator it = instrumenTypeStartupData.iterator();
+        	
+        	while (it.hasNext()) {
+        		StartUPData data = (StartUPData)it.next();
+        		instrumenTypeVal.add(data.getName());
+        	}
         }
-
+        private void initComponents() {        	
+        	remoteReferenceData = RemoteServiceUtil.getRemoteReferenceDataService();
+        	try {
+        		instrumenTypeStartupData = remoteReferenceData.getStartUPData("InstrumentTypeVal");
+        		getInstrumentVal();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			
+        	mod = new TableModelUtil(data,col);
+            Attribute bean = new Attribute();
+            jTable1  = new JTable() ;
+            rowEditor = new EachRowEditor(jTable1);
+            jTable1.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+            // mod.addRow(bean);
+            jTable1.setModel(mod);
+            setLayout(new GroupLayout());
+            add(getJTabbedPane0(), new Constraints(new Leading(5, 309, 10, 10), new Leading(4, 470, 10, 10)));
+            setSize(327, 484);               
+        }
         private JTabbedPane getJTabbedPane0() {
-                if (jTabbedPane0 == null) {
-                        jTabbedPane0 = new JTabbedPane();
-                        jTabbedPane0.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
-                        jTabbedPane0.addTab("Attributes ", getJScrollPane0());
-                }
-                return jTabbedPane0;
+            if (jTabbedPane0 == null) {
+                    jTabbedPane0 = new JTabbedPane();
+                    jTabbedPane0.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
+                    jTabbedPane0.addTab("Attributes ", getJScrollPane0());
+            }
+            return jTabbedPane0;
         }
-
         private JScrollPane getJScrollPane0() {
-                if (jScrollPane0 == null) {
-                        jScrollPane0 = new JScrollPane();
-                        jScrollPane0.setViewportView(getJTable0());
-                }
-                return jScrollPane0;
+            if (jScrollPane0 == null) {
+                    jScrollPane0 = new JScrollPane();
+                    jScrollPane0.setViewportView(getJTable0());
+            }
+            return jScrollPane0;
         }
-
         private JTable getJTable0() {
-                if (jTable1 == null) {
-                        jTable1 = new JTable();
-                        jTable1.setModel(new DefaultTableModel(new Object[][] { { "0x0", "0x1", }, { "1x0", "1x1", }, }, new String[] { "Title 0", "Title 1", }) {
-                                private static final long serialVersionUID = 1L;
-                                Class<?>[] types = new Class<?>[] { Object.class, Object.class, };
-        
-                                public Class<?> getColumnClass(int columnIndex) {
-                                        return types[columnIndex];
-                                }
-                        });
-                }
-                return jTable1;
+	        if (jTable1 == null) {
+	                jTable1 = new JTable();
+	                jTable1.setModel(new DefaultTableModel(new Object[][] { { "0x0", "0x1", }, { "1x0", "1x1", }, }, new String[] { "Title 0", "Title 1", }) {
+	                        private static final long serialVersionUID = 1L;
+	                        Class<?>[] types = new Class<?>[] { Object.class, Object.class, };
+	
+	                        public Class<?> getColumnClass(int columnIndex) {
+	                                return types[columnIndex];
+	                        }
+	                });
+	        }
+	        return jTable1;
         }
         public JTextField getJTextFieldBox() {
-                final JTextField values = new JTextField(100);
-                values.addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-                if (e.getKeyChar() == KeyEvent.VK_ENTER) { 
-                        
-                                        // TODO Auto-generated method stub
-                        String attributeName = values.getText();
-                                        int i = jTable1.getSelectedRow();
-                                        
-                                        Attribute attribute = getFilterBeanAtRow(i);
-                                        if(attribute != null) {
-                                                attribute.setValue(attributeName);
-                                                removeFilterBeanAtRow(i);
-                                                addFilterBeanAt(i, attribute);
-                                        }
-                                //      searchPanel.setFocusable(true);
-
-                                }
-                        }
-                });
-                values.addFocusListener(new FocusAdapter() {
-                        
-
-                  public void FocusLost(FocusEvent e) {
-                         // System.out.println(e.getKeyChar());
-            
+            final JTextField values = new JTextField(100);
+            values.addKeyListener(new KeyAdapter() {
+            	@Override
+		        public void keyTyped(KeyEvent e) {
+		            if (e.getKeyChar() == KeyEvent.VK_ENTER) { 
+		            	String attributeName = values.getText();
+		                int i = jTable1.getSelectedRow();
+		                Attribute attribute = getFilterBeanAtRow(i);
+		                if(attribute != null) {
+		                	attribute.setValue(attributeName);
+		                    removeFilterBeanAtRow(i);
+		                    addFilterBeanAt(i, attribute);
+		                }
+		            }
+		        }
+             });
+            values.addFocusListener(new FocusAdapter() {       
+            	public void FocusLost(FocusEvent e) {
+            		String attributeName = values.getText();
+            		int i = jTable1.getSelectedRow();                                    
+                    Attribute attribute = getFilterBeanAtRow(i);
                     
-                                
-                                                // TODO Auto-generated method stub
-                          //System.out.println("Coming from ruennenenenene ");
-                        String attributeName = values.getText();
-                   int i = jTable1.getSelectedRow();
-                                        
-                                        Attribute attribute = getFilterBeanAtRow(i);
-                                        if(attribute != null) {
-                                                attribute.setValue(attributeName);
-                                                removeFilterBeanAtRow(i);
-                                                addFilterBeanAt(i, attribute);
-                                        }
-                                        //      searchPanel.setFocusable(true);
-
-                                        
-                                }
-                });
-                return values;
-        }
-        
+                    if(attribute != null) {
+                            attribute.setValue(attributeName);
+                            removeFilterBeanAtRow(i);
+                            addFilterBeanAt(i, attribute);
+                    }
+                }
+            });
+            return values;
+        }        
         public void addNewRow(Attribute bean) {
-                if(mod != null) 
-                 mod.addRow(bean);
+        	if(mod != null) 
+        		mod.addRow(bean);
         }
-        
-        
         public Attribute getFilterBeanAtRow(int row) {
-                if(row >= 0)
-                return ( Attribute) data.get(row);
-                return null;
+            if(row >= 0)
+            	return ( Attribute) data.get(row);
+            return null;
         }
         public void removeFilterBeanAtRow(int row) {
-                data.remove(row);
-        }
-        
+        	data.remove(row);
+        }        
         public void addFilterBeanAt(int row,Attribute filterBean) {
-                data.add(row,filterBean);
+            data.add(row,filterBean);
         }
         public int getTableRowCount() {
-                return jTable1.getRowCount();
+            return jTable1.getRowCount();
         }
         public void addRowEditor(int row,MultiSelectListExComboBox multiCombox,String columnName) {
-                 final MultiSelectionRenderer ed = new MultiSelectionRenderer(multiCombox,null);
-                rowEditor.setEditorAt(row,ed);
-                jTable1.getColumn(columnName).setCellEditor(rowEditor);
+            final MultiSelectionRenderer ed = new MultiSelectionRenderer(multiCombox,null);
+            rowEditor.setEditorAt(row,ed);
+            jTable1.getColumn(columnName).setCellEditor(rowEditor);
         }
         public void addRowEditor(int row,int col,MultiSelectListExComboBox multiCombox,String columnName) {
-                 final MultiSelectionRenderer ed = new MultiSelectionRenderer(multiCombox,null);
-                rowEditor.setEditorForRowCol(row,col,ed);
-                jTable1.getColumn(columnName).setCellEditor(rowEditor);
+            final MultiSelectionRenderer ed = new MultiSelectionRenderer(multiCombox,null);
+            rowEditor.setEditorForRowCol(row,col,ed);
+            jTable1.getColumn(columnName).setCellEditor(rowEditor);
         }
         public void addRowEditor(int row,int col,JTextField jtextField,String columnName) {
-                MyTableCellEditor1 ed = new MyTableCellEditor1(jtextField,null);
-                rowEditor.setEditorForRowCol(row,col,ed);
-                jTable1.getColumn(columnName).setCellEditor(rowEditor);
+            MyTableCellEditor1 ed = new MyTableCellEditor1(jtextField,null);
+            rowEditor.setEditorForRowCol(row,col,ed);
+            jTable1.getColumn(columnName).setCellEditor(rowEditor);
         }
         public void addRowEditor(int row,int col,DateCellEditor multiCombox,String columnName) {
-        //       final MultiSelectionRenderer ed = new MultiSelectionRenderer(multiCombox,null);
-                rowEditor.setEditorForRowCol(row,col,multiCombox);
-                jTable1.getColumn(columnName).setCellEditor(rowEditor);
+    //       final MultiSelectionRenderer ed = new MultiSelectionRenderer(multiCombox,null);
+            rowEditor.setEditorForRowCol(row,col,multiCombox);
+            jTable1.getColumn(columnName).setCellEditor(rowEditor);
         }
         public void addRowEditor(int row,JComboBox combox,String columnName) {
-                DefaultCellEditor ed = new DefaultCellEditor(combox);
-                rowEditor.setEditorAt(row,ed);
-                jTable1.getColumn(columnName).setCellEditor(rowEditor);
+            DefaultCellEditor ed = new DefaultCellEditor(combox);
+            rowEditor.setEditorAt(row,ed);
+            jTable1.getColumn(columnName).setCellEditor(rowEditor);
         }
         public void addRowEditor(int row,int col,JComboBox combox,String columnName) {
-                DefaultCellEditor ed = new DefaultCellEditor(combox);
-                rowEditor.setEditorForRowCol(row,col,ed);
-                jTable1.getColumn(columnName).setCellEditor(rowEditor);
+            DefaultCellEditor ed = new DefaultCellEditor(combox);
+            rowEditor.setEditorForRowCol(row,col,ed);
+            jTable1.getColumn(columnName).setCellEditor(rowEditor);
         }
         private EachRowEditor getRowEditor() {
-                return rowEditor;
+            return rowEditor;
         }
         /**
          * @param rowEditor the rowEditor to set
          */
         private void setRowEditor(EachRowEditor rowEditor) {
-                this.rowEditor = rowEditor;
+            this.rowEditor = rowEditor;
         }
-         public JComboBox getJComboxBox(final String [] criteria) {
-                        final JComboBox criteriaC = new JComboBox(criteria);
-                                criteriaC.addItemListener(new ItemListener() {
-
-                                        @Override
-                                        public void itemStateChanged(ItemEvent e) {
-                                                if (criteriaC.getSelectedIndex() != -1) {
-                                                        // TODO Auto-generated method stub
-                                                        String attributeName = criteriaC.getSelectedItem().toString();
-                                                        int i = jTable1.getSelectedRow();
-                                                        
-                                                        if(i == -1)
-                                                                return;
-                                                        
-                                                        jTable1.setValueAt(attributeName, i, 1);
-                                                        
-                                                        
-                                                        if ((jTable1.getValueAt(i,0)).toString().equalsIgnoreCase("InstrumentType") && 
-                                                                        (jTable1.getValueAt(i,1)).toString().equalsIgnoreCase("FCNR")){
-                                                                
-                                                        	fwdOp.startDate.setText(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
-                                                                setCheckBox(true);
-                                                                
-                                                        } else {
-                                                        	fwdOp.startDate.setText(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
-                                                                setCheckBox(false);
-                                                        }
-                                                                
-                                                }
-                                        }
-                                });
-                                return criteriaC;
-                         
-                 }
+	     public JComboBox getJComboxBox(final String [] criteria) {
+	        final JComboBox criteriaC = new JComboBox(criteria);
+	        criteriaC.addItemListener(new ItemListener() {
+	        	@Override
+            	public void itemStateChanged(ItemEvent e) {
+                    if (criteriaC.getSelectedIndex() != -1) {
+	                    String attributeName = criteriaC.getSelectedItem().toString();
+	                    int i = jTable1.getSelectedRow();
+	                    
+	                    if(i == -1)
+	                            return;
+	                    
+	                    jTable1.setValueAt(attributeName, i, 1);	                   
+	                    
+	                    if ((jTable1.getValueAt(i,0)).toString().equalsIgnoreCase("InstrumentType") && 
+	                                    (instrumenTypeVal.contains(String.valueOf(jTable1.getValueAt(i,1))))){
+	                    	fwdOp.startDate.setText(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
+	                        setCheckBox(true);	                            
+	                    } else {
+	                    	fwdOp.startDate.setText(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
+	                        setCheckBox(false);
+	                    }
+                                    
+                    }
+                }
+	        });
+           return criteriaC;
+	                     
+	     }
          
-         public void setFXPanelObjs(FWDOptionPanel fwdOp) {
-                 
+         public void setFXPanelObjs(FWDOptionPanel fwdOp) {                 
                  this.fwdOp = fwdOp;
          }
-         private void setCheckBox(boolean enabled) {
-        	 
-                 fwdOp.startDate.setEnabled(enabled);
-                 
-                 
+         private void setCheckBox(boolean enabled) {        	 
+                 fwdOp.startDate.setEnabled(enabled);             
          }
          
         Hashtable<String,String[]> stringarray = new Hashtable<String,String[]>();
         public String []  convertVectortoSringArray(Vector v,String sname) {
                  
-        String name [] = null;
-        int i=0;
-        name = stringarray.get(sname);
-        if(name != null) 
-                return name;
-        else 
-        if(v != null ) {
-                name = new String[v.size()+1]; 
-                name[i] = "Selected Values";
-                i = 1;
-                Iterator its = v.iterator();
-                while(its.hasNext()) {
-                        
-                        name [i] = ( (StartUPData) its.next()).getName();
-                        i++;
-                }
-        }
-        stringarray.put(sname, name);
-                return name;                                           
-        // TODO add your handling code here:
-    } 
+	        String name [] = null;
+	        int i=0;
+	        name = stringarray.get(sname);
+	        if(name != null) 
+	                return name;
+	        else 
+	        if(v != null ) {
+	                name = new String[v.size()+1]; 
+	                name[i] = "Selected Values";
+	                i = 1;
+	                Iterator its = v.iterator();
+	                while(its.hasNext()) {
+	                        
+	                        name [i] = ( (StartUPData) its.next()).getName();
+	                        i++;
+	                }
+	        }
+	        stringarray.put(sname, name);
+	        return name;                                           
+        } 
         public void clearllCriterial() {
-                mod = null;
-                mod = new TableModelUtil(data,col);
-                jTable1.setModel(mod);
-                data.clear();
-                
-                
+	        mod = null;
+	        mod = new TableModelUtil(data,col);
+	        jTable1.setModel(mod);
+	        data.clear();         
         }
         
         public void clearllCriteriaModel() {
-                mod.removeALL();
-                
-                data.clear();
-                
-                
+		    mod.removeALL();                
+		    data.clear();    
         }
         public void deleteRowCriteria(int row) {
-                mod.delRow(row);
-                jTable1.repaint();
-                mod.fireTableDataChanged();
+	        mod.delRow(row);
+	        jTable1.repaint();
+	        mod.fireTableDataChanged();
         }
         class TableModelUtil extends AbstractTableModel {
                 final String[] columnNames;
