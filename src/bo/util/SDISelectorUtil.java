@@ -127,6 +127,25 @@ public class SDISelectorUtil {
 		return preferredSdis.get(key);
 	}
 	
+	public static Sdi getPreferredSdiOnly(String key) {
+		Vector<Sdi> sdis= getPreferredSdisOnKey(key);
+		Sdi sdi = null;
+		if(commonUTIL.isEmpty(sdis))  {
+			return null;
+		} else {
+			for(int i=0;i<sdis.size();i++) {
+				Sdi s = sdis.get(i);
+				if(!commonUTIL.isEmpty(s.getkey())) {
+					sdi = s;
+				    break;
+				}
+			}
+			if(sdi == null)
+			sdi = sdis.elementAt(0); // default value is always first 
+		}
+		return sdi;
+	}
+	
 	private static String createKey(String role,String currency,String productType,int leID) {
 		return role+"|"+currency+"|"+productType+"|"+String.valueOf(leID);
 	}
@@ -164,9 +183,10 @@ public class SDISelectorUtil {
 	public static void updateSDIPreferredKeys(Sdi sdi,RemoteReferenceData remoteref,String key) {
 		// TODO Auto-generated method stub
 		try {
-			Sdi sdiupdate = remoteref.updateSDI(sdi);
-			replaceExistingKeySDI(key,remoteref);
 			
+			replaceExistingKeySDI(key,remoteref);
+			sdi.setkey(key);
+			Sdi sdiupdate = remoteref.updateSDI(sdi);
 			int indextoUpdated = 0;
 			int checkExistingKey = 0;
 			
