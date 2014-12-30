@@ -31,8 +31,8 @@ import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 import org.dyno.visual.swing.layouts.Trailing;
 
+import swingUtils.TableColumnAdjuster;
 import apps.window.tradewindow.BackOfficePanel;
-import beans.Account;
 import beans.DocumentInfo;
 import beans.Message;
 import beans.Posting;
@@ -44,7 +44,6 @@ import bo.message.bomessagehandler.MessageFormat;
 import bo.message.bomessagehandler.MessageFormatterUtil;
 import bo.swift.SwiftFieldMessage;
 import bo.swift.SwiftMessage;
-import dsServices.RemoteAccount;
 import dsServices.RemoteBOProcess;
 import dsServices.RemoteReferenceData;
 import dsServices.RemoteTrade;
@@ -57,11 +56,11 @@ public class MessagePanel  extends BackOfficePanel {
 	private JTable jTable0;
 	private JScrollPane jScrollPane0;
 	private JLabel jLabel0;
-	private JTextField jTextField0;
-	private JTextField jTextField1;
-	private JTextField jTextField2;
+	private JTextField tradeIdField;
+	private JTextField id;
+	private JTextField transferId;
 	private JLabel jLabel3;
-	private JTextField jTextField3;
+	private JTextField linkId;
 	private JLabel jLabel1;
 	private JLabel jLabel2;
 	private JPanel jPanel0;
@@ -69,26 +68,26 @@ public class MessagePanel  extends BackOfficePanel {
 	private JLabel jLabel5;
 	private JLabel jLabel6;
 	private JLabel jLabel7;
-	private JTextField jTextField4;
-	private JTextField jTextField7;
-	private JTextField jTextField6;
-	private JTextField jTextField5;
+	private JTextField eventtTypeField;
+	private JTextField productSubTypeField;
+	private JTextField messageDateField;
+	private JTextField actionField;
 	private JLabel jLabel8;
 	private JLabel jLabel9;
 	private JLabel jLabel10;
 	private JLabel jLabel11;
-	private JTextField jTextField8;
-	private JTextField jTextField9;
-	private JTextField jTextField10;
-	private JTextField jTextField11;
+	private JTextField templateField;
+	private JTextField formatField;
+	private JTextField gatewayField;
+	private JTextField statusField;
 	private JLabel jLabel12;
-	private JTextField jTextField12;
+	private JTextField tradeDateField;
 	private JLabel jLabel13;
-	private JTextField jTextField13;
+	private JTextField senderField;
 	private JLabel jLabel14;
-	private JTextField jTextField14;
+	private JTextField productTypeField;
 	private JLabel jLabel15;
-	private JTextField jTextField15;
+	private JTextField receiverField;
 	private RemoteBOProcess remoteBO;
 	 public Users getUsers() {
 		return users;
@@ -98,17 +97,11 @@ public class MessagePanel  extends BackOfficePanel {
 		this.users = users;
 	}
 
-
-
-
-
-
-
 	Users users = null;
 	Vector<Message> data = new Vector<Message>();
-	 java.util.Hashtable<Integer,String> accontName = new Hashtable();
-	 TableModelUtil model = null;
-	  String cols [] = {  "Message ID", "tradeID","transferId","EventType","TradeDate","MessageType","linkId","ProductType","ProductSubType","MessageDate","Sender","Receiver","Status","Action","Template","Format","GateWay","AddressType"};
+	java.util.Hashtable<Integer,String> accontName = new Hashtable();
+	TableModelUtil model = null;
+	String cols [] = {  "Message ID", "tradeID","transferId","EventType","TradeDate","MessageType","linkId","ProductType","ProductSubType","MessageDate","Sender","Receiver","Status","Action","Template","Format","GateWay","AddressType"};
 	private RemoteReferenceData remoteRef;
 	private JPanel jPanel1;
 	private JButton jButton0;
@@ -134,6 +127,7 @@ public class MessagePanel  extends BackOfficePanel {
 		 JMenuItem showMessage = new JMenuItem("Message");
 		 other.add(showMessage);
 		 popupMenu.add( other);
+		 
 		 showMessage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(jTable0.getSelectedRow() == -1)
@@ -184,7 +178,33 @@ public class MessagePanel  extends BackOfficePanel {
 		 
 	}
 
+	private JTextField getAddressField() {
+		if (addressField == null) {
+			addressField = new JTextField();
+			addressField.setText("addressField");
+		}
+		return addressField;
+	}
+
+	private JLabel getJLabel16() {
+		if (jLabel16 == null) {
+			jLabel16 = new JLabel();
+			jLabel16.setText("Address");
+		}
+		return jLabel16;
+	}
+
+	private void getPopupMenu() {
+		
+	}
 	
+	private void getActions() {
+		
+	}
+	
+	private void getOther() {
+		
+	}
 	private JButton getJButton0() {
 		if (jButton0 == null) {
 			jButton0 = new JButton();
@@ -222,100 +242,100 @@ public class MessagePanel  extends BackOfficePanel {
 		return jPanel1;
 	}
 
-	private JTextField getJTextField15() {
-		if (jTextField15 == null) {
-			jTextField15 = new JTextField();
-			//jTextField15.setText("jTextField15");
+	private JTextField getReceiverField() {
+		if (receiverField == null) {
+			receiverField = new JTextField();
+			//receiverField.setText("receiverField");
 		}
-		return jTextField15;
+		return receiverField;
 	}
 
 	private JLabel getJLabel15() {
 		if (jLabel15 == null) {
 			jLabel15 = new JLabel();
-			jLabel15.setText("CreditAmt");
+			jLabel15.setText("Receiver");
 		}
 		return jLabel15;
 	}
 
-	private JTextField getJTextField14() {
-		if (jTextField14 == null) {
-			jTextField14 = new JTextField();
-		//	jTextField14.setText("jTextField14");
+	private JTextField getProductTypeField() {
+		if (productTypeField == null) {
+			productTypeField = new JTextField();
+		//	productTypeField.setText("productTypeField");
 		}
-		return jTextField14;
+		return productTypeField;
 	}
 
 	private JLabel getJLabel14() {
 		if (jLabel14 == null) {
 			jLabel14 = new JLabel();
-			jLabel14.setText("CreditA/C");
+			jLabel14.setText("ProductType");
 		}
 		return jLabel14;
 	}
 
-	private JTextField getJTextField13() {
-		if (jTextField13 == null) {
-			jTextField13 = new JTextField();
-			//jTextField13.setText("jTextField13");
+	private JTextField getSenderField() {
+		if (senderField == null) {
+			senderField = new JTextField();
+			//senderField.setText("senderField");
 		}
-		return jTextField13;
+		return senderField;
 	}
 
 	private JLabel getJLabel13() {
 		if (jLabel13 == null) {
 			jLabel13 = new JLabel();
-			jLabel13.setText("DebitAmt");
+			jLabel13.setText("Sender");
 		}
 		return jLabel13;
 	}
 
-	private JTextField getJTextField12() {
-		if (jTextField12 == null) {
-			jTextField12 = new JTextField();
-		//	jTextField12.setText("jTextField12");
+	private JTextField getTradeDateField() {
+		if (tradeDateField == null) {
+			tradeDateField = new JTextField();
+		//	tradeDateField.setText("tradeDateField");
 		}
-		return jTextField12;
+		return tradeDateField;
 	}
 
 	private JLabel getJLabel12() {
 		if (jLabel12 == null) {
 			jLabel12 = new JLabel();
-			jLabel12.setText("DebitA/C");
+			jLabel12.setText("TradeDate");
 		}
 		return jLabel12;
 	}
 
-	private JTextField getJTextField11() {
-		if (jTextField11 == null) {
-			jTextField11 = new JTextField();
-		//	jTextField11.setText("jTextField11");
+	private JTextField getStatusField() {
+		if (statusField == null) {
+			statusField = new JTextField();
+		//	statusField.setText("statusField");
 		}
-		return jTextField11;
+		return statusField;
 	}
 
-	private JTextField getJTextField10() {
-		if (jTextField10 == null) {
-			jTextField10 = new JTextField();
-		//	jTextField10.setText("jTextField10");
+	private JTextField getGatewayField() {
+		if (gatewayField == null) {
+			gatewayField = new JTextField();
+		//	gatewayField.setText("gatewayField");
 		}
-		return jTextField10;
+		return gatewayField;
 	}
 
-	private JTextField getJTextField9() {
-		if (jTextField9 == null) {
-			jTextField9 = new JTextField();
-	//		jTextField9.setText("jTextField9");
+	private JTextField getFormatField() {
+		if (formatField == null) {
+			formatField = new JTextField();
+	//		formatField.setText("formatField");
 		}
-		return jTextField9;
+		return formatField;
 	}
 
-	private JTextField getJTextField8() {
-		if (jTextField8 == null) {
-			jTextField8 = new JTextField();
-		//	jTextField8.setText("jTextField8");
+	private JTextField getTemplateField() {
+		if (templateField == null) {
+			templateField = new JTextField();
+		//	templateField.setText("templateField");
 		}
-		return jTextField8;
+		return templateField;
 	}
 
 	private JLabel getJLabel11() {
@@ -329,7 +349,7 @@ public class MessagePanel  extends BackOfficePanel {
 	private JLabel getJLabel10() {
 		if (jLabel10 == null) {
 			jLabel10 = new JLabel();
-			jLabel10.setText("EffectiveDate");
+			jLabel10.setText("Gateway");
 		}
 		return jLabel10;
 	}
@@ -337,7 +357,7 @@ public class MessagePanel  extends BackOfficePanel {
 	private JLabel getJLabel9() {
 		if (jLabel9 == null) {
 			jLabel9 = new JLabel();
-			jLabel9.setText("CreationDate");
+			jLabel9.setText("Format");
 		}
 		return jLabel9;
 	}
@@ -345,47 +365,47 @@ public class MessagePanel  extends BackOfficePanel {
 	private JLabel getJLabel8() {
 		if (jLabel8 == null) {
 			jLabel8 = new JLabel();
-			jLabel8.setText("BookingDate");
+			jLabel8.setText("Template");
 		}
 		return jLabel8;
 	}
 
-	private JTextField getJTextField5() {
-		if (jTextField5 == null) {
-			jTextField5 = new JTextField();
-			//jTextField5.setText("jTextField5");
+	private JTextField getActionField() {
+		if (actionField == null) {
+			actionField = new JTextField();
+			//actionField.setText("actionField");
 		}
-		return jTextField5;
+		return actionField;
 	}
 
-	private JTextField getJTextField6() {
-		if (jTextField6 == null) {
-			jTextField6 = new JTextField();
-		//	jTextField6.setText("jTextField6");
+	private JTextField getMessageDateField() {
+		if (messageDateField == null) {
+			messageDateField = new JTextField();
+		//	messageDateField.setText("messageDateField");
 		}
-		return jTextField6;
+		return messageDateField;
 	}
 
-	private JTextField getJTextField7() {
-		if (jTextField7 == null) {
-			jTextField7 = new JTextField();
-		//	jTextField7.setText("jTextField7");
+	private JTextField getProductSubTypeField() {
+		if (productSubTypeField == null) {
+			productSubTypeField = new JTextField();
+		//	productSubTypeField.setText("productSubTypeField");
 		}
-		return jTextField7;
+		return productSubTypeField;
 	}
 
-	private JTextField getJTextField4() {
-		if (jTextField4 == null) {
-			jTextField4 = new JTextField();
-		//	jTextField4.setText("jTextField4");
+	private JTextField getEventtTypeField() {
+		if (eventtTypeField == null) {
+			eventtTypeField = new JTextField();
+		//	eventtTypeField.setText("eventtTypeField");
 		}
-		return jTextField4;
+		return eventtTypeField;
 	}
 
 	private JLabel getJLabel7() {
 		if (jLabel7 == null) {
 			jLabel7 = new JLabel();
-			jLabel7.setText("RuleName");
+			jLabel7.setText("MessageDate");
 		}
 		return jLabel7;
 	}
@@ -393,7 +413,7 @@ public class MessagePanel  extends BackOfficePanel {
 	private JLabel getJLabel6() {
 		if (jLabel6 == null) {
 			jLabel6 = new JLabel();
-			jLabel6.setText("Type");
+			jLabel6.setText("ProductSubType");
 		}
 		return jLabel6;
 	}
@@ -401,7 +421,7 @@ public class MessagePanel  extends BackOfficePanel {
 	private JLabel getJLabel5() {
 		if (jLabel5 == null) {
 			jLabel5 = new JLabel();
-			jLabel5.setText("AccEventType");
+			jLabel5.setText("Action");
 		}
 		return jLabel5;
 	}
@@ -418,39 +438,41 @@ public class MessagePanel  extends BackOfficePanel {
 		if (jPanel0 == null) {
 			jPanel0 = new JPanel();
 			jPanel0.setLayout(new GroupLayout());
-			jPanel0.add(getJLabel12(), new Constraints(new Leading(5, 66, 10, 10), new Leading(122, 10, 10)));
-			jPanel0.add(getJLabel14(), new Constraints(new Leading(5, 66, 10, 10), new Leading(146, 10, 10)));
 			jPanel0.add(getJLabel0(), new Constraints(new Leading(9, 12, 12), new Leading(8, 10, 10)));
-			jPanel0.add(getJTextField0(), new Constraints(new Leading(93, 71, 12, 12), new Leading(33, 10, 10)));
-			jPanel0.add(getJTextField1(), new Constraints(new Leading(93, 71, 12, 12), new Leading(5, 12, 12)));
-			jPanel0.add(getJTextField2(), new Constraints(new Leading(91, 71, 10, 10), new Leading(59, 10, 10)));
-			jPanel0.add(getJTextField3(), new Constraints(new Leading(91, 71, 10, 10), new Leading(84, 10, 10)));
+			jPanel0.add(getTradeIdField(), new Constraints(new Leading(93, 71, 12, 12), new Leading(33, 10, 10)));
+			jPanel0.add(getId(), new Constraints(new Leading(93, 71, 12, 12), new Leading(5, 12, 12)));
 			jPanel0.add(getJLabel1(), new Constraints(new Leading(9, 49, 12, 12), new Leading(34, 12, 12)));
-			jPanel0.add(getJLabel4(), new Constraints(new Leading(180, 93, 10, 10), new Leading(6, 12, 12)));
-			jPanel0.add(getJLabel5(), new Constraints(new Leading(178, 93, 10, 10), new Leading(29, 10, 10)));
-			jPanel0.add(getJLabel6(), new Constraints(new Leading(174, 93, 10, 10), new Leading(60, 12, 12)));
-			jPanel0.add(getJLabel7(), new Constraints(new Leading(174, 81, 10, 10), new Leading(85, 12, 12)));
-			jPanel0.add(getJTextField4(), new Constraints(new Leading(275, 137, 10, 10), new Leading(5, 12, 12)));
-			jPanel0.add(getJTextField7(), new Constraints(new Leading(275, 137, 10, 10), new Leading(60, 12, 12)));
-			jPanel0.add(getJLabel2(), new Constraints(new Leading(5, 66, 10, 10), new Leading(64, 12, 12)));
-			jPanel0.add(getJLabel3(), new Constraints(new Leading(9, 66, 12, 12), new Leading(88, 12, 12)));
-			jPanel0.add(getJLabel8(), new Constraints(new Leading(609, 75, 10, 10), new Leading(6, 12, 12)));
-			jPanel0.add(getJLabel11(), new Constraints(new Leading(413, 54, 10, 10), new Leading(8, 14, 12, 12)));
-			jPanel0.add(getJTextField8(), new Constraints(new Leading(696, 137, 10, 10), new Leading(8, 12, 12)));
-			jPanel0.add(getJLabel9(), new Constraints(new Leading(607, 77, 10, 10), new Leading(34, 12, 12)));
-			jPanel0.add(getJTextField9(), new Constraints(new Leading(696, 137, 10, 10), new Leading(30, 12, 12)));
-			jPanel0.add(getJTextField10(), new Constraints(new Leading(696, 137, 10, 10), new Leading(56, 12, 12)));
-			jPanel0.add(getJLabel10(), new Constraints(new Leading(608, 83, 12, 12), new Leading(58, 14, 12, 12)));
-			jPanel0.add(getJTextField5(), new Constraints(new Leading(275, 176, 12, 12), new Leading(32, 12, 12)));
-			jPanel0.add(getJTextField6(), new Constraints(new Leading(273, 176, 12, 12), new Leading(88, 12, 12)));
-			jPanel0.add(getJLabel13(), new Constraints(new Leading(278, 66, 10, 10), new Leading(120, 12, 12)));
-			jPanel0.add(getJTextField13(), new Constraints(new Leading(352, 137, 10, 10), new Leading(120, 12, 12)));
-			jPanel0.add(getJTextField12(), new Constraints(new Leading(89, 166, 12, 12), new Leading(119, 12, 12)));
-			jPanel0.add(getJTextField14(), new Constraints(new Leading(91, 166, 12, 12), new Leading(146, 12, 12)));
-			jPanel0.add(getJTextField11(), new Constraints(new Leading(460, 137, 12, 12), new Leading(8, 12, 12)));
-			jPanel0.add(getJLabel15(), new Constraints(new Leading(275, 66, 12, 12), new Leading(148, 12, 12)));
-			jPanel0.add(getJTextField15(), new Constraints(new Leading(349, 137, 10, 10), new Leading(144, 12, 12)));
+			jPanel0.add(getTemplateField(), new Constraints(new Leading(696, 137, 10, 10), new Leading(8, 12, 12)));
 			jPanel0.add(getJButton0(), new Constraints(new Leading(918, 10, 10), new Leading(8, 12, 12)));
+			jPanel0.add(getTransferId(), new Constraints(new Leading(93, 71, 12, 12), new Leading(59, 12, 12)));
+			jPanel0.add(getLinkId(), new Constraints(new Leading(95, 71, 10, 10), new Leading(88, 12, 12)));
+			jPanel0.add(getJLabel3(), new Constraints(new Leading(9, 66, 12, 12), new Leading(92, 12, 12)));
+			jPanel0.add(getEventtTypeField(), new Constraints(new Leading(95, 103, 10, 10), new Leading(119, 12, 12)));
+			jPanel0.add(getJLabel4(), new Constraints(new Leading(9, 66, 12, 12), new Leading(121, 12, 12)));
+			jPanel0.add(getJLabel2(), new Constraints(new Leading(9, 66, 12, 12), new Leading(64, 12, 12)));
+			jPanel0.add(getTradeDateField(), new Constraints(new Leading(377, 105, 10, 10), new Leading(6, 12, 12)));
+			jPanel0.add(getJLabel12(), new Constraints(new Leading(250, 78, 10, 10), new Leading(6, 12, 12)));
+			jPanel0.add(getReceiverField(), new Constraints(new Leading(377, 137, 12, 12), new Leading(145, 22, 12, 12)));
+			jPanel0.add(getJLabel14(), new Constraints(new Leading(250, 80, 12, 12), new Leading(59, 12, 12)));
+			jPanel0.add(getJLabel7(), new Constraints(new Leading(250, 81, 12, 12), new Leading(36, 12, 12)));
+			jPanel0.add(getJLabel15(), new Constraints(new Leading(250, 66, 12, 12), new Leading(151, 12, 12)));
+			jPanel0.add(getActionField(), new Constraints(new Leading(95, 113, 12, 12), new Leading(147, 12, 12)));
+			jPanel0.add(getJLabel5(), new Constraints(new Leading(6, 93, 10, 10), new Leading(151, 12, 12)));
+			jPanel0.add(getJLabel8(), new Constraints(new Leading(589, 75, 12, 12), new Leading(10, 12, 12)));
+			jPanel0.add(getJLabel10(), new Constraints(new Leading(589, 83, 12, 12), new Leading(59, 14, 12, 12)));
+			jPanel0.add(getJLabel9(), new Constraints(new Leading(589, 77, 12, 12), new Leading(34, 12, 12)));
+			jPanel0.add(getJLabel16(), new Constraints(new Leading(589, 72, 12, 12), new Leading(85, 12, 12)));
+			jPanel0.add(getJLabel11(), new Constraints(new Leading(589, 54, 12, 12), new Leading(113, 14, 12, 12)));
+			jPanel0.add(getAddressField(), new Constraints(new Leading(696, 131, 12, 12), new Leading(81, 12, 12)));
+			jPanel0.add(getStatusField(), new Constraints(new Leading(696, 137, 12, 12), new Leading(107, 12, 12)));
+			jPanel0.add(getFormatField(), new Constraints(new Leading(696, 137, 12, 12), new Leading(33, 18, 12, 12)));
+			jPanel0.add(getGatewayField(), new Constraints(new Leading(696, 137, 12, 12), new Leading(58, 18, 12, 12)));
+			jPanel0.add(getJLabel13(), new Constraints(new Leading(250, 66, 12, 12), new Leading(119, 12, 12)));
+			jPanel0.add(getSenderField(), new Constraints(new Leading(377, 137, 12, 12), new Leading(116, 12, 12)));
+			jPanel0.add(getJLabel6(), new Constraints(new Leading(250, 10, 10), new Leading(89, 18, 12, 12)));
+			jPanel0.add(getProductSubTypeField(), new Constraints(new Leading(377, 137, 12, 12), new Leading(88, 12, 12)));
+			jPanel0.add(getProductTypeField(), new Constraints(new Leading(377, 111, 12, 12), new Leading(58, 22, 12, 12)));
+			jPanel0.add(getMessageDateField(), new Constraints(new Leading(377, 110, 12, 12), new Leading(32, 12, 12)));
 		}
 		return jPanel0;
 	}
@@ -471,12 +493,12 @@ public class MessagePanel  extends BackOfficePanel {
 		return jLabel1;
 	}
 
-	private JTextField getJTextField3() {
-		if (jTextField3 == null) {
-			jTextField3 = new JTextField();
-		//	jTextField3.setText("jTextField3");
+	private JTextField getLinkId() {
+		if (linkId == null) {
+			linkId = new JTextField();
+		//	linkId.setText("linkId");
 		}
-		return jTextField3;
+		return linkId;
 	}
 
 	private JLabel getJLabel3() {
@@ -487,28 +509,28 @@ public class MessagePanel  extends BackOfficePanel {
 		return jLabel3;
 	}
 
-	private JTextField getJTextField2() {
-		if (jTextField2 == null) {
-			jTextField2 = new JTextField();
-		//	jTextField2.setText("jTextField2");
+	private JTextField getTransferId() {
+		if (transferId == null) {
+			transferId = new JTextField();
+		//	transferId.setText("transferId");
 		}
-		return jTextField2;
+		return transferId;
 	}
 
-	private JTextField getJTextField1() {
-		if (jTextField1 == null) {
-			jTextField1 = new JTextField();
-			//jTextField1.setText("jTextField1");
+	private JTextField getId() {
+		if (id == null) {
+			id = new JTextField();
+			//id.setText("id");
 		}
-		return jTextField1;
+		return id;
 	}
 
-	private JTextField getJTextField0() {
-		if (jTextField0 == null) {
-			jTextField0 = new JTextField();
-		//	jTextField0.setText("jTextField0");
+	private JTextField getTradeIdField() {
+		if (tradeIdField == null) {
+			tradeIdField = new JTextField();
+		//	tradeIdField.setText("tradeIdField");
 		}
-		return jTextField0;
+		return tradeIdField;
 	}
 
 	private JLabel getJLabel0() {
@@ -522,10 +544,11 @@ public class MessagePanel  extends BackOfficePanel {
 	private JScrollPane getJScrollPane0() {
 		if (jScrollPane0 == null) {
 			
-			int v = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS; 
+			/*int v = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS; 
 			int h = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS;
       		
-      		jScrollPane0 = new JScrollPane(getJTable0(),v,h);
+      		jScrollPane0 = new JScrollPane(getJTable0(),v,h);*/
+			jScrollPane0 = new JScrollPane(getJTable0());
 		}
 		return jScrollPane0;
 	}
@@ -580,30 +603,37 @@ public class MessagePanel  extends BackOfficePanel {
 			   jTable0.getColumnModel().getColumn(14).setPreferredWidth(10); 
 			   jTable0.getColumnModel().getColumn(15).setPreferredWidth(2); 
 			   
-			 
+			   TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
+			   tca.adjustColumns();
 			
-		}jTable0.addMouseListener(new java.awt.event.MouseAdapter() {
+		}
+		
+		jTable0.addMouseListener(new java.awt.event.MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				int selectRow = jTable0.getSelectedRow();
+				
 				Message message = (Message) data.get(selectRow);
-				/*jTextField1.setText(((Integer) posting.getId()).toString());
-				jTextField4.setText((String) posting.getEventType());
-				jTextField8.setText((String) posting.getBookingDate());
-				jTextField0.setText(((Integer)posting.getTradeID()).toString());
-				jTextField5.setText((String) posting.getAccEventType());
-				jTextField9.setText((String) posting.getCreationDate());
-				jTextField2.setText(((Integer)posting.getTransferId()).toString());
-				jTextField7.setText((String) posting.getType());
-				jTextField10.setText((String) posting.getEffectiveDate());
-				jTextField3.setText(((Integer) posting.getLinkId()).toString());
-				jTextField6.setText((String) posting.getRuleName());
-				jTextField11.setText((String) posting.getStatus());
-				jTextField12.setText(((String) getAccName(posting.getDebitAccId())).toString());
-				jTextField13.setText(((Double)  posting.getDebitAmount()).toString());
-				jTextField14.setText(((String)getAccName(posting.getCreditAccId())).toString());
-				jTextField15.setText(((Double) posting.getCreditAmount()).toString()); */
+				
+				id.setText(((Integer) message.getId()).toString());
+				tradeIdField.setText(((Integer) message.getTradeId()).toString());
+				transferId.setText(((Integer) message.getTransferId()).toString());
+				linkId.setText(((Integer) message.getLinkId()).toString());
+				eventtTypeField.setText((String) message.getEventType());
+				actionField.setText((String) message.getAction());
+				tradeDateField.setText((String) message.getTradeDate());
+				messageDateField.setText((String) message.getMessageDate());
+				productTypeField.setText((String) message.getProductType());
+				productSubTypeField.setText((String) message.getProductSubType());
+				senderField.setText((String) message.getSenderName());
+				receiverField.setText((String) message.getReceiverName());
+				templateField.setText((String) message.getTemplateName());
+				formatField.setText((String) message.getFormat());
+				gatewayField.setText((String) message.getMessageGateway());
+				addressField.setText((String) message.getAddressType());
+				statusField.setText((String) message.getStatus());
+		
 				if(SwingUtilities.isRightMouseButton(e) == true) 	 {				
 					int row = jTable0.rowAtPoint(e.getPoint()); 
 					int selectrow [] = jTable0.getSelectedRows();
@@ -851,6 +881,8 @@ public class MessagePanel  extends BackOfficePanel {
 		
 	}
 RemoteTrade remoteTrade = null;
+private JLabel jLabel16;
+private JTextField addressField;
 	public void setRemoteTrade(RemoteTrade remoteTrade) {
 		// TODO Auto-generated method stub
 		this.remoteTrade = remoteTrade;
