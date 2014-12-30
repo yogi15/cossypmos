@@ -256,14 +256,16 @@ public class SDIPanel extends BackOfficePanel {
 					// TODO Auto-generated method stub
 					int payerInt = payerInstr.getSelectedIndex();
 					int receiverInt = receiverInstr.getSelectedIndex();
-					Sdi  payersdi = payerPreferredSDIs.get(payerInt);
-					Sdi  recievers = receiverPreferredSDIs.get(receiverInt);
+					Sdi  payersdi = null; 
+					Sdi  recievers = null;
 					
 					
 					TransferRule rule = rules.get(jTable0.getSelectedRow());
 					
 					try {
 						rule1 = (TransferRule) rule.clone();
+						payersdi = (Sdi) payerPreferredSDIs.get(payerInt).clone();
+						recievers =  (Sdi)  receiverPreferredSDIs.get(receiverInt).clone();
 						//System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"+originalRules.get(1).get_payerAgentID() + " "+ rule1.get_payerAgentID() + " " + rule.get_payerAgentID());
 						originalRules.set(jTable0.getSelectedRow(), rule1);
 					} catch (CloneNotSupportedException e1) {
@@ -275,8 +277,8 @@ public class SDIPanel extends BackOfficePanel {
 					rule.set_payerAgentID(payersdi.getAgentId());
 					rule.set_receiverAgentID(payersdi.getAgentId());
 					// System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"+originalRules.get(1).get_payerAgentID() + " "+ rule1.get_payerAgentID() + " " + rule.get_payerAgentID());
-					String payerKey =  getLERole(payersdi.getCpId())+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(payersdi.getCpId());
-					String receiverKey =  getLERole(recievers.getCpId())+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(recievers.getCpId());
+					String payerKey =  rule.get_payerLegalEntityRole()+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(payersdi.getCpId());
+					String receiverKey =  rule.get_receiverLegalEntityRole()+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(recievers.getCpId());
 					payersdi.setkey(payerKey);
 					recievers.setkey(receiverKey);
 					SDISelectorUtil.updateSDIPreferredKeys(payersdi,referenceData,payerKey);
@@ -325,7 +327,24 @@ public class SDIPanel extends BackOfficePanel {
 				 	commonUTIL.showAlertMessage(" Setting to Default ");
 					
 						tmodel = new TableModelUtil(originalRules, col);
+						
 						jTable0.setModel(tmodel);
+						jTable0.getColumnModel().getColumn(0).setPreferredWidth(150); 
+						 jTable0.getColumnModel().getColumn(1).setPreferredWidth(150); 
+						 jTable0.getColumnModel().getColumn(2).setPreferredWidth(250); 
+						 jTable0.getColumnModel().getColumn(3).setPreferredWidth(250); 
+						 jTable0.getColumnModel().getColumn(4).setPreferredWidth(250); 
+						 jTable0.getColumnModel().getColumn(5).setPreferredWidth(280); 
+						 jTable0.getColumnModel().getColumn(6).setPreferredWidth(230); 
+						 jTable0.getColumnModel().getColumn(7).setPreferredWidth(230); 
+						 jTable0.getColumnModel().getColumn(8).setPreferredWidth(230); 
+						 jTable0.getColumnModel().getColumn(9).setPreferredWidth(200); 
+						 jTable0.getColumnModel().getColumn(10).setPreferredWidth(240); 
+						 jTable0.getColumnModel().getColumn(11).setPreferredWidth(200); 
+						 jTable0.getColumnModel().getColumn(12).setPreferredWidth(200); 
+						 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); 
+						 TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
+							tca.adjustColumns();
 						
 						
 					}
@@ -551,8 +570,8 @@ public class SDIPanel extends BackOfficePanel {
 				String recKey = rule.get_receiverLegalEntityRole()+"|"+rule.get_settlementCurrency()+"|"+rule.get_productType()+"|"+String.valueOf(rule.get_receiverLegalEntityId());
 				payerPreferredSDIs	 = SDISelectorUtil.getPreferredSdisOnKey(payKey);
 			    receiverPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(recKey);
-			     payerInstr.removeAllItems();
-			     receiverInstr.removeAllItems();
+			  //   payerInstr.removeAllItems();
+			//     receiverInstr.removeAllItems();
 			     payerModel.removeAllElements();
 			     receiverModel.removeAllElements();
 			     
@@ -876,7 +895,7 @@ public class SDIPanel extends BackOfficePanel {
 	}
 
 	private DefaultComboBoxModel processComboxData(Vector<Sdi> preferredSDis,DefaultComboBoxModel model) {
-        model.removeAllElements();
+      //  model.removeAllElements();
 		if(preferredSDis != null) {
 			for(int i=0;i<preferredSDis.size();i++) {
 				Sdi sdi = preferredSDis.get(i);
@@ -887,7 +906,8 @@ public class SDIPanel extends BackOfficePanel {
 				else
 				 key = sdi.getCurrency()+"/"+sdi.getGlName()+"/"+sdi.getProducts();
 				*/
-				key = getLEName(sdi.getAgentId());
+				key = getLEName(sdi.getAgentId()) + "/"+sdi.getGlName();
+				
 				model.addElement(key);
 				/*if (!sdi.getkey().equals("")) {
 					model.setSelectedItem(key);
