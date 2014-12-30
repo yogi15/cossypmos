@@ -7,7 +7,7 @@ import java.io.Serializable;
 import util.ReferenceDataCache;
 import util.commonUTIL;
 
-public class Sdi extends BOObject implements Serializable {
+public class Sdi extends BOObject implements Serializable,Cloneable {
 	
 	int agentId;
 	int cpId;
@@ -316,9 +316,9 @@ public class Sdi extends BOObject implements Serializable {
 		// TODO Auto-generated method stub
 		this.agentSdi = agenSdi;
 	}
-	public Sdi getAgentSdi() {
+	public DefaultPartySDI getAgentSdi() {
 		// TODO Auto-generated method stub
-		return agentSdi;
+		return getPartySdi();
 	}
 	 /**
      * Returns The type of this Party's address code.  Valid codes include:
@@ -484,6 +484,27 @@ public class Sdi extends BOObject implements Serializable {
 	        
 		
 	}
+	public DefaultPartySDI getPartySdi() {
+		DefaultPartySDI  agentSdi = new DefaultPartySDI();
+		agentSdi.set_partyId(getAgentId());
+		agentSdi.setCpId(getAgentId());
+		agentSdi.set_messageToParty(isMessageToAgent());
+		agentSdi.set_partyAccountName(getGlName());
+		agentSdi.set_productType(getProducts());
+		agentSdi.set_partyContactType(getAgentContacts());
+		agentSdi.set_partyRole("Agent");
+		agentSdi.setRole("Agent");
+		agentSdi.set_partyCode("SWIFT");
+		agentSdi.setMessageType(getMessageType());
+		
+		
+	return agentSdi;
+		
+		
+	}
+	public boolean isMessageToAgent() {
+		return true;
+	}
 	public void setTrade(Trade trade) {
 		// TODO Auto-generated method stub
 		
@@ -537,7 +558,13 @@ public class Sdi extends BOObject implements Serializable {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+	 @Override
+
+		public Object clone() throws CloneNotSupportedException {
+
+		return super.clone();
+
+		}
 	
 	
 }
