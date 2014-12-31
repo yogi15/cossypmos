@@ -52,10 +52,12 @@ public class MessageManager extends ControllerManager {
    		
 	}
 	
-  public void handleEvent(EventProcessor event)	 {
+  public synchronized void handleEvent(EventProcessor event)	 {
+	  commonUTIL.display("Message Handle Event coming  ", event.getClassName() + " "+event.getEventType() );
 		if(event instanceof TradeEventProcessor) {
+			
 			TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
-			System.out.println(tradeEvent.getTrade().getId());
+			System.out.println(tradeEvent.getTrade().getId()); 
 			
 		    	processor.processMessage(tradeEvent);
 			     publishMessage(tradeEvent.getTrade());
@@ -67,7 +69,7 @@ public class MessageManager extends ControllerManager {
 		    	processor.processMessage(transferEvent);
 			     publishMessage(transferEvent.getTrade());
 			
-		}
+		} 
 		
 	}
 
