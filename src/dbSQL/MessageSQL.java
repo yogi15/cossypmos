@@ -17,30 +17,30 @@ public class MessageSQL {
 	final static private String INSERT_FROM_message = "INSERT into message("
 			+ " id,  tradeid,  transferid, messagetype, sendername, senderRole, receiverName, "
 			+ " receiverRole, tradeversion, transferversion, action, status, addresstype, templateName, "
-			+ " linkid,messagedate, tradedate, messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction" + ") " 
-			+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			+ " linkid,messagedate, tradedate, messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid" + ") " 
+			+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	
 	final static private String SELECT_MAX = "SELECT MESSAGE_SEQ.NEXTVAL DESC_ID FROM dual ";
 	
 	final static private String SELECTALL = "SELECT id, tradeid, transferid, messageType, sendername, senderRole, " 
 			+ " receiverName, receiverRole, tradeversion, "
 			+ " transferversion, action, status, addresstype, templateName, linkid, messagedate, tradedate,"
-			+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction FROM message order by id";
+			+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid FROM message order by id";
 	final static private String SELECT = "SELECT tradeid FROM message where id =  ?";
 	static private String SELECTONE = "SELECT id, tradeid, transferid, messageType, sendername, senderRole, " 
 		+ " receiverName, receiverRole, tradeversion, "
 		+ " transferversion, action, status, addresstype, templateName, linkid, messagedate, tradedate,"
-		+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction FROM message order by id";
+		+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid FROM message order by id";
 	final static private String SELECTONPRODUCT = "SELECT id, tradeid, transferid, messageType, sendername, senderRole, " 
 		+ " receiverName, receiverRole, tradeversion, "
 		+ " transferversion, action, status, addresstype, templateName, linkid, messagedate, tradedate,"
-		+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction  FROM message order by id";
+		+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid  FROM message order by id";
 
 	
 	final static private String SELECTWHERE = "SELECT id, tradeid, transferid, messageType, sendername, senderRole, " 
 			+ " receiverName, receiverRole, tradeversion, "
 			+ " transferversion, action, status, addresstype, templateName, linkid, messagedate, tradedate,"
-			+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction  FROM message  where ";
+			+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid  FROM message  where ";
 	
 	
 	private static String getUpdateSQL(Message message) {
@@ -60,14 +60,14 @@ public class MessageSQL {
 				.append(" status = '").append(message.getStatus()).append("',")
 				.append(" addresstype = '").append(message.getAddressType()).append("',")
 				.append(" templateName = '").append(message.getTemplateName()).append("',")
-				.append(" linkid = '").append(message.getLinkId()).append("',")
-				.append(" messagedate = '").append(message.getMessageDate()).append("',")
-				.append(" tradedate = '").append(message.getTradeDate()).append("',")
+				.append(" linkid = ").append(message.getLinkId()).append(",")
+				//.append(" messagedate = '").append("to_date('" +message.getMessageDate()+"', 'DD/MM/YYYY hh24:mi:ss')").append("',")
+				//.append(" tradedate = '").append("to_date('" +message.getTradeDate()+"', 'DD/MM/YYYY hh24:mi:ss')").append("',")
 				.append("  messagegateway = '").append(message.getMessageGateway()).append("',")
 				.append(" productsubtype = '").append(message.getProductSubType()).append("',")
 				.append(" eventtype = '").append(message.getEventType()).append("',")
 				.append(" triggerON = '").append(message.getTriggerON()).append("',")
-				.append(" productid = ").append(message.getproductID()).append(",'")
+				.append(" productid = ").append(message.getproductID()).append(",")
 				.append(" attributes = '").append(message.getAttributes()).append("',")
 				.append(" format = '").append(message.getFormat()).append("',")
 				.append(" producttype = '").append(message.getProductType()).append("',")
@@ -76,10 +76,13 @@ public class MessageSQL {
 				.append(" senderID = ").append(message.getSenderId()).append(",")
 				.append(" receiverID = ").append(message.getReceiverId()).append(",")
 				.append(" messConfigID = ").append(message.getMessageConfigID()).append(",")
-				.append(" subAction = ").append(message.getSubAction()).append("")
+				.append(" subAction = '").append(message.getSubAction()).append("',")
+				.append(" userid = ").append(message.getUserID()).append("")
 				.toString();
-        updateSQL = updateSQL = " where id = "+message.getId();
-		System.out.println(updateSQL);
+	//	updateSQL = updateSQL + " and  messagedate = to_date('" + message.getMessageDate() +"', 'DD/MM/YYYY hh24:mi:ss')";
+	//	updateSQL = updateSQL + " and tradedate = to_date('" + message.getTradeDate() +"', 'DD/MM/YYYY hh24:mi:ss')";
+        updateSQL = updateSQL + " where id = "+message.getId();
+		//System.out.println(updateSQL);
 
 		return updateSQL;
 
@@ -147,7 +150,7 @@ public class MessageSQL {
 		Message updateMess = null;
 		try {
 
-			con.setAutoCommit(false);
+		//	con.setAutoCommit(false);
 			sql = getUpdateSQL(updateMessage);
 			stmt = con.prepareStatement(sql);
 			
@@ -281,6 +284,7 @@ public class MessageSQL {
 			stmt.setInt(29, inserMessage.getReceiverId());
 			stmt.setInt(30, inserMessage.getMessageConfigID());
 			stmt.setString(31, inserMessage.getSubAction());
+			stmt.setInt(32, inserMessage.getUserID());
 			newMessage = inserMessage;
 			if (stmt.executeUpdate() > 0) {
 				newMessage = inserMessage;
@@ -376,6 +380,7 @@ public class MessageSQL {
 				message.setReceiverId(rs.getInt(29));
 				message.setMessageConfigID(rs.getInt(30));
 				message.setSubAction(rs.getString(31));
+				message.setUserID(rs.getInt(32));
 				return message;
 
 			}
@@ -440,6 +445,7 @@ public class MessageSQL {
 				message.setReceiverId(rs.getInt(29));
 				message.setMessageConfigID(rs.getInt(30));
 				message.setSubAction(rs.getString(31));
+				message.setUserID(rs.getInt(32));
 				messages.add(message);
 
 			}
@@ -503,6 +509,7 @@ public class MessageSQL {
 				message.setReceiverId(rs.getInt(29));
 				message.setMessageConfigID(rs.getInt(30));
 				message.setSubAction(rs.getString(31));
+				message.setUserID(rs.getInt(32));
 				messages.add(message);
 
 			}
@@ -568,6 +575,7 @@ public class MessageSQL {
 				message.setReceiverId(rs.getInt(29));
 				message.setMessageConfigID(rs.getInt(30));
 				message.setSubAction(rs.getString(31));
+				message.setUserID(rs.getInt(32));
 				messages.add(message);
 
 			}
@@ -636,6 +644,7 @@ public class MessageSQL {
 				message.setReceiverId(rs.getInt(29));
 				message.setMessageConfigID(rs.getInt(30));
 				message.setSubAction(rs.getString(31));
+				message.setUserID(rs.getInt(32));
 				messages.add(message);
 
 			}
