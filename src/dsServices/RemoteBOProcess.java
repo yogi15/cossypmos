@@ -52,6 +52,7 @@ public interface RemoteBOProcess  extends Remote {
 	Collection getAction(Transfer transfer) throws RemoteException;
 	public Collection getOnlyAction(Transfer transfer) throws RemoteException;
 	public Collection updateTransferAndPublish(Transfer transfer,int userID) throws RemoteException;
+	public Collection updateMessageAndPublish(Message message,int userID) throws RemoteException;
 	public Transfer getNettingTransfer(int id, String deliveryDate) throws RemoteException;
 	public Collection getNettedTransfers(NettingConfig netConfig) throws RemoteException;
 	public Collection getNettedTransfers(int nettingTransferID) throws RemoteException;

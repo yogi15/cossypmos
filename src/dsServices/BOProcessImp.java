@@ -22,6 +22,7 @@ import dbSQL.TaskSQL;
 import dbSQL.TransferSQL;
 import dbSQL.WFConfigSQL;
 import dbSQL.dsSQL;
+import dsEventProcessor.MessageEventProcessor;
 import dsEventProcessor.TaskEventProcessor;
 import dsEventProcessor.TransferEventProcessor;
 
@@ -599,6 +600,30 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 	
 		return autowf;
 	} 
+	@Override
+	public Collection updateMessageAndPublish(Message message,int userID) {
+		Vector updateMessage = new Vector();
+		try{
+			message.setUserID(userID);
+			updateMessage.add(message);
+			if(remoteTrade == null)
+		    	initRemoteInterface(); 
+			Trade trade = (Trade) remoteTrade.selectTrade(message.getTradeId());
+			Transfer transfer = null;
+			if(message.getTransferId() != 0) {
+				transfer = (Transfer) getTransfer(message.getTransferId());
+			}
+			updateMessage = saveMesage(updateMessage, "update", trade, transfer);
+			// MessageEventProcessor  as there is no sender engine we are not publishing messages. 
+			//saveMessage(message)
+			
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("BOProcessImp ", "updateMessageAndPublish ", e);
+			return null;
+		}
+		return updateMessage;
+	}
   // event is fired from transfer Panel
 	@Override
 	public Collection updateTransferAndPublish(Transfer transfer, int userID) {
@@ -1099,9 +1124,11 @@ return status;
 		if(sqlType.equalsIgnoreCase("insert")) {
 			messages = processMessageAction(mess,"insert",trade,transfer);
 			messages =  MessageSQL.insert(messages, dsSQL.getConn());
+		} 
+		if(sqlType.equalsIgnoreCase("update")) {
+			messages = processMessageAction(mess,"update",trade,transfer);
+			messages =  MessageSQL.update(mess, dsSQL.getConn());
 		}
-		//if(sqlType.equalsIgnoreCase("update"))
-			//messages =  MessageSQL.update(mess, dsSQL.getConn());
 		return messages;
 	}
 	
@@ -1121,6 +1148,18 @@ return status;
 				   message.setSubAction("CANCEL");
 			   }
 			  
+			   messsageWithStatus.add(message);
+		   }
+		   if(sqlType.equalsIgnoreCase("update")) {
+			   Message message = messages.get(i);
+			   Vector<String> statusMessages = new Vector<String>();
+			   WFConfig wf =  getStatusOnMessageAction(message, message.getStatus(), statusMessages, trade, transfer);
+			   message.setStatus(wf.getOrgStatus());
+			   if(message.getStatus().equalsIgnoreCase("CANCELLED")) {
+				  // message.setSubAction("CANCEL");
+			   } else {
+				  // message.setSubAction("AMEND");
+			   }
 			   messsageWithStatus.add(message);
 		   }
 		   
