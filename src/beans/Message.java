@@ -11,6 +11,19 @@ public class Message implements Serializable, Cloneable {
      * each other (For SWIFT tags, typically)
      */
     static final public String MESSAGE_REF = "MessageRef";
+    /**
+	 * @return the userID
+	 */
+	public int getUserID() {
+		return userID;
+	}
+	/**
+	 * @param userID the userID to set
+	 */
+	public void setUserID(int userID) {
+		this.userID = userID;
+	}
+	int userID = 0;
 	int id = 0;
 	 int tradeId = 0;
 	 int transferId = 0;
