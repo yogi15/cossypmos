@@ -157,7 +157,13 @@ public class MessageProcessor {
 			Message message = messages.get(i);
 			Vector<Message> oldmess = getOLDMessage(messageConfigid,objectID,message.getEventType(),eventTriggerON);
 			if(commonUTIL.isEmpty(oldmess)) {
-				message.setSubAction("NEW");
+				
+				
+				if(message.getEventType().contains("CANCELLED")) {
+					message.setSubAction("CANCEL");  // this logic needs to be changed as first it must check if confirmation has been send or not if yes then send cancel messages.
+				} else {
+					message.setSubAction("NEW");
+				}
 				insertMessages.add(message);
 			} else {
 				// checkout code need to added.
@@ -170,6 +176,9 @@ public class MessageProcessor {
 			    			message.setSubAction("AMEND");
 			    		} else {
 			    			message.setSubAction("NEW");
+			    		}
+			    		if(message.getEventType().contains("CANCELLED")) {
+			    			message.setSubAction("CANCEL");
 			    		}
 			    		message.setLinkId(oldMessage.getId());
 			    		
