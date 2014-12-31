@@ -19,7 +19,7 @@ public abstract class ProductTransferRule {
 	public RemoteTrade remoteTrade = null;
 	public RemoteProduct remoteProduct = null;
 	
-
+	
 	public RemoteBOProcess remoteBOProcess = null;
 	public RemoteReferenceData refData = null;
 	public Vector<Sdi> sdis = null;
@@ -61,26 +61,7 @@ public abstract class ProductTransferRule {
 		 return null;
 	 }
 	 
-	 public Sdi getSdi(String role) {
-		 Sdi sd = null;
-		if(sdis ==  null || sdis.isEmpty()) 
-			return null;
-	
-		 if((sdis != null) && (!sdis.isEmpty())) {
-			 for(int i=0;i<sdis.size();i++) {
-				 Sdi s = (Sdi) sdis.elementAt(i);
-				 if(s.getRole().equalsIgnoreCase(role)) {
-					 sd =s;
-				     break;
-				 }
-			 }
-			 
-			 
-			 
-		 }
-		 return sd;
-			
-	 }
+	 
 	 public Sdi getSdi(int sdiID) {
 		 Sdi sd = null;
 		if(sdis ==  null || sdis.isEmpty()) 
@@ -113,7 +94,27 @@ public abstract class ProductTransferRule {
 	
 	
 	
-	
+	public void setPOSdi(Sdi sdi) {
+		this.poSdi = sdi;
+	}
+	Sdi counterPartySdi = null;
+	public void setCounterPartySDI(Sdi sdi) {
+		this.counterPartySdi = sdi;
+	}
+	public Sdi getPOSDI() {
+		return poSdi;
+	}
+	public Sdi getCounterPartySDI() {
+		return counterPartySdi;
+	}
+	public Sdi getSdi(String role) {
+		Sdi sdi = null;
+		if(role.equalsIgnoreCase("PO"))
+			sdi =  getPOSDI();
+		if(role.equalsIgnoreCase("CounterParty"))
+			sdi= getCounterPartySDI();
+		return sdi;
+	}
 	
 	 public  abstract String getProductType();
 	 public abstract Vector<TransferRule> getTransferRules(Vector v1);
@@ -168,5 +169,7 @@ public abstract class ProductTransferRule {
 			}
 			return book;
 		}
+		
+		
 		
 }
