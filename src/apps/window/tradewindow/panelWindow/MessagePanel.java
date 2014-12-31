@@ -686,7 +686,7 @@ public class MessagePanel  extends BackOfficePanel {
 				        public void actionPerformed(ActionEvent arg0) {
 				        	 String action = arg0.getActionCommand().toString();
 				        	 message.setAction(action);
-				      //	updateTransferOnAction(message, userID, row);
+				      	updateMessageOnAction(message, userID, row);
 				        }
 			});			// TODO Auto-generated method stub
 			
@@ -694,7 +694,18 @@ public class MessagePanel  extends BackOfficePanel {
     
     	
     }
-	
+	protected void updateMessageOnAction(Message message, int userID, int row) {
+		// TODO Auto-generated method stub
+		try {
+
+			remoteBO.updateMessageAndPublish(message, userID);
+			model.udpateValueAt(message, row, jTable0.getSelectedColumn());
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 	@Override
 	public void fillJTabel(Vector data) {
 		// TODO Auto-generated method stub
