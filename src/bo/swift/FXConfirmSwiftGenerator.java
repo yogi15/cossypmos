@@ -47,10 +47,10 @@ public class FXConfirmSwiftGenerator extends SwiftGenerator {
 		LegalEntity po = refeCache.getPO(trade.getBookId());
 		String poKey = "PO|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+po.getId();
 		String cpKey =  "CounterParty|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+trade.getCpID();
-		Vector<Sdi> poPerferedSdis = SDISelectorUtil.getPreferredSdisOnKey(poKey);
-		fxTransferRule.setPOSdi(poPerferedSdis.elementAt(0));
-		Vector<Sdi> cpPerferedSdis = SDISelectorUtil.getPreferredSdisOnKey(cpKey);
-		fxTransferRule.setCounterPartySDI(cpPerferedSdis.elementAt(0));
+		Sdi poPerferedSdi = SDISelectorUtil.getPreferredSdiOnly(poKey);
+		fxTransferRule.setPOSdi(poPerferedSdi);
+		Sdi cpPerferedSdis =SDISelectorUtil.getPreferredSdiOnly(cpKey); 
+		fxTransferRule.setCounterPartySDI(cpPerferedSdis);
 		
 		String senderMessageCode = ReferenceDataCache.getSenderMessageCode(message.getSenderRole(),po.getId(),trade.getProductType(),message.getAddressType(),message.getSenderContactType());
 		String receiverMessageCode = ReferenceDataCache.getSenderMessageCode(message.getReceiverRole(),message.getReceiverId(),trade.getProductType(),message.getAddressType(),message.getReceiverContactType());
@@ -86,7 +86,7 @@ public class FXConfirmSwiftGenerator extends SwiftGenerator {
         fields.addElement(field);
         
       //Related Reference
-        if (!message.getAction().equals("NONE")) {
+        if (!message.getSubAction().equals("NEW")) {
                 field = new SwiftFieldMessage();
                 field.setStatus((byte)'O');
                 field.setTAG(":21:");
@@ -99,17 +99,19 @@ public class FXConfirmSwiftGenerator extends SwiftGenerator {
         field.setStatus((byte)'M');
         field.setTAG(":22A:");
         field.setName("Type of Operation");
-        if (message.getAction().equals("NEW")){
+        if (message.getSubAction().equals("NEW")){
             field.setValue("NEWT");
            // if (trade.getKeywordValue(Trade.EXERCISE_OPTION) != null) {
               //  field.setValue("EXOP");
            // }
-        }
+        } 
        
-        else if (message.getSubAction().equals("AMEND"))
+        else if (message.getSubAction().equals("AMEND")) {
             field.setValue("AMND");
       
-        else field.setValue("CANC");
+        }  else {
+        	field.setValue("CANC");
+        }
         //PB - Add support for Exercise of Option.
 
         fields.addElement(field);
