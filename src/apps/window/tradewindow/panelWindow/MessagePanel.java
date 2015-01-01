@@ -606,7 +606,7 @@ public class MessagePanel  extends BackOfficePanel {
 			   jTable0.getColumnModel().getColumn(15).setPreferredWidth(2); 
 			   
 			   tca = new TableColumnAdjuster(jTable0);
-			   
+			   tca.adjustColumns();
 			
 		}
 		
