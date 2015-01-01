@@ -89,6 +89,7 @@ public class MessagePanel  extends BackOfficePanel {
 	private JLabel jLabel15;
 	private JTextField receiverField;
 	private RemoteBOProcess remoteBO;
+	private TableColumnAdjuster tca = null;
 	 public Users getUsers() {
 		return users;
 	}
@@ -544,11 +545,11 @@ public class MessagePanel  extends BackOfficePanel {
 	private JScrollPane getJScrollPane0() {
 		if (jScrollPane0 == null) {
 			
-			/*int v = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS; 
+			int v = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS; 
 			int h = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS;
       		
-      		jScrollPane0 = new JScrollPane(getJTable0(),v,h);*/
-			jScrollPane0 = new JScrollPane(getJTable0());
+      		jScrollPane0 = new JScrollPane(getJTable0(),v,h);
+      		
 		}
 		return jScrollPane0;
 	}
@@ -579,7 +580,8 @@ public class MessagePanel  extends BackOfficePanel {
 						return c;
 					}
 				};
-
+				
+				jTable0.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	//		jTable0.setPreferredScrollableViewportSize(new Dimension(500, 70));
 		//	jTable0.setFillsViewportHeight(true);
 		//	jTable0.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -603,8 +605,8 @@ public class MessagePanel  extends BackOfficePanel {
 			   jTable0.getColumnModel().getColumn(14).setPreferredWidth(10); 
 			   jTable0.getColumnModel().getColumn(15).setPreferredWidth(2); 
 			   
-			   TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
-			   tca.adjustColumns();
+			   tca = new TableColumnAdjuster(jTable0);
+			   
 			
 		}
 		
@@ -712,6 +714,7 @@ public class MessagePanel  extends BackOfficePanel {
 		this.data = data;
 		model = new TableModelUtil(data,cols,null);
 		jTable0.setModel(model);
+		tca.adjustColumns();
 		
 	}
 	public RemoteBOProcess getRemoteBOProcess() {
