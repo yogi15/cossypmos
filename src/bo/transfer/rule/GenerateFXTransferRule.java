@@ -57,26 +57,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 			 return sd;
 		 }
 		 
-		 public Sdi getSdi(String role) {
-			 Sdi sd = null;
-			if(sdi ==  null || sdi.isEmpty()) 
-				return null;
 		
-			 if((sdi != null) && (!sdi.isEmpty())) {
-				 for(int i=0;i<sdi.size();i++) {
-					 Sdi s = (Sdi) sdi.elementAt(i);
-					 if(s.getRole().equalsIgnoreCase(role)) {
-						 sd =s;
-					     break;
-					 }
-				 }
-				 
-				 
-				 
-			 }
-			 return sd;
-				
-		 }
 		 public Sdi getAgentSdis() {
 				Sdi po = getSdi("PO");
 			    Sdi cp = getSdi("CounterParty");
@@ -152,6 +133,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 					 
 				 ruleB.set_payerLegalEntityId(book.getLe_id()); // po role 
 				 Sdi paySdi = getSdiOnEntity(po.getId(),productType,trade.getCurrency(),SDIConstants.PO);
+				 setPOSdi(paySdi);
 					if(paySdi != null) {
 					ruleB.set_payerLegalEntityRole(paySdi.getRole());
 					ruleB.set__sMethod(paySdi);
@@ -170,6 +152,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 LegalEntity le =  (LegalEntity) getLegalEntity(trade.getCpID());
 				
 				 Sdi recSdi = getSdiOnEntity(trade.getCpID(),productType,trade.getCurrency(),SDIConstants.COUNTERPARY); // cp 
+				 setCounterPartySDI(recSdi);
 			     if(trade.isMirrorTrade()) {
 			    	 recSdi = paySdi;
 			     }
@@ -254,7 +237,9 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleB.set_payReceive(RECEIVE);
 				 
 				 Sdi paySdi = getSdiOnEntity(trade.getCpID(),productType,trade.getCurrency(),SDIConstants.COUNTERPARY);  // cp 
+				 setCounterPartySDI(paySdi);
 				 Sdi recSdi = getSdiOnEntity(po.getId(),productType,trade.getCurrency(),SDIConstants.PO);  // po 
+				 setPOSdi(recSdi);
 				 if(paySdi != null) {
 				 ruleB.set_payerLegalEntityRole(paySdi.getRole());  // cp
 				 ruleB.set_payerAgentID(paySdi.getAgentId());
@@ -298,7 +283,9 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleS.set_payerLegalEntityId(ruleB.get_receiverLegalEntityId());
 				 ruleS.set_payerLegalEntityRole(ruleB.get_receiverLegalEntityRole());
 				  paySdi =  getSdiOnEntity(po.getId(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.PO);
+				  setPOSdi(paySdi);
 				  recSdi =getSdiOnEntity(trade.getCpID(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.COUNTERPARY);
+				  setPOSdi(recSdi);
 				  if(recSdi != null) {
 				 ruleS.set_receiverSDId(recSdi.getId());
 				 ruleS.set_receiverAgentID(recSdi.getAgentId());
@@ -385,6 +372,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 							ruleB.set_payerLegalEntityId(book.getLe_id());
 							
 							Sdi paySdi =  getSdiOnEntity(po.getId(),productType,trade.getCurrency(),SDIConstants.PO); 
+							setPOSdi(paySdi);
 							if(paySdi != null) {
 							ruleB.set_payerLegalEntityRole(paySdi.getRole());
 							ruleB.set__sMethod(paySdi);
@@ -395,6 +383,8 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 						 LegalEntity le =  (LegalEntity) getLegalEntity(trade.getCpID());
 						
 						 Sdi recSdi =getSdiOnEntity(trade.getCpID(),productType,trade.getCurrency(),SDIConstants.COUNTERPARY);
+						 setCounterPartySDI(recSdi);
+						 setCounterPartySDI(recSdi);
 						 if(recSdi != null) {
 						 ruleB.set_receiverLegalEntityRole(recSdi.getRole());
 						 ruleB.set_receiverSDId(recSdi.getId());
@@ -419,6 +409,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 						 ruleS.set_receiverLegalEntityId(ruleB.get_payerLegalEntityId());
 						 ruleS.set_receiverLegalEntityRole(ruleB.get_payerLegalEntityRole());
 						  recSdi = getSdiOnEntity(po.getId(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.PO); 
+						  setPOSdi(recSdi);
 						  if(recSdi != null) {
 						  ruleS.set__sMethod(recSdi);
 						  
@@ -428,6 +419,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 						 ruleS.set_payerLegalEntityId(ruleB.get_receiverLegalEntityId());
 						 ruleS.set_payerLegalEntityRole(ruleB.get_receiverLegalEntityRole());
 						 paySdi =getSdiOnEntity(trade.getCpID(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.COUNTERPARY);
+						 setCounterPartySDI(paySdi);
 						 if(paySdi != null) {
 							ruleS.set_payerSDId(paySdi.getId());
 							ruleS.set_payerAgentID(paySdi.getAgentId());
@@ -465,6 +457,8 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 						 
 						 Sdi paySdi = getSdiOnEntity(trade.getCpID(),productType,trade.getCurrency(),SDIConstants.COUNTERPARY);  // cp 
 						 Sdi recSdi = getSdiOnEntity(po.getId(),productType,trade.getCurrency(),SDIConstants.PO);  // po 
+						 setPOSdi(recSdi);
+						 setCounterPartySDI(paySdi);
 						 ruleB.set_payerLegalEntityRole(paySdi.getRole());
 						 ruleB.set_receiverLegalEntityRole(recSdi.getRole());
 						 if(paySdi != null) {
@@ -500,6 +494,8 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 						 ruleS.set_payerLegalEntityRole(ruleB.get_receiverLegalEntityRole());
 						  paySdi =  getSdiOnEntity(po.getId(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.PO);
 						  recSdi =getSdiOnEntity(trade.getCpID(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.COUNTERPARY);
+						  setPOSdi(paySdi);
+						  setCounterPartySDI(recSdi);
 						  if(recSdi != null) {
 						 ruleS.set_receiverSDId(recSdi.getId());
 						 ruleS.set_receiverAgentID(recSdi.getAgentId());
