@@ -285,8 +285,9 @@ public class FXConfirmSwiftGenerator extends SwiftGenerator {
         //Mandatory subsequence Amount bought
         field = new SwiftFieldMessage();
         field.setStatus((byte)'M');
-        field.setTAG(":32B:");
-        field.setName("Amount bought (Currency,Amount)");
+      //  field.setTAG(":32B:"); // required by swift 
+        field.setTAG(":32R:");
+        field.setName("Amount bought (ValueDate,Currency,Amount)");
         String amountBought;
         String ccy = null;
         boolean usePo=true;
@@ -303,7 +304,7 @@ public class FXConfirmSwiftGenerator extends SwiftGenerator {
             usePo=true;
         }
 
-        field.setValue(amountBought);
+        field.setValue(SwiftUtil.getSwiftDate(trade.getDelivertyDate())+amountBought);
         fields.addElement(field);
         
         field = SwiftUtil.getTAG53(fxTransferRule,"RECEIVE", trade,null,"Delivery Agent",false,message,transferRules,null);
@@ -319,7 +320,8 @@ public class FXConfirmSwiftGenerator extends SwiftGenerator {
         if (field != null) fields.addElement(field);
         field = new SwiftFieldMessage();
         field.setStatus((byte)'M');
-        field.setTAG(":33B:");
+      //  field.setTAG(":33B:"); // required by swift code
+        field.setTAG(":33P:");
         field.setName("Amount sold (Currency,Amount)");
         String amountSold;
         if (trade.getQuantity() < 0) {
@@ -334,7 +336,7 @@ public class FXConfirmSwiftGenerator extends SwiftGenerator {
                 SwiftUtil.getSwiftAmount(trade.getNominal(),ccy);
             usePo=false;
         }
-        field.setValue(amountSold);
+        field.setValue(SwiftUtil.getSwiftDate(trade.getDelivertyDate())+amountSold);
         fields.addElement(field);
 
         field = SwiftUtil.getTAG53(fxTransferRule,"PAY", trade,null,"Delivery Agent",true,message,transferRules,null);
