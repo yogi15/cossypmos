@@ -2,9 +2,6 @@ package beans;
 
 import java.io.Serializable;
 
-import org.apache.kerberos.kdc.ticketgrant.GetRequestPrincipalEntry;
-
-
 import util.ReferenceDataCache;
 
 
