@@ -539,7 +539,7 @@ public class SDIPanel extends BackOfficePanel {
 */
 		
 			tca = new TableColumnAdjuster(jTable0);
-			
+			tca.adjustColumns();
 			
 		}
 		jTable0.addMouseListener(new java.awt.event.MouseAdapter() {
