@@ -28,6 +28,7 @@ import util.BackOfficeCache;
 import util.ClassInstantiateUtil;
 import util.ReferenceDataCache;
 import util.commonUTIL;
+import util.common.DateU;
 import beans.LeContacts;
 import bo.message.bomessagehandler.BOMessageHandler;
 import bo.swift.bic.BICSwiftData;
@@ -692,7 +693,9 @@ public class SwiftUtil {
 		// TODO Auto-generated method stub
 		String tradeDate = trade.getTradeDate().substring(0, 10);
 		Date date = commonUTIL.stringToDate(tradeDate.trim(), true);
-	 return  SwiftUtil.getSwiftDate(date, 8);
+		DateU dated = DateU.valueOf(date);
+		return getSwiftDate(dated, 8);
+	
 	}
 	
 	/**
@@ -706,7 +709,25 @@ public class SwiftUtil {
 	static public String getSwiftDate(String date) {
 		String tradeDate = date.substring(0, 10);
 		Date dat = commonUTIL.stringToDate(tradeDate.trim(), true);
-		return getSwiftDate(dat, 8);
+		DateU dated = DateU.valueOf(dat);
+		return getSwiftDate(dated, 8);
+	}
+	static public String getSwiftDate(DateU date, int length) {
+		String s = String.valueOf(date.getYear());
+		if (date.getMonth() < 10)
+			s += ("0" + date.getMonth());
+		else
+			s += date.getMonth();
+		if (date.getDayOfMonth() < 10)
+			s += ("0" + date.getDayOfMonth());
+		else
+			s += date.getDayOfMonth();
+
+		if (length == 6 && s.length() == 8)
+			return s.substring(2); // Return YYMMDD as opposed to YYYYMMDD
+		if (length == 4 && s.length() == 8)
+			return s.substring(4); // Return MMDD as opposed to YYYYMMDD
+		return s;
 	}
 	/**
 	 * Returns a Swift Formatted date either as YYYYMMDD, YYMMDD or MMDD
