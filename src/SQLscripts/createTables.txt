@@ -1270,3 +1270,64 @@ insert into users values(1,'Group1','user1','user1');
  insert into  users values(3,'Group3','user3','user3');
  insert into  users values(4,'Group2','g1','g1');
  insert into  users values(5,'Group2','g2','g21');
+ 
+ 
+ CREATE OR REPLACE Function getQuoteData
+   ( name_in IN varchar2 , quotedate in varchar2)
+   RETURN number
+IS
+   cnumber varchar2(20);
+ 
+   CURSOR c1
+   IS
+     SELECT to_number(close)
+     FROM quotedata
+     WHERE quotename  = name_in and to_char(to_date(DATETIME, 'dd/MON/yyyy HH24:MI:SS'), 'dd/mm/yyyy') = quotedate;
+ 
+BEGIN
+ 
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+ 
+   if c1%notfound then
+      cnumber := 9999;
+   end if;
+ 
+   CLOSE c1;
+ 
+RETURN cnumber;
+ 
+END;
+
+
+create or replace function getSPOTTtypeDeals(tradedate in timestamp,deliverdate in timestamp) return number
+is
+cnumber number(10);
+begin
+cnumber := trunc(deliverdate) - trunc(tradedate);
+ if(cnumber >= 2) Then
+     cnumber := 2;
+   else
+      cnumber := 1;
+end if;
+  RETURN cnumber;
+ 
+ 
+EXCEPTION
+WHEN OTHERS THEN
+   raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
+END;
+ 
+ 
+ select decode( t.currency,'INR','FCY/INR','FCY/FCY'), t.currency,decode(substr(t.type,0,3),'BUY','PURCHASE','SALE') as BUYSELL ,
+  (SUM(DECODE(t.tradedesc1, 'FXFORWARDOPTION', decode(a.ATTRIBUTENAME,'InstrumentType',decode(a.ATTRIBUTEVALUE,'MerchantReady',t.quantity , 0))))  *  getQuoteData(t.tradedesc,'01/01/2015')) AS MerchantReady  ,
+( SUM(DECODE(t.tradedesc1, 'FXFORWARDOPTION', decode(a.ATTRIBUTENAME,'InstrumentType',decode(a.ATTRIBUTEVALUE,'MerchantForward',t.quantity , 0))))  *  getQuoteData(t.tradedesc,'01/01/2015')) AS MerchantForward   ,
+ (SUM(DECODE(t.tradedesc1, 'FXFORWARDOPTION', decode(a.ATTRIBUTENAME,'InstrumentType',decode(a.ATTRIBUTEVALUE,'MerchantCancellationA',t.quantity , 0))))  *  getQuoteData(t.tradedesc,'01/01/2015')) AS MerchantCancellationA,
+ (SUM(DECODE(t.tradedesc1, 'FXSWAP', quantity/2  ))  *  getQuoteData(t.tradedesc,'01/01/2015')) AS  FXSWAP ,
+(SUM(DECODE(t.tradedesc1, 'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),  1,quantity/2 ) ))  *  getQuoteData(t.tradedesc,'01/01/2015')) AS  SPOT,
+             (SUM(DECODE(t.tradedesc1, 'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),  2,quantity/2 ) ))  *  getQuoteData(t.tradedesc,'01/01/2015')) AS  FORWARD
+ from trade t,attribute  a where t.id = a.ID
+and trunc(t.tradedate) = to_date('01/01/2015','dd/mm/yyyy') and a.type = 'Trade'
+and a.type = 'Trade'
+group by t.currency,substr(t.type,0,3),t.tradedesc
+order by t.currency
