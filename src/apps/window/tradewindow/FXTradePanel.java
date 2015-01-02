@@ -3266,7 +3266,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		}
 		public void setSDIPanelInstruction() {
 			if(trade != null) {
-			
+				sdiPanel.clearALL();
 				sdiPanel.setTrade(trade);
 				 
 			} else {
@@ -3274,6 +3274,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				dummy.setId(0);
 				fillTrade(dummy,"NEW");
 				if(isTradeProper)  {
+					sdiPanel.clearALL();
 					sdiPanel.setTrade(dummy);
 				}
 				isTradeProper = false;
