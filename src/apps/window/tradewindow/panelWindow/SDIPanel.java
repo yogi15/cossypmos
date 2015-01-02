@@ -14,7 +14,6 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -33,8 +32,6 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
-import constants.SDIConstants;
-
 import swingUtils.TableColumnAdjuster;
 import util.commonUTIL;
 import apps.window.referencewindow.JFrameReferenceWindow;
@@ -48,6 +45,7 @@ import beans.Trade;
 import beans.TransferRule;
 import bo.transfer.rule.ProductTransferRule;
 import bo.util.SDISelectorUtil;
+import constants.SDIConstants;
 import dsServices.RemoteReferenceData;
 import dsServices.ServerConnectionUtil;
 
@@ -83,7 +81,6 @@ public class SDIPanel extends BackOfficePanel {
 	private JTextField jTextField10;
 	private JTextField jTextField11;
 	private JButton jButton0;
-	private TableColumnAdjuster tca = null;
 	Vector<Sdi> payerPreferredSDIs = null;
 	Vector<Sdi> receiverPreferredSDIs = null;
 	boolean customChangeApply = false;
@@ -98,6 +95,20 @@ public class SDIPanel extends BackOfficePanel {
 	public SDIPanel() {
 		initComponents();
 		init();
+	}
+	public void clearALL() {
+		jCheckBox0.setSelected(false);
+		payerInstr.removeAllItems();
+		payerModel.removeAllElements();
+		receiverInstr.removeAllItems();
+		receiverModel.removeAllElements();
+		customChangeApply = false;
+		jTable0.removeAll();
+		payerPreferredSDIs = null;
+		receiverPreferredSDIs = null;
+		originalRules = null;
+		rules = null;
+		
 	}
 
 	private void initComponents() {
@@ -312,15 +323,7 @@ public class SDIPanel extends BackOfficePanel {
 							commonUTIL.showAlertMessage("Select TransferRule ");
 							jCheckBox0.setSelected(false);
 							return;
-						} else {
-							
-								receiverSDI.setText("");
-								payerSDI.setText("");
-								payerModel.removeAllElements();
-								receiverModel.removeAllElements();
-								payerInstr.setModel(payerModel);
-								receiverInstr.setModel(payerModel);
-						}
+						} 
 						
 					}
 					if(customChangeApply) {
@@ -328,9 +331,9 @@ public class SDIPanel extends BackOfficePanel {
 				 	commonUTIL.showAlertMessage(" Setting to Default ");
 					
 						tmodel = new TableModelUtil(originalRules, col);
-						
+						rules = originalRules;
 						jTable0.setModel(tmodel);
-						/*jTable0.getColumnModel().getColumn(0).setPreferredWidth(150); 
+						jTable0.getColumnModel().getColumn(0).setPreferredWidth(150); 
 						 jTable0.getColumnModel().getColumn(1).setPreferredWidth(150); 
 						 jTable0.getColumnModel().getColumn(2).setPreferredWidth(250); 
 						 jTable0.getColumnModel().getColumn(3).setPreferredWidth(250); 
@@ -343,9 +346,10 @@ public class SDIPanel extends BackOfficePanel {
 						 jTable0.getColumnModel().getColumn(10).setPreferredWidth(240); 
 						 jTable0.getColumnModel().getColumn(11).setPreferredWidth(200); 
 						 jTable0.getColumnModel().getColumn(12).setPreferredWidth(200); 
-						 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190);*/ 
-						 
-						 tca.adjustColumns();
+						 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); 
+						 TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
+							tca.adjustColumns();
+							customChangeApply = false;
 						
 						
 					}
@@ -522,7 +526,7 @@ public class SDIPanel extends BackOfficePanel {
 			
 			tmodel = new TableModelUtil(rules,col);
 			jTable0.setModel(tmodel);
-			/* jTable0.getColumnModel().getColumn(0).setPreferredWidth(250); 
+			 jTable0.getColumnModel().getColumn(0).setPreferredWidth(250); 
 			 jTable0.getColumnModel().getColumn(1).setPreferredWidth(350); 
 			 jTable0.getColumnModel().getColumn(2).setPreferredWidth(350); 
 			 jTable0.getColumnModel().getColumn(3).setPreferredWidth(550); 
@@ -536,9 +540,9 @@ public class SDIPanel extends BackOfficePanel {
 			 jTable0.getColumnModel().getColumn(11).setPreferredWidth(500); 
 			 jTable0.getColumnModel().getColumn(12).setPreferredWidth(500); 
 			 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); 
-*/
+
 		
-			tca = new TableColumnAdjuster(jTable0);
+			TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
 			tca.adjustColumns();
 			
 		}
@@ -547,6 +551,8 @@ public class SDIPanel extends BackOfficePanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				int selectRow = jTable0.getSelectedRow();
+				if(selectRow == -1)
+					return;
 				jTextField1.setText((String) jTable0.getValueAt(selectRow, 0));
 				jTextField4.setText((String) jTable0.getValueAt(selectRow, 1));
 				jTextField8.setText((String) jTable0.getValueAt(selectRow, 2));
@@ -563,7 +569,8 @@ public class SDIPanel extends BackOfficePanel {
 				jTextField11.setText(new Integer((Integer) jTable0.getValueAt(
 						selectRow, 11)).toString());
 				if(jCheckBox0.isSelected()) {
-				
+				if(selectRow == -1)
+					return;
 				TransferRule rule = rules.get(selectRow);
 				receiverSDI.setText(getLEName(rule.get_receiverLegalEntityId()));
 				payerSDI.setText(getLEName(rule.get_payerLegalEntityId()));
@@ -735,39 +742,38 @@ public class SDIPanel extends BackOfficePanel {
 			jPanel0.setBorder(new LineBorder(Color.black, 1, false));
 			jPanel0.setLayout(new GroupLayout());
 			jPanel0.add(getJLabel0(), new Constraints(new Leading(9, 10, 10), new Leading(16, 10, 10)));
-			jPanel0.add(getJTextField0(), new Constraints(new Leading(95, 71, 10, 10), new Leading(42, 12, 12)));
-			jPanel0.add(getJTextField1(), new Constraints(new Leading(95, 71, 12, 12), new Leading(14, 12, 12)));
-			jPanel0.add(getJTextField2(), new Constraints(new Leading(93, 71, 12, 12), new Leading(68, 12, 12)));
-			jPanel0.add(getJTextField3(), new Constraints(new Leading(93, 71, 12, 12), new Leading(94, 12, 12)));
+			jPanel0.add(getJTextField1(), new Constraints(new Leading(101, 71, 12, 12), new Leading(14, 12, 12)));
 			jPanel0.add(getJLabel4(), new Constraints(new Leading(181, 93, 10, 10), new Leading(16, 12, 12)));
-			jPanel0.add(getJLabel5(), new Constraints(new Leading(178, 93, 12, 12), new Leading(44, 12, 12)));
-			jPanel0.add(getJLabel6(), new Constraints(new Leading(176, 93, 12, 12), new Leading(68, 12, 12)));
-			jPanel0.add(getJLabel7(), new Constraints(new Leading(176, 81, 10, 10), new Leading(94, 12, 12)));
 			jPanel0.add(getJTextField4(), new Constraints(new Leading(276, 137, 10, 10), new Leading(14, 12, 12)));
-			jPanel0.add(getJTextField7(), new Constraints(new Leading(276, 137, 12, 12), new Leading(68, 12, 12)));
-			jPanel0.add(getJTextField5(), new Constraints(new Leading(276, 137, 12, 12), new Leading(42, 12, 12)));
-			jPanel0.add(getJTextField6(), new Constraints(new Leading(276, 137, 12, 12), new Leading(96, 12, 12)));
 			jPanel0.add(getJLabel8(), new Constraints(new Leading(435, 93, 10, 10), new Leading(14, 12, 12)));
 			jPanel0.add(getJLabel9(), new Constraints(new Leading(435, 93, 12, 12), new Leading(40, 12, 12)));
 			jPanel0.add(getJLabel10(), new Constraints(new Leading(435, 93, 12, 12), new Leading(68, 12, 12)));
 			jPanel0.add(getJLabel11(), new Constraints(new Leading(435, 93, 12, 12), new Leading(96, 12, 12)));
-			jPanel0.add(getJLabel1(), new Constraints(new Leading(9, 74, 12, 12), new Leading(42, 12, 12)));
 			jPanel0.add(getJLabel2(), new Constraints(new Leading(7, 78, 12, 12), new Leading(72, 12, 12)));
-			jPanel0.add(getJLabel3(), new Constraints(new Leading(9, 74, 12, 12), new Leading(98, 12, 12)));
-			jPanel0.add(getJLabel12(), new Constraints(new Leading(11, 74, 46, 477), new Leading(124, 12, 12)));
-			jPanel0.add(getJLabel13(), new Constraints(new Leading(438, 93, 10, 10), new Leading(122, 12, 12)));
+			jPanel0.add(getJLabel13(), new Constraints(new Leading(435, 93, 10, 10), new Leading(122, 12, 12)));
 			jPanel0.add(getJTextField13(), new Constraints(new Leading(540, 137, 10, 10), new Leading(122, 12, 12)));
 			jPanel0.add(getJTextField8(), new Constraints(new Leading(540, 137, 12, 12), new Leading(14, 12, 12)));
 			jPanel0.add(getJTextField9(), new Constraints(new Leading(540, 137, 12, 12), new Leading(38, 12, 12)));
 			jPanel0.add(getJTextField10(), new Constraints(new Leading(540, 137, 12, 12), new Leading(66, 12, 12)));
 			jPanel0.add(getJTextField11(), new Constraints(new Leading(540, 137, 12, 12), new Leading(94, 12, 12)));
-			jPanel0.add(getJTextField12(), new Constraints(new Leading(93, 320, 12, 12), new Leading(124, 12, 12)));
-			jPanel0.add(getJButton0(), new Constraints(new Leading(9, 12, 12), new Leading(154, 12, 12)));
 			jPanel0.add(getJPanel2(), new Constraints(new Leading(695, 513, 10, 10), new Leading(8, 209, 10, 10)));
+			jPanel0.add(getJButton0(), new Constraints(new Leading(7, 12, 12), new Leading(209, 10, 10)));
+			jPanel0.add(getJLabel12(), new Constraints(new Leading(9, 74, 12, 12), new Leading(177, 10, 10)));
+			jPanel0.add(getJTextField12(), new Constraints(new Leading(101, 320, 12, 12), new Leading(174, 12, 12)));
+			jPanel0.add(getJLabel6(), new Constraints(new Leading(7, 64, 12, 12), new Leading(106, 12, 12)));
+			jPanel0.add(getJTextField7(), new Constraints(new Leading(101, 235, 12, 12), new Leading(102, 12, 12)));
+			jPanel0.add(getJLabel3(), new Constraints(new Leading(9, 12, 12), new Leading(132, 10, 10)));
+			jPanel0.add(getJTextField6(), new Constraints(new Leading(538, 137, 10, 10), new Leading(152, 12, 12)));
+			jPanel0.add(getJTextField3(), new Constraints(new Leading(101, 235, 12, 12), new Leading(130, 12, 12)));
+			jPanel0.add(getJLabel7(), new Constraints(new Leading(435, 81, 12, 12), new Leading(158, 13, 12, 12)));
+			jPanel0.add(getJTextField2(), new Constraints(new Leading(101, 235, 12, 12), new Leading(72, 12, 12)));
+			jPanel0.add(getJLabel5(), new Constraints(new Leading(9, 93, 12, 12), new Leading(45, 12, 12)));
+			jPanel0.add(getJTextField5(), new Constraints(new Leading(101, 234, 12, 12), new Leading(44, 12, 12)));
+			jPanel0.add(getJTextField0(), new Constraints(new Leading(546, 129, 12, 12), new Leading(186, 12, 12)));
+			jPanel0.add(getJLabel1(), new Constraints(new Leading(438, 74, 12, 12), new Leading(189, 20, 12, 12)));
 		}
 		return jPanel0;
 	}
-
 	private JLabel getJLabel2() {
 		if (jLabel2 == null) {
 			jLabel2 = new JLabel();
@@ -795,11 +801,10 @@ public class SDIPanel extends BackOfficePanel {
 	private JLabel getJLabel3() {
 		if (jLabel3 == null) {
 			jLabel3 = new JLabel();
-			jLabel3.setText("ReceiverRole");
+			jLabel3.setText("Receiver Agent");
 		}
 		return jLabel3;
 	}
-
 	private JTextField getJTextField2() {
 		if (jTextField2 == null) {
 			jTextField2 = new JTextField();
@@ -847,6 +852,9 @@ public class SDIPanel extends BackOfficePanel {
 	@Override
 	public void fillJTabel(Vector data) {
 		if (data != null && (!data.isEmpty())) {
+			jCheckBox0.setSelected(false);
+			customChangeApply = false;
+
 			Hashtable<String, TransferRule> checkDuplicate = new Hashtable<String, TransferRule>();
 			setSdis(data);
 			if(trade == null)
@@ -861,7 +869,7 @@ public class SDIPanel extends BackOfficePanel {
 			int r = tmodel.getRowCount();
 			
 			jTable0.repaint();
-			tca.adjustColumns();
+
 			int i = 0;
 			while (it.hasNext()) {
 				TransferRule trule = (TransferRule) it.next();
@@ -897,6 +905,7 @@ public class SDIPanel extends BackOfficePanel {
 
 	private DefaultComboBoxModel processComboxData(Vector<Sdi> preferredSDis,DefaultComboBoxModel model) {
       //  model.removeAllElements();
+		
 		if(preferredSDis != null) {
 			for(int i=0;i<preferredSDis.size();i++) {
 				Sdi sdi = preferredSDis.get(i);
@@ -984,7 +993,7 @@ public class SDIPanel extends BackOfficePanel {
 		originalRules = new Vector(rules);
 		// System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"+originalRules.get(1).get_payerAgentID());
 		jTable0.setModel(tmodel);
-		/*jTable0.getColumnModel().getColumn(0).setPreferredWidth(150); 
+		jTable0.getColumnModel().getColumn(0).setPreferredWidth(150); 
 		 jTable0.getColumnModel().getColumn(1).setPreferredWidth(150); 
 		 jTable0.getColumnModel().getColumn(2).setPreferredWidth(250); 
 		 jTable0.getColumnModel().getColumn(3).setPreferredWidth(250); 
@@ -997,8 +1006,8 @@ public class SDIPanel extends BackOfficePanel {
 		 jTable0.getColumnModel().getColumn(10).setPreferredWidth(240); 
 		 jTable0.getColumnModel().getColumn(11).setPreferredWidth(200); 
 		 jTable0.getColumnModel().getColumn(12).setPreferredWidth(200); 
-		 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); */
-		 //TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
+		 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); 
+		 TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
 			tca.adjustColumns();
 		 TransferRule rule = rules.get(0); // for first time it will be first record only. 
 			receiverSDI.setText(getLEName(rule.get_receiverLegalEntityId()));
@@ -1007,6 +1016,10 @@ public class SDIPanel extends BackOfficePanel {
 			String recKey = rule.get_receiverLegalEntityRole()+"|"+rule.get_settlementCurrency()+"|"+rule.get_productType()+"|"+String.valueOf(rule.get_receiverLegalEntityId());
 			payerPreferredSDIs	 = SDISelectorUtil.getPreferredSdisOnKey(payKey);
 		    receiverPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(recKey);
+		      payerInstr.removeAllItems();
+		      payerModel.removeAllElements();
+		      receiverInstr.removeAllItems();
+		      receiverModel.removeAllElements();
 		     processComboxData(payerPreferredSDIs,payerModel);
 		     processComboxData(receiverPreferredSDIs,receiverModel);
 		     payerInstr.setModel(payerModel);
@@ -1113,7 +1126,6 @@ public class SDIPanel extends BackOfficePanel {
 					.getRMIService("ReferenceData");
 
 			jTable0.setModel(tmodel);
-			tca.adjustColumns();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
