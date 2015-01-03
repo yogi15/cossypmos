@@ -353,6 +353,10 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 		Product product = ProductSQL.selectProduct(transfer.getProductId(), dsSQL.getConn());
 		String whereClause = "productType ='" + product.getProductType() + "' and productSubType = '"+ product.getProdcutShortName() + "' and currentstatus = '" + transfer.getStatus() + "' and action = '" + transfer.getAction() + "' and type ='TRANSFER'";
 		Vector  wfs = (Vector) WFConfigSQL.selectWhere(whereClause, dsSQL.getConn());// this must alway retunr one transition which is unique .
+		if(commonUTIL.isEmpty(wfs)) {
+			commonUTIL.displayError("BOProcessImp", "getStatusOnTransferAction" + " not getting  workflow rule at " +  whereClause + " ",  null);
+			return null;
+		}
 		WFConfig wf = (WFConfig) wfs.elementAt(0);
 		if(!commonUTIL.isEmpty(wf.getRule())) {
 			if(wfhandler != null) {				
@@ -814,21 +818,26 @@ return status;
 			     } else {
 			    	 Vector<String> statusMessages = new  Vector<String>();
 				     WFConfig wfs = getStatusOnTransferAction(trs,trs.getStatus(),statusMessages,trade);
-			    	 trs.setUserid(trade.getUserID());
-			    	 trs.setStatus(wfs.getOrgStatus());
-			    	 Transfer nettedTransfer = getNettedTransfer(trs,netConfig); // not required in case of update and delete
-			    	 if(trs.getNettedTransferID() > 0 && (trs.isCanceled() || trs.isSettled())) {
-			    		 	trs.setNettedConfigID(0);
-			    		 	trs.setNettedTransferID(0);
-			     // nettedTransfer.setSettleAmount(nettedTransfer.getSettleAmount() - trs.getAmount());
-			    	 }
-			    	 updateTransfer(trs);
-			     }
+				     if(wfs == null) {
+				    	 commonUTIL.displayError("BOProcessImp", "saveTransfers",new Exception("NO Workflow on transfer " + trs.getId() + " for status " + trs.getStatus() + " on action " + trs.getAction()));
+				         
+				     } else {
+					    	 trs.setUserid(trade.getUserID());
+					    	 trs.setStatus(wfs.getOrgStatus());
+					    	 Transfer nettedTransfer = getNettedTransfer(trs,netConfig); // not required in case of update and delete
+					    	 if(trs.getNettedTransferID() > 0 && (trs.isCanceled() || trs.isSettled())) {
+					    		 	trs.setNettedConfigID(0);
+					    		 	trs.setNettedTransferID(0);
+					     // nettedTransfer.setSettleAmount(nettedTransfer.getSettleAmount() - trs.getAmount());
+					    	 }
+					    	 updateTransfer(trs);
+				     			}
 					
 					 publishTaskOnOldTransfer(oldTransfer,trade,trade.getUserID()); // userid need to be checked. 
 				//	 Task task =  processTask(trs,trade,trade.getUserID(),wfs);
 					// publishTask(task,trade,trs);
 				    newTransfer.addElement(trs);
+			     }
 				 
 				}
 			}else if(type.equalsIgnoreCase("delete")) {
