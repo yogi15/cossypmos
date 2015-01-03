@@ -1177,8 +1177,11 @@ public class TransferPanel extends BackOfficePanel {
 
 	public synchronized void addtaskData(TaskEventProcessor task) {
 		// TODO Auto-generated method stub
+		if(task == null)
+			return;
 		Transfer transfer = task.getTransfer();
-		
+		if(transfer == null)
+			return;
 		Trade ntrade = task.getTrade();
 		if(ntrade == null)
 			return;
@@ -1190,6 +1193,8 @@ public class TransferPanel extends BackOfficePanel {
 			
 			Vector newdata = (Vector) remoteBO.queryWhere("Transfer",
 					"tradeId = " + trade.getId());
+			if(commonUTIL.isEmpty(newdata))
+				return;
 			
 					model = new TableModelUtil(newdata, col, remoteBO, remoteProduct, false);
 					jTable0.setModel(model);
@@ -1218,10 +1223,13 @@ public class TransferPanel extends BackOfficePanel {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		if(nettedTransfers != null) {
 		TableModelUtil mutil = new TableModelUtil(nettedTransfers, col,
 				remoteBO, remoteProduct, false);
+		
 		dyTable.repaint();
 		dyTable.setModel(mutil);
+		}
 		dynTables.put(transfer.getDeliveryDate(),dyTable);
          
           
