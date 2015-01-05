@@ -124,13 +124,8 @@ public class SDIPanel extends BackOfficePanel {
 		add(getJPanel0(), new Constraints(new Bilateral(8, 9, 0), new Bilateral(276, 12, 229)));
 		setSize(1234, 567);
 		this.addMouseListener(new MouseAdapter() {
-		
-			
-			
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				//commonUTIL.showAlertMessage("I am coming");
-				
 			}
 		});
 	}
@@ -167,17 +162,15 @@ public class SDIPanel extends BackOfficePanel {
 					    	Book book =  getBook(trade.getBookId());
 					    	leid = book.getLe_id();
 					    }
-								String payerKey =  role+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(leid);
-								payerPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(payerKey);
-								payerInstr.removeAllItems();
-								payerModel.removeAllElements();
-								processComboxData(payerPreferredSDIs,payerModel);
+						String payerKey =  role+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(leid);
+						payerPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(payerKey);
+						payerInstr.removeAllItems();
+						payerModel.removeAllElements();
+						processComboxData(payerPreferredSDIs,payerModel);
 					}
 					
 				}
-			});
-		
-			
+			});			
 		}
 		return payerRole;
 	}
@@ -333,7 +326,7 @@ public class SDIPanel extends BackOfficePanel {
 						tmodel = new TableModelUtil(originalRules, col);
 						rules = originalRules;
 						jTable0.setModel(tmodel);
-						jTable0.getColumnModel().getColumn(0).setPreferredWidth(150); 
+						/*jTable0.getColumnModel().getColumn(0).setPreferredWidth(150); 
 						 jTable0.getColumnModel().getColumn(1).setPreferredWidth(150); 
 						 jTable0.getColumnModel().getColumn(2).setPreferredWidth(250); 
 						 jTable0.getColumnModel().getColumn(3).setPreferredWidth(250); 
@@ -346,10 +339,10 @@ public class SDIPanel extends BackOfficePanel {
 						 jTable0.getColumnModel().getColumn(10).setPreferredWidth(240); 
 						 jTable0.getColumnModel().getColumn(11).setPreferredWidth(200); 
 						 jTable0.getColumnModel().getColumn(12).setPreferredWidth(200); 
-						 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); 
-						 TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
-							tca.adjustColumns();
-							customChangeApply = false;
+						 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); */
+						 
+						 tca.adjustColumns();
+						 customChangeApply = false;
 						
 						
 					}
@@ -526,7 +519,7 @@ public class SDIPanel extends BackOfficePanel {
 			
 			tmodel = new TableModelUtil(rules,col);
 			jTable0.setModel(tmodel);
-			 jTable0.getColumnModel().getColumn(0).setPreferredWidth(250); 
+			 /*jTable0.getColumnModel().getColumn(0).setPreferredWidth(250); 
 			 jTable0.getColumnModel().getColumn(1).setPreferredWidth(350); 
 			 jTable0.getColumnModel().getColumn(2).setPreferredWidth(350); 
 			 jTable0.getColumnModel().getColumn(3).setPreferredWidth(550); 
@@ -539,10 +532,9 @@ public class SDIPanel extends BackOfficePanel {
 			 jTable0.getColumnModel().getColumn(10).setPreferredWidth(140); 
 			 jTable0.getColumnModel().getColumn(11).setPreferredWidth(500); 
 			 jTable0.getColumnModel().getColumn(12).setPreferredWidth(500); 
-			 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); 
-
+			 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); */
 		
-			TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
+			tca = new TableColumnAdjuster(jTable0);
 			tca.adjustColumns();
 			
 		}
@@ -869,7 +861,7 @@ public class SDIPanel extends BackOfficePanel {
 			int r = tmodel.getRowCount();
 			
 			jTable0.repaint();
-
+			tca.adjustColumns();
 			int i = 0;
 			while (it.hasNext()) {
 				TransferRule trule = (TransferRule) it.next();
@@ -974,6 +966,7 @@ public class SDIPanel extends BackOfficePanel {
 	private JComboBox payerRole;
 	private JLabel jLabel18;
 	private JLabel jLabel19;
+	private  TableColumnAdjuster tca = null;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	public Vector getSdis() {
 		return sdis;
@@ -993,7 +986,7 @@ public class SDIPanel extends BackOfficePanel {
 		originalRules = new Vector(rules);
 		// System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"+originalRules.get(1).get_payerAgentID());
 		jTable0.setModel(tmodel);
-		jTable0.getColumnModel().getColumn(0).setPreferredWidth(150); 
+		/*jTable0.getColumnModel().getColumn(0).setPreferredWidth(150); 
 		 jTable0.getColumnModel().getColumn(1).setPreferredWidth(150); 
 		 jTable0.getColumnModel().getColumn(2).setPreferredWidth(250); 
 		 jTable0.getColumnModel().getColumn(3).setPreferredWidth(250); 
@@ -1006,9 +999,10 @@ public class SDIPanel extends BackOfficePanel {
 		 jTable0.getColumnModel().getColumn(10).setPreferredWidth(240); 
 		 jTable0.getColumnModel().getColumn(11).setPreferredWidth(200); 
 		 jTable0.getColumnModel().getColumn(12).setPreferredWidth(200); 
-		 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); 
-		 TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
-			tca.adjustColumns();
+		 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); */
+		 //tca = new TableColumnAdjuster(jTable0);
+		 tca.adjustColumns();
+		 
 		 TransferRule rule = rules.get(0); // for first time it will be first record only. 
 			receiverSDI.setText(getLEName(rule.get_receiverLegalEntityId()));
 			payerSDI.setText(getLEName(rule.get_payerLegalEntityId()));
@@ -1126,6 +1120,7 @@ public class SDIPanel extends BackOfficePanel {
 					.getRMIService("ReferenceData");
 
 			jTable0.setModel(tmodel);
+			tca.adjustColumns();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
