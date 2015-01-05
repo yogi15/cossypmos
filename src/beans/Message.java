@@ -297,6 +297,14 @@ public class Message implements Serializable, Cloneable {
 	public String getSubAction() {
 		return subAction;
 	}
-	
+	String isUpdatedBeforeSend = "";
+	public String getUpdateBeforeSend() {
+		// TODO Auto-generated method stub
+		return isUpdatedBeforeSend;
+	}
+	public void setUpdateBeforeSend(String flagforUpdate) {
+		// TODO Auto-generated method stub
+		isUpdatedBeforeSend =  flagforUpdate;
+	}
 	
 }
