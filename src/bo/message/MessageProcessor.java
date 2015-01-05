@@ -172,17 +172,34 @@ public class MessageProcessor {
 			    		Message oldMessage = oldmess.get(0);  // always going to first record bz of we have used order id by in where clause.
 			    		
 			    			
-			    		if(oldMessage.getSubAction().equalsIgnoreCase("NEW") && oldMessage.getStatus().equalsIgnoreCase("SEND")) {
+			    		if(oldMessage.getSubAction().equalsIgnoreCase("NEW") && isMessageWasSend(oldMessage,oldmess)) {
 			    			message.setSubAction("AMEND");
+			    			message.setLinkId(oldMessage.getId());
+			    			insertMessages.add(message);
 			    		} else {
 			    			message.setSubAction("NEW");
+			    			message.setId(oldMessage.getId());
+			    			message.setUpdateBeforeSend("TRUE");
+			    			updatetMessages.add(message);
+			    		//	message.setLinkId(oldMessage.getLinkId());
+			    			//message.
 			    		}
-			    		if(message.getEventType().contains("CANCELLED")) {
+			    		if(message.getEventType().contains("CANCELLED") && isMessageWasSend(oldMessage,oldmess)) {
 			    			message.setSubAction("CANCEL");
+			    			message.setLinkId(oldMessage.getId());
+			    			if(isMessageWasSend(oldMessage,oldmess)) {
+			    			 insertMessages.add(message);
+			    		} else {
+			    			message.setId(oldMessage.getId());
+			    			message.setSubAction("NEW");
+			    			message.setUpdateBeforeSend("TRUE");
+			    			updatetMessages.add(message);
 			    		}
-			    		message.setLinkId(oldMessage.getId());
+			    				
+			    		}
 			    		
-			    		insertMessages.add(message);
+			    		
+			    		
 			    	
 			    }
 			}
@@ -192,6 +209,24 @@ public class MessageProcessor {
 	}
 
 	
+	private boolean isMessageWasSend(Message oldMessage,Vector<Message> Oldmessages) {
+		// TODO Auto-generated method stub
+		boolean flag = false;
+		if(oldMessage.getStatus().equalsIgnoreCase("SEND"))
+			flag =  true;
+		for(int i=0;i<Oldmessages.size();i++) {
+			Message message  = Oldmessages.get(i);
+			if(message.getStatus().equalsIgnoreCase("SEND")) {
+				flag =  true;
+				break;
+			}
+			
+		}
+		return flag;
+		
+		
+	}
+
 	private Vector<Message> getOLDMessage(int messageConfig,int tradeID,String eventType,String messageOn) {
 		Vector<Message> message = null;
 		try {
