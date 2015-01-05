@@ -100,6 +100,7 @@ public class MessagePanel  extends BackOfficePanel {
 
 	Users users = null;
 	Vector<Message> data = new Vector<Message>();
+	Vector<Message> olddata = new Vector<Message>();
 	java.util.Hashtable<Integer,String> accontName = new Hashtable();
 	TableModelUtil model = null;
 	String cols [] = {  "Message ID", "tradeID","transferId","EventType","TradeDate","MessageType","linkId","ProductType","ProductSubType","MessageDate","Sender","Receiver","Status","Action","Template","Format","GateWay","AddressType"};
@@ -182,7 +183,6 @@ public class MessagePanel  extends BackOfficePanel {
 	private JTextField getAddressField() {
 		if (addressField == null) {
 			addressField = new JTextField();
-			addressField.setText("addressField");
 		}
 		return addressField;
 	}
@@ -451,29 +451,29 @@ public class MessagePanel  extends BackOfficePanel {
 			jPanel0.add(getEventtTypeField(), new Constraints(new Leading(95, 103, 10, 10), new Leading(119, 12, 12)));
 			jPanel0.add(getJLabel4(), new Constraints(new Leading(9, 66, 12, 12), new Leading(121, 12, 12)));
 			jPanel0.add(getJLabel2(), new Constraints(new Leading(9, 66, 12, 12), new Leading(64, 12, 12)));
-			jPanel0.add(getTradeDateField(), new Constraints(new Leading(377, 105, 10, 10), new Leading(6, 12, 12)));
 			jPanel0.add(getJLabel12(), new Constraints(new Leading(250, 78, 10, 10), new Leading(6, 12, 12)));
-			jPanel0.add(getReceiverField(), new Constraints(new Leading(377, 137, 12, 12), new Leading(145, 22, 12, 12)));
 			jPanel0.add(getJLabel14(), new Constraints(new Leading(250, 80, 12, 12), new Leading(59, 12, 12)));
 			jPanel0.add(getJLabel7(), new Constraints(new Leading(250, 81, 12, 12), new Leading(36, 12, 12)));
 			jPanel0.add(getJLabel15(), new Constraints(new Leading(250, 66, 12, 12), new Leading(151, 12, 12)));
 			jPanel0.add(getActionField(), new Constraints(new Leading(95, 113, 12, 12), new Leading(147, 12, 12)));
 			jPanel0.add(getJLabel5(), new Constraints(new Leading(6, 93, 10, 10), new Leading(151, 12, 12)));
-			jPanel0.add(getJLabel8(), new Constraints(new Leading(589, 75, 12, 12), new Leading(10, 12, 12)));
-			jPanel0.add(getJLabel10(), new Constraints(new Leading(589, 83, 12, 12), new Leading(59, 14, 12, 12)));
-			jPanel0.add(getJLabel9(), new Constraints(new Leading(589, 77, 12, 12), new Leading(34, 12, 12)));
-			jPanel0.add(getJLabel16(), new Constraints(new Leading(589, 72, 12, 12), new Leading(85, 12, 12)));
-			jPanel0.add(getJLabel11(), new Constraints(new Leading(589, 54, 12, 12), new Leading(113, 14, 12, 12)));
 			jPanel0.add(getAddressField(), new Constraints(new Leading(696, 131, 12, 12), new Leading(81, 12, 12)));
 			jPanel0.add(getStatusField(), new Constraints(new Leading(696, 137, 12, 12), new Leading(107, 12, 12)));
 			jPanel0.add(getFormatField(), new Constraints(new Leading(696, 137, 12, 12), new Leading(33, 18, 12, 12)));
 			jPanel0.add(getGatewayField(), new Constraints(new Leading(696, 137, 12, 12), new Leading(58, 18, 12, 12)));
 			jPanel0.add(getJLabel13(), new Constraints(new Leading(250, 66, 12, 12), new Leading(119, 12, 12)));
-			jPanel0.add(getSenderField(), new Constraints(new Leading(377, 137, 12, 12), new Leading(116, 12, 12)));
 			jPanel0.add(getJLabel6(), new Constraints(new Leading(250, 10, 10), new Leading(89, 18, 12, 12)));
-			jPanel0.add(getProductSubTypeField(), new Constraints(new Leading(377, 137, 12, 12), new Leading(88, 12, 12)));
-			jPanel0.add(getProductTypeField(), new Constraints(new Leading(377, 111, 12, 12), new Leading(58, 22, 12, 12)));
-			jPanel0.add(getMessageDateField(), new Constraints(new Leading(377, 110, 12, 12), new Leading(32, 12, 12)));
+			jPanel0.add(getTradeDateField(), new Constraints(new Leading(377, 206, 12, 12), new Leading(6, 12, 12)));
+			jPanel0.add(getMessageDateField(), new Constraints(new Leading(377, 206, 12, 12), new Leading(32, 12, 12)));
+			jPanel0.add(getProductTypeField(), new Constraints(new Leading(377, 203, 10, 10), new Leading(58, 22, 12, 12)));
+			jPanel0.add(getProductSubTypeField(), new Constraints(new Leading(377, 202, 12, 12), new Leading(88, 12, 12)));
+			jPanel0.add(getSenderField(), new Constraints(new Leading(377, 202, 12, 12), new Leading(116, 12, 12)));
+			jPanel0.add(getReceiverField(), new Constraints(new Leading(377, 206, 12, 12), new Leading(145, 22, 12, 12)));
+			jPanel0.add(getJLabel8(), new Constraints(new Leading(609, 75, 12, 12), new Leading(12, 12, 12)));
+			jPanel0.add(getJLabel10(), new Constraints(new Leading(610, 83, 10, 10), new Leading(59, 14, 12, 12)));
+			jPanel0.add(getJLabel9(), new Constraints(new Leading(610, 77, 10, 10), new Leading(34, 12, 12)));
+			jPanel0.add(getJLabel16(), new Constraints(new Leading(610, 72, 10, 10), new Leading(85, 12, 12)));
+			jPanel0.add(getJLabel11(), new Constraints(new Leading(610, 54, 12, 12), new Leading(113, 14, 12, 12)));
 		}
 		return jPanel0;
 	}
@@ -570,10 +570,11 @@ public class MessagePanel  extends BackOfficePanel {
 
 						if (!isRowSelected(row))
 						{
+							
 							c.setBackground(getBackground());
 							int modelRow = convertRowIndexToModel(row);
-							String type = (String)getModel().getValueAt(modelRow, 5);
-							if ("REVERSAL".equals(type)) c.setBackground(Color.orange);
+							String type = (String)getModel().getValueAt(modelRow, 17);
+							if ("TRUE".equals(type)) c.setBackground(Color.pink);
 						//	if ("Sell".equals(type)) c.setBackground(Color.YELLOW);
 						}
 
@@ -709,9 +710,10 @@ public class MessagePanel  extends BackOfficePanel {
 
 	}
 	@Override
-	public void fillJTabel(Vector data) {
+	public void fillJTabel(Vector data1) {
 		// TODO Auto-generated method stub
-		this.data = data;
+		olddata = data;
+		this.data = data1;
 		model = new TableModelUtil(data,cols,null);
 		jTable0.setModel(model);
 		tca.adjustColumns();
@@ -826,6 +828,9 @@ public class MessagePanel  extends BackOfficePanel {
 		     case 16:
 		         value =message.getAddressType();
 		         break;
+		     case 17:
+		         value =message.getUpdateBeforeSend();
+		         break;
 			 }
 		     return value;
 		 }   
@@ -836,14 +841,11 @@ public class MessagePanel  extends BackOfficePanel {
 		 return false;   
 		 }   
 		 public void setValueAt(Object value, int row, int col) {   
-		         System.out.println("Setting value at " + row + "," + col   
-		                            + " to " + value   
-		                            + " (an instance of "    
-		                            + value.getClass() + ")");  
+		        
 		         if(value instanceof Posting) {
 		     data.set(row,(Message) value) ;
 		     this.fireTableDataChanged();   
-		         System.out.println("New value of data:");   
+		         
 		         }
 		        
 		 }   
