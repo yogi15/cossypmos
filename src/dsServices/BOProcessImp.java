@@ -193,7 +193,7 @@ public void startProducingMessage() {
 				Iterator<Transfer > trans = transfers.iterator();
 				while(trans.hasNext()) {
 			     Transfer trs = trans.next();
-			     System.out.println("*************************vv   "+trs.getId() + "  " + trade.getId() );
+			   //  System.out.println("*************************vv   "+trs.getId() + "  " + trade.getId() );
 			     Transfer oldTransfer = trs;
 		//	     System.out.println("id == "+ trs.getId() + " action == " + trs.getAction() + " status " + trs.getStatus());
 			     Vector<String> statusMessages = new Vector<String>();
@@ -354,7 +354,7 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 		String whereClause = "productType ='" + product.getProductType() + "' and productSubType = '"+ product.getProdcutShortName() + "' and currentstatus = '" + transfer.getStatus() + "' and action = '" + transfer.getAction() + "' and type ='TRANSFER'";
 		Vector  wfs = (Vector) WFConfigSQL.selectWhere(whereClause, dsSQL.getConn());// this must alway retunr one transition which is unique .
 		if(commonUTIL.isEmpty(wfs)) {
-			commonUTIL.displayError("BOProcessImp", "getStatusOnTransferAction" + " not getting  workflow rule at " +  whereClause + " ",  null);
+			commonUTIL.displayError("BOProcessImp", "getStatusOnTransferAction" + " not getting Transfer workflow rule at " +  whereClause + " ",  null);
 			return null;
 		}
 		WFConfig wf = (WFConfig) wfs.elementAt(0);
@@ -381,6 +381,10 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 		Product product = ProductSQL.selectProduct(message.getproductID(), dsSQL.getConn());
 		String whereClause = "productType ='" + product.getProductType() + "' and productSubType = '"+ product.getProdcutShortName() + "' and currentstatus = '" + message.getStatus() + "' and action = '" + message.getAction() + "' and type ='MESSAGE'";
 		Vector  wfs = (Vector) WFConfigSQL.selectWhere(whereClause, dsSQL.getConn());// this must alway retunr one transition which is unique .
+		if(commonUTIL.isEmpty(wfs)) {
+			commonUTIL.displayError("BOProcessImp", "getStatusOnTransferAction" + " not getting Message  workflow rule at " +  whereClause + " ",  null);
+			return null;
+		}
 		WFConfig wf = (WFConfig) wfs.elementAt(0);
 		if(!commonUTIL.isEmpty(wf.getRule())) {
 			if(wfhandler != null) {				
@@ -1013,7 +1017,7 @@ return status;
 		newNettedTransfer.setAmount(0);
 		//newNettedTransfer.set
 		int id = TransferSQL.save(newNettedTransfer, dsSQL.getConn());
-		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$     From generateNettingTransfer "+ id);
+	//	System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$     From generateNettingTransfer "+ id);
 		newNettedTransfer.setId(id);
 		return newNettedTransfer;
 	}
@@ -1162,6 +1166,12 @@ return status;
 		   if(sqlType.equalsIgnoreCase("update")) {
 			   Message message = messages.get(i);
 			   Vector<String> statusMessages = new Vector<String>();
+			// this is used when existing old message with same key(advcieconfig,tradeid or transferid,producytype,currency,po) are same with new message so it's treated as OLD message only. 
+				 
+			   if(message.getUpdateBeforeSend().equalsIgnoreCase("TRUE") && commonUTIL.isEmpty(message.getAction()) &&  commonUTIL.isEmpty(message.getStatus())) {
+				   message.setAction("NEW");    
+				   message.setStatus("NONE");
+			   }
 			   WFConfig wf =  getStatusOnMessageAction(message, message.getStatus(), statusMessages, trade, transfer);
 			   message.setStatus(wf.getOrgStatus());
 			   if(message.getStatus().equalsIgnoreCase("CANCELLED")) {
