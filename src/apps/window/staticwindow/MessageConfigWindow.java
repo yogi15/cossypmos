@@ -89,6 +89,8 @@ public class MessageConfigWindow extends JPanel {
 	private JTextField receiverLe;
 	private JComboBox receiverContactTypeCombobBox;
 	private JComboBox jComboBox2;
+	private  TableColumnAdjuster tca= null;
+	
 	Vector formatTemplateTypes = null;
 	javax.swing.DefaultComboBoxModel productModel = new javax.swing.DefaultComboBoxModel();
 	 javax.swing.DefaultComboBoxModel productSubModel = new javax.swing.DefaultComboBoxModel();
@@ -271,12 +273,21 @@ public class MessageConfigWindow extends JPanel {
 						 if(poSearchID > 0) {
 							 data = 	 (Vector) referenceData.getMessageConfigsonProductype(productType, productsubType,poSearchID);
 						 } else {
-						 data =  (Vector) referenceData.getMessageConfigsonProductype(productType, productsubType);
+							 data =  (Vector) referenceData.getMessageConfigsonProductype(productType, productsubType);
+						 }
+						 
+						 model.removeALL();
+						 
+						 if (data == null || data.isEmpty()) {
+							 commonUTIL.showAlertMessage("Message Config Not found");
+							 return;
 						 }
 						 
 						 model = new TableModelUtil(data, cols, messLeg);
 						 jTable0.setModel(model);
-						 jTable0.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+						 
+						 
+						/* jTable0.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 						 jTable0.getColumnModel().getColumn(0).setPreferredWidth(100); 
 						 jTable0.getColumnModel().getColumn(1).setPreferredWidth(150); 
 						 jTable0.getColumnModel().getColumn(2).setPreferredWidth(150); 
@@ -288,9 +299,10 @@ public class MessageConfigWindow extends JPanel {
 						 jTable0.getColumnModel().getColumn(8).setPreferredWidth(230); 
 						 jTable0.getColumnModel().getColumn(9).setPreferredWidth(200); 
 						 jTable0.getColumnModel().getColumn(10).setPreferredWidth(140); 
-						 jTable0.getColumnModel().getColumn(11).setPreferredWidth(300); 
-						 TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
-							tca.adjustColumns();
+						 jTable0.getColumnModel().getColumn(11).setPreferredWidth(300); */
+						 
+						 tca = new TableColumnAdjuster(jTable0);
+						 tca.adjustColumns();
 						
 					 } catch (RemoteException e1) {
 							// TODO Auto-generated catch block
@@ -651,16 +663,15 @@ public class MessageConfigWindow extends JPanel {
 		addButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	
-                 MessageConfig messConfig = new MessageConfig();
-                 messConfig.setId(0);
+            	MessageConfig messConfig = new MessageConfig();
+                messConfig.setId(0);
                 if( fillConfig(messConfig)) {
                 	try {
 						int id = referenceData.saveMessageConfig(messConfig);
 						if(id > 0) {
-						messConfig.setId(id);
-					    model.addRow(messConfig);
-					    commonUTIL.showAlertMessage("MessageConfig Saved with ID " + id);
-					    
+							messConfig.setId(id);
+						    model.addRow(messConfig);
+						    commonUTIL.showAlertMessage("MessageConfig Saved with ID " + id);					    
 						} else {
 							commonUTIL.showAlertMessage("MessageConfig Not Saved");
 						}
@@ -697,7 +708,7 @@ public class MessageConfigWindow extends JPanel {
 			jTable0 = new JTable();
 			jTable0.setModel(model);
 			jTable0.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-			 jTable0.getColumnModel().getColumn(0).setPreferredWidth(100); 
+			 /*jTable0.getColumnModel().getColumn(0).setPreferredWidth(100); 
 			 jTable0.getColumnModel().getColumn(1).setPreferredWidth(150); 
 			 jTable0.getColumnModel().getColumn(2).setPreferredWidth(150); 
 			 jTable0.getColumnModel().getColumn(3).setPreferredWidth(150); 
@@ -708,13 +719,13 @@ public class MessageConfigWindow extends JPanel {
 			 jTable0.getColumnModel().getColumn(8).setPreferredWidth(230); 
 			 jTable0.getColumnModel().getColumn(9).setPreferredWidth(200); 
 			 jTable0.getColumnModel().getColumn(10).setPreferredWidth(140); 
-			 jTable0.getColumnModel().getColumn(11).setPreferredWidth(300); 
+			 jTable0.getColumnModel().getColumn(11).setPreferredWidth(300); */
 			// jTable0.getColumnModel().getColumn(12).setPreferredWidth(500); 
 			// jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); 
 
 		
 			TableColumnAdjuster tca = new TableColumnAdjuster(jTable0);
-			//tca.adjustColumns();
+			tca.adjustColumns();
 		}jTable0.addMouseListener(new java.awt.event.MouseAdapter() {
 
 			@Override
