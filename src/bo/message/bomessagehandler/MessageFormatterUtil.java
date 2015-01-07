@@ -16,6 +16,8 @@ public class MessageFormatterUtil {
     public static final String TEXT="TEXT";
     public static final String XML="XML";
     public static final String SWIFT="SWIFT";
+
+    public static final String CCIL="CCIL";
     protected static Hashtable _messageGenerator = new Hashtable();
     protected static Hashtable _selectors         = new Hashtable();
     
@@ -28,8 +30,9 @@ public class MessageFormatterUtil {
         
            
             //    return findMessageFormatter(message);
-            	 if (name.equalsIgnoreCase(SWIFT)) {
-            		 	String classname = "bo.swift." +name.toUpperCase() + "MessageGenerator";  
+            	 if (name.equalsIgnoreCase(SWIFT) || name.equalsIgnoreCase(CCIL)) {
+            		    
+            		 	String classname = "bo.swift." +SWIFT.toUpperCase() + "MessageGenerator";  
             		 	Class class1;
 						try {
 							class1 = ClassInstantiateUtil.getClass(classname,true);
