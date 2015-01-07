@@ -149,7 +149,7 @@ public class MessagePanel  extends BackOfficePanel {
 			
 				if(docInfo == null) 
 					return;
-				if(!message.getFormat().equalsIgnoreCase("SWIFT")) {
+				if(!message.getFormat().equalsIgnoreCase("SWIFT") && !message.getFormat().equalsIgnoreCase("CCIL")) {
 					format.display(message, docInfo, remoteTrade, remoteRef);
 				} else {
 						SwiftMessage swiftM = docInfo.getSwiftMessage();
