@@ -89,7 +89,7 @@ public class SwiftGenerator extends BaseFormatter  {
 	 protected synchronized SwiftMessage generateSwift(String template,Transfer transfer,Message message,Trade trade,RemoteTrade remoteTrade,RemoteReferenceData remoteRef)  {
 		
 		  if ((message.getFormat()!= null)
-	                && !message.getFormat().equals("SWIFT")) {
+	                && ((!message.getFormat().equalsIgnoreCase("SWIFT") && (!message.getFormat().equalsIgnoreCase("CCIL"))))) {
 	            commonUTIL.display("SwiftGenerator"," Not a Swift Message : ("  + message.getFormat() + ") for message "  + message.getId());
 	            return null;
 	        }

@@ -20,11 +20,14 @@ public class SWIFTMessageGenerator implements MessageFormat {
 	
 	Hashtable<String,SwiftGenerator> swiftMessageGen = new Hashtable<String,SwiftGenerator>();
 	
-	public  SwiftGenerator genearteSWIFTMessageFormat(String name) {
+	public  SwiftGenerator genearteSWIFTMessageFormat(String name,String format) {
 		// TODO Auto-generated method stub
 		SwiftGenerator _swiftmessageFormat = null;
-		
-		 String classname = "bo.swift." +name + "SwiftGenerator";
+		String classname = "";
+		if(format.equalsIgnoreCase("SWIFT"))
+		  classname = "bo." + format.toLowerCase()+  "." +name + "SwiftGenerator";
+		if(format.equalsIgnoreCase("CCIL"))
+			 classname = "bo." + format.toLowerCase()+  "." +name + "CCILGenerator";
 		 try {
 			
 			 synchronized (swiftMessageGen) {
@@ -40,7 +43,11 @@ public class SWIFTMessageGenerator implements MessageFormat {
              }
 			 else {
 				// name = "MT202";
-				 classname = "bo.swift." +name + "SwiftGenerator";
+				 
+					if(format.equalsIgnoreCase("SWIFT"))
+					  classname = "bo." + format.toLowerCase()+  "." +name + "SwiftGenerator";
+					if(format.equalsIgnoreCase("CCIL"))
+						 classname = "bo." + format.toLowerCase()+  "." +name + "CCILGenerator";
 				class1 = ClassInstantiateUtil.getClass(classname,
 		  					true);
 				 if(class1 != null)            	  {
@@ -64,7 +71,7 @@ public class SWIFTMessageGenerator implements MessageFormat {
 	public SwiftMessage generateSWIFMessage(Trade trade,Transfer transfer,Message message,RemoteTrade remoteTrade,RemoteReferenceData remoteRef) {
 		
 		
-		SwiftGenerator format = genearteSWIFTMessageFormat(getTemplateName(message.getMessageType(),message.getTemplateName()));
+		SwiftGenerator format = genearteSWIFTMessageFormat(getTemplateName(message.getMessageType(),message.getTemplateName()),message.getFormat());
 		SwiftMessage swiftMessage = null;
 		try {
 			swiftMessage =  format.generate(message, trade, transfer, remoteTrade,remoteRef);
@@ -94,7 +101,7 @@ public class SWIFTMessageGenerator implements MessageFormat {
 	public DocumentInfo generate(Message message, Trade trade,Transfer transfer,boolean newDocument,RemoteTrade remoteTrade,RemoteReferenceData remoteRef) {
 		// TODO Auto-generated method stub
 		String name = getTemplateName(message.getMessageType(),message.getTemplateName());
-		SwiftGenerator swiftGen = genearteSWIFTMessageFormat(name);
+		SwiftGenerator swiftGen = genearteSWIFTMessageFormat(name,message.getFormat());
 		if(swiftGen == null)
 			return null;
 		DocumentInfo docInfo = new DocumentInfo();
