@@ -1156,6 +1156,19 @@ return status;
 			   
 			   Vector<String> statusMessages = new Vector<String>();
 			   WFConfig wf =  getStatusOnMessageAction(message, message.getStatus(), statusMessages, trade, transfer);
+			   if(wf == null) {
+				   statusMessages.add(String.valueOf(new Integer(-10)));
+				commonUTIL.displayError("BOProcessImp", "SaveMessage wf is null for message "+message.getId() + " at  " + message.getStatus() + " on action " + message.getAction() , new Exception());
+				statusMessages.add(new String(" Action "+ message.getAction() + " not Valid on status "+ message.getStatus()));
+				
+				return messsageWithStatus;
+		   }
+			   if(statusMessages.size() > 0) {
+				   commonUTIL.displayError("WorkflowImp", "SaveMessage wf rule failed for message "+message.getId() + " at  " + message.getStatus() + " on action " + message.getAction() , new Exception());
+					statusMessages.add(new String(" Action "+ message.getAction() + " not Valid on status "+ message.getStatus()));
+					
+				   return messsageWithStatus;
+			   }
 			   message.setStatus(wf.getOrgStatus());
 			   if(message.getStatus().equalsIgnoreCase("CANCELLED")) {
 				   message.setSubAction("CANCEL");
