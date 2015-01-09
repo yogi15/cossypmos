@@ -88,14 +88,14 @@ public class MessageProcessor {
 			Message message = null;
 			if(event instanceof TradeEventProcessor) {
 			    message = boHandler.fillMessage(trade, null, messConfig,"TRADE",null,(TradeEventProcessor) event,receiver,sender);
-			    messages.add(message); 
-			    filterOldMessages(message.getMessageConfigID(),trade.getId(),messages,"TRADE",filterMessages);
+			   // messages.add(message); 
+			    filterOldMessages(message.getMessageConfigID(),trade.getId(),message,"TRADE",filterMessages);
 				saveFilterMessages(filterMessages,trade,transfer);
 			}
 			if(event instanceof TransferEventProcessor) {
 				 message = boHandler.fillMessage(trade, transfer, messConfig,"TRANSFER",(TransferEventProcessor) event,null,receiver,sender);
-				 messages.add(message); 
-				 filterOldMessages(message.getMessageConfigID(),transfer.getId(),messages,"TRANSFER",filterMessages);
+			//	 messages.add(message); 
+				 filterOldMessages(message.getMessageConfigID(),transfer.getId(),message,"TRANSFER",filterMessages);
 					saveFilterMessages(filterMessages,trade,transfer);
 			}
 			  
@@ -147,14 +147,14 @@ public class MessageProcessor {
 		
 	} */
 	
-	private void filterOldMessages(int messageConfigid,int objectID,Vector<Message> messages,String eventTriggerON,Hashtable<String,Vector<Message>> filterMessages) {
+	private void filterOldMessages(int messageConfigid,int objectID,Message message,String eventTriggerON,Hashtable<String,Vector<Message>> filterMessages) {
 		// TODO Auto-generated method stub
 		Vector<Message> insertMessages = new Vector<Message>();
 		Vector<Message> updatetMessages = new Vector<Message>();
-		if(messages == null || messages.isEmpty())
+		if(message == null )
 			return;
-		for(int i=0;i<messages.size();i++) {
-			Message message = messages.get(i);
+		//for(int i=0;i<messages.size();i++) {
+		//	Message message = messages.get(i);
 			Vector<Message> oldmess = getOLDMessage(messageConfigid,objectID,message.getEventType(),eventTriggerON);
 			if(commonUTIL.isEmpty(oldmess)) {
 				
@@ -202,7 +202,7 @@ public class MessageProcessor {
 			    		
 			    	
 			    }
-			}
+		//	}
 		}
 		filterMessages.put("insert",insertMessages);
 		filterMessages.put("update",updatetMessages);
@@ -245,7 +245,7 @@ public class MessageProcessor {
 		
 		try {
 			String messConfig = trade.getProductType()+"_"+trade.getTradedesc1()+"_"+tradeEvent.getEventType()+"_"+getBook(trade.getBookId()).getLe_id();	
-			synchronized (messConfig) {
+			synchronized (messageConfigs) {
 				messConfigs = messageConfigs.get(messConfig);				
 			}
 			if(messConfigs == null) {
