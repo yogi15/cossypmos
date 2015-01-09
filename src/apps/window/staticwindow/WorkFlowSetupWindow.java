@@ -114,7 +114,7 @@ public class WorkFlowSetupWindow extends JPanel {
      DefaultListModel Ruleemodel ;
      
      DefaultListModel tradeRuleemodel = new DefaultListModel();
- 	
+     DefaultListModel messageRuleemodel = new DefaultListModel();
  	DefaultListModel transferRuleemodel = new DefaultListModel();
 	private JCheckBox jCheckBox1;
 	JDialogBoxForChoice choice12 = null;
@@ -274,7 +274,14 @@ public class WorkFlowSetupWindow extends JPanel {
     				choice12.setLocationRelativeTo(choice12);
     				//choice12.setSize(200,200);
     				choice12.setVisible(true);
-				} else {
+				} 
+            	if(type.equalsIgnoreCase("MESSAGE")) {
+                	choice12 =	new JDialogBoxForChoice(messageRuleemodel);
+                		choice12.jList3.setModel(messageRuleemodel);
+        				choice12.setLocationRelativeTo(choice12);
+        				//choice12.setSize(200,200);
+        				choice12.setVisible(true);
+    				}else {
 					choice12 =	new JDialogBoxForChoice(transferRuleemodel);
 					choice12.jList3.setModel(transferRuleemodel);
     				choice12.setLocationRelativeTo(choice12);
@@ -445,7 +452,13 @@ public class WorkFlowSetupWindow extends JPanel {
                 	commonUTIL.showAlertMessage("Select Type of Transition");
                 	return;
                 }
-                	
+                String groupName = jComboBox3.getSelectedItem().toString();
+				if(!commonUTIL.isEmpty(groupName))  {
+					config.setGroupName(groupName);
+				} else {
+					commonUTIL.showAlertMessage("Select Group please");
+					return;
+				}
                 config.setType(jComboBox4.getSelectedItem().toString());
                 try {
                 	if(!checkAllTableValues()) {
@@ -466,7 +479,8 @@ public class WorkFlowSetupWindow extends JPanel {
 						commonUTIL.showAlertMessage("Reverse Transition not allowed ");
 						return;
 					}
-					config.setId(i);
+					//config.set
+					
 					model.addRow(config);
 				//	filltable(config,tmodel.getRowCount());
                 	}
@@ -542,6 +556,12 @@ public class WorkFlowSetupWindow extends JPanel {
                     		}
                     	
                     		config.setType(jComboBox4.getSelectedItem().toString());
+                    		if(jComboBox3.getSelectedIndex() == -1)  {
+                    			commonUTIL.showAlertMessage("Select Group");
+                    			return;
+                    		}
+                    			
+                    		config.setGroupName(jComboBox3.getSelectedItem().toString());
                     		try {
                     			if(!checkAllTableValues(i)) {
                     				JOptionPane.showMessageDialog(null,"Transition Already Exists ",null,
@@ -864,6 +884,16 @@ public class WorkFlowSetupWindow extends JPanel {
 		    		i++;
 	 	    	
 	 		}	
+	 	    	vector = (Vector) remoteBORef.getStartUPData("MessageRule");
+	 			 it = vector.iterator();
+	 	    	  i = 0;
+	 	    	while(it.hasNext()) {
+	 	    		
+	 	    		StartUPData data = (StartUPData) it.next();
+		    		messageRuleemodel.addElement(data.getName());
+		    		i++;
+	 	    	
+	 		}	
 	 	    	Ruleemodel = tradeRuleemodel;
 		}catch (RemoteException e) {
 					// TODO Auto-generated catch block
@@ -1020,7 +1050,7 @@ public void selectProductWF(String productType,String productSubType,String type
 	   	         value =wfconfig.getOrgStatus();
 	   	         break;
 	   	     case 4:
-	   	         value = "GROUP1";
+	   	         value = wfconfig.getGroupName();
 	   	         break;
 	   	     case 5:
 	   	         value =wfconfig.getAuto();
