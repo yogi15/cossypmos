@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import productPricing.Pricer;
 import dsServices.RemoteBOProcess;
+import dsServices.RemoteReferenceData;
 import dsServices.RemoteTrade;
 import dsServices.ServerConnectionUtil;
 import util.ClassInstantiateUtil;
@@ -21,16 +22,19 @@ public class WFHandler {
 	
 	Hashtable<String,TradeRule> _tradeRules = new Hashtable<String,TradeRule>();
 	Hashtable<String,TransferRule> _transferRules = new Hashtable<String,TransferRule>();
+	Hashtable<String,MessageRule> _messageRules = new Hashtable<String,MessageRule>();
 	static protected Hashtable _pricers = new Hashtable();
 	RemoteTrade remoteTrade = null;
 	RemoteBOProcess remoteBO = null;
 	 ServerConnectionUtil de = null;
+	 RemoteReferenceData remoteRef = null;
 	
 	public WFHandler() {
 		 	de =ServerConnectionUtil.connect("localhost", 1099,commonUTIL.getServerIP() );
 		  try { 
 		  remoteTrade = (RemoteTrade) de.getRMIService("Trade");
 		  remoteBO = (RemoteBOProcess) de.getRMIService("BOProcess");
+		  remoteRef = (RemoteReferenceData) de.getRMIService("ReferenceData");
 			//	System.out.println(deals.toString());
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
@@ -90,7 +94,7 @@ public class WFHandler {
 			if(messageData.size() > 0 )
 				return;
 			for(int i=0;i<rules.length;i++) {
-				TransferRule transferRule =(TransferRule) getTradeRule(rule); // db transcation handler needs to be handle. 
+				TransferRule transferRule =(TransferRule) getTransferRule(rule); // db transcation handler needs to be handle. 
 				System.out.println("Rule " + newTransfer.getId()  +  " get Rule " + transferRule);
 			//	start Transcation here
 				transferRule.update(trade, newTransfer,newTransfer,remoteTrade,remoteBO, messageData,pricer,con);
@@ -196,12 +200,65 @@ public class WFHandler {
 	}
 
 
+	private  MessageRule getMessageRule(String name) {
+        String messageRule = "wfManager.messageRules.valid"  + name.trim() + "MessageRule";
+        MessageRule _messageRule = null;
+        
+        try {
+        	  synchronized(_messageRules) {
+        		  _messageRule = (MessageRule) _messageRules.get(name);
+        	  }
+        	if(_messageRule == null) {
+        Class class1 =    ClassInstantiateUtil.getClass(messageRule,true);
+        _messageRule =  (MessageRule) class1.newInstance();
+        if ( _messageRule == null) 
+        	commonUTIL.display("WFHandler", "getMessageRule for Message  "+ name + "is null  <<<<<<< " );
+        else 
+        	_messageRules.put(name, _messageRule);
+        commonUTIL.display("WFHandler", "getMessageRule for Trade  "+ name + "Found >>>>  " );
+        }
+           //  productWindow = (BondPanel) 
+        } catch (Exception e) {
+        	commonUTIL.displayError("WFHandler", "getMessageRule for Message  "+ name + "is null  <<<<<<< " , e);
+        }
 
+        return _messageRule;
+    }
 
 
 	public void generateMessageRule(Trade trade, Transfer transfer,
-			Message message, WFConfig stpWFConfig, Vector tradeStats,
+			Message message, WFConfig wfconfig, Vector messageData,
 			Connection con) {
+		String rule = wfconfig.getRule();
+		
+		Pricer pricer = getProductPricer(trade.getProductType());
+		if(!commonUTIL.isEmpty(rule)) {
+			if(rule.contains(",")) {
+				String rules [] = rule.split(",");
+				for(int i=0;i<rules.length;i++) {
+					MessageRule messageRule =(MessageRule) getMessageRule(rule);
+					messageRule.checkValid(trade, transfer,message,messageData,remoteTrade,remoteBO, remoteRef,pricer,con);
+				}
+				if(messageData.size() > 0 )
+					return;
+				for(int i=0;i<rules.length;i++) {
+					MessageRule messageRule =(MessageRule) getMessageRule(rule); // db transcation handler needs to be handle. 
+					System.out.println("Rule " + message.getId()  +  " get Rule " + messageRule);
+				//	start Transcation here
+					messageRule.update(trade, transfer,message,messageData,remoteTrade,remoteBO,remoteRef, pricer,con);
+					//end Transcation here.
+				}
+			} else {
+				MessageRule messageRule =(MessageRule) getMessageRule(rule);
+				System.out.println("Rule " + message.getId()  +  " get Rule " + messageRule);
+				messageRule.checkValid(trade, transfer,message,messageData,remoteTrade,remoteBO, remoteRef,pricer,con);
+			if(messageData.size() > 0 )
+				return;
+//			start Transcation here
+			messageRule.update(trade, transfer,message,messageData,remoteTrade,remoteBO,remoteRef, pricer,con);
+			//end Transcation here.
+			}
+			}
 		// TODO Auto-generated method stub
 		
 	}
