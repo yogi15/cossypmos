@@ -15,8 +15,15 @@ public class WFConfig implements Serializable {
 	int le;
 	int usid;
 	String type;
-	boolean task=false;
+	String groupName;
 	
+	boolean task=false;
+	public String getGroupName() {
+		return groupName;
+	}
+	public void setGroupName(String groupName1) {
+		this.groupName = groupName1;
+	}
 	public boolean isTask() {
 		return task;
 	}
