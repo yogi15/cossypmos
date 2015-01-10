@@ -44,6 +44,7 @@ import bo.message.bomessagehandler.MessageFormat;
 import bo.message.bomessagehandler.MessageFormatterUtil;
 import bo.swift.SwiftFieldMessage;
 import bo.swift.SwiftMessage;
+import dsEventProcessor.TaskEventProcessor;
 import dsServices.RemoteBOProcess;
 import dsServices.RemoteReferenceData;
 import dsServices.RemoteTrade;
@@ -907,6 +908,14 @@ private JTextField addressField;
 	public RemoteTrade getRemoteTrade() {
 		// TODO Auto-generated method stub
 		return remoteTrade;
+		
+	}
+
+	public void addtaskData(TaskEventProcessor taskEvent) {
+		// TODO Auto-generated method stub
+		if(taskEvent != null) {
+			
+		}
 		
 	}
 }
