@@ -72,7 +72,8 @@ public class MessageProcessor {
 		Hashtable<String,Vector<Message>> filterMessages = new Hashtable<String,Vector<Message>>();
 		Vector<Message> messages = new Vector<Message>();
 		if(messConfigs == null || messConfigs.isEmpty() ) {
-			commonUTIL.display("MessageProcessor" , "Message Configuration not Found on " + event.getEventType() + " for Proudct " + trade.getProductType() + " subType " + trade.getTradedesc1());
+			commonUTIL.display("MessageProcessor" , "Message Configuration not Found on " + event.getEventType() + " for Proudct " + trade.getProductType() 
+					+ " subType " + trade.getTradedesc1() + "tradeEvent " + event.getEventType() + " and selected PO");
 		    return;
 		}
 		for(int i=0;i<messConfigs.size();i++) {
@@ -248,11 +249,11 @@ public class MessageProcessor {
 			synchronized (messageConfigs) {
 				messConfigs = messageConfigs.get(messConfig);				
 			}
-			if(messConfigs == null) {
+			if(messConfigs == null || messConfig.isEmpty()) {
 				messConfigs = (Vector<MessageConfig>) refData.getMessageConfig(trade.getProductType(), trade.getTradedesc1(), tradeEvent.getEventType(), getBook(trade.getBookId()).getLe_id());
 			   if(messConfigs != null)
 				messageConfigs.put(messConfig, messConfigs);
-			}
+			} 
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
