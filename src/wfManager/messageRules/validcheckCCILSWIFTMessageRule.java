@@ -23,13 +23,30 @@ public class validcheckCCILSWIFTMessageRule implements MessageRule {
 			Pricer pricer, Connection con) {
 		// TODO Auto-generated method stub
 		try {
-			LegalEntity le = remoteRef.selectLE(newTrade.getCpID());
-			// le.getAttributes(); from here get attributes ;
-			// message.getFormat(); // formate of message.
-			// trade.getCurrency(); or 
-			// 
+			LegalEntity receiver = remoteRef.selectLE(message.getReceiverId());
+			LegalEntity sender = remoteRef.selectLE(message.getSenderId());
+						
 			if(message.getFormat().equalsIgnoreCase("CCIL")) {
-				messageData.addElement(new String("validCCILSWIFTMessageRule failed As Message will not generated for CCIL"));
+				
+				if (!(sender.getCountry().equalsIgnoreCase("India") 
+						&& receiver.getCountry().equalsIgnoreCase("India") 
+						&& newTrade.getProductType().equals("FX")
+						&& newTrade.getTradedesc().equals("USD/INR"))) {
+					
+					messageData.addElement(new String("validCCILSWIFTMessageRule failed As Message will not generated for CCIL"));
+					
+				} 			
+				
+			} else  {
+				if ((sender.getCountry().equalsIgnoreCase("India") 
+			
+					&& receiver.getCountry().equalsIgnoreCase("India") 
+					&& newTrade.getProductType().equals("FX")
+					&& newTrade.getTradedesc().equals("USD/INR"))) {
+				
+					messageData.addElement(new String("validCCILSWIFTMessageRule failed As Message will not generated for CCIL"));
+				
+				}
 			}
 			
 		} catch (RemoteException e) {
