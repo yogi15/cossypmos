@@ -160,33 +160,38 @@ public class WorkFlowSetupWindow extends JPanel {
 	  		public void mouseClicked(MouseEvent e) {
 	  			jTextField0.setText("");
 	  			int i=jTable0.getSelectedRow();
+	  			
 	  			if(i >= 0 ) {
 	  			
 	  				jCheckBox0.setSelected(false);
-	  				 jCheckBox1.setSelected(false);
+	  				jCheckBox1.setSelected(false);
 	  				jComboBox0.setSelectedItem(jTable0.getValueAt(i, 1).toString()); // for org status combox
-	  			jComboBox1.setSelectedItem(jTable0.getValueAt(i, 2).toString()); // for action combox
-	  			jComboBox2.setSelectedItem(jTable0.getValueAt(i, 3).toString()); // for newStatus combox
-	  			jComboBox3.setSelectedItem(jTable0.getValueAt(i, 4).toString()); // for Group 
-	  			jComboBox4.setSelectedItem(jTable0.getValueAt(i, 7).toString()); // Type
-	  			if(jTable0.getValueAt(i, 6) != null)
-	  			  jTextField0.setText(jTable0.getValueAt(i, 6).toString());
-	  			else 
-	  				jTextField0.setText("");
-	  			int a = ((Integer) jTable0.getValueAt(i, 5)).intValue();
-	  			int auto = new Integer(a).intValue();
-	  			if(auto == 0) {
-	  				jCheckBox0.setSelected(false);
-	  			} else {
-	  				jCheckBox0.setSelected(true);
-	  			}
-	  			if(jTable0.getValueAt(i, 8).toString().equalsIgnoreCase("1")) {
-	  				jCheckBox1.setSelected(true);
-		                 } else {
-		                	 if(jCheckBox1.isSelected()) 
-		                	    jCheckBox1.setSelected(false);
-		                 }
-	  			}
+	  				jComboBox1.setSelectedItem(jTable0.getValueAt(i, 2).toString()); // for action combox
+		  			jComboBox2.setSelectedItem(jTable0.getValueAt(i, 3).toString()); // for newStatus combox
+		  			//jComboBox3.setSelectedItem(jTable0.getValueAt(i, 4).toString()); // for Group 
+		  			jComboBox4.setSelectedItem(jTable0.getValueAt(i, 7).toString()); // Type
+		  			
+		  			if(jTable0.getValueAt(i, 6) != null)
+		  				jTextField0.setText(jTable0.getValueAt(i, 6).toString());
+		  			else 
+		  				jTextField0.setText("");
+	  			
+		  			int a = ((Integer) jTable0.getValueAt(i, 5)).intValue();
+		  			int auto = new Integer(a).intValue();
+		  			
+		  			if(auto == 0) {
+		  				jCheckBox0.setSelected(false);
+		  			} else {
+		  				jCheckBox0.setSelected(true);
+		  			}
+		  			
+		  			if(jTable0.getValueAt(i, 8).toString().equalsIgnoreCase("1")) {
+		  				jCheckBox1.setSelected(true);
+			        } else {
+	                	if(jCheckBox1.isSelected()) 
+	                	    jCheckBox1.setSelected(false);
+	                 	}
+		  			}
 	  		//	if(jTable0.getValueAt(i, 8).toString())
 	  		}
 
@@ -479,7 +484,7 @@ public class WorkFlowSetupWindow extends JPanel {
 						commonUTIL.showAlertMessage("Reverse Transition not allowed ");
 						return;
 					}
-					//config.set
+					config.setId(i);
 					
 					model.addRow(config);
 				//	filltable(config,tmodel.getRowCount());
