@@ -37,8 +37,17 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 	String payerInst;
 	String attributes;
 	String status;
-	
+	int leid = 0;
 	int nettedTransferID;
+	int bookId;
+	boolean isApproved = false;
+	int nettedConfigID;
+	int version;
+	double settleAmount;
+	String action;
+	String productType = null;
+	int userID = 0;
+	
 	/**
 	 * Delivery Type
 	 *
@@ -104,7 +113,7 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 		return isApproved;
 	}
 
-   int bookId;
+   
     public int getBookId() {
     	return bookId;
     }
@@ -112,7 +121,6 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
     	this.bookId = bookId;
     }
 
-	boolean isApproved = false;
 	public boolean isCanceled() {
 		return isCanceled;
 	}
@@ -130,21 +138,13 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 			setAttributesData(getAttributes());
 		return attributesData;
 	}
-	
 
-
-	
 	public int getTradeVersionID() {
 		return tradeVersionID;
 	}
 	public void setTradeVersionID(int tradeVersionID) {
 		this.tradeVersionID = tradeVersionID;
 	}
-
-
-
-
-
 	
 	public int getLinkid() {
 		return linkid;
@@ -152,11 +152,6 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 	public void setLinkid(int linkid) {
 		this.linkid = linkid;
 	}
-
-
-
-
-
 	
 	public int getNettedTransferID() {
 		return nettedTransferID;
@@ -183,13 +178,6 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 		this.settleAmount = settleAmount;
 	}
 
-
-
-
-
-	int nettedConfigID;
-	int version;
-	double settleAmount;
 	public String getStatus() {
 		return status;
 	}
@@ -211,12 +199,6 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 		this.action = action;
 	}
 
-
-
-
-
-	String action;
-	
 	public String getAttributes() {
 		return attributes;
 	}
@@ -303,19 +285,13 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 	public void setPayerInst(String payerInst) {
 		this.payerInst = payerInst;
 	}
-
-	
-	
-	
-	
     public String getEventType() {
 		return eventType;
 	}
 	public void setEventType(String eventType) {
 		this.eventType = eventType;
 	}
-	
-    
+
 	public int getTradeId() {
 		return tradeId;
 	}
@@ -347,12 +323,12 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 		this.id = id;
 	}
 	public void setTransferType(String transerType) {
-		// TODO Auto-generated method stub
+		
 		this.transferType = transerType;
 	}
 	
 	public String getTransferType() {
-		// TODO Auto-generated method stub
+		
 		return transferType;
 	}
 	public void addAttribues(String key,String value) {
@@ -373,7 +349,6 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 	
 	
 	public String getAttributeValue(String key) {
-		String value = null;
 		if(attributesData.size() == 0)
 			setAttributesData(attributes);
 		
@@ -469,32 +444,28 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 		return i;
 	}
 	
-	int leid = 0;
 	public int getCPid() {
 		return leid;
 	}
-	String productType = null;
-		
-	
+
 	public void setCPid(int leid) {
-		// TODO Auto-generated method stub
+		
 		this.leid = leid;
 		
 	}
 	public void setProductType(String productType) {
-		// TODO Auto-generated method stub
+		
 		this.productType = productType;
 	}
 	public String getProductType() {
 		return productType;
 	}
-   int userID = 0;
 	public int getUserid() {
-		// TODO Auto-generated method stub
+		
 	return userID;
 	}
 	public void setUserid(int userID) {
-		// TODO Auto-generated method stub
+		
 	this. userID = userID;
 	}
 	@Override
@@ -506,8 +477,60 @@ public class Transfer extends BOObject implements Serializable,Comparable<Transf
 	}
 
 	public Object getDeliveryType() {
-		// TODO Auto-generated method stub
+		
 		return null;
+	}
+	
+	public String getValues() {
+		String values ="";
+
+
+
+
+
+
+
+		try {
+		 values = "Id="+getId()+
+		                ";tradeId="+getTradeId()+
+		                ";tradeVersionID="+getTradeVersionID()+
+		                ";version="+getVersion()+
+	                    ";rec_pay="+getRec_pay()+
+	                     ";eventType="+ getEventType().trim() +
+	                     ";transferType="+ getTransferType() +
+	                     ";transferStatus="+ getTransferStatus() +
+	                     ";settlecurrency="+ getSettlecurrency() +
+	                     ";settleAmount="+ getSettleAmount() +
+	                     ";payerCode="+ getPayerCode()+
+	                     ";payerRole="+ getPayerRole() +
+	                     ";receiverCode="+ getReceiverCode() +
+	                     ";receiverRole="+getReceiverRole()+
+	                     ";paymentStatus="+getPaymentStatus() +
+	                     ";deliveryDate= "+getDeliveryDate() +
+	                      ";valueDate="+getValueDate()+
+	                      ";method="+getMethod()+
+	                      ";receiverInst="+getReceiverInst()+
+		                  ";payerInst="+getPayerInst()+
+		                  ";attributes="+getAttributes()+
+		                  ";linkid="+ getLinkid()+
+		                  ";amount="+getAmount()+
+		                  ";quantity="+getQuantity()+
+		                  ";userID="+getUserid()+
+	                      ";productType="+getProductType()+
+	                      ";action="+getAction()+
+		                  ";nettedConfigID="+ getNettedConfigID()+
+		                  ";bookId="+getBookId()+
+		                  ";nettedTransferID="+getNettedTransferID()+
+		                  ";leid="+getLeid()+
+		                  ";status= "+ getStatus() +
+		                  ";productId="+getProductId();
+		 
+		}catch(Exception e) {
+			commonUTIL.displayError("Trade Object", "getValues  == " + values, e);
+			return values;
+		}
+		
+		return values;
 	}
 	
 }
