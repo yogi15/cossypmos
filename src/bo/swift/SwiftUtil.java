@@ -2390,7 +2390,7 @@ public class SwiftUtil {
 	{
 		return getTAG57(rule,getPayRec(trade, poB), trade, transfer, fieldName, poB, message,rules, dsCon);
 	}
-	protected  static SwiftFieldMessage getTAG57(ProductTransferRule rulep,
+	public static SwiftFieldMessage getTAG57(ProductTransferRule rulep,
 			String payRec, Trade trade, Transfer transfer, String fieldName,
 			boolean poB, Message message, Vector<TransferRule> rules,
 			Connection dsCon) {
