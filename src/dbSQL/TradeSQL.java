@@ -8,12 +8,13 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+
 
 import beans.Trade;
 import util.commonUTIL;
 
 public class TradeSQL {
- 
  
  
  final static private String tableName = "Trade";
@@ -591,7 +592,8 @@ protected static int selectMax(Connection con ) {
          // Trades.add(Trade);
       
        }
-       commonUTIL.display("TradeSQL",SELECTONE + " " + sql);
+      
+      commonUTIL.display("TradeSQL",SELECTONE + " " + sql);
        if(!recordExist)
     	    trade = null;
    } catch (Exception e) {
