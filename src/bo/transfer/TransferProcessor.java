@@ -128,7 +128,7 @@ public class TransferProcessor extends Thread {
 		} else {
 			transfersData.put("insert", transfers);
 		}
-		
+
 		if(trade.getId() >0 ) {
 			publishtransfers.removeAllElements();   // this is a problem  can caused data corruption
 			Enumeration<String > keys = transfersData.keys();
