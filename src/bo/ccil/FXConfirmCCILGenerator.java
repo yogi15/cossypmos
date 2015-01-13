@@ -20,11 +20,7 @@ import bo.util.SDISelectorUtil;
 import dsServices.RemoteReferenceData;
 import dsServices.RemoteTrade;
 
-public class FXConfirmCCILGenerator  extends SwiftGenerator {
-
-	
-	
-	
+public class FXConfirmCCILGenerator  extends SwiftGenerator {	
 	
 	@Override
 	public SwiftMessage generate(Message message, Trade trade,
@@ -43,7 +39,7 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
 		fxTransferRule.setRemoteTrade(remoteTrade);
 		fxTransferRule.setRefDate(remoteRef);
 		Vector<TransferRule> transferRules =  fxTransferRule.generateRules(trade);
-		String type = "MT300";
+		String type = "CCIL";
 		refeCache = ReferenceDataCache.getSingleInstatnce();
 		LegalEntity po = refeCache.getPO(trade.getBookId());
 		String poKey = "PO|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+po.getId();
@@ -69,87 +65,138 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
         Vector fields = new Vector();
         swift.setFields(fields);
         SwiftFieldMessage field = null;
-      //General Information
-        field = new SwiftFieldMessage();
-        field.setStatus((byte)'M');
-        field.setTAG(":15A:");
-        field.setName("General Information");
-        field.setValue("");
-        fields.addElement(field);
-        
-        
-      //Sender's Reference
+     
+     // transaction Reference no
         field = new SwiftFieldMessage();
         field.setStatus((byte)'M');
         field.setTAG(":20:");
-        field.setName("Sender's Reference");
-        field.setValue(String.valueOf(message.getId()));
+        field.setName("Transaction Reference");
+        field.setValue(String.valueOf(trade.getId()));
         fields.addElement(field);
-        
-      //Related Reference
-        if (!message.getSubAction().equals("NEW")) {
-                field = new SwiftFieldMessage();
-                field.setStatus((byte)'O');
-                field.setTAG(":21:");
-                field.setName("Related Reference");
-                field.setValue(String.valueOf(message.getLinkId()));
-                fields.addElement(field);
-        } 
-        //Type of Operation
-        field = new SwiftFieldMessage();
-        field.setStatus((byte)'M');
-        field.setTAG(":22A:");
-        field.setName("Type of Operation");
-        if (message.getSubAction().equals("NEW")){
-            field.setValue("NEWT");
-           // if (trade.getKeywordValue(Trade.EXERCISE_OPTION) != null) {
-              //  field.setValue("EXOP");
-           // }
-        } 
-       
-        else if (message.getSubAction().equals("AMEND")) {
-            field.setValue("AMND");
-      
-        }  else {
-        	field.setValue("CANC");
-        }
-        //PB - Add support for Exercise of Option.
 
-        fields.addElement(field);
-        //Scope of Operation
-        field = new SwiftFieldMessage();
-        field.setStatus((byte)'O');
-        field.setTAG(":94A:");
-        field.setName("Scope of Operation");
-        String scope="BILA";
-       // if (!isMatchingSystem) { // -- need to understand about matching
-            if (message.getReceiverId() != trade.getCpID())    {
-                if (message.getReceiverRole().equalsIgnoreCase("AGENT"))
-                    scope="AGNT";
-                else
-                    scope="BROK";
-            }
-       // }
-        field.setValue(scope);
-        fields.addElement(field);
-      //Common Reference
+
+		// :21: Related Reference
+		field = new SwiftFieldMessage();
+		field.setStatus((byte) 'M');
+		field.setTAG(":21:");
+		field.setName("Related Reference");
+		if (message.getSubAction().equals("NEW")) {
+			field.setValue("NEWT");
+		}
+
+		else if (message.getSubAction().equals("AMEND")) {
+			field.setValue("AMND");
+
+		} else {
+			field.setValue("CANC");
+		}
+
+		fields.addElement(field);
+
+		
+		
+	//>>>>>>>>>>>>:22:Common Reference Number( As Explained In Page 1)
         //To be reviewed according to the Swift Rule
         field = new SwiftFieldMessage();
         field.setStatus((byte)'M');
-        field.setTAG(":22C:");
+        field.setTAG(":22:");
         field.setName("Common Reference");
-        String receiver = message.getReceiverAddressCode();
-       // if (isMatchingSystem) {
-       //     receiver = matchingContact.getSwift(); // this need to be understand properly. 
-       // }
+        String receiver = message.getReceiverAddressCode().substring(0,3);
+        //*********************************
+        
+        
+        
+        //   add Location code in 22
+        
+        
+        
+        
+        //*********************************
         double price = trade.getPrice(); 
         field.setValue(SwiftUtil.getSwiftCommonReferenceNoRounding(price,
                                                          message.getSenderAddressCode(),
-                                                         receiver));
+                                                         message.getReceiverAddressCode()));
         fields.addElement(field);
+        
+    //Date Contract Agreed ?
+        field = new SwiftFieldMessage();
+        field.setStatus((byte)'M');
+        field.setTAG(":30:");
+        field.setName("Date Contract Agreed");
+        field.setValue(SwiftUtil.getSwiftTradeDate(trade));
+        fields.addElement(field);
+		
+	//Exchange Rate 
+        field = new SwiftFieldMessage();
+        field.setStatus((byte)'M');
+        field.setTAG(":36:");
+        field.setName("Exchange Rate");
+        field.setValue(String.valueOf(trade.getPrice()));
+        fields.addElement(field);
+	
+	 //>>>>>>>>>>>>: 72:/Sender to Receiver Information ( Mandatory to be sent to sent to CCIL)
+        // this is taking now contactType which is saved in LeContact
+        //however this has to be CCIL ccontact Type
+        field = new SwiftFieldMessage();
+        field.setStatus((byte)'M');
+        field.setTAG(":72:/");
+        field.setName("Sender to Receiver Information");
+        field.setValue(senderMessageCode + "" + receiverMessageCode);
+        fields.addElement(field);
+	 
+	//    :32R:Value Date(8n)/Currency Code(3a)/Amount Bought(15 Number)
+		field = new SwiftFieldMessage();
+		field.setStatus((byte) 'M');
+		// field.setTAG(":32B:"); // required by swift
+		field.setTAG(":32R:");
+		field.setName("Amount Sold (ValueDate,Currency,Amount)");
+		String amountBought;
+		String ccy = null;
+		boolean usePo = true;
+		if (trade.getQuantity() > 0) {
+			ccy = trade.getTradedesc().substring(0, 3);
+			amountBought = ccy
+					+ SwiftUtil.getSwiftAmount(trade.getQuantity(), ccy);
+			usePo = false;
+		} else {
+			ccy = trade.getTradedesc1().substring(4, 7);
+			amountBought = ccy
+					+ SwiftUtil.getSwiftAmount(trade.getNominal(), ccy);
+			usePo = true;
+		}
+
+		field.setValue(SwiftUtil.getSwiftDate(trade.getDelivertyDate()) + amountBought);
+		fields.addElement(field);
+	
+	//>>>>>>>>>>>>: 57A:
+	
+	
+	//:33P:Value Date(8n)/Currency Code(3a)/Amount Bought(15 Number)
+		field = new SwiftFieldMessage();
+		field.setStatus((byte) 'M');
+		field.setTAG(":33P:");
+		field.setName("Amount Bought (Currency,Amount)");
+		String amountSold;
+		if (trade.getQuantity() < 0) {
+			ccy = trade.getTradedesc().substring(0, 3);
+			amountSold = ccy
+					+ SwiftUtil.getSwiftAmount(trade.getQuantity(), ccy);
+			usePo = true;
+		} else {
+			ccy = trade.getTradedesc().substring(4, 7);
+			amountSold = ccy
+					+ SwiftUtil.getSwiftAmount(trade.getNominal(), ccy);
+			usePo = false;
+		}
+		field.setValue(SwiftUtil.getSwiftDate(trade.getDelivertyDate())
+				+ amountSold);
+		fields.addElement(field);
+		
+	    //>>>>>>>>>>>>: 57A: Account with The Institution Correspondent Bank Swift Code (Already Submitted to CCIL during Admission).
+
 
       //Party A is always the Processing Org
-        field = new SwiftFieldMessage();
+/*        field = new SwiftFieldMessage();
         field.setStatus((byte)'M');
         field.setName("Party A");
         String party = SwiftUtil.formatParty("A", po.getId(),
@@ -177,9 +224,10 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
             field.setTAG(":82A:");
             field.setValue(party);
         }
-        fields.addElement(field);
+        fields.addElement(field);*/
+        
         //Party B is always the CounterParty
-        field = new SwiftFieldMessage();
+   /*     field = new SwiftFieldMessage();
         field.setStatus((byte)'M');
         field.setName("Party B");
         String tag;
@@ -218,14 +266,6 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
         field.setValue(party);
         fields.addElement(field);
 
-        if (isMatchingSystem) {
-            field = new SwiftFieldMessage();
-            field.setStatus((byte)'O');
-            field.setTAG(":83J:");
-            field.setName("Fund or Beneficiary Customer");
-            field.setValue("/NAME/"+cptyMatchingContact.getLeLastName());
-            fields.addElement(field);
-        }
         LegalEntity cp = ReferenceDataCache.getLegalEntity(trade.getCpID());
         if (cp.getRole().equals("FUND")) {
             field = new SwiftFieldMessage();
@@ -246,99 +286,8 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
                 fields.addElement(field);
 
             }
-        }
-        field = new SwiftFieldMessage();
-        field.setStatus((byte)'M');
-        field.setTAG(":15B:");
-        field.setName("New Sequence");
-        field.setValue("");
-        fields.addElement(field);
-        //Trade Date
-
-
-        field = new SwiftFieldMessage();
-        field.setStatus((byte)'M');
-        field.setTAG(":30T:");
-        field.setName("Trade Date");
-        field.setValue(SwiftUtil.getSwiftTradeDate(trade));
-        fields.addElement(field);
-        
-      //Value Date
-        field = new SwiftFieldMessage();
-        field.setStatus((byte)'M');
-        field.setTAG(":30V:");
-        field.setName("Value Date");
-        field.setValue(SwiftUtil.getSwiftDate(trade.getDelivertyDate()));
-        fields.addElement(field);
-        
-      //Exchange Rate
-        field = new SwiftFieldMessage();
-        field.setStatus((byte)'M');
-        field.setTAG(":36:");
-        field.setName("Exchange Rate");
-        double rate = trade.getPrice();// FXBasedSWIFTFormatter.round(trade, trade.getPrice()); // this need to check. 
-        String rateStr =  commonUTIL.converDoubleToString(rate); // SwiftUtil.getSwiftAmountNoRounding(rate);
-        if (rateStr.length() > 12) {
-            rateStr = rateStr.substring(0, 12);
-        }
-        field.setValue(rateStr);
-        fields.addElement(field);
-        //Mandatory subsequence Amount bought
-        field = new SwiftFieldMessage();
-        field.setStatus((byte)'M');
-      //  field.setTAG(":32B:"); // required by swift 
-        field.setTAG(":32R:");
-        field.setName("Amount bought (ValueDate,Currency,Amount)");
-        String amountBought;
-        String ccy = null;
-        boolean usePo=true;
-        if (trade.getQuantity() > 0) {
-            ccy = trade.getTradedesc().substring(0, 3);
-            amountBought = ccy +
-                SwiftUtil.getSwiftAmount(trade.getQuantity(),ccy);
-            usePo=false;
-        }
-        else {
-            ccy = trade.getTradedesc1().substring(4, 7);
-            amountBought = ccy +
-                SwiftUtil.getSwiftAmount(trade.getNominal(),ccy);
-            usePo=true;
-        }
-
-        field.setValue(SwiftUtil.getSwiftDate(trade.getDelivertyDate())+amountBought);
-        fields.addElement(field);
-        
-        field = SwiftUtil.getTAG53(fxTransferRule,"RECEIVE", trade,null,"Delivery Agent",false,message,transferRules,null);
-        if (field != null) fields.addElement(field);
-      
-        
-        // this is for intermeidaary let's think this later.
-        
-       // field = SwiftUtil.getTAG56(fxTransferRule,"PAY", trade,null,"Intermediary",false,message,transferRules,dsCon);
-      //  if (field != null) fields.addElement(field);
-
-        field = SwiftUtil.getTAG57(fxTransferRule,"PAY", trade,null,"Receiving Agent",true,message,transferRules,null);
-        if (field != null) fields.addElement(field);
-        field = new SwiftFieldMessage();
-        field.setStatus((byte)'M');
-      //  field.setTAG(":33B:"); // required by swift code
-        field.setTAG(":33P:");
-        field.setName("Amount sold (Currency,Amount)");
-        String amountSold;
-        if (trade.getQuantity() < 0) {
-            ccy = trade.getTradedesc().substring(0, 3);
-            amountSold = ccy +
-                SwiftUtil.getSwiftAmount(trade.getQuantity(),ccy);
-            usePo=true;
-        }
-        else {
-            ccy = trade.getTradedesc().substring(4, 7);
-            amountSold = ccy +
-                SwiftUtil.getSwiftAmount(trade.getNominal(),ccy);
-            usePo=false;
-        }
-        field.setValue(SwiftUtil.getSwiftDate(trade.getDelivertyDate())+amountSold);
-        fields.addElement(field);
+        }*/
+ 
 
         field = SwiftUtil.getTAG53(fxTransferRule,"PAY", trade,null,"Delivery Agent",true,message,transferRules,null);
         if (field != null) fields.addElement(field);
@@ -350,24 +299,7 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
         if (field != null) fields.addElement(field);
 
         // Tag 58A should only be displayed if beneficiary is not counterparty
-       
-        Sdi sdi = fxTransferRule.getSdi("CounterParty");
-        if (sdi != null &&
-            sdi.getBeneficiary() != null &&
-            sdi.getBeneficiary().getCpId() != 0 &&
-            (sdi.getBeneficiary()).getCpId() != trade.getCpID()) {
-            field = SwiftUtil.getTAG58(fxTransferRule,"PAY", trade,null,"Beneficiary Institution",!usePo,message,transferRules,null);
-            if (field != null) fields.addElement(field);
-        }
-       /*if ( !trade.getActiveAlternateDate()(trade.getDelivertyDate())){  // we have understand this scenario
-            field = new SwiftFieldMessage();
-            field.setStatus((byte)'O');
-            field.setTAG(":72A:");
-            field.setName("Split Value Date");
-            field.setValue(SwiftUtil.getSwiftDate(trade.getDelivertyDate()) +
-                           trade.getCurrency());
-            fields.addElement(field);
-       } */
+
         
 		   return swift;
 			}
