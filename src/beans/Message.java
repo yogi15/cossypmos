@@ -2,6 +2,8 @@ package beans;
 
 import java.io.Serializable;
 
+import util.commonUTIL;
+
 public class Message implements Serializable, Cloneable {
 	 
 	public static final String FORMAT_ISSUE_MSG_ATTR = "FORMAT ISSUE";
@@ -44,6 +46,21 @@ public class Message implements Serializable, Cloneable {
 	 String tradeDate = "";
 	 String messageGateway = "";
 	 String productSubType = "";
+	 String eventType="";
+	 String triggerON = "";
+	 int productID =0;
+	 String attributes;
+	 String format = "";
+	 private String _senderAddressCode;
+	 protected String _receiverAddressCode;
+	 int receiverID;
+	 String poContactType="";	 
+	 String subAction = "NEW";
+	 String isUpdatedBeforeSend = "";
+	 String receiverContactType="";
+	 int senderID = 0;
+	 int messageConfigID = 0;
+	 
 	public int getId() {
 		return id;
 	}
@@ -164,49 +181,38 @@ public class Message implements Serializable, Cloneable {
 	public void setProductSubType(String productSubType) {
 		this.productSubType = productSubType;
 	}
-	String eventType="";
-	public String getEventType() {
-		// TODO Auto-generated method stub
+	
+	public String getEventType() {		
 		return eventType;
 	}
 	public void setEventType(String eventType) {
 		this.eventType = eventType;
 	}
-	String triggerON = "";
-	public String getTriggerON() {
-		// TODO Auto-generated method stub
+	
+	public String getTriggerON() {		
 		return triggerON;
 	}
-	public void setTriggerON(String triggerON) {
-		// TODO Auto-generated method stub
+	public void setTriggerON(String triggerON) {		
 		this.triggerON = triggerON;
 	}
-	int productID =0;
-	public int getproductID() {
-		// TODO Auto-generated method stub
+	
+	public int getproductID() {		
 		return productID;
 	}
-	public void setproductID(int productID) {
-		// TODO Auto-generated method stub
+	public void setproductID(int productID) {		
 		this.productID = productID;
-	}
-	String attributes;
-	
-	
+	}	
 	public String getAttributes() {
 		return attributes;
 	}
 	public void setAttributes(String attributes) {
 		this.attributes = attributes;
 	}
-	String format = "";
-	private String _senderAddressCode;
-	public void setFormat(String formatType) {
-		// TODO Auto-generated method stub
+	
+	public void setFormat(String formatType) {		
 		format = formatType;
 	}
-	public String getFormat() {
-		// TODO Auto-generated method stub
+	public String getFormat() {		
 		return format;
 	}
 	 /**
@@ -217,94 +223,116 @@ public class Message implements Serializable, Cloneable {
      * @return   the sender's address String, which is an actual
      * address value like a fax number
      */
-	 protected String             _receiverAddressCode;
+	 
 	 final public void setSenderAddressCode(String s) {  _senderAddressCode=s;}
 
     final public String getSenderAddressCode() { return _senderAddressCode;}
     final public String getReceiverAddressCode() { return _receiverAddressCode;}
     final public void setReceiverAddressCode(String s) {  _receiverAddressCode=s;}
-    int receiverID;
-	public int getReceiverId() {
-		// TODO Auto-generated method stub
+    
+	public int getReceiverId() {		
 		return receiverID;
 	}
-	public void setReceiverId(int receiverID) {
-		// TODO Auto-generated method stub
+	public void setReceiverId(int receiverID) {		
 		this.receiverID =  receiverID;
 	}
-	public String getSenderContactType() {
-		// TODO Auto-generated method stub
+	public String getSenderContactType() {		
 		return poContactType;
 	}
-	public String getReceiverContactType() {
-		// TODO Auto-generated method stub
+	public String getReceiverContactType() {		
 		return receiverContactType;
 	}
-	public String getSettleDate() {
-		// TODO Auto-generated method stub
+	public String getSettleDate() {		
 		return null;
-	}
-	String poContactType="";
-	public void setSenderContactType(String poContactType) {
-		// TODO Auto-generated method stub
+	}	
+	public void setSenderContactType(String poContactType) {		
 		this.poContactType = poContactType;
-	}
-	String receiverContactType="";
-	public void setReceiverContactType(String receiverContactType) {
-		// TODO Auto-generated method stub
+	}	
+	public void setReceiverContactType(String receiverContactType) {		
 		this.receiverContactType = receiverContactType;
-	}
-	 int senderID = 0;
-	public void setSenderId(int poid) {
-		// TODO Auto-generated method stub
-		this.senderID = poid;
-		
+	}	 
+	public void setSenderId(int poid) {		
+		this.senderID = poid;		
 	}
 	public int getSenderId() {
-		// TODO Auto-generated method stub
-		return senderID ;
-		
+		return senderID ;		
 	}
-	public boolean getExternalB() {
-		// TODO Auto-generated method stub
+	public boolean getExternalB() {		
 		return false;
 	}
-	public String  getAttribute(String string) {
-		// TODO Auto-generated method stub
+	public String  getAttribute(String string) {		
 		return null;
 	}
-	public int getVersion() {
-		// TODO Auto-generated method stub
+	public int getVersion() {		
 		return 0;
 	}
-	public String getLanguage() {
-		// TODO Auto-generated method stub
+	public String getLanguage() {		
 		return "English";
-	}
-	int messageConfigID = 0;
-	public void setMessageConfigID(int messageConfig) {
-		// TODO Auto-generated method stub
-		messageConfigID = messageConfig;
-		
+	}	
+	public void setMessageConfigID(int messageConfig) {		
+		messageConfigID = messageConfig;		
 	}
 	public int getMessageConfigID() {
 		return messageConfigID;
-	}
-	String subAction = "NEW";
+	}	
 	public void setSubAction(String subAction) {
 		this.subAction = subAction;
 	}
 	public String getSubAction() {
 		return subAction;
 	}
-	String isUpdatedBeforeSend = "";
+	
 	public String getUpdateBeforeSend() {
-		// TODO Auto-generated method stub
 		return isUpdatedBeforeSend;
 	}
-	public void setUpdateBeforeSend(String flagforUpdate) {
-		// TODO Auto-generated method stub
+	public void setUpdateBeforeSend(String flagforUpdate) {		
 		isUpdatedBeforeSend =  flagforUpdate;
 	}
 	
+	public String getValues() {
+		String values ="";
+
+		try {
+		 values = "Id="+getId()+
+		                ";tradeId="+getTradeId()+
+		                ";transferId="+getTransferId()+
+		                ";version="+getVersion()+
+		                ";tradeVersion="+getTradeVersion()+
+		                ";transferVersion="+getTransferVersion()+
+		                ";senderId="+ getSenderId()+
+	                    ";senderName="+ getSenderName() +
+	                    ";senderRole="+ getSenderRole() +	                    
+	                    ";_senderAddressCode="+ getSenderAddressCode() +	                    
+		                ";receiverName="+ getReceiverName() +
+	                    ";receiverRole="+getReceiverRole()+
+	                    ";_receiverAddressCode="+ getReceiverAddressCode() +
+	                    ";receiverContactType="+ getReceiverContactType() +
+	                    ";messageType="+getMessageType()+
+	                     ";tradeDate="+ getTradeDate() +
+	                     ";templateName="+ getTemplateName() +
+	                     ";messageDate="+ getMessageDate() +
+	                     ";messageGateway="+ getMessageGateway() +
+	                     ";messageConfigID="+ getMessageConfigID() +
+	                     ";eventType="+ getEventType().trim() +	                     	                    
+	                     ";triggerON="+ getTriggerON() +
+	                     ";format= "+ getFormat() +
+	                      ";poContactType="+ getSenderContactType()+
+	                      ";subAction="+getSubAction()+
+	                      ";isUpdatedBeforeSend="+getUpdateBeforeSend()+
+		                  ";attributes="+getAttributes()+		                  		      
+		                  ";userID="+getUserID()+
+		                  ";action="+getAction()+
+		                  ";linkid="+getLinkId()+
+		                  ";status="+getStatus()+
+		                  ";productType="+getProductType()+
+		                  ";productSubType="+getProductSubType()+
+		                  ";productId="+getproductID();
+		 
+		}catch(Exception e) {
+			commonUTIL.displayError("Trade Object", "getValues  == " + values, e);
+			return values;
+		}
+		
+		return values;
+	}
 }
