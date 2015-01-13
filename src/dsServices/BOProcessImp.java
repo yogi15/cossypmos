@@ -15,6 +15,7 @@ import util.commonUTIL;
 import util.common.DateU;
 import wfManager.WFHandler;
 
+import dbSQL.AuditSQL;
 import dbSQL.MessageSQL;
 import dbSQL.PostingSQL;
 import dbSQL.ProductSQL;
@@ -26,6 +27,7 @@ import dsEventProcessor.MessageEventProcessor;
 import dsEventProcessor.TaskEventProcessor;
 import dsEventProcessor.TransferEventProcessor;
 
+import beans.Audit;
 import beans.BOObject;
 import beans.DocumentInfo;
 import beans.Message;
@@ -50,21 +52,21 @@ public class BOProcessImp implements RemoteBOProcess {
 		}
 	@Override
 	public void removePosting(Posting posting) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		PostingSQL.delete(posting, dsSQL.getConn());
 		
 	}
 
 	@Override
 	public void removeTransfer(Transfer transfer) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		TransferSQL.delete(transfer, dsSQL.getConn());
 		
 	}
 
 	@Override
 	public int savePosting(Posting posting) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return PostingSQL.save(posting, dsSQL.getConn());
 	}
 
@@ -75,14 +77,14 @@ public class BOProcessImp implements RemoteBOProcess {
 
 	@Override
 	public Posting selectPosting(Posting Posting) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		Vector v1 = (Vector) PostingSQL.selectPosting( Posting.getId(), dsSQL.getConn());
 		return (Posting) v1.elementAt(0);
 	}
 
 	@Override
 	public Transfer selectTransfer(Transfer transfer) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		Vector v1 = (Vector) TransferSQL.selectTransfer(transfer.getId(), dsSQL.getConn());
 		if(commonUTIL.isEmpty(v1))
 			return null;
@@ -91,13 +93,13 @@ public class BOProcessImp implements RemoteBOProcess {
 
 	@Override
 	public void updatePosting(Posting Posting) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		PostingSQL.update(Posting, dsSQL.getConn());
 	}
 
 	@Override
 	public void updateTransfer(Transfer transfer) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		TransferSQL.update(transfer, dsSQL.getConn());
 		
 	}
@@ -105,7 +107,7 @@ public class BOProcessImp implements RemoteBOProcess {
 	@Override
 	public Collection queryWhere(String boObject, String where)
 			throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		
 		if(boObject.equalsIgnoreCase("Transfer")) {
 			return TransferSQL.selectWhere(where,dsSQL.getConn());
@@ -166,7 +168,7 @@ public void startProducingMessage() {
 	public  Collection saveTransfers(Vector<Transfer> transfers, String type,String tradeStatus,Trade trade,int userID)
 			throws RemoteException {
 		Vector<Transfer> newTransfer = new Vector();
-		// TODO Auto-generated method stub
+		
 		if(!transfers.isEmpty()) {
 			if(type.equalsIgnoreCase("insert")) {
 				Iterator<Transfer > trans = transfers.iterator();
@@ -187,6 +189,8 @@ public void startProducingMessage() {
 				 Task task =  processTask(trs,trade,userID,wfs);
 				 publishTask(task,trade,trs);
 				 newTransfer.addElement(trs);
+				 
+				 processTransferAudit(trs, trade);
 				 
 				}
 			} else if(type.equalsIgnoreCase("update")) {
@@ -224,17 +228,113 @@ public void startProducingMessage() {
 				 
 				}
 			}
-		}
-		
+		}	
 		
 		
 		return newTransfer;
 	}
 
 	
-	
-	
+	private void processTransferAudit(Transfer transfer, Trade trade) {
+		try {
+		
+		String currentDateTime= util.commonUTIL.getCurrentDateTime();
+		// trade.getVersion();
 
+		if(transfer.getVersion() == 1) {
+			Audit audit = new Audit();
+			audit.setChangeDate(currentDateTime);
+			audit.setFieldname("--");
+			audit.setTradeid(transfer.getId());
+			audit.setType("NEW");
+			audit.setUserid(transfer.getUserid());
+			audit.setVersion(transfer.getVersion());
+			//System.out.println(trade.getValues());
+			audit.setValues(transfer.getValues());
+			audit.setTattribue(transfer.getAttributes());
+			
+			AuditSQL.save(audit,  dsSQL.getConn());
+		} else {
+			
+			Vector v1 = (Vector) AuditSQL.selectLatestTradeVersion(transfer.getId(), dsSQL.getConn());
+			
+			String oldTransferValues = ((Audit)v1.elementAt(0)).getValues();
+			String newTransferValues = transfer.getValues();
+			//System.out.println();
+			String changevalues = getChangeValues(oldTransferValues, newTransferValues);
+			
+			Audit audit = new Audit();
+			audit.setChangeDate(currentDateTime);
+			audit.setFieldname(changevalues);
+			audit.setTradeid(transfer.getId());
+			audit.setType("UPDATE");
+			audit.setUserid(transfer.getUserid());
+			audit.setVersion(transfer.getVersion());
+			audit.setValues(transfer.getValues());
+			if(transfer.getAttributes() !=null) {
+				String auditAttribures = ((Audit)v1.elementAt(0)).getTattribue();
+				if(auditAttribures == null) {
+					audit.setTattribue(transfer.getAttributes().trim());
+				
+				} else {
+					if(!auditAttribures.equalsIgnoreCase(transfer.getAttributes())) {
+						audit.setTattribue(transfer.getAttributes());
+					}
+				}
+				}
+			
+			else {
+				audit.setTattribue("");
+			}
+			AuditSQL.save(audit,  dsSQL.getConn());
+			
+		}
+	}	catch(Exception e) {
+		commonUTIL.displayError("BOProcessImp", "processTransferAudit", e);
+		
+	}
+		
+		
+	}
+	
+	private String getChangeValues(String oldValues, String newValues) {
+		String changeColumn = "";
+		try {
+		System.out.println(" oldValues = "+ oldValues)	;
+		System.out.println(" newValues = "+ newValues);
+		String oldtoken [] = oldValues.trim().split(";");
+		String newtoken [] = newValues.trim().split(";");
+	//	System.out.println(Arrays.toString(oldtoken));
+		
+		for(int i =0;i<oldtoken.length;i++) {
+			String ovalue = "";
+			String nvalue = "";
+			String old = (String) oldtoken[i];
+			String ne = (String) newtoken[i];
+			if(old.length() > 0)
+			    ovalue = old.substring(old.indexOf('='), old.length());
+			if(ne.length() > 0)
+			nvalue = ne.substring(ne.indexOf('='), ne.length());
+			
+			
+		//	System.out.println(" old " + old + " value "+ ovalue);
+			//System.out.println(" ne " + ne + " value "+ nvalue);
+			
+			if(!ovalue.equalsIgnoreCase(nvalue)) {
+				if(old.length() > 0)
+				changeColumn = changeColumn + old.substring(0, old.indexOf('=')) + ",";
+				else 
+					changeColumn = changeColumn + ne.substring(0, ne.indexOf('=')) + ",";
+			}
+			
+		}
+		return changeColumn;
+		}catch(Exception e) {
+			commonUTIL.displayError("BoProcessImp", "getChangeValues " + changeColumn ,    e);
+			return "";
+		}
+		
+	}
 
 	private Task updateTaskwithUpdatedTrasnfer(Task task,Transfer transfer,Trade trade,int userID) {
 		task.setTradeID(transfer.getTradeId());
@@ -278,7 +378,7 @@ public void startProducingMessage() {
 					try {
 						remoteTrade.publishnewTrade("POS_NEWTRADE","Object",getTaskEvent(task,trade,oldTransfer));
 					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
+						
 						e.printStackTrace();
 					}
 				
@@ -293,7 +393,7 @@ public void startProducingMessage() {
 private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) {
 	if(transfer.getTradeId() == 0)
 		return null;
-	// TODO Auto-generated method stub
+	
 	Task task = null;
 	if(wfc == null) {
 		task = new Task();
@@ -404,7 +504,7 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 		return wf;
 	}
 	private WFConfig checkSTPExistsonTransition(Product product,WFConfig wf,Message message,Vector<String> statusMessages,Trade trade,Transfer transfer) {
-		// TODO Auto-generated method stub
+		
 		WFConfig cf = wf;
 		if(wf != null) {
 			if(wf.getAuto() == 1 ) {
@@ -440,7 +540,7 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 	}
 	
 	private WFConfig checkSTPExistsonTransition(Product product,WFConfig wf,Transfer transfer,Vector<String> statusMessages,Trade trade) {
-		// TODO Auto-generated method stub
+		
 		WFConfig cf = wf;
 		if(wf != null) {
 			if(wf.getAuto() == 1 ) {
@@ -508,7 +608,7 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 	}
 
 	private void getAction(Transfer trs, String tradeAction) {
-		// TODO Auto-generated method stub
+		
 		if(tradeAction.equalsIgnoreCase("CANCELLED")) {
 			trs.setAction("CANCEL");
 		}
@@ -517,7 +617,7 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 	}
 	@Override
 	public Collection getTransferOnTrade(int tradeID) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return TransferSQL.getTransferOnTrade(tradeID,dsSQL.getConn());
 	}
 	
@@ -552,7 +652,7 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 	
 	@Override
 	public Collection getAction(Transfer transfer) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		Product product = ProductSQL.selectProduct(transfer.getProductId(), dsSQL.getConn());
 		String whereClause = "productType ='" + product.getProductType() + "' and productSubType = '"+ product.getProdcutShortName() + "' and currentstatus = '" + transfer.getStatus() + "' and action = '" + transfer.getAction() + "' and type ='TRANSFER'";
 		Vector v1 = (Vector)  WFConfigSQL.selectWhere(whereClause, dsSQL.getConn());
@@ -593,7 +693,7 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 	
 	
 	private WFConfig getStponNewStatus1(String whereClause) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		WFConfig autowf = null;
 		if(whereClause != null) {
 			 
@@ -626,7 +726,7 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 			//saveMessage(message)
 			
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			commonUTIL.displayError("BOProcessImp ", "updateMessageAndPublish ", e);
 			return null;
 		}
@@ -660,7 +760,7 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 				remoteTrade.publishnewTrade("TRANS_NEWTRANSFER","TRADE",event);
 			}
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 			commonUTIL.displayError("BOProcessImp ", "updateTransferAndPublish ", e);
 		}
 		return updateTransfer;
@@ -686,7 +786,7 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 		try {
 			remoteTrade = (RemoteTrade) de.getRMIService("Trade");
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			
 		commonUTIL.displayError("BOProcessImp", "initRemoteInterface", e);
 		}
 	}
@@ -710,7 +810,7 @@ return status;
 	@Override
 	public Collection getTransfers(Trade trade, boolean cancelTrue)
 			throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		
 		return null;
 	}
@@ -795,8 +895,11 @@ return status;
 				 	     publishTask(task,trade,trs);
 				 	     newTransfer.addElement(trs);
 			     	 
-				 
+				 	    processTransferAudit(trs, trade);
 				}
+				
+				 
+				 
 			} else if(type.equalsIgnoreCase("update")) {
 				Iterator<Transfer > trans = transfers.iterator();
 				while(trans.hasNext()) {
@@ -842,7 +945,7 @@ return status;
 					// publishTask(task,trade,trs);
 				    newTransfer.addElement(trs);
 			     }
-				 
+			     processTransferAudit(trs, trade);
 				}
 			}else if(type.equalsIgnoreCase("delete")) {
 				Iterator<Transfer > trans = transfers.iterator();
@@ -890,7 +993,7 @@ return status;
 			    	initRemoteInterface();
 						remoteTrade.publishnewTrade("TRANS_NEWTRANSFER","TRADE",taskEvent);
 					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
+						
 						commonUTIL.displayError("BOProcessImpl", "publishTask", e);
 					}
 			    }
@@ -911,7 +1014,7 @@ return status;
 	// check if nettingTransfer exits on nettconfig  
 	// if exists than add transfer passed to  nettingtransfer or else create new nettedtransfer not exist on passed transfer deliverydate.
 	private Transfer getNettedTransfer(Transfer trs, NettingConfig netConfig) {
-		// TODO Auto-generated method stub
+		
 		Transfer nettedTransfer = null;
 	//	if(trs.getStatus().equalsIgnoreCase("CANCELLED"))
 		//	return nettedTransfer;
@@ -960,8 +1063,6 @@ return status;
 		 if(!commonUTIL.isEmpty(tasks)) {
 			 task = tasks.elementAt(0);
 		 } else {
-			
-		
 				task.setProductID(0);
 				task.setTransferID(nettedTransfer.getId());
 				//task.setType(trade.getStatus());
@@ -984,7 +1085,7 @@ return status;
 				task.setId(0);
 		 }
 		return task;
-		// TODO Auto-generated method stub
+		
 		
 	}
 	private double getTransferSettlementAmount(Transfer transfer) {
@@ -999,7 +1100,7 @@ return status;
 	
 	// create new netting transfer on basis of netconfig configuration and deliverydate. 
 	private Transfer generateNettingTransfer(Transfer trs, NettingConfig netConfig) {
-		// TODO Auto-generated method stub
+		
 		Transfer newNettedTransfer = new Transfer();
 		newNettedTransfer.setId(0);
 		newNettedTransfer.setTradeId(0);
@@ -1026,7 +1127,7 @@ return status;
 	// get existing netting transfer from hashtable or from db. 
 	@Override
 	public Transfer getNettingTransfer(int nettingConfigid, String deliveryDate) {
-		// TODO Auto-generated method stub 
+		 
 		Transfer nettingTransfer = null;
 		synchronized (nettedTransfers) {
 			   nettingTransfer = nettedTransfers.get(deliveryDate+"_"+nettingConfigid);
@@ -1079,43 +1180,43 @@ return status;
 	}
 	@Override
 	public void removeMessage(Message message) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		
 	}
 	@Override
 	public void updateMessage(Message message) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		
 	}
 	@Override
 	public Message selectMessage(Message message) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 	@Override
 	public Collection getMessageOnTrade(int tradeID) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		String where = " tradeid = " + tradeID;
 		return MessageSQL.getMessageOnWhere(where, dsSQL.getConn());
 	}
 	@Override
 	public Collection getMessageOnTransfer(int transferID)
 			throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		String where = " transferid = " + transferID;
 		return MessageSQL.getMessageOnWhere(where, dsSQL.getConn());
 	}
 	
 	@Override
 	public void saveMessage(Message message) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		MessageSQL.save(message,dsSQL.getConn());
 		
 	}
 	
 	@Override
 	public Collection getMessage(int id,String eventType,String triggerON) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		String sql = "";
 		if(triggerON.equalsIgnoreCase("TRADE")) 
 			sql = " tradeid = "+id+" and eventtype = '"+eventType +"' and triggerON ='"+triggerON+"'";
@@ -1130,19 +1231,87 @@ return status;
 	@Override
 	public Vector<Message> saveMesage(Vector<Message> mess, String sqlType,Trade trade,Transfer transfer)
 			throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		Vector<Message> messages = null;
 		if(mess == null || mess.isEmpty()) 
 			return null;
 		if(sqlType.equalsIgnoreCase("insert")) {
 			messages = processMessageAction(mess,"insert",trade,transfer);
-			messages =  MessageSQL.insert(messages, dsSQL.getConn());
+			messages =  MessageSQL.insert(messages, dsSQL.getConn());		
 		} 
 		if(sqlType.equalsIgnoreCase("update")) {
 			messages = processMessageAction(mess,"update",trade,transfer);
 			messages =  MessageSQL.update(mess, dsSQL.getConn());
 		}
+		
+		for(int i=0;i<messages.size();i++) {
+			Message newMess = messages.get(i);
+
+			processMessageAudit(newMess);
+		}
+		
 		return messages;
+	}
+	
+	private void processMessageAudit(Message message) {
+		try {
+		
+		String currentDateTime= util.commonUTIL.getCurrentDateTime();
+		// trade.getVersion();
+
+		if(message.getVersion() == 1) {
+			Audit audit = new Audit();
+			audit.setChangeDate(currentDateTime);
+			audit.setFieldname("--");
+			audit.setTradeid(message.getId());
+			audit.setType("NEW");
+			audit.setUserid(message.getUserID());
+			audit.setVersion(message.getVersion());
+			//System.out.println(trade.getValues());
+			audit.setValues(message.getValues());
+			audit.setTattribue(message.getAttributes());
+			
+			AuditSQL.save(audit,  dsSQL.getConn());
+		} else {
+			
+			Vector v1 = (Vector) AuditSQL.selectLatestTradeVersion(message.getId(), dsSQL.getConn());
+			
+			String oldTransferValues = ((Audit)v1.elementAt(0)).getValues();
+			String newTransferValues = message.getValues();
+			//System.out.println();
+			String changevalues = getChangeValues(oldTransferValues, newTransferValues);
+			
+			Audit audit = new Audit();
+			audit.setChangeDate(currentDateTime);
+			audit.setFieldname(changevalues);
+			audit.setTradeid(message.getId());
+			audit.setType("UPDATE");
+			audit.setUserid(message.getUserID());
+			audit.setVersion(message.getVersion());
+			audit.setValues(message.getValues());
+			if(message.getAttributes() !=null) {
+				String auditAttribures = ((Audit)v1.elementAt(0)).getTattribue();
+				if(auditAttribures == null) {
+					audit.setTattribue(message.getAttributes().trim());				
+				} else {
+					if(!auditAttribures.equalsIgnoreCase(message.getAttributes())) {
+						audit.setTattribue(message.getAttributes());
+					}
+				}
+				}
+			
+			else {
+				audit.setTattribue("");
+			}
+			AuditSQL.save(audit,  dsSQL.getConn());
+			
+		}
+	}	catch(Exception e) {
+		commonUTIL.displayError("BoProcessImp", "processMessageAudit", e);
+		
+	}
+		
+		
 	}
 	
 	private Vector<Message> processMessageAction(Vector<Message> messages,String sqlType,Trade trade,Transfer transfer) {
@@ -1201,52 +1370,52 @@ return status;
 	@Override
 	public Vector<Message> getMessagesOnWhere(String where)
 			throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return (Vector<Message>) MessageSQL.getMessageOnWhere(where,dsSQL.getConn());
 	}
 	@Override
 	public Vector<Message> getMessages(int tradeID, String eventType,
 			String triggerON) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 	@Override
 	public Vector<Message> saveMesage(Vector<Message> mess, String sqlType)
 			throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 	@Override
 	public Collection getSwiftBICData(String sql) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 	@Override
 	public Collection getSwiftBICData(BICSwiftData query)
 			throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 	@Override
 	public Transfer getTransfer(int transferID) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return (Transfer) TransferSQL.getTransfer(transferID, dsSQL.getConn());
 	}
 	@Override
 	public DocumentInfo getLatestAdviceDocument(int id, Object object)
 			throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 	@Override
 	public Message selectMessageOnLinkid(int linkId) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 	@Override
 	public Vector<Message> getMessages(int messageConfigid, int tradeID,
 			String eventType, String triggerON) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		String sql = " messConfigID="+messageConfigid+" and tradeID ="+tradeID+" and eventType='"+eventType+"' and triggerON ='"+triggerON+"' order by id desc";
 		 return  getMessagesOnWhere(sql);
 		
