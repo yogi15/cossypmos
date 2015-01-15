@@ -22,7 +22,7 @@ import mqServices.messageProducer.CreateNewMessage;
 public class LogPublishUtil extends Thread {
 	
 	
-	static Hashtable<Integer,String> messages = new Hashtable<>();
+	static Hashtable<Integer,String> messages = new Hashtable <Integer,String>();
 	static int producerCounter = 0;
 	static int counsumerCounter = 0;
 	boolean isCrossLimit =false;
