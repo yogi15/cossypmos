@@ -24,6 +24,7 @@ public interface RemoteBOProcess  extends Remote {
 	public void updateTransfer(Transfer transfer) throws RemoteException;
 	public Transfer selectTransfer(Transfer transfer) throws RemoteException;
 	public Collection getTransferOnTrade(int tradeID)  throws RemoteException;
+	public Collection getTransferOnTradeWithNoCancelStatus(int tradeID)   throws RemoteException;
 	
 	
 	public void removeMessage(Message message) throws RemoteException; 
