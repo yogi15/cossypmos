@@ -54,6 +54,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 
 import constants.CommonConstants;
+import dsEventProcessor.DebugEventProcessor;
+import dsEventProcessor.EventProcessor;
 
 //import oracle.sql.DATE;
 
@@ -70,6 +72,9 @@ public class commonUTIL {
     }
 	
 	
+	static public void publishEvent(EventProcessor event) {
+		RemoteServiceUtil.publishEvent(event);
+	}
 	static public boolean getBooleanValue(int value) {
 		
 		if(value == 0) {
@@ -476,12 +481,18 @@ public class commonUTIL {
 	        }
 	      
 	    }
-	 static public void display(String name,String message) {
-	      System.out.println("Classname : " + name + " : MethodName : " +message + " :: ");
-	       
+	
+	 static public synchronized void display(String name,String message) {
+		// if(!name.contains("SQL"))
+	      LogPublishUtil.addMessage("Classname : " + name + " : MethodName : " +message + " :: ");
+	   //  DebugEventProcessor deb = new DebugEventProcessor();
+	 //   deb.setComments("Classname : " + name + " : MethodName : " +message + " :: ");
+	   //    publishEvent(deb);
+	     //  deb = null;
 	    }
+	    static SimpleDateFormat formator = new SimpleDateFormat(CommonConstants.SDF_DATE_FORMAT);
 	 static public String  dateToString(java.util.Date date) {
-	        SimpleDateFormat formator = new SimpleDateFormat(CommonConstants.SDF_DATE_FORMAT);
+	    
 	        formator.setLenient(true);
 	        String datetostring = "";
 	        String nowYYYYMMDD = new String(formator.format(date));
@@ -510,7 +521,7 @@ public class commonUTIL {
 			  addr = InetAddress.getLocalHost();
 			  
 		  }catch (Exception e) {
-			  commonUTIL.displayError("CommonUTIL", "getLocalHost() ", e); }
+			  commonUTIL.displayError("CommonUTIL", "getLocalHostName() ", e); }
 		  return addr.getHostName();
 	  }
 	  
