@@ -5,7 +5,7 @@ import java.io.InterruptedIOException;
 import util.commonUTIL;
 import dsServices.ServiceManager;
 
-public class PositionManagerStartup  implements ServiceManager {
+public class PositionManagerStartup  extends ServiceManager {
 	PositionManager amanager = null;
 	Thread t = null;
 	@Override

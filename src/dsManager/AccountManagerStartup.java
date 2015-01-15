@@ -5,7 +5,7 @@ import java.io.InterruptedIOException;
 import util.commonUTIL;
 import dsServices.ServiceManager;
 
-public class AccountManagerStartup implements ServiceManager {
+public class AccountManagerStartup extends ServiceManager {
 	AccountManager amanager = null;
 	Thread t = null;
 	@Override
