@@ -38,9 +38,9 @@ public class ReflectionUtilObject {
 					m.invoke(Integer.valueOf(value), 0);
 				}
 			}
-			
-			
-			} catch (IllegalArgumentException | InvocationTargetException e) {
+			 
+		
+			} catch (IllegalArgumentException e ) {
 				// TODO Auto-generated catch block
 				commonUTIL.displayError("ReflectionUtilObject", "getObject", e);
 				return null;
@@ -57,7 +57,12 @@ public class ReflectionUtilObject {
 			// TODO Auto-generated catch block
 			commonUTIL.displayError("ReflectionUtilObject", "getObject", e);
 			return null;
-		}
+		} catch (InvocationTargetException e ) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("ReflectionUtilObject", "getObject", e);
+			return null;
+		
+	}
 		return t;
 	}
 	
