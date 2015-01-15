@@ -16,11 +16,12 @@ import bo.message.bomessagehandler.BOMessageHandler;
 import dsEventProcessor.EventProcessor;
 import dsEventProcessor.TradeEventProcessor;
 import dsEventProcessor.TransferEventProcessor;
+import dsManager.MessageManager;
 import dsServices.RemoteBOProcess;
 import dsServices.RemoteReferenceData;
 import dsServices.RemoteTrade;
 
-public class MessageProcessor {
+public class MessageProcessor extends Thread {
 
 	RemoteBOProcess remoteBO;
 	RemoteTrade remoteTrade;
@@ -28,13 +29,35 @@ public class MessageProcessor {
 	Hashtable<Integer,Book> books = new Hashtable<Integer,Book>();
 	Hashtable<String,Vector<MessageConfig>> messageConfigs = new Hashtable<String,Vector<MessageConfig>>();
 	Hashtable<Integer,LegalEntity>  legalEntitys = new  Hashtable<Integer,LegalEntity>();
+	Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
 	Vector<Message> publishMessages = new Vector<Message>();
-	public Vector<Message> getPublishMessages() {
-		return publishMessages;
+	MessageManager manager = null;
+	/**
+	 * @return the manager
+	 */
+	public MessageManager getManager() {
+		return manager;
 	}
 
-	public void setPublishMessages(Vector<Message> publishMessages) {
-		this.publishMessages = publishMessages;
+	/**
+	 * @param manager the manager to set
+	 */
+	public void setMessageManager(MessageManager manager) {
+		this.manager = manager;
+	}
+
+
+	int counter = 0;
+	boolean eventUnderProcess = true;
+	public Vector<Message> getPublishMessages() { // this method is access by MesssageManager
+		return publishMessages; 
+	}
+
+	public void setPublishMessages(Vector<Message> publishMessages1) { // this method is access within Processor 
+		if((publishMessages1 != null) || (!commonUTIL.isEmpty(publishMessages1))) {
+			for(int i=0;i<publishMessages1.size();i++) 
+				publishMessages.add(publishMessages1.get(i)); 
+		}
 	}
 
 	public void setRemoteBOProcess(RemoteBOProcess remoteBO) {
@@ -61,12 +84,26 @@ public class MessageProcessor {
 		Transfer transfer = null; 
 		if(event instanceof TradeEventProcessor) {
 			TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
+			
 			trade = tradeEvent.getTrade();
+			if(trade == null) {
+				try {
+				trade = 	remoteTrade.getTradeOnVersion(tradeEvent.getObjectID(), tradeEvent.getObjectVersionID());
+				tradeEvent.setTrade(trade);
+					
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			duplicateEventCheck.put(trade.getId()+"_"+trade.getStatus()+"_"+trade.getVersion(),tradeEvent.getEventid());
 		}
 		if(event instanceof TransferEventProcessor) {
 			TransferEventProcessor transferEvent = (TransferEventProcessor) event;
 			trade = transferEvent.getTrade();
 			transfer = transferEvent.getTransfer();
+			duplicateEventCheck.put(transfer.getId()+"_"+transfer.getStatus()+"_"+transfer.getVersion(),transferEvent.getEventid());
 		}
 		Vector<MessageConfig> messConfigs = getMessageConfig(event,trade);
 		Hashtable<String,Vector<Message>> filterMessages = new Hashtable<String,Vector<Message>>();
@@ -74,14 +111,16 @@ public class MessageProcessor {
 		if(messConfigs == null || messConfigs.isEmpty() ) {
 			commonUTIL.display("MessageProcessor" , "Message Configuration not Found on " + event.getEventType() + " for Proudct " + trade.getProductType() 
 					+ " subType " + trade.getTradedesc1() + "tradeEvent " + event.getEventType() + " and selected PO");
-		    return;
+			manager.updateEventProcess(event);
+			return;
 		}
 		for(int i=0;i<messConfigs.size();i++) {
 			MessageConfig messConfig = messConfigs.get(i);
 			BOMessageHandler boHandler = BOMessageHandler.getBOHandler(messConfig.getProductType(), messConfig.getProductSubType());
 			if(boHandler == null) {
 				commonUTIL.display("MessageProcessor" , "Message Handler not Found  for Product " + trade.getProductType() + " subType " + trade.getTradedesc1());
-			    return;
+				manager.updateEventProcess(event);
+				return;
 			}
 			LegalEntity receiver = getLegalEntity(messConfig.getReceiverID());
 			LegalEntity sender = getLegalEntity(messConfig.getPoid());
@@ -91,14 +130,15 @@ public class MessageProcessor {
 			    message = boHandler.fillMessage(trade, null, messConfig,"TRADE",null,(TradeEventProcessor) event,receiver,sender);
 			   // messages.add(message); 
 			    filterOldMessages(message.getMessageConfigID(),trade.getId(),message,"TRADE",filterMessages);
-				saveFilterMessages(filterMessages,trade,transfer);
+				saveFilterMessages(filterMessages,trade,transfer,event);
 			}
 			if(event instanceof TransferEventProcessor) {
 				 message = boHandler.fillMessage(trade, transfer, messConfig,"TRANSFER",(TransferEventProcessor) event,null,receiver,sender);
 			//	 messages.add(message); 
 				 filterOldMessages(message.getMessageConfigID(),transfer.getId(),message,"TRANSFER",filterMessages);
-					saveFilterMessages(filterMessages,trade,transfer);
+					saveFilterMessages(filterMessages,trade,transfer,event);
 			}
+			
 			  
 		}
 		
@@ -282,7 +322,7 @@ public class MessageProcessor {
 	}
 	
 	private void saveFilterMessages(
-			Hashtable<String, Vector<Message>> filterMessages,Trade trade,Transfer transfer) {
+			Hashtable<String, Vector<Message>> filterMessages,Trade trade,Transfer transfer,EventProcessor event) {
 		// TODO Auto-generated method stub
 		Vector<Message> newpublishMessages = new Vector<Message>();
 		if(filterMessages == null || filterMessages.isEmpty()) {
@@ -292,8 +332,9 @@ public class MessageProcessor {
 		Vector<Message> updateMessage = filterMessages.get("update");
 			saveMessages(insertMessage,newpublishMessages,"insert",trade,transfer);
 			saveMessages(updateMessage,newpublishMessages,"update",trade,transfer);
-			publishMessages.isEmpty();
+			//publishMessages.isEmpty();
 			setPublishMessages(newpublishMessages);
+			manager.updateEventProcess(event);
 			
 			
 		//remoteBO.save
@@ -314,7 +355,78 @@ public class MessageProcessor {
 		e.printStackTrace();
 	}
     }
-		
-		
+
+    public void run(){
+		  for( ; ; ) {
+			  try {
+				Thread.sleep(300);
+				
+					 
+					
+				
+				
+				if(manager.balance.size() > counter) {
+					 System.out.println(":pppp:"+  manager.balance.size() + " counter " + counter);
+					
+						EventProcessor event = null;
+						
+							 synchronized (manager.transferEvents) {
+					        	 
+								 event   = manager.balance.get(counter);
+							}
+							if(event == null)
+								return;
+							eventUnderProcess = false;
+							if(event instanceof TradeEventProcessor) {
+								TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
+							      
+							      if(!isDuplicateEvent(tradeEvent.getTrade())) {
+							    	  manager.publishMessage(tradeEvent.getTrade(), null);
+							      }
+							}
+							if(event instanceof TransferEventProcessor) {
+								TransferEventProcessor transferEvent = (TransferEventProcessor) event;
+							      
+							      if(!isDuplicateEvent(transferEvent.getTransfer())) {
+							    	  manager.publishMessage(transferEvent.getTrade(), transferEvent.getTransfer());
+							      }
+							}
+							 
+							 counter = counter + 1;
+							// eventUnderProcess = true;
+							  
+						 
+					  
+				 }
+				
+				 
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		  
+		  }
+	  }
+    private boolean isDuplicateEvent(Trade trade) {
+		boolean flag = false;
+		String key = trade.getId()+"_"+trade.getStatus()+"_"+trade.getVersion();
+		System.out.println(" for key = " + key); 
+		if(duplicateEventCheck.containsKey(key))
+			flag = true;
+		return flag;
+	}
+	
+	
+    private boolean isDuplicateEvent(Transfer transfer) {
+		boolean flag = false;
+		String key = transfer.getId()+"_"+transfer.getStatus()+"_"+transfer.getVersion();
+		System.out.println(" for key = " + key); 
+		if(duplicateEventCheck.containsKey(key))
+			flag = true;
+		return flag;
+	}
+	
+	
+	
 	
 }
