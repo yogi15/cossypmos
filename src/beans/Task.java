@@ -207,4 +207,13 @@ public int getCpid() {
 	 return cpID;
 	
 }
+int messageVersionID = 0; 
+public void setMessageVersionID(int version) {
+	// TODO Auto-generated method stub
+	messageVersionID = version;
+}
+public int getMessageVersionID(int version) {
+	// TODO Auto-generated method stub
+	return messageVersionID;
+}
 }
