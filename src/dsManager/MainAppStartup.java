@@ -6,7 +6,7 @@ import java.net.URL;
 import apps.window.utilwindow.Login;
 import dsServices.ServiceManager;
 
-public class MainAppStartup implements ServiceManager {
+public class MainAppStartup extends ServiceManager {
 	Login login = null;
 	@Override
 	public void start() {
