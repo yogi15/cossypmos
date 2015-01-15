@@ -2,6 +2,7 @@ package dsEventProcessor;
 
 import java.io.Serializable;
 
+import beans.Message;
 import beans.Trade;
 import beans.Transfer;
 
@@ -50,7 +51,17 @@ public class MessageEventProcessor extends EventProcessor  implements Serializab
 		// TODO Auto-generated method stub
 		return processName;
 	}
-	
+	Message message = null;
+	public void setMessage(Message message) {
+		// TODO Auto-generated method stub
+		this.message = message;
+		
+	}
+	public Message getMessage() {
+		// TODO Auto-generated method stub
+		return message;
+		
+	}
 	
 
 }
