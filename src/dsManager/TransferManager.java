@@ -15,11 +15,15 @@ import beans.Task;
 import beans.Trade;
 import beans.Transfer;
 import bo.transfer.TransferProcessor;
+import dsEventProcessor.AdminEventProcessor;
 import dsEventProcessor.EventProcessor;
 import dsEventProcessor.TaskEventProcessor;
 import dsEventProcessor.TradeEventProcessor;
 import dsEventProcessor.TransferEventProcessor;
+import dsServices.EngineMonitorUtil;
+import dsServices.RemoteAdminManager;
 import dsServices.RemoteBOProcess;
+import dsServices.RemoteEvent;
 import dsServices.RemoteReferenceData;
 import dsServices.RemoteTrade;
 
@@ -27,10 +31,13 @@ public class TransferManager extends ControllerManager {
 	
 	
 	
-	String managerName = "TranserManager";
+	String managerName = "TransferManager";
+	TransferManagerStartup startUpManager;
 	RemoteBOProcess remoteBO;
 	RemoteTrade remoteTrade;
 	RemoteReferenceData refData;
+	RemoteAdminManager remoteAdmin;
+	RemoteEvent remoteEvent;
 	TransferProcessor processor = null;
 	Thread transferManagerThread = null;
 	Transfer transfer = null;
@@ -38,7 +45,25 @@ public class TransferManager extends ControllerManager {
 	String transferTriggerEvt = "TRANSFERTriggerEvent";
 	String canceltransferTriggerEvt = "TRANSFERCancelTriggerEvent";
 	Vector<String> transferTriggerEvts = new Vector<String>();
+	Vector<EventProcessor> eventNotProcess = new Vector<EventProcessor>();
 	boolean newEvent = false;
+	boolean serviceStarted = false;
+	
+	/**
+	 * @return the serviceStarted
+	 */
+	public boolean isServiceStarted() {
+		return serviceStarted;
+	}
+
+
+	/**
+	 * @param serviceStarted the serviceStarted to set
+	 */
+	public void setServiceStarted(boolean serviceStarted) {
+		this.serviceStarted = serviceStarted;
+	}
+
 	Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
 	public boolean isNewEvent() {
 		//System.out.println("PPPPPPPPPPPPPPPPPPPPPPP  isNewEvent " + newEvent);
@@ -70,19 +95,33 @@ public class TransferManager extends ControllerManager {
 	}
 	
 
-	public TransferManager(String host,String hostName,String managerName) {
+	public TransferManager(String host,String hostName,String managerName,TransferManagerStartup startUpManager ) {
+		
 		super(host,hostName,managerName);
+		this.startUpManager = startUpManager;
+		
 		try {
 			processor = new TransferProcessor();		
 			remoteBO = (RemoteBOProcess) getDe().getRMIService("BOProcess");
 			remoteTrade = (RemoteTrade) getDe().getRMIService("Trade");
 	   		refData = (RemoteReferenceData) getDe().getRMIService("ReferenceData");
+	   		remoteAdmin = (RemoteAdminManager) getDe().getRMIService("ServerController");
+	   		remoteEvent = (RemoteEvent) getDe().getRMIService("Event");
 	   	    setTransferTriggerEvt(refData.getStartUPData(transferTriggerEvt));
+	   	    eventNotProcess = (Vector<EventProcessor>) remoteEvent.getEventNotProcessed("Transfer");
 	   	    processor.setCancelTransferTriggerEvent(refData.getStartUPData(canceltransferTriggerEvt));
-	   	 processor.setRemoteBOProcess(remoteBO);
+	   	    processor.setRemoteBOProcess(remoteBO);
 			processor.setRefData(refData);
 			processor.setRemoteTrade(remoteTrade);
 	   	    processor.setTransferManager(this);
+	   	    if(eventNotProcess.size() > 0) {
+	   	    	for(int i=0;i<eventNotProcess.size();i++) {  // first process all event are not consumed. 
+	   	    		EventProcessor event = eventNotProcess.get(i); 
+	   	    		handleEvent(event);
+	   	    	}
+	   	    }
+	   	    startUpManager.setClientID(getDe().getClientID());
+	   	 startUpManager.startProducingMessage(managerName, hostName, ":61616", startUpManager);
 	   	   processor.start();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
@@ -91,11 +130,32 @@ public class TransferManager extends ControllerManager {
    		
    		
 		
-		
    		
 	}
 	
 	
+		public void publishStartEvent(String engineName,String siginal) {
+			
+			try {
+				remoteAdmin.addEngines(engineName+"_"+siginal,startUpManager.getClientID(),startUpManager.getUser());
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		
+		
+	}
+
+public void updateEventProcess(EventProcessor event) {
+	    try {
+	    	event.setSubscribableList("Transfer");
+			remoteTrade.isEventExceuted(event);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+}
 	
 	private void setTransferTriggerEvt(Collection startUPData) {
 		// TODO Auto-generated method stub
@@ -110,9 +170,20 @@ public class TransferManager extends ControllerManager {
 
 
 	public  synchronized void handleEvent(EventProcessor event)	 {
-		System.out.println("Starting of  ****** " +   event.getTradeID());
+	//	System.out.println("Starting of  ****** " +   event.getTradeID());
 	//	setNewEvent(true);
+		try {
 		TradeEventProcessor tradeEvent = null;
+	//	System.out.println(event.getEventType() + " " + event.getClassName());
+		if(event instanceof AdminEventProcessor ) {
+			  AdminEventProcessor  adminEvent = (AdminEventProcessor) event;
+			  if(adminEvent.getEngineStartedSignal().contains(managerName))  {
+				  if(adminEvent.getEngineStartedSignal().contains(managerName)) {
+				  if(adminEvent.getClientID() == startUpManager.getClientID())
+				     startUpManager.stop();
+				  }
+			  }
+		  }
 		if(event instanceof TradeEventProcessor) {
 			tradeEvent = (TradeEventProcessor) event;
 			
@@ -123,6 +194,17 @@ public class TransferManager extends ControllerManager {
 					    			     				   
 					      
 					        synchronized (transferEvents) {
+					        	if( tradeEvent.getTrade() == null) {
+					        		Trade trade;
+									try {
+										trade = remoteTrade.getTradeOnVersion(tradeEvent.getObjectID(),tradeEvent.getObjectVersionID());
+										tradeEvent.setTrade(trade);
+									} catch (RemoteException e) {
+										// TODO Auto-generated catch block
+										commonUTIL.displayError("TransferManager", "handleEvent", e);
+									}
+					        		
+					        	}
 					        	if(!isDuplicateEvent(tradeEvent.getTrade())) {
 					        		  System.out.println(" adding at  counter *****  = " + counter + tradeEvent.getTrade().getId() + " " + tradeEvent.getTrade().getStatus() + " " + tradeEvent.getTrade().getVersion());
 					        	       
@@ -142,23 +224,19 @@ public class TransferManager extends ControllerManager {
 				   
 				
 		    	
+			} else {
+			updateEventProcess(tradeEvent);
 			}
 			
-			
 			//System.out.println("End  of ****** " +   tradeEvent.getTradeID());
+		}
+		}
+		catch(NullPointerException e) {
+			commonUTIL.displayError("TransferManager", "HandleEvent", e);
 		}
 	//	setNewEvent(false);
 		//tradeEvent = null;
 	}
-	
-	
-public  void processPosition(TradeEventProcessor tradeEvent) {
-		
-		synchronized (processor) {
-			//System.out.println("        Start Process of generating position for trade " + trade.getId() + " version == " + trade.getVersion());
-			  processor.processTransfer(tradeEvent,tradeEvent.getTrade());
-		}
-}
 	
 	
 	
@@ -202,50 +280,17 @@ public TransferEventProcessor getTransferEvent(Transfer transfer,Trade trade ) {
 	transferEvent.setTrade(trade);
 	transferEvent.setTransfer(transfer);
 	transferEvent.setProcessName("TransferEngineProcess");
-
+	transferEvent.setPublish(true);
+	transferEvent.setSavetoDB(true);
 	transferEvent.setEventType(transfer.getStatus()+"_"+transfer.getEventType());
+	transferEvent.setType("Transfer");
+	transferEvent.setObjectID(transfer.getId());
+	transferEvent.setComments(" Transfer status  " + transfer.getStatus() + " for Action "+transfer.getAction() + " on Trade_"+trade.getId()+"_Version_"+trade.getVersion() );
+	
 	commonUTIL.display("TransferManager",transferEvent.getEventType());
 	commonUTIL.display("","");
 	return transferEvent;
 }
 
-//public void stop() {
-//	commonUTIL.display(manager.getManagerName(), "Stop <<<<<<<<<  " +manager.getManagerName());
-	//this.stop();
-	//System.exit(0);
-	
-//}
-	public static void main(String args[]) {
-		TransferManager tmanager = new TransferManager("localhost",commonUTIL.getLocalHostName(),"TransferManager");
-		commonUTIL.display("TransferManager", "Started Transfer Manager >>>>>>>> ");
-		tmanager.start(tmanager);
-	}
-
-
-	
-	
  
 }
-
-  class InnerTransferProcessor implements Runnable {
-    
-
-	boolean processEvent = false;
-     
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		for( ; ; ) {
-				
-		}
-	}
-	
-	 public boolean isProcessEvent() {
-			return processEvent;
-		}
-
-		public void setProcessEvent(boolean processEvent) {
-			this.processEvent = processEvent;
-		}
-	  
-  }
