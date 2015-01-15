@@ -7,6 +7,45 @@ public class Users implements Serializable {
 	String user_groups;
 	String user_name;
 	String password;
+	String hostName;
+	/**
+	 * @return the hostName
+	 */
+	public String getHostName() {
+		return hostName;
+	}
+	/**
+	 * @param hostName the hostName to set
+	 */
+	public void setHostName(String hostName) {
+		this.hostName = hostName;
+	}
+	/**
+	 * @return the applicattionNameLoginOn
+	 */
+	public String getApplicattionNameLoginOn() {
+		return applicattionNameLoginOn;
+	}
+	/**
+	 * @param applicattionNameLoginOn the applicattionNameLoginOn to set
+	 */
+	public void setApplicattionNameLoginOn(String applicattionNameLoginOn) {
+		this.applicattionNameLoginOn = applicattionNameLoginOn;
+	}
+	/**
+	 * @return the instanceNameofAapplication
+	 */
+	public String getInstanceNameofAapplication() {
+		return instanceNameofAapplication;
+	}
+	/**
+	 * @param instanceNameofAapplication the instanceNameofAapplication to set
+	 */
+	public void setInstanceNameofAapplication(String instanceNameofAapplication) {
+		this.instanceNameofAapplication = instanceNameofAapplication;
+	}
+	String applicattionNameLoginOn;
+	String instanceNameofAapplication;
 	int id;
 	public String getUser_groups() {
 		return user_groups;
