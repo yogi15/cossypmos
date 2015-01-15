@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.Vector;
 import java.rmi.Remote;
 
+import dsEventProcessor.EventProcessor;
+
+import beans.EventController;
 import beans.Trade;
 import beans.WFConfig;
 
@@ -14,6 +17,8 @@ public interface RemoteTrade extends Remote {
 	public Vector getTradeRollOverHierarchies(int tradeID) throws RemoteException;
 	public Vector getTradeRollBackHierarchies(int tradeID) throws RemoteException;
 	public Vector saveTrade(Trade trade,Vector<String> message)throws RemoteException;
+	public Trade getTradeOldVersion(int tradeID,int tradeVersion)throws RemoteException;
+	public void isEventExceuted(EventProcessor event) throws RemoteException;
 	
 	public boolean checkLimitOnTrade(Trade trade,String type) throws RemoteException;
 	
