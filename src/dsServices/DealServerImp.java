@@ -9,6 +9,7 @@ import static java.lang.System.out;
 
 import beans.DealBean;
 import beans.ServerBean;
+import beans.Users;
 
 public class DealServerImp  implements RemoteDeal {
 
@@ -37,6 +38,20 @@ public class DealServerImp  implements RemoteDeal {
 			String messageType, Object object) throws RemoteException {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public ServerBean connect(String username, String password,
+			String applicationName) throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServerBean connect(Users user, String applicationName)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	
