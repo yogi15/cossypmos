@@ -2,8 +2,6 @@ package beans;
 
 import java.io.Serializable;
 
-import util.commonUTIL;
-
 public class Message implements Serializable, Cloneable {
 	 
 	public static final String FORMAT_ISSUE_MSG_ATTR = "FORMAT ISSUE";
@@ -46,20 +44,68 @@ public class Message implements Serializable, Cloneable {
 	 String tradeDate = "";
 	 String messageGateway = "";
 	 String productSubType = "";
-	 String eventType="";
-	 String triggerON = "";
-	 int productID =0;
-	 String attributes;
-	 String format = "";
-	 private String _senderAddressCode;
-	 protected String _receiverAddressCode;
-	 int receiverID;
-	 String poContactType="";	 
-	 String subAction = "NEW";
-	 String isUpdatedBeforeSend = "";
-	 String receiverContactType="";
-	 int senderID = 0;
-	 int messageConfigID = 0;
+	 /**
+	 * @return the taskID
+	 */
+	public int getTaskID() {
+		return taskID;
+	}
+	/**
+	 * @param taskID the taskID to set
+	 */
+	public void setTaskID(int taskID) {
+		this.taskID = taskID;
+	}
+	/**
+	 * @return the productID
+	 */
+	public int getProductID() {
+		return productID;
+	}
+	/**
+	 * @param productID the productID to set
+	 */
+	public void setProductID(int productID) {
+		this.productID = productID;
+	}
+	/**
+	 * @return the receiverID
+	 */
+	public int getReceiverID() {
+		return receiverID;
+	}
+	/**
+	 * @param receiverID the receiverID to set
+	 */
+	public void setReceiverID(int receiverID) {
+		this.receiverID = receiverID;
+	}
+	/**
+	 * @return the poContactType
+	 */
+	public String getPoContactType() {
+		return poContactType;
+	}
+	/**
+	 * @param poContactType the poContactType to set
+	 */
+	public void setPoContactType(String poContactType) {
+		this.poContactType = poContactType;
+	}
+	/**
+	 * @return the senderID
+	 */
+	public int getSenderID() {
+		return senderID;
+	}
+	/**
+	 * @param senderID the senderID to set
+	 */
+	public void setSenderID(int senderID) {
+		this.senderID = senderID;
+	}
+	int taskID = 0; 
+	 
 	 
 	public int getId() {
 		return id;
@@ -181,38 +227,49 @@ public class Message implements Serializable, Cloneable {
 	public void setProductSubType(String productSubType) {
 		this.productSubType = productSubType;
 	}
-	
-	public String getEventType() {		
+	String eventType="";
+	public String getEventType() {
+		// TODO Auto-generated method stub
 		return eventType;
 	}
 	public void setEventType(String eventType) {
 		this.eventType = eventType;
 	}
-	
-	public String getTriggerON() {		
+	String triggerON = "";
+	public String getTriggerON() {
+		// TODO Auto-generated method stub
 		return triggerON;
 	}
-	public void setTriggerON(String triggerON) {		
+	public void setTriggerON(String triggerON) {
+		// TODO Auto-generated method stub
 		this.triggerON = triggerON;
 	}
-	
-	public int getproductID() {		
+	int productID =0;
+	public int getproductID() {
+		// TODO Auto-generated method stub
 		return productID;
 	}
-	public void setproductID(int productID) {		
+	public void setproductID(int productID) {
+		// TODO Auto-generated method stub
 		this.productID = productID;
-	}	
+	}
+	String attributes;
+	
+	
 	public String getAttributes() {
 		return attributes;
 	}
 	public void setAttributes(String attributes) {
 		this.attributes = attributes;
 	}
-	
-	public void setFormat(String formatType) {		
+	String format = "";
+	private String _senderAddressCode;
+	public void setFormat(String formatType) {
+		// TODO Auto-generated method stub
 		format = formatType;
 	}
-	public String getFormat() {		
+	public String getFormat() {
+		// TODO Auto-generated method stub
 		return format;
 	}
 	 /**
@@ -223,116 +280,94 @@ public class Message implements Serializable, Cloneable {
      * @return   the sender's address String, which is an actual
      * address value like a fax number
      */
-	 
+	 protected String             _receiverAddressCode;
 	 final public void setSenderAddressCode(String s) {  _senderAddressCode=s;}
 
     final public String getSenderAddressCode() { return _senderAddressCode;}
     final public String getReceiverAddressCode() { return _receiverAddressCode;}
     final public void setReceiverAddressCode(String s) {  _receiverAddressCode=s;}
-    
-	public int getReceiverId() {		
+    int receiverID;
+	public int getReceiverId() {
+		// TODO Auto-generated method stub
 		return receiverID;
 	}
-	public void setReceiverId(int receiverID) {		
+	public void setReceiverId(int receiverID) {
+		// TODO Auto-generated method stub
 		this.receiverID =  receiverID;
 	}
-	public String getSenderContactType() {		
+	public String getSenderContactType() {
+		// TODO Auto-generated method stub
 		return poContactType;
 	}
-	public String getReceiverContactType() {		
+	public String getReceiverContactType() {
+		// TODO Auto-generated method stub
 		return receiverContactType;
 	}
-	public String getSettleDate() {		
+	public String getSettleDate() {
+		// TODO Auto-generated method stub
 		return null;
-	}	
-	public void setSenderContactType(String poContactType) {		
+	}
+	String poContactType="";
+	public void setSenderContactType(String poContactType) {
+		// TODO Auto-generated method stub
 		this.poContactType = poContactType;
-	}	
-	public void setReceiverContactType(String receiverContactType) {		
+	}
+	String receiverContactType="";
+	public void setReceiverContactType(String receiverContactType) {
+		// TODO Auto-generated method stub
 		this.receiverContactType = receiverContactType;
-	}	 
-	public void setSenderId(int poid) {		
-		this.senderID = poid;		
+	}
+	 int senderID = 0;
+	public void setSenderId(int poid) {
+		// TODO Auto-generated method stub
+		this.senderID = poid;
+		
 	}
 	public int getSenderId() {
-		return senderID ;		
+		// TODO Auto-generated method stub
+		return senderID ;
+		
 	}
-	public boolean getExternalB() {		
+	public boolean getExternalB() {
+		// TODO Auto-generated method stub
 		return false;
 	}
-	public String  getAttribute(String string) {		
+	public String  getAttribute(String string) {
+		// TODO Auto-generated method stub
 		return null;
 	}
-	public int getVersion() {		
+	public int getVersion() {
+		// TODO Auto-generated method stub
 		return 0;
 	}
-	public String getLanguage() {		
+	public String getLanguage() {
+		// TODO Auto-generated method stub
 		return "English";
-	}	
-	public void setMessageConfigID(int messageConfig) {		
-		messageConfigID = messageConfig;		
+	}
+	int messageConfigID = 0;
+	public void setMessageConfigID(int messageConfig) {
+		// TODO Auto-generated method stub
+		messageConfigID = messageConfig;
+		
 	}
 	public int getMessageConfigID() {
 		return messageConfigID;
-	}	
+	}
+	String subAction = "NEW";
 	public void setSubAction(String subAction) {
 		this.subAction = subAction;
 	}
 	public String getSubAction() {
 		return subAction;
 	}
-	
+	String isUpdatedBeforeSend = "";
 	public String getUpdateBeforeSend() {
+		// TODO Auto-generated method stub
 		return isUpdatedBeforeSend;
 	}
-	public void setUpdateBeforeSend(String flagforUpdate) {		
+	public void setUpdateBeforeSend(String flagforUpdate) {
+		// TODO Auto-generated method stub
 		isUpdatedBeforeSend =  flagforUpdate;
 	}
 	
-	public String getValues() {
-		String values ="";
-
-		try {
-		 values = "Id="+getId()+
-		                ";tradeId="+getTradeId()+
-		                ";transferId="+getTransferId()+
-		                ";version="+getVersion()+
-		                ";tradeVersion="+getTradeVersion()+
-		                ";transferVersion="+getTransferVersion()+
-		                ";senderId="+ getSenderId()+
-	                    ";senderName="+ getSenderName() +
-	                    ";senderRole="+ getSenderRole() +	                    
-	                    ";_senderAddressCode="+ getSenderAddressCode() +	                    
-		                ";receiverName="+ getReceiverName() +
-	                    ";receiverRole="+getReceiverRole()+
-	                    ";_receiverAddressCode="+ getReceiverAddressCode() +
-	                    ";receiverContactType="+ getReceiverContactType() +
-	                    ";messageType="+getMessageType()+
-	                     ";tradeDate="+ getTradeDate() +
-	                     ";templateName="+ getTemplateName() +
-	                     ";messageDate="+ getMessageDate() +
-	                     ";messageGateway="+ getMessageGateway() +
-	                     ";messageConfigID="+ getMessageConfigID() +
-	                     ";eventType="+ getEventType().trim() +	                     	                    
-	                     ";triggerON="+ getTriggerON() +
-	                     ";format= "+ getFormat() +
-	                      ";poContactType="+ getSenderContactType()+
-	                      ";subAction="+getSubAction()+
-	                      ";isUpdatedBeforeSend="+getUpdateBeforeSend()+
-		                  ";attributes="+getAttributes()+		                  		      
-		                  ";userID="+getUserID()+
-		                  ";action="+getAction()+
-		                  ";linkid="+getLinkId()+
-		                  ";status="+getStatus()+
-		                  ";productType="+getProductType()+
-		                  ";productSubType="+getProductSubType()+
-		                  ";productId="+getproductID();
-		 
-		}catch(Exception e) {
-			commonUTIL.displayError("Trade Object", "getValues  == " + values, e);
-			return values;
-		}
-		
-		return values;
-	}
 }
