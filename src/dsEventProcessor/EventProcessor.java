@@ -7,19 +7,174 @@ import util.commonUTIL;
 import beans.Users;
 
 public class EventProcessor implements Serializable,Cloneable {
+	int clientID = 0;
+	public void setClientID(int clientID) {
+		// TODO Auto-generated method stub
+		this.clientID = clientID;
+		
+	}
+	public int getClientID() {
+		return clientID;
+	}
+ boolean publishFlag = true;
 	
-	  private long occurrenceTime;
+	public boolean getPublishFlag() {
+		return publishFlag;
+	}
+	public void setPublishFlag(boolean publishFlag) {
+		this.publishFlag = publishFlag;
+	}
+	public boolean isAdminEvent = false;
+	public String adminClearedEventType = "";
+	
+	
+	  /**
+	 * @return the adminClearedEventType
+	 */
+	public String getAdminClearedEventType() {
+		return adminClearedEventType;
+	}
+	/**
+	 * @param adminClearedEventType the adminClearedEventType to set
+	 */
+	public void setAdminClearedEventType(String adminClearedEventType) {
+		this.adminClearedEventType = adminClearedEventType;
+	}
+	/**
+	 * @return the isAdminEvent
+	 */
+	public boolean isAdminEvent() {
+		return isAdminEvent;
+	}
+	/**
+	 * @param isAdminEvent the isAdminEvent to set
+	 */
+	private void setAdminEvent(boolean isAdminEvent) {
+		this.isAdminEvent = isAdminEvent;
+	}
+	public String occurrenceTime;
 	int eventid = 0;
 	private String occrrenceDate;
 	int tradeID = 0;
 	int taskID = 0;
 	boolean isEventProcess = false;
+	int objectID;
+	boolean isSaveToDB = false;
+	public void setSavetoDB(boolean flag) {
+		isSaveToDB = flag;
+	}
+    public boolean isSavetoDB() {
+    	return isSaveToDB;
+    }
+	/**
+	 * @return the type
+	 */
+	public String getType() {
+		return type;
+	}
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(String type) {
+		this.type = type;
+	}
+	String type = "";
+	
+	/**
+	 * @return the occrrenceDate
+	 */
+	public String getOccrrenceDate() {
+		return occrrenceDate;
+	}
+	/**
+	 * @param occrrenceDate the occrrenceDate to set
+	 */
+	public void setOccrrenceDate(String occrrenceDate) {
+		this.occrrenceDate = occrrenceDate;
+	}
+	/**
+	 * @return the objectID
+	 */
+	public int getObjectID() {
+		return objectID;
+	}
+	/**
+	 * @param objectID the objectID to set
+	 */
+	public void setObjectID(int objectID) {
+		this.objectID = objectID;
+	}
+	/**
+	 * @return the publish
+	 */
+	public boolean isPublish() {
+		return publish;
+	}
+	/**
+	 * @param publish the publish to set
+	 */
+	public void setPublish(boolean publish) {
+		this.publish = publish;
+	}
+	/**
+	 * @return the consumed
+	 */
+	public boolean isConsumed() {
+		return consumed;
+	}
+	/**
+	 * @param consumed the consumed to set
+	 */
+	public void setConsumed(boolean consumed) {
+		this.consumed = consumed;
+	}
+	/**
+	 * @return the objectVersionID
+	 */
+	public int getObjectVersionID() {
+		return objectVersionID;
+	}
+	/**
+	 * @param objectVersionID the objectVersionID to set
+	 */
+	public void setObjectVersionID(int objectVersionID) {
+		this.objectVersionID = objectVersionID;
+	}
+	/**
+	 * @return the comments
+	 */
+	public String getComments() {
+		return comments;
+	}
+	/**
+	 * @param comments the comments to set
+	 */
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
+	/**
+	 * @param occurrenceTime the occurrenceTime to set
+	 */
+	public void setOccurrenceTime(long occurrenceTime) {
+		this.occurrenceTime = String.valueOf(occurrenceTime);
+	}
+	boolean publish = false;
+	boolean consumed = false;
+	int objectVersionID = 0;
+	String comments = "";
 	
 	
 	
 	
 	
 	
+	
+	/**
+	 * @param occurrenceTime the occurrenceTime to set
+	 */
+	public void setOccurrenceTime(String occurrenceTime) {
+		this.occurrenceTime = occurrenceTime;
+	}
 	public boolean isEventProcess() {
 		return isEventProcess;
 	}
@@ -73,14 +228,14 @@ public class EventProcessor implements Serializable,Cloneable {
 	
 	public EventProcessor() {
 		eventid = 0;
-    	occurrenceTime = System.currentTimeMillis();
+    	occurrenceTime = String.valueOf(System.currentTimeMillis());
     	occrrenceDate = commonUTIL.dateToString(commonUTIL.getCurrentDate());
 	}
 	public String getOccurrenceDate()
     {
     	return occrrenceDate;
     }
-	public long getOccurrenceTime()
+	public String getOccurrenceTime()
     {
     	return occurrenceTime;
     }
@@ -115,8 +270,24 @@ public class EventProcessor implements Serializable,Cloneable {
 		String subStr = className.substring(className.lastIndexOf('.')+1);
 		return subStr;
 	    }
+	String subscribeList = "";
+	public String getSubscribeList() {
+		return subscribeList;
+	}
+	public void setSubscribableList(String subscribeList1) {
+	 this.subscribeList = subscribeList1;
+		
+	}
 	
 	final public String getServerName() { return ServerName;}
     final public void setServerName(String s) { ServerName=s;}
-
+    boolean isClearedByAdmin = false;
+	public boolean isClearedByAdmin() {
+		// TODO Auto-generated method stub
+		return isClearedByAdmin;
+	}
+	public void isClearedByAdmin(boolean isClearedByAdmin) {
+		// TODO Auto-generated method stub
+		this. isClearedByAdmin = isClearedByAdmin;
+	}
 }
