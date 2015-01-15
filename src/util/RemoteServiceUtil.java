@@ -4,9 +4,12 @@ import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import dsEventProcessor.EventProcessor;
 import dsServices.Remote;
 import dsServices.RemoteAccount;
+import dsServices.RemoteAdminManager;
 import dsServices.RemoteBOProcess;
+import dsServices.RemoteEvent;
 import dsServices.RemoteProduct;
 import dsServices.RemoteReferenceData;
 import dsServices.RemoteTask;
@@ -39,7 +42,25 @@ public class RemoteServiceUtil {
 		return referenceData;
 
 	}
-	
+	public static RemoteEvent getRemoteEventService() {
+
+		RemoteEvent remoteEvent = null;
+
+		try {
+
+			ServerConnectionUtil de = getServerConnection();
+
+			remoteEvent = (RemoteEvent) de.getRMIService("Event");
+
+		} catch (RemoteException e) {
+
+			e.printStackTrace();
+
+		}
+
+		return remoteEvent;
+
+	}
 	
 	public static RemoteTask getRemoteTaskService() {
 
@@ -137,6 +158,33 @@ public class RemoteServiceUtil {
 
 		return remoteAccount;
 
+	}
+	public static RemoteAdminManager getRemoteAdmin() {
+
+		RemoteAdminManager remoteAdmin = null;
+
+		try {
+
+			ServerConnectionUtil de = getServerConnection();
+			remoteAdmin = (RemoteAdminManager) de.getRMIService("ServerController");
+
+		} catch (RemoteException e) {
+
+			e.printStackTrace();
+
+		}
+
+		return remoteAdmin;
+
+	}
+	
+	public static void publishEvent(EventProcessor event) {
+		try {
+			getRemoteTradeService().publishnewTrade("POS_NEWTRADE","Object", event);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("RemoteServiceUtil", "publishEvent", e);
+		}
 	}
 }
 
