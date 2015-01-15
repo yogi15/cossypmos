@@ -8,6 +8,12 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Vector;
 
+import dsEventProcessor.EventProcessor;
+import dsEventProcessor.LimitEventProcessor;
+import dsEventProcessor.MessageEventProcessor;
+import dsEventProcessor.TradeEventProcessor;
+import dsEventProcessor.TransferEventProcessor;
+
 import util.commonUTIL;
 import beans.Event;
 import beans.Event;
@@ -16,36 +22,49 @@ import beans.Event;
 
 public class EventSQL implements Serializable {
 
-	final static private String tableName = "Event";
+	final static private String tableName = "EventController";
 	final static private String DELETE =
 		"DELETE FROM " + tableName + "   where name =? ";
 	final static private String INSERT =
-		"INSERT into " + tableName + "(eventID,eventType,type,tradeID,transferID,consumedFlag,sqlType) values(?,?,?,?,?,?,?)";
+		"INSERT into " + tableName + "(eventID,eventType,type,consumed,publish,objectID,objectVersion,comments,processName,eventDate,eventTime,subscriberlist) values(?,?,?,?,?,?,?,?,?,?,?,?)";
 	final static private String UPDATE =
 		"UPDATE " + tableName + " set type=?,typename=?,typevalue=?   where userid = ? ";
 	final static private String SELECT_MAX =
-		"SELECT MAX(id) DESC_ID FROM " + tableName + " ";
+			  "SELECT EVENT_SEQ.NEXTVAL  DESC_ID FROM  dual";
 	final static private String SELECTALL =
-		"SELECT eventID,eventType,type,tradeID,transferID,consumedFlag,sqlType " + tableName + " ";
+		"SELECT eventID,eventType,type,consumed,publish,objectID,objectVersion,comments,processName,eventDate,eventTime,subscriberlist,adminclearMark " + tableName + " ";
 	final static private String SELECT =
-		"SELECT eventID,eventType,type,tradeID,transferID,consumedFlag,sqlType  FROM " + tableName + " where userid =  ? and type = ?";
+		"SELECT eventID,eventType,type,consumed,publish,objectID,objectVersion,comments,processName,eventDate,eventTime,subscriberlist,adminclearMark    FROM " + tableName + " where userid =  ? and type = ?";
 	 static private String SELECTONE =
-		"SELECT eventID,eventType,type,tradeID,transferID,consumedFlag,sqlType  FROM " + tableName + " where   userid =  ?  order by type ";
+		"SELECT eventID,eventType,type,consumed,publish,objectID,objectVersion,comments,processName,eventDate,eventTime,subscriberlist,adminclearMark   FROM " + tableName + " where   userid =  ?  order by type ";
 	 static private String CHECKINSERT  =
-				"SELECT  eventID,eventType,type,tradeID,transferID,consumedFlag,sqlType   FROM " + tableName + " where userid =   ? and type = ? and typename = ?  order by type ";
+				"SELECT  eventID,eventType,type,consumed,publish,objectID ,objectVersion,comments,processName,eventDate,eventTime,subscriberlist,adminclearMark   FROM " + tableName + " where userid =   ? and type = ? and typename = ?  order by type ";
 	 static private String SELECTWHERE  =
-				"SELECT eventID,eventType,type,tradeID,transferID,consumedFlag,sqlType   FROM " + tableName + " where " ;
+				"SELECT eventID,eventType,type,consumed,publish,objectID,objectVersion,comments,processName,eventDate,eventTime,subscriberlist,adminclearMark   FROM " + tableName + " where " ;
 	 
-	 
-	 public static boolean save(Event insertEvent, Connection con) {
+	 private static String getUpdateSQL(EventProcessor evnt) {
+		 String updateSQL  = " update EVENTCONTROLLER set subscriberlist =  subscriberlist || '" + evnt.getSubscribeList() + ";' where eventid = "+evnt.getEventid();
+		 
+		
+		 return updateSQL;
+					
+	 }
+	 private static String getAdminUpdateSQL(EventProcessor evnt) {
+		 String updateSQL  = " update EVENTCONTROLLER set adminclearMark =  adminclearMark || '" + evnt.getAdminClearedEventType() + ";' where eventid = "+evnt.getEventid();
+		 
+		
+		 return updateSQL;
+					
+	 }
+	 public static EventProcessor save(EventProcessor insertEvent, Connection con) {
 		 try {
              return insert(insertEvent, con);
          }catch(Exception e) {
         	 commonUTIL.displayError("EventSQL","save",e);
-        	 return false;
+        	 return null;
          }
 	 }
-	 public static boolean update(Event updateEvent, Connection con) {
+	 public static boolean update(EventProcessor updateEvent, Connection con) {
 		 try {
              return edit(updateEvent, con);
          }catch(Exception e) {
@@ -93,7 +112,7 @@ public class EventSQL implements Serializable {
 	        }
 	        return true;
 	 }
-	 public static Collection selectEvent(Event favorities, Connection con) {
+	 public static Collection selectEvent(EventProcessor favorities, Connection con) {
 		 try {
              return  select(favorities, con);
          }catch(Exception e) {
@@ -110,13 +129,19 @@ public class EventSQL implements Serializable {
          }
 	 }
 	 
-	 protected static  boolean edit(Event updateEvent, Connection con ) {
+	 protected static  boolean edit(EventProcessor updateEvent, Connection con ) {
 		 
 	        PreparedStatement stmt = null;
+	        String sql = "";
 		 try {
 			 int j = 1;
 			 con.setAutoCommit(false);
-			 stmt = dsSQL.newPreparedStatement(con, UPDATE);
+			 if(updateEvent.isClearedByAdmin())  {
+			  sql = getAdminUpdateSQL(updateEvent);
+			 } else {
+				 sql = getUpdateSQL(updateEvent);
+			 }
+			 stmt = dsSQL.newPreparedStatement(con, sql);
 	            
 			
 	           
@@ -131,7 +156,7 @@ public class EventSQL implements Serializable {
 	            con.commit();
 			 
 		 } catch (Exception e) {
-			 commonUTIL.displayError("EventSQL ",UPDATE,e);
+			 commonUTIL.displayError("EventSQL ","edit " + sql,e);
 			 return false;
 	           
 	        }
@@ -146,7 +171,7 @@ public class EventSQL implements Serializable {
 	        return true;
 	 }
 	
-	 protected static boolean insert(Event inserEvent, Connection con ) {
+	 protected static EventProcessor insert(EventProcessor inserEvent, Connection con ) {
 			
 	        PreparedStatement stmt = null;
 		 try {
@@ -155,14 +180,31 @@ public class EventSQL implements Serializable {
 			 int j = 1;
 			 stmt = dsSQL.newPreparedStatement(con, INSERT);
 			// eventID, eventType,type,tradeID,transferID,consumedFlag,sqlType	
-			 stmt.setInt(1, inserEvent.getEventID());
+			int id = selectMax(con);
+			inserEvent.setEventid(id);
+			 stmt.setInt(1,id);
 			  stmt.setString(2, inserEvent.getEventType());
 	            stmt.setString(3,inserEvent.getType());
-	            stmt.setInt(4, inserEvent.getTradeID());
-	            stmt.setInt(5, inserEvent.getTransferID());
-	            if(!inserEvent.isConsumedFlag())
-	               stmt.setInt(6,1);
-	            stmt.setString(7, inserEvent.getSqlType());
+	          
+	            if(!inserEvent.isConsumed())
+	               stmt.setString(4,"False");
+	            else
+	            	 stmt.setString(4,"True");
+	            
+	            if(!inserEvent.isPublish())
+		               stmt.setString(5,"False");
+		            else
+		            	 stmt.setString(5,"True");
+	            
+	            stmt.setInt(6, inserEvent.getObjectID());
+	            stmt.setInt(7,  inserEvent.getObjectVersionID());
+	           
+	            stmt.setString(8,inserEvent.getComments());
+	            stmt.setString(9,inserEvent.getProcessName());
+	            stmt.setString(10,inserEvent.getOccurrenceDate());
+	            stmt.setString(11,inserEvent.getOccurrenceTime());
+	           stmt.setString(12,"NONE");
+	           // stmt.setString(11,inserEvent.getOccurrenceDate());
 	            commonUTIL.display(" EventSQL insert ",INSERT);
 			 
 	            stmt.executeUpdate();
@@ -170,7 +212,7 @@ public class EventSQL implements Serializable {
 			// }	
 		 } catch (Exception e) {
 			 commonUTIL.displayError("EventSQL",INSERT,e);
-			 return false;
+			 return null;
 	           
 	        }
 	        finally {
@@ -181,38 +223,46 @@ public class EventSQL implements Serializable {
 				commonUTIL.displayError("EventSQL "," insert",e);
 			}
 	        }
-	        return true;
+	        return inserEvent;
 	 }
 	 
-	 protected static Collection select(Event event,Connection con ) {
+	 protected static Collection select(EventProcessor event,Connection con ) {
 		 
 		 int j = 0;
 	        PreparedStatement stmt = null;
-	       Vector<Event> values = new Vector<Event>();
+	       Vector<EventProcessor> values = new Vector<EventProcessor>();
 	       String sql  = "";
 		 try {
-			 sql = SELECTONE + "'" + event.getEventID() + "'";
+			 sql = SELECTONE + "'" + event.getEventid() + "'";
 			con.setAutoCommit(false);
 			 stmt = dsSQL.newPreparedStatement(con,sql) ;
 	         
 	         ResultSet rs = stmt.executeQuery();
 	         
 	         while(rs.next()) {
-	        	// eventID, eventType,type,tradeID,transferID,consumedFlag,sqlType		
-	        	 Event evt = new Event();
-	        	 evt.setEventID(rs.getInt(1));
-	        	 evt.setEventType(rs.getString(1));
-	        	 evt.setType(rs.getString(1));
-	        	 evt.setTradeID(rs.getInt(1));
-	        	 evt.setTransferID(rs.getInt(1));
-	        	 
-	        
+	        	// eventID, eventType,type,tradeID,transferID,consumedFlag,sqlType	
+	      //  	 eventID,eventType,type,consumed,publish,objectID,objectVersion,comments,processName,eventDate,eventTime 
+	        	 EventProcessor evt = new EventProcessor();
+	        	 evt.setEventid(rs.getInt(1));
+	        	 evt.setEventType(rs.getString(2));
+	        	 evt.setType(rs.getString(3));
+	        	 if(rs.getString(4).equalsIgnoreCase("True")) 
+	        	 evt.setPublish(true);
+	        	 if(rs.getString(5).equalsIgnoreCase("True")) 
+		        	 evt.setConsumed(true);
+	        	 evt.setObjectID(rs.getInt(6));
+	        	 evt.setObjectVersionID(rs.getInt(7));
+	        	 evt.setComments(rs.getString(8));
+	        	    	 evt.setProcessName(rs.getString(9));
+	        	 evt.setOccrrenceDate(rs.getString(10));
+	        	 evt.setOccurrenceTime(rs.getString(11));
+	        	 evt.setSubscribableList(rs.getString(12));
 	        values.add(evt);
 	        
 	      
-	       
-	         
 	         }
+	         
+	         
 		 } catch (Exception e) {
 			 commonUTIL.displayError("EventSQL",sql,e);
 			 return values;
@@ -236,7 +286,7 @@ public static Collection selectWhere(String sqlw,Connection con ) {
 	       Vector values = new Vector();
 	       String sql  = "";
 		 try {
-			 sql = SELECTWHERE + sqlw + " order by type ";
+			 sql = SELECTWHERE + sqlw ;
 			con.setAutoCommit(false);
 			 stmt = dsSQL.newPreparedStatement(con,sql) ;
 	         
@@ -244,14 +294,36 @@ public static Collection selectWhere(String sqlw,Connection con ) {
 	         
 	         while(rs.next()) {
 	        	
-	        	 Event evt = new Event();
-	        	 evt.setEventID(rs.getInt(1));
-	        	 evt.setEventType(rs.getString(1));
-	        	 evt.setType(rs.getString(1));
-	        	 evt.setTradeID(rs.getInt(1));
-	        	 evt.setTransferID(rs.getInt(1));
-	        	 
-	        
+	        	 EventProcessor evt = null; //new EventProcessor();
+	        	 if(rs.getString(3).equalsIgnoreCase("Trade")) {
+	        		 evt = new TradeEventProcessor();
+	        	 }
+	        	 if(rs.getString(3).equalsIgnoreCase("Transfer")) {
+	        		 evt = new TransferEventProcessor();
+	        	 }
+	        	 if(rs.getString(3).equalsIgnoreCase("Task")) {
+	        		 evt = new TransferEventProcessor();
+	        	 }
+	        	 if(rs.getString(3).equalsIgnoreCase("Message")) {
+	        		 evt = new MessageEventProcessor();
+	        	 }
+	        	 if(rs.getString(3).equalsIgnoreCase("Limit")) {
+	        		 evt = new LimitEventProcessor();
+	        	 }
+	        	 evt.setEventid(rs.getInt(1));
+	        	 evt.setEventType(rs.getString(2));
+	        	 evt.setType(rs.getString(3));
+	        	 if(rs.getString(4).equalsIgnoreCase("True")) 
+	        	 evt.setPublish(true);
+	        	 if(rs.getString(5).equalsIgnoreCase("True")) 
+		        	 evt.setConsumed(true);
+	        	 evt.setObjectID(rs.getInt(6));
+	        	 evt.setObjectVersionID(rs.getInt(7));
+	        	 evt.setComments(rs.getString(8));
+	        	    	 evt.setProcessName(rs.getString(9));
+	        	 evt.setOccrrenceDate(rs.getString(10));
+	        	 evt.setOccurrenceTime(rs.getString(11));
+	        	 evt.setSubscribableList(rs.getString(12));
 	        values.add(evt);
 	        
 	      
@@ -287,17 +359,25 @@ public static Collection selectWhere(String sqlw,Connection con ) {
 	      ResultSet rs = stmt.executeQuery();
 	      
 	      while(rs.next()) {
-	    	  Event Event = new Event();
+	    	 
 	    	
-	    	  Event evt = new Event();
-	        	 evt.setEventID(rs.getInt(1));
-	        	 evt.setEventType(rs.getString(1));
-	        	 evt.setType(rs.getString(1));
-	        	 evt.setTradeID(rs.getInt(1));
-	        	 evt.setTransferID(rs.getInt(1));
-	        	 
-	        
+	    	  EventProcessor evt = new EventProcessor();
+	        	 evt.setEventid(rs.getInt(1));
+	        	 evt.setEventType(rs.getString(2));
+	        	 evt.setType(rs.getString(3));
+	        	 if(rs.getString(4).equalsIgnoreCase("True")) 
+	        	 evt.setPublish(true);
+	        	 if(rs.getString(5).equalsIgnoreCase("True")) 
+		        	 evt.setConsumed(true);
+	        	 evt.setObjectID(rs.getInt(6));
+	        	 evt.setObjectVersionID(rs.getInt(7));
+	        	 evt.setComments(rs.getString(8));
+	        	    	 evt.setProcessName(rs.getString(9));
+	        	 evt.setOccrrenceDate(rs.getString(10));
+	        	 evt.setOccurrenceTime(rs.getString(11));
+	        	 evt.setSubscribableList(rs.getString(12));
 	        	 Events.add(evt);
+	        
 	        
 	      
 	      }  commonUTIL.display("EventSQL ",SELECTALL);
@@ -317,6 +397,35 @@ public static Collection selectWhere(String sqlw,Connection con ) {
 	     }
 	     return Events;
 	 }
+	 protected static int selectMax(Connection con ) {
+		  
+		   int j = 0;
+		         PreparedStatement stmt = null;
+		   try {
+		    con.setAutoCommit(false);
+//		    System.out.println(con.getAutoCommit());
+		    stmt = dsSQL.newPreparedStatement(con, SELECT_MAX);
+		    commonUTIL.display("EventSQL ::  selectMax", SELECT_MAX);
+		          ResultSet rs = stmt.executeQuery();
+		          while(rs.next())
+		          j = rs.getInt("DESC_ID");
+		   
+		   } catch (Exception e) {
+		    commonUTIL.displayError("EventSQL",SELECT_MAX,e);
+		    return j;
+		           
+		         }
+		         finally {
+		            try {
+		    stmt.close();
+		   } catch (SQLException e) {
+		    // TODO Auto-generated catch block
+		    commonUTIL.displayError("EventSQL","selectMax",e);
+		   }
+		         }
+		         return j;
+		  }
+		     
 	public static Collection getEventName(Connection con) {
 		// TODO Auto-generated method stub
 		int j = 0;
