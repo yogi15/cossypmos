@@ -17,6 +17,7 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import dsEventProcessor.EventProcessor;
+import dsEventProcessor.TaskEventProcessor;
 import dsEventProcessor.TransferEventProcessor;
 import dsServices.RemoteBOProcess;
 import dsServices.RemoteMO;
@@ -25,6 +26,7 @@ import dsServices.RemoteTrade;
 import dsServices.ServerConnectionUtil;
 import beans.Trade;
 import beans.Transfer;
+import beans.Users;
 import util.commonUTIL;
 
 public abstract class ControllerManager  implements Runnable , ExceptionListener {
@@ -55,7 +57,16 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 		 this.hostName = hostName;
 		 this.managerName = managerName;
 	 }
-
+	 public ControllerManager(String host,String hostName,String managerName,String userName,String Password) {
+		 de =ServerConnectionUtil.connectServer(host, 1099,commonUTIL.getServerIP(),managerName,userName,Password);
+		 this.hostName = hostName;
+		 this.managerName = managerName;
+	 }
+	 public ControllerManager(String host,String hostName,String managerName,Users user) {
+		 de =ServerConnectionUtil.connectServer(host, 1099,commonUTIL.getServerIP(),managerName,user);
+		 this.hostName = hostName;
+		 this.managerName = managerName;
+	 }
 	@Override
 		public void onException(JMSException e) {
 			commonUTIL.displayError( getManagerName(),"Error in listening" , e);
@@ -90,8 +101,11 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 
 			            if (message instanceof ObjectMessage) {
 			            	ObjectMessage oMessage = (ObjectMessage) message;
-			          //  	System.out.println(manager.managerName + "       >>>>>>>>>>>>>>>   " + oMessage.getObject());
+			            	//System.out.println(manager.managerName + "       >>>>>>>>>>>>>>>   " + ((EventProcessor)oMessage.getObject()).getClassName());
+			            
+			            	//if(checkEvents((EventProcessor)  oMessage.getObject())) {
 			            	manager.handleEvent((EventProcessor) oMessage.getObject());
+			            	//}
 			            	
 			               // pframe.refresh();
 			    			//Thread.sleep(8000);
@@ -101,23 +115,36 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 			            session.close();
 			            connection.close();
 			            Thread.sleep(800);
-			          
+				 } catch (java.lang.NullPointerException e) {
+						// TODO Auto-generated catch block
+					   commonUTIL.displayError("ControllerManager " +  getManagerName(), "run()", e);
+						//System.exit(0);
+					      
 					
 				} catch (java.lang.InterruptedException e) {
 					// TODO Auto-generated catch block
 					commonUTIL.display(manager.getManagerName(), manager.getManagerName() +"  is stop");
+					//System.exit(0);
 				} catch (JMSException j) {
 					// TODO Auto-generated catch block
 					commonUTIL.display(manager.getManagerName(), manager.getManagerName() +"  is stop");
+					//System.exit(0);
 				} catch(Exception e) {
 					 commonUTIL.displayError( getManagerName(), "run()", e);
-				 }
+					// System.exit(0);
+				 
+				}
 
 			}
 			
 		}
 		
-
+        private boolean checkEvents(EventProcessor event) {
+        	boolean flag = true;
+        	if(event instanceof TaskEventProcessor) 
+        		flag = false;
+        	return flag;
+        }
 		private boolean isInterrupted() {
 			// TODO Auto-generated method stub
 			if(managerThread != null)
@@ -131,7 +158,7 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 			de.publishEvent(messageIndicator, queueName, messageType, (Serializable) event);
 		}
 	public void handleEvent(EventProcessor event)	 {
-		System.out.println(event.getOccurrenceTime());
+		//System.out.println(event.getOccurrenceTime());
 	}
 		
 	
@@ -147,11 +174,21 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 	public void stop() {
 	//	commonUTIL.display(manager.getManagerName(), "Stop <<<<<<<<<  " +manager.getManagerName());
 		try {
+			
 			managerThread.interrupt();
 			throw new InterruptedIOException();
+			
+			
 		} catch (InterruptedIOException e) {
 			// TODO Auto-generated catch block
-			commonUTIL.display(manager.getManagerName(), manager.getManagerName() +"  is stop");
+if(managerThread.isInterrupted()) {
+	System.out.println(manager.getManagerName() + " stop");
+
+	
+	commonUTIL.display(manager.getManagerName(), manager.getManagerName() +"  is stop");
+	//System.exit(0);
+			}
+			
 		}
 		
 	//manager

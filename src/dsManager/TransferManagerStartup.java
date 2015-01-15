@@ -1,21 +1,51 @@
 package dsManager;
 
 import java.io.InterruptedIOException;
+import java.io.Serializable;
 
+import beans.Users;
+
+import dsServices.EngineMonitorUtil;
 import dsServices.ServiceManager;
 import util.commonUTIL;
 
-public class TransferManagerStartup implements ServiceManager {
+public class TransferManagerStartup  extends ServiceManager  {
 	TransferManager amanager = null;
+	String managerName = "TransferManager";
 	Thread t = null;
+	Users user = null;
+	/**
+	 * @return the user
+	 */
+	public Users getUser() {
+		return user;
+	}
+
+
+	/**
+	 * @param user the user to set
+	 */
+	public void setUser(Users user) {
+		this.user = user;
+	}
+
+
 	@Override
 	public void start() {
 		// TODO Auto-generated method stub
-		String managerName = "TransferManager";
+		//startProducingMessage("Transfer",commonUTIL.getLocalHostName(),":61616");
+		//startProducingMessage();
 		String hostName = commonUTIL.getLocalHostName();
 		String localHost = "localhost";
-		amanager = new TransferManager(localHost,hostName,managerName);
-	
+		user = new Users();
+		user.setUser_name("DummyTransfer");
+		user.setHostName(hostName);
+		user.setApplicattionNameLoginOn("TransferManager");
+		setUser(user);
+		amanager = new TransferManager(localHost,hostName,managerName,this);
+
+		
+		amanager.publishStartEvent(managerName,"Started");
 		amanager.start(amanager);
 		
 	}
@@ -24,6 +54,7 @@ public class TransferManagerStartup implements ServiceManager {
 	public static void main(String args[]) {
 		TransferManagerStartup startTransferService = new TransferManagerStartup();
 		startTransferService.start();
+		
 	}
 
 	@Override
@@ -33,16 +64,37 @@ public class TransferManagerStartup implements ServiceManager {
 //		System.out.println(t.getId());
 		
 		try {
+			
+			amanager.publishStartEvent(managerName,"Stopped");
+			
 			amanager.stop();
+			amanager = null;
 			throw new InterruptedIOException();
 		} catch (InterruptedIOException e) {
 			// TODO Auto-generated catch block
-			commonUTIL.display("TransferManager", "TransferManager is stop");
+			commonUTIL.display("TransferManager", "TransferManager is Stopped");
+			System.exit(0);
+		} finally {
+			System.exit(0);
 		}
 	
 	//	System.out.println(t.getId());
 		
 	}
+    protected void finalize() {
+    	try {
+			amanager.publishStartEvent(managerName,"Stopped");
+			amanager.stop();
+			throw new InterruptedIOException();
+			
+		} catch (InterruptedIOException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.display("TransferManager", "TransferManager is stop");
+		} finally {
+			amanager = null;
+			System.exit(0);
+		}
+    }
 
 
 }
