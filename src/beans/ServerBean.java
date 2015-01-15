@@ -16,6 +16,19 @@ public class ServerBean implements Serializable {
 	   String windowSetting;
 	   String username;
 	   String password;
+	   /**
+	 * @return the clientID
+	 */
+	public int getClientID() {
+		return clientID;
+	}
+	/**
+	 * @param clientID the clientID to set
+	 */
+	public void setClientID(int clientID) {
+		this.clientID = clientID;
+	}
+	int clientID;
 	   
 	public String get_dataServerName() {
 		return _dataServerName;
