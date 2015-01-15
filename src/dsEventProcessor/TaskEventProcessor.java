@@ -2,6 +2,7 @@ package dsEventProcessor;
 
 import java.io.Serializable;
 
+import beans.Message;
 import beans.Task;
 import beans.Trade;
 import beans.Transfer;
@@ -61,6 +62,16 @@ public class TaskEventProcessor  extends EventProcessor  implements Serializable
 	}
 	public void setTaskID(int taskID) {
 		this.taskID = taskID;
+	}
+	Message message = null;
+	public void setMessage(Message message) {
+		// TODO Auto-generated method stub
+		this.message = message;
+		
+		
+	}
+	public Message getMessage() {
+		return message;
 	}
 	
 	
