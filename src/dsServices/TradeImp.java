@@ -3,7 +3,7 @@ package dsServices;
 import java.io.Serializable;
 
 import java.rmi.RemoteException;
-
+import util.ReflectionUtilObject;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -12,15 +12,19 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import javax.rmi.CORBA.Util;
+
 import constants.TradeConstants;
 
 import util.ClassInstantiateUtil;
+import util.ReflectionUtilObject;
 import util.commonUTIL;
 import wfManager.WFHandler;
 import dbSQL.AttributSQL;
 import dbSQL.AuditSQL;
 import dbSQL.B2BConfigSQL;
 import dbSQL.BookSQL;
+import dbSQL.EventSQL;
 import dbSQL.FeesSQL;
 import dbSQL.FutureContractSQL;
 import dbSQL.LegalEntitySQL;
@@ -42,6 +46,7 @@ import beans.Attribute;
 import beans.Audit;
 import beans.B2BConfig;
 import beans.Book;
+import beans.EventController;
 import beans.Fees;
 import beans.LegalEntity;
 import beans.Posting;
@@ -80,10 +85,18 @@ public class TradeImp implements RemoteTrade {
 		try{   
 			if(getNewMessage() == null) {
 					startProducingMessage();
-					newMessage.produceNewMessage(messageIndicator,"TRADE",messageType,(Serializable) object,"true"); 
+					EventProcessor e1 = (EventProcessor) object;
+					if(e1.isSavetoDB()) {
+						e1 = EventSQL.save((EventProcessor) object, dsSQL.getConn());
+					}
+					newMessage.produceNewMessage(messageIndicator,"TRADE",messageType,(Serializable) e1,"true"); 
 			} else {
+				EventProcessor event = (EventProcessor) object;
+				if(event.isSavetoDB()) {
+					event = EventSQL.save((EventProcessor) object, dsSQL.getConn());
+				}
 			
-			newMessage.produceNewMessage(messageIndicator,"TRADE",messageType,(Serializable) object,null); 
+			newMessage.produceNewMessage(messageIndicator,"TRADE",messageType,(Serializable) event,null); 
 			//newMessage.run();
 			}
 			}catch(Exception e){
@@ -259,7 +272,7 @@ public class TradeImp implements RemoteTrade {
 		
 	} catch (RemoteException e) {
 		// TODO Auto-generated catch block
-		e.printStackTrace();
+	      commonUTIL.displayError("TradeImp", "isAuthorisedUserAction", e);
 	}
 		return flag;
 	}
@@ -428,6 +441,9 @@ public class TradeImp implements RemoteTrade {
 		taskEvent.setTradeID(trade.getId());
 		taskEvent.setTradeVersion(trade.getVersion());
 		taskEvent.setUserID(trade.getUserID());
+		taskEvent.setType("Task");
+		taskEvent.setEventType("TaskEventProcessor");
+		taskEvent.setObjectID(task.getId());
 				return taskEvent;
 	}
 	
@@ -449,6 +465,14 @@ public class TradeImp implements RemoteTrade {
 		 tradeEvent.setTrade(trade);
 		 tradeEvent.setTradeID(trade.getId());
 		 tradeEvent.setEventType("TRADE_"+trade.getStatus());
+		 tradeEvent.setType("Trade");
+		 tradeEvent.setObjectID(trade.getId());
+		 tradeEvent.setObjectVersionID(trade.getVersion());
+		 tradeEvent.setPublish(true);
+		 tradeEvent.setSavetoDB(true);
+		 tradeEvent.setProcessName("TradeProcess");
+		 //tradeEvent.setUser(new Userstrade.getUserID());
+		 tradeEvent.setComments(" Trade status on " + trade.getStatus() + " for Action "+trade.getAction() );
 		 return tradeEvent;
 	}
 	
@@ -536,6 +560,9 @@ public class TradeImp implements RemoteTrade {
 
 
 
+	
+	
+	
 	private void prcessAudit(Trade trade) {
 		try {
 		
@@ -1595,7 +1622,32 @@ return status;
 
 
 
-			
+			@Override
+			public void isEventExceuted(EventProcessor event)
+					throws RemoteException {
+				// TODO Auto-generated method stub
+				
+				EventSQL.update(event, dsSQL.getConn());
+			}
+
+
+
+			@Override
+			public Trade getTradeOldVersion(int tradeID, int tradeVersion)
+					throws RemoteException {
+				// TODO Auto-generated method stub
+				String sql = " id = " + tradeID + " and version = " + tradeVersion;
+				Vector v1 = (Vector) AuditSQL.selectwhere(sql,  dsSQL.getConn());
+				String oldTradeValues = "";
+				if(v1 != null || v1.size() > 0) 
+						  oldTradeValues = ((Audit)v1.elementAt(0)).getValues();
+				Trade trade = (Trade) ReflectionUtilObject.getObject("beans.trade", oldTradeValues)	;
+				
+		      return trade;
+
+
+
+			}
 
 		
 
