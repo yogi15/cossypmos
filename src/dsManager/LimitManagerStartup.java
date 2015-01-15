@@ -5,7 +5,7 @@ import java.io.InterruptedIOException;
 import util.commonUTIL;
 import dsServices.ServiceManager;
 
-public class LimitManagerStartup implements ServiceManager {
+public class LimitManagerStartup extends ServiceManager {
 	LimitManager amanager = null;
 	Thread t = null;
 	@Override
