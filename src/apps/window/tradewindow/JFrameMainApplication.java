@@ -23,6 +23,7 @@ import javax.swing.UIManager;
 import dsManager.TaskManager;
 import dsServices.ServerConnectionUtil;
 import beans.Users;
+import apps.window.adminmonitor.JFrameAdminMonitorWindow;
 import apps.window.limitdashboardpanel.JFrameLimitDashBoard;
 import apps.window.operationwindow.JFrameJobApplication;
 import apps.window.operationwindow.JFrameTradeBrowser;
@@ -77,6 +78,10 @@ public class JFrameMainApplication extends JFrame {
 	private static JMenuItem[] positionmenu = {
 			new JMenuItem("PositionManager"),
 			new JMenuItem("ManualLiquidation") };
+	private static JMenuItem[] adminUtilmenu = {
+		new JMenuItem("AdminMonitorUtil")
+		 };
+	
 	Hashtable<String, JMenuItem[]> subMenu = new Hashtable<String, JMenuItem[]>();
 	URL imgURL = null;
 	Users name = null;
@@ -333,11 +338,27 @@ public class JFrameMainApplication extends JFrame {
 			});
 
 		}
+		for (int i = 0; i < adminUtilmenu.length; i++) {
+			final Users us1 = user;
+			menu[5].add(adminUtilmenu[i]);
+			adminUtilmenu[i].setFont(Font.decode("SansSerif-12"));
+			adminUtilmenu[i].addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					JFrameAdminMonitorWindow pm = new JFrameAdminMonitorWindow("AdminMonitor", name);
+					pm.setSize(900, 750);
+					pm.setVisible(true);
+					pm.setIconImage(Toolkit.getDefaultToolkit().getImage(
+							imgURL));
+					pm.setTitle("Admin Monitor " + name.getUser_name());
+				}
+
+			});
+		}
 		for (int i = 0; i < positionmenu.length; i++) {
 			final Users us1 = user;
 			positionmenu[i].setFont(Font.decode("SansSerif-12"));
 			// commonUTIL.setBackGroundColor( reports[i]);
-			commonUTIL.setBackGroundColor(favItems[i]);
+			
 			positionmenu[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 
