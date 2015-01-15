@@ -50,6 +50,16 @@ public class ServiceInit {
         return UnicastRemoteObject.exportObject(object, port);//, clientSocketFactory, serverSocketFactory);
     }
     
+    public static RemoteTrade getRemoteTrade() {
+    	RemoteTrade remoteTrade = null;
+    	try {
+			return (RemoteTrade) ServerConnectionUtil.getdefault().getRMIService("Trade");
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return remoteTrade;
+    }
     
     public static void startService (ConfigService configService, Registry regist) throws Exception {
          ServerConnectionUtil servc = ServerConnectionUtil.getdefault();
@@ -162,6 +172,7 @@ public class ServiceInit {
         }
         try {
             regist = LocateRegistry.getRegistry(registryPort);
+           
         } catch (Exception e) {
         	System.out.println( "Error encountered when getting reference to registry on port " + registryPort + e);
         }

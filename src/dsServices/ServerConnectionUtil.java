@@ -2,6 +2,7 @@ package dsServices;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import beans.ServerBean;
+import beans.Users;
 
 import util.JavaUtil;
 import util.commonUTIL;
@@ -23,6 +25,23 @@ public class ServerConnectionUtil {
 	protected  int _rmiPort;
 	 String username;
 	 String password;
+	 /**
+	 * @return the clientID
+	 */
+	public int getClientID() {
+		return clientID;
+	}
+	/**
+	 * @param clientID the clientID to set
+	 */
+	public void setClientID(int clientID) {
+		this.clientID = clientID;
+	}
+
+
+
+
+	int clientID = 0;
 	public   Map rmiServices = Collections.synchronizedMap(new HashMap());
 	private   String serverName = "ServerController";
 	static public ServerConnectionUtil _default;
@@ -35,6 +54,7 @@ public class ServerConnectionUtil {
 		 ServerConnectionUtil sutil = new ServerConnectionUtil();
 try {
 	sutil.set_dataServerName(_dsName);
+	
 	sutil.set_rmiPort(rmiPort);
 	sutil.set_hostName(hostName);
 			
@@ -51,6 +71,37 @@ try {
 					 sutil.setdefault(sutil);
 					// System.out.println("connect to Server...." + s.get_hostName() + " "+s.get_rmiPort());
 					
+					 sutil.setClientID(s.getClientID());
+			
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		return getdefault();
+	
+	}
+	public static ServerConnectionUtil   connectServer(String _dsName,int rmiPort,String hostName,String applicationName,String userName,String password)  {
+		 ServerConnectionUtil sutil = new ServerConnectionUtil();
+try {
+	sutil.set_dataServerName(_dsName);
+	sutil.set_rmiPort(rmiPort);
+	sutil.set_hostName(hostName);
+			
+	remoteDeal	= (RemoteDeal) sutil.getRMIService(sutil.serverName);
+			ServerBean s = (ServerBean) remoteDeal.connect(userName, password, applicationName);
+			
+			
+				sutil.set_dataServerName(s.get_dataServerName()); 
+			//	sutil.set_dataServerName(s.get_dataServerName()); 
+				//sutil.set_dataServerName(s.get_dataServerName()); 
+				sutil.setUsername(s.getUsername());
+				sutil.setPassword(s.getPassword());
+					 sutil.setRmiServices(s.getRmiServices());
+					 sutil.setdefault(sutil);
+					 sutil.setClientID(s.getClientID());
+		//System.out.println(applicationName + "ServiceManager" + " connect to Server.... on " + s.get_hostName() + " "+s.get_rmiPort() + " with UserName " + userName );
+					
 						
 			
 		} catch (RemoteException e) {
@@ -61,7 +112,37 @@ try {
 		return getdefault();
 	
 	}
+	public static ServerConnectionUtil   connectServer(String _dsName,int rmiPort,String hostName,String applicationName,Users user)  {
+		 ServerConnectionUtil sutil = new ServerConnectionUtil();
+try {
+	sutil.set_dataServerName(_dsName);
+	sutil.set_rmiPort(rmiPort);
+	sutil.set_hostName(hostName);
+
+	remoteDeal	= (RemoteDeal) sutil.getRMIService(sutil.serverName);
+			ServerBean s = (ServerBean) remoteDeal.connect(user.getUser_name(),user.getPassword(), applicationName);
+			
+			
+				sutil.set_dataServerName(s.get_dataServerName()); 
+			//	sutil.set_dataServerName(s.get_dataServerName()); 
+				//sutil.set_dataServerName(s.get_dataServerName()); 
+				sutil.setUsername(s.getUsername());
+				sutil.setPassword(s.getPassword());
+					 sutil.setRmiServices(s.getRmiServices());
+					 sutil.setdefault(sutil);
+					 sutil.setClientID(s.getClientID());
+		//System.out.println(applicationName + "ServiceManager" + " connect to Server.... on " + s.get_hostName() + " "+s.get_rmiPort() + " with UserName " + userName );
+					
+						
+			
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		return getdefault();
 	
+	}
 	  
 	public void publishEvent(String messageIndicator,String queueName,String messageType,Object object) {
 		try {

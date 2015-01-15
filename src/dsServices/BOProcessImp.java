@@ -388,7 +388,66 @@ public void startProducingMessage() {
 		}
 	}
 
+	private Task processTask(Message message,Transfer transfer,Trade trade,int userID,int taskID) {
+		if(message.getTradeId() == 0)
+			return null;
+		// TODO Auto-generated method stub
+		Task task = null;
+		if(taskID == 0) {
+			task = new Task();
+			task.setTradeID(message.getTradeId());
+			task.setProductID(message.getproductID());
+			task.setTransferID(message.getTransferId());
+			//task.setType(trade.getStatus());
+			task.setAction(message.getAction());
+			task.setStatus(message.getStatus());
+			task.setTaskDate(commonUTIL.dateToString(commonUTIL.getCurrentDate()));
+			task.setTradeDate(trade.getTradeDate());
+			task.setTransferDate(message.getMessageDate());
+			task.setTaskstatus("0");
+			//task.setCurrency(message.get);
+			//task.setBookid();
+			task.setEvent_type(message.getStatus()+"_"+message.getEventType());
+			task.setType("MESSAGE");
+			task.setProductType(message.getProductType());
+			task.setUserid(userID);
+			task.setMessageVersionID(message.getVersion());
+			task.setTradeVersionID(trade.getVersion());
+			task.setId(0);
+			task.setProductID(message.getproductID());
+			return task;
+		} 
+		if(taskID == 1) {
 
+		 task = new Task();
+			task.setProductID(message.getproductID());
+		task.setTradeID(message.getTradeId());
+		
+		task.setTransferID(message.getTransferId());
+		//task.setType(trade.getStatus());
+		task.setAction(message.getAction());
+		task.setStatus(message.getStatus());
+		task.setTaskDate(commonUTIL.dateToString(commonUTIL.getCurrentDate()));
+		task.setTradeDate(trade.getTradeDate());
+	//	task.setTransferDate(message.get.getValueDate()); // this need to understand. 
+		task.setTaskstatus("0");
+		//task.setCurrency(transfer.getSettlecurrency());
+	//	task.setBookid(transfer.getBookId());
+		task.setEvent_type(message.getEventType());
+		task.setType("MESSAGE");
+		task.setProductType(message.getProductType());
+		task.setUserid(userID);
+		task.setTransferVersionID(message.getTransferVersion());
+		task.setTradeVersionID(trade.getVersion());
+		task.setMessageVersionID(message.getVersion());
+		
+		task.setId(0);
+		//task.se
+		}
+		return task;
+		
+		
+	}
 	
 private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) {
 	if(transfer.getTradeId() == 0)
@@ -775,6 +834,7 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 		transferEvent.setTransfer(transfer);
 
 		transferEvent.setEventType(transfer.getStatus()+"_"+transfer.getEventType());
+		transferEvent.setComments("Trade_id_"+  trade.getId() + "_version_"+trade.getVersion());
 		commonUTIL.display("TransferManager",transferEvent.getEventType());
 		commonUTIL.display("","");
 		return transferEvent;
@@ -1000,6 +1060,31 @@ return status;
 			}
 		}
 	}
+	private void publishTask(Task task,Trade trade,Message message,Transfer transfer) {
+		if(task != null) {
+			 int taskID = 0;
+			if(task  != null) {
+				if(task.getId() == 0)
+			    taskID = TaskSQL.save(task,dsSQL.getConn());
+				else 
+					taskID = task.getId();
+			    if(taskID >0 ) {
+			    	try {
+			    	task.setId(taskID);
+			    	TaskEventProcessor taskEvent =  getTaskEvent(task,trade,transfer,message);
+			    //System.out.println(remoteTrade);
+			    if(remoteTrade == null)
+			    	initRemoteInterface();
+						remoteTrade.publishnewTrade("TRANS_NEWTRANSFER","TRADE",taskEvent);
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						commonUTIL.displayError("BOProcessImpl", "publishTask", e);
+					}
+			    }
+			}
+		}
+	}
+	
 	private TaskEventProcessor getTaskEvent(Task task,Trade trade,Transfer transfer) {
 		TaskEventProcessor taskEvent = new TaskEventProcessor();
 		taskEvent.setTask(task);
@@ -1007,6 +1092,19 @@ return status;
 	   taskEvent.setTransfer(transfer);
 	   taskEvent.setTaskID(task.getId());
 		taskEvent.setProcessName("TaskManagerProcesser");
+		taskEvent.setComments("Publish for Transfer " + transfer.getId());
+		taskEvent.setTaskID(task.getId());
+				return taskEvent;
+	}
+	private TaskEventProcessor getTaskEvent(Task task,Trade trade,Transfer transfer,Message message) {
+		TaskEventProcessor taskEvent = new TaskEventProcessor();
+		taskEvent.setTask(task);
+		taskEvent.setTrade(trade);
+	   taskEvent.setTransfer(transfer);
+	   taskEvent.setMessage(message);
+	   taskEvent.setTaskID(task.getId());
+		taskEvent.setProcessName("TaskManagerProcesser");
+		taskEvent.setComments(" for Message " + message.getId() + " ");
 		
 		taskEvent.setTaskID(task.getId());
 				return taskEvent;
@@ -1238,6 +1336,17 @@ return status;
 		if(sqlType.equalsIgnoreCase("insert")) {
 			messages = processMessageAction(mess,"insert",trade,transfer);
 			messages =  MessageSQL.insert(messages, dsSQL.getConn());		
+			if(remoteTrade != null) {
+				for(int i=0;i<messages.size();i++) {
+					Message savemess = messages.get(i);
+					if(savemess.getTaskID() == 1) {
+						
+						Task task =  processTask(savemess, transfer, trade, savemess.getUserID(), savemess.getTaskID());
+						publishTask(task, trade, savemess, transfer);
+					}
+					
+				}
+			}
 		} 
 		if(sqlType.equalsIgnoreCase("update")) {
 			messages = processMessageAction(mess,"update",trade,transfer);
@@ -1338,6 +1447,8 @@ return status;
 					
 				   return messsageWithStatus;
 			   }
+			   if(wf.isTask())
+			   message.setTaskID(1);  // this will publish task for task Station.
 			   message.setStatus(wf.getOrgStatus());
 			   if(message.getStatus().equalsIgnoreCase("CANCELLED")) {
 				   message.setSubAction("CANCEL");
@@ -1356,6 +1467,8 @@ return status;
 			   }
 			   WFConfig wf =  getStatusOnMessageAction(message, message.getStatus(), statusMessages, trade, transfer);
 			   message.setStatus(wf.getOrgStatus());
+			   if(wf.isTask())
+				   message.setTaskID(1);  // this will publish task for task Station.
 			   if(message.getStatus().equalsIgnoreCase("CANCELLED")) {
 				  // message.setSubAction("CANCEL");
 			   } else {
@@ -1418,6 +1531,18 @@ return status;
 		
 		String sql = " messConfigID="+messageConfigid+" and tradeID ="+tradeID+" and eventType='"+eventType+"' and triggerON ='"+triggerON+"' order by id desc";
 		 return  getMessagesOnWhere(sql);
+		
+	}
+	private Collection getTransferOnWhere(String sql) {
+		return TransferSQL.selectWhere(sql, dsSQL.getConn());
+	}
+	@Override
+	public Collection getTransferOnTradeWithNoCancelStatus(int tradeID)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		String sqlwhere = " tradeid = " + tradeID + " and status not in ('CANCELLED') and action not in ('CANCEL') " ; 
+		return getTransferOnWhere(sqlwhere);
+		
 		
 	}
 
