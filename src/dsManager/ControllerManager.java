@@ -14,6 +14,8 @@ import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import logAppender.TransferServiceAppenderLog;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import dsEventProcessor.EventProcessor;
@@ -64,6 +66,7 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 	 }
 	 public ControllerManager(String host,String hostName,String managerName,Users user) {
 		 de =ServerConnectionUtil.connectServer(host, 1099,commonUTIL.getServerIP(),managerName,user);
+		
 		 this.hostName = hostName;
 		 this.managerName = managerName;
 	 }
@@ -183,7 +186,7 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 			// TODO Auto-generated catch block
 if(managerThread.isInterrupted()) {
 	System.out.println(manager.getManagerName() + " stop");
-
+	TransferServiceAppenderLog.printLog("DEBUG", "TransferService is stop ");
 	
 	commonUTIL.display(manager.getManagerName(), manager.getManagerName() +"  is stop");
 	//System.exit(0);
