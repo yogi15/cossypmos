@@ -15,6 +15,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.ServerNotActiveException;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -59,7 +60,7 @@ public class ServerControllerImp  extends ServerManager implements RemoteDeal ,R
  static  ConcurrentHashMap<String,String> runningEngines = new ConcurrentHashMap<String,String>();
    ConcurrentHashMap<Integer,Users> connectedUserData  = new ConcurrentHashMap<Integer,Users>();
 
-  static ConcurrentHashMap<String,Users> monitorConnectedUserData  = new ConcurrentHashMap<String,Users>();
+  static HashMap<String,Users> monitorConnectedUserData  = new  HashMap<String,Users>();
   static boolean holdRemoveEngineSignals = false;
 static ConcurrentHashMap<String, String> engineSignals = new ConcurrentHashMap<String, String> ();
    static int clientID = 1544;
@@ -219,12 +220,25 @@ static ConcurrentHashMap<String, String> engineSignals = new ConcurrentHashMap<S
 public ServerBean connect(String username,String password) throws RemoteException {
 	// TODO Auto-generated method stub
 	ServerBean sbean = new ServerBean();
+	Users user = (Users) UsersSQL.selectUsers(username, password, dsSQL.getConn());
+	
+	if(user == null) {
+		commonUTIL.display("INFO", "Connect "+user.getUser_name() +" Not Register in Database");
+		return sbean;
+		
+	}
+	try {
+		user.setHostName(java.rmi.server.RemoteServer.getClientHost());
+	} catch (ServerNotActiveException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 	sbean.set_dataServerName(sconn.getdefault()._dataServerName);
 	sbean.setRmiServices(sconn.getdefault().getRmiServices());
 	sbean.set_rmiPort(sconn.getdefault()._rmiPort);
 	sbean.set_hostName(sconn.getdefault()._hostName);
 	sbean.setWindowSetting("String");
-	Users user = (Users) UsersSQL.selectUsers(username, username, dsSQL.getConn());
+	
 	sbean.setClientID(clientID++);
 	synchronized (connectedUserData) {
 		connectedUserData.put(sbean.getClientID(), user);
@@ -397,6 +411,7 @@ public void removeEngine(String engineName,int clientID) {
     		Users user = monitorConnectedUserData.get(name+"_"+clientID);
     		user.setApplicattionNameLoginOn("NONE");
     		monitorConnectedUserData.put(name+"_"+clientID,user);
+    		System.out.println("Client ID " +clientID + " Disconneted from .... " + user.getHostName() + " "+ user.getUser_name() + " " + user.getApplicattionNameLoginOn());
     		adminEvent.setUser(user);
     		
     		try {
@@ -440,16 +455,23 @@ public ServerBean connect(String username, String password,
 		String applicationName) throws RemoteException {
 	// TODO Auto-generated method stub
 	ServerBean sbean = new ServerBean();
-	sbean.set_dataServerName(sconn.getdefault()._dataServerName);
-	sbean.setRmiServices(sconn.getdefault().getRmiServices());
-	sbean.set_rmiPort(sconn.getdefault()._rmiPort);
-	sbean.set_hostName(sconn.getdefault()._hostName);
-	sbean.setWindowSetting("String");
-	Users user = (Users) UsersSQL.selectUsers(username, username, dsSQL.getConn());
+	
+	Users user = (Users) UsersSQL.selectUsers(username, password, dsSQL.getConn());
+	if(user == null) {
+		commonUTIL.display("INFO", "Connect "+user.getUser_name() +" Not Register in Database");
+		
+	} else {
+		sbean.set_dataServerName(sconn.getdefault()._dataServerName);
+		sbean.setRmiServices(sconn.getdefault().getRmiServices());
+		sbean.set_rmiPort(sconn.getdefault()._rmiPort);
+		sbean.set_hostName(sconn.getdefault()._hostName);
+		sbean.setWindowSetting("String");
+	
 	sbean.setClientID(clientID++);System.out.println(  applicationName + "ServiceManager"+applicationName+"  to Server Connected ... with id " + sbean.getClientID() + sconn.getdefault()._hostName  + " with user " + user.getUser_name());
 	synchronized (connectedUserData) {
 		connectedUserData.put(sbean.getClientID(), user);
 		
+	}
 	}
 	return sbean;
 }
@@ -458,8 +480,15 @@ public ServerBean connect(String username, String password,
 public ServerBean connect(Users user1,
 		String applicationName) throws RemoteException {
 	// TODO Auto-generated method stub
+	Users user = null;
 	try {
-		System.out.println(java.rmi.server.RemoteServer.getClientHost());
+	//	System.out.println(java.rmi.server.RemoteServer.getClientHost());
+		user = (Users) UsersSQL.selectUsers(user1.getUser_name(), user1.getPassword(), dsSQL.getConn());
+		if(user == null) {
+			ServerBean sbean = new ServerBean();
+			return sbean;
+		}
+		user.setHostName(java.rmi.server.RemoteServer.getClientHost());
 	} catch (ServerNotActiveException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -470,8 +499,9 @@ public ServerBean connect(Users user1,
 	sbean.set_rmiPort(sconn.getdefault()._rmiPort);
 	sbean.set_hostName(sconn.getdefault()._hostName);
 	sbean.setWindowSetting("String");
-	Users user = (Users) UsersSQL.selectUsers(user1.getUser_name(), user1.getPassword(), dsSQL.getConn());
+	
 	sbean.setClientID(clientID++);
+	
 	synchronized (connectedUserData) {
 		connectedUserData.put(sbean.getClientID(), user);
 			}

@@ -121,8 +121,9 @@ try {
 
 	remoteDeal	= (RemoteDeal) sutil.getRMIService(sutil.serverName);
 			ServerBean s = (ServerBean) remoteDeal.connect(user.getUser_name(),user.getPassword(), applicationName);
-			
-			
+			if(s.getClientID() == 0) {
+				return null;
+			}
 				sutil.set_dataServerName(s.get_dataServerName()); 
 			//	sutil.set_dataServerName(s.get_dataServerName()); 
 				//sutil.set_dataServerName(s.get_dataServerName()); 
