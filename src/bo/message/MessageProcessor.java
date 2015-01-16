@@ -109,8 +109,7 @@ public class MessageProcessor extends Thread {
 		Hashtable<String,Vector<Message>> filterMessages = new Hashtable<String,Vector<Message>>();
 		Vector<Message> messages = new Vector<Message>();
 		if(messConfigs == null || messConfigs.isEmpty() ) {
-			commonUTIL.display("MessageProcessor" , "Message Configuration not Found on " + event.getEventType() + " for Proudct " + trade.getProductType() 
-					+ " subType " + trade.getTradedesc1() + "tradeEvent " + event.getEventType() + " and selected PO");
+			commonUTIL.display("MessageProcessor" , "Message Configuration not Found on " + event.getEventType() + " for Proudct " + trade.getProductType() + " subType " + trade.getTradedesc1());
 			manager.updateEventProcess(event);
 			return;
 		}
@@ -289,11 +288,11 @@ public class MessageProcessor extends Thread {
 			synchronized (messageConfigs) {
 				messConfigs = messageConfigs.get(messConfig);				
 			}
-			if(messConfigs == null || messConfig.isEmpty()) {
+			if(messConfigs == null) {
 				messConfigs = (Vector<MessageConfig>) refData.getMessageConfig(trade.getProductType(), trade.getTradedesc1(), tradeEvent.getEventType(), getBook(trade.getBookId()).getLe_id());
 			   if(messConfigs != null)
 				messageConfigs.put(messConfig, messConfigs);
-			} 
+			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
