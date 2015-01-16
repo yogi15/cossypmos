@@ -7,7 +7,7 @@ import constants.logConstants;
 public class TransferServiceAppenderLog {
 	
 	static Logger logger = Logger.getLogger(
-			TransferServiceAppenderLog.class.getName());
+			"TransferServiceAppenderLogger");
 	
 	public static void printLog(String logType, String msg) {
 
@@ -17,14 +17,10 @@ public class TransferServiceAppenderLog {
 			logger.info(msg);
 			return;
 		case 2:
-			logger.debug(msg);
-			
-			return;
-
-		
+			logger.debug(msg);			
+			return;		
 		case 3:
-			logger.error(msg);
-			
+			logger.error(msg);			
 			return;
 
 		}
