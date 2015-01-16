@@ -7,6 +7,10 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.logging.Log;
+
+import logAppender.TransferServiceAppenderLog;
+
 import util.commonUTIL;
 
 import apps.window.staticwindow.StartDataUPWindow;
@@ -97,10 +101,17 @@ public class TransferManager extends ControllerManager {
 
 	public TransferManager(String host,String hostName,String managerName,TransferManagerStartup startUpManager ) {
 		
-		super(host,hostName,managerName);
+		super(host,hostName,managerName,startUpManager.getUser());
+		TransferServiceAppenderLog.printLog("INFO", "TransferService connecting... to "+ host + " "+hostName + " with User "+startUpManager.getUser().getUser_name());
 		this.startUpManager = startUpManager;
 		
 		try {
+			if(getDe() == null) {
+				TransferServiceAppenderLog.printLog("INFO", "TransferService not getting connection <<<<<<<<<<<<<<<<<<<< on "+ host + " "+hostName + " with User "+startUpManager.getUser().getUser_name());
+				return;
+			} 
+			TransferServiceAppenderLog.printLog("INFO", "TransferService connected >>>>>>>>>>>>>>>>>>>>> on "+ host + " "+hostName + " with User "+startUpManager.getUser().getUser_name());
+			
 			processor = new TransferProcessor();		
 			remoteBO = (RemoteBOProcess) getDe().getRMIService("BOProcess");
 			remoteTrade = (RemoteTrade) getDe().getRMIService("Trade");
@@ -114,7 +125,8 @@ public class TransferManager extends ControllerManager {
 			processor.setRefData(refData);
 			processor.setRemoteTrade(remoteTrade);
 	   	    processor.setTransferManager(this);
-	   	    if(eventNotProcess.size() > 0) {
+	   	    
+	   	    if(!commonUTIL.isEmpty(eventNotProcess) && eventNotProcess.size() > 0) {
 	   	    	for(int i=0;i<eventNotProcess.size();i++) {  // first process all event are not consumed. 
 	   	    		EventProcessor event = eventNotProcess.get(i); 
 	   	    		handleEvent(event);
@@ -126,6 +138,8 @@ public class TransferManager extends ControllerManager {
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			commonUTIL.displayError("TransferManager", "In Constructor", e);
+			TransferServiceAppenderLog.printLog("ERROR", "TransferService  getting Error on Startup "+e);
+			
 		}
    		
    		
@@ -137,23 +151,32 @@ public class TransferManager extends ControllerManager {
 		public void publishStartEvent(String engineName,String siginal) {
 			
 			try {
+		
 				remoteAdmin.addEngines(engineName+"_"+siginal,startUpManager.getClientID(),startUpManager.getUser());
+			
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				commonUTIL.displayError("TransferManager", "publishStartEvent", e);
+				TransferServiceAppenderLog.printLog("ERROR", "TransferService getting Error on publishing SiginalEvents "+e);
+				
 			}
 			
 		
 		
 	}
-
+// this event is used when transfer event successfully executed the Event.
 public void updateEventProcess(EventProcessor event) {
 	    try {
+	    		
 	    	event.setSubscribableList("Transfer");
 			remoteTrade.isEventExceuted(event);
+			 TransferServiceAppenderLog.printLog("DEBUG", "TransferService processed event "+event.getEventid() + " on event for Trade event "+event.getEventType());
+				
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// TODO Auto-generated catch blockcommonUTIL.displayError("TransferManager", "publishStartEvent", e);
+			commonUTIL.displayError("TransferManager", "updateEventProcess", e);
+			TransferServiceAppenderLog.printLog("ERROR", "TransferService getting Error on updateEventProcess "+e);
+			
 		}
 }
 	
@@ -177,8 +200,11 @@ public void updateEventProcess(EventProcessor event) {
 	//	System.out.println(event.getEventType() + " " + event.getClassName());
 		if(event instanceof AdminEventProcessor ) {
 			  AdminEventProcessor  adminEvent = (AdminEventProcessor) event;
+				
 			  if(adminEvent.getEngineStartedSignal().contains(managerName))  {
 				  if(adminEvent.getEngineStartedSignal().contains(managerName)) {
+					  TransferServiceAppenderLog.printLog("DEBUG", "TransferService recevied Admin Event to stop TransferService");
+						
 				  if(adminEvent.getClientID() == startUpManager.getClientID())
 				     startUpManager.stop();
 				  }
@@ -190,30 +216,33 @@ public void updateEventProcess(EventProcessor event) {
 		//	System.out.println("Starting of  ****** " +   tradeEvent.getTradeID() + " " + transferEvents.size());
 			//System.out.println(tradeEvent.getTrade().getId());
 			if(transferTriggerEvts.contains(event.getEventType())) {
-				 
-					    			     				   
+				  TransferServiceAppenderLog.printLog("DEBUG", "TransferService starting processing  TransferEvent for Trade "+tradeEvent.getTradeID() + " on event of  "+event.getEventType());
+					
 					      
 					        synchronized (transferEvents) {
 					        	if( tradeEvent.getTrade() == null) {
 					        		Trade trade;
 									try {
 										trade = remoteTrade.getTradeOnVersion(tradeEvent.getObjectID(),tradeEvent.getObjectVersionID());
+										if(trade != null) 
 										tradeEvent.setTrade(trade);
 									} catch (RemoteException e) {
 										// TODO Auto-generated catch block
 										commonUTIL.displayError("TransferManager", "handleEvent", e);
+										TransferServiceAppenderLog.printLog("ERROR", "TransferService getting Error HandleEvent for Executing Events "+e);
+										
 									}
 					        		
 					        	}
 					        	if(!isDuplicateEvent(tradeEvent.getTrade())) {
-					        		  System.out.println(" adding at  counter *****  = " + counter + tradeEvent.getTrade().getId() + " " + tradeEvent.getTrade().getStatus() + " " + tradeEvent.getTrade().getVersion());
+					        		//  System.out.println(" adding at  counter *****  = " + counter + tradeEvent.getTrade().getId() + " " + tradeEvent.getTrade().getStatus() + " " + tradeEvent.getTrade().getVersion());
 					        	       
 					        		  balance.put(counter, tradeEvent);
 					        		 
 					        		  duplicateEventCheck.put(tradeEvent.getTrade().getId()+"_"+tradeEvent.getTrade().getStatus()+"_"+tradeEvent.getTrade().getVersion(),tradeEvent.getTrade().getId());
 					        		  counter = counter + 1;
 					        	} else {
-					        		  System.out.println(" Notting addding value = " + counter + tradeEvent.getTrade().getId() + " " + tradeEvent.getTrade().getStatus() + " " + tradeEvent.getTrade().getVersion());
+					        		//  System.out.println(" Noting addding value = " + counter + tradeEvent.getTrade().getId() + " " + tradeEvent.getTrade().getStatus() + " " + tradeEvent.getTrade().getVersion());
 					        	}
 					        	 
 							}
@@ -225,6 +254,8 @@ public void updateEventProcess(EventProcessor event) {
 				
 		    	
 			} else {
+				 TransferServiceAppenderLog.printLog("DEBUG", "TransferService starting not processing TransferEvent for Trade "+tradeEvent.getTradeID() + " on event of  "+event.getEventType());
+					
 			updateEventProcess(tradeEvent);
 			}
 			
@@ -233,13 +264,16 @@ public void updateEventProcess(EventProcessor event) {
 		}
 		catch(NullPointerException e) {
 			commonUTIL.displayError("TransferManager", "HandleEvent", e);
+			
+			TransferServiceAppenderLog.printLog("ERROR", "TransferService getting Error HandleEvent for Executing Events "+e);
+			
 		}
 	//	setNewEvent(false);
 		//tradeEvent = null;
 	}
 	
 	
-	
+	// this method is called when trade event is consumed by transfer service and publish transfer event. 
 public void publishTransfer(Trade trade) {
 		
 		
@@ -250,14 +284,21 @@ public void publishTransfer(Trade trade) {
 				 for(int i=0;i<transfers.size();i++)
 					try {
 						commonUTIL.display("TransferManager","publishing transfer id "+ transfers.get(i).getId() + " for trade   "+ trade.getId() + "  on event " );
+						  TransferServiceAppenderLog.printLog("DEBUG", "TransferService creating  TransferEvent for"+transfers.get(i).getId() + " on Trade trade "+trade.getId());
+							
 						TransferEventProcessor event = getTransferEvent(transfers.get(i),trade);
 						if(event != null) {
 						  remoteTrade.publishnewTrade("TRANS_NEWTRANSFER","TRADE",event);
+						  TransferServiceAppenderLog.printLog("DEBUG", "TransferService published  TransferEvent with"+event.getEventType() + " on Trade trade "+trade.getId());
+							
 						} else {
-							commonUTIL.display("TransferManager","Event not publish Trade is Cancel or Terminated  <<<<<<<<<<<<< ");						}
+							commonUTIL.display("TransferManager","Event not publish Trade is Cancel or Terminated  <<<<<<<<<<<<< ");						
+							}
 					} catch (RemoteException e) {
 						// TODO Auto-generated catch block
 						commonUTIL.displayError("TransferManager", "publishTransfer", e);
+						TransferServiceAppenderLog.printLog("ERROR", "TransferService getting Error in publishTransfer Events "+e);
+						
 					}
 				 
 				// transferexist = false;
@@ -265,15 +306,16 @@ public void publishTransfer(Trade trade) {
 			
 		
 	}
-public Thread init(TransferManager amanager,Trade trade) {
-	
-	transferManagerThread = new Thread(amanager);
-	return transferManagerThread;
-}
 
 
 
 public TransferEventProcessor getTransferEvent(Transfer transfer,Trade trade ) {
+	if(transfer == null) {
+		TransferServiceAppenderLog.printLog("INFO", "TransferService not able to create TransferEvent on trade "+trade.getId() +" <<<<<<<<<<<<< ");
+		return null;
+	}
+	
+	
 	TransferEventProcessor transferEvent = new TransferEventProcessor();
 	transferEvent.setTransferID(transfer.getId());
 	transferEvent.setTradeID(transfer.getTradeId());
@@ -283,12 +325,13 @@ public TransferEventProcessor getTransferEvent(Transfer transfer,Trade trade ) {
 	transferEvent.setPublish(true);
 	transferEvent.setSavetoDB(true);
 	transferEvent.setEventType(transfer.getStatus()+"_"+transfer.getEventType());
+	
 	transferEvent.setType("Transfer");
 	transferEvent.setObjectID(transfer.getId());
 	transferEvent.setComments(" Transfer status  " + transfer.getStatus() + " for Action "+transfer.getAction() + " on Trade_"+trade.getId()+"_Version_"+trade.getVersion() );
+	TransferServiceAppenderLog.printLog("DEBUG", "TransferService creating  TransferEvent with"+transferEvent.getEventType() + " on Trade trade "+trade.getId());
 	
 	commonUTIL.display("TransferManager",transferEvent.getEventType());
-	commonUTIL.display("","");
 	return transferEvent;
 }
 
