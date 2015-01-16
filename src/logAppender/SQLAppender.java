@@ -5,8 +5,7 @@ import org.apache.log4j.Logger;
 import constants.logConstants;
 
 public class SQLAppender {
-	static Logger logger = Logger.getLogger(
-		SQLAppender.class.getName());
+	static Logger logger = Logger.getLogger("SQLLogger");
 
 
 
