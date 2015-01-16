@@ -5,6 +5,8 @@ import java.util.Vector;
 
 import javax.swing.plaf.synth.SynthDesktopIconUI;
 
+import logAppender.TransferServiceAppenderLog;
+
 import constants.SDIConstants;
 
 import productPricing.MMPricing;
@@ -91,9 +93,13 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 	@Override
 	public Vector<TransferRule> generateRules(Trade trade) {
 		// TODO Auto-generated method stub
+		TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting Called   ****** on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType());
+		
 		 Vector<Fees> fees = null;
 		 Vector<Sdi> sdis = null;
 		if(trade.isFXSwap()) {
+			TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting Called   ****** on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() +" FXSWap");
+			
 			return generateRulesForFXSwap(trade);
 		} else {
 			//try {
@@ -112,7 +118,10 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 			 Vector<TransferRule>  mmRules = new Vector<TransferRule>();
 			 LegalEntity po = null;
 			 if(trade.getType().equalsIgnoreCase(tradeTypeBUY)) {
-				
+				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule  ****** on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " ");
+				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule processing rules on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " "+tradeTypeBUY);
+				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule Starting for First Leg on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " "+tradeTypeBUY);
+							
 				 TransferRule ruleB = new TransferRule();
 				 ruleB.set_tradeId(trade.getId());
 				 ruleB.set_productId(trade.getProductId());
@@ -133,6 +142,8 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 					 
 				 ruleB.set_payerLegalEntityId(book.getLe_id()); // po role 
 				 Sdi paySdi = getSdiOnEntity(po.getId(),productType,trade.getCurrency(),SDIConstants.PO);
+				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting SDI for PaySdi on " +   trade.getId() + " on "+ trade.getCurrency()+ " for PO " + po.getName() + " sdi id == "+paySdi.getId());
+					
 				 setPOSdi(paySdi);
 					if(paySdi != null) {
 					ruleB.set_payerLegalEntityRole(paySdi.getRole());
@@ -152,6 +163,8 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 LegalEntity le =  (LegalEntity) getLegalEntity(trade.getCpID());
 				
 				 Sdi recSdi = getSdiOnEntity(trade.getCpID(),productType,trade.getCurrency(),SDIConstants.COUNTERPARY); // cp 
+				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting SDI for recSdi on " +   trade.getId() + " on "+ trade.getCurrency()+ " for LE " + le.getName() + " sdi id == "+recSdi.getId());
+					
 				 setCounterPartySDI(recSdi);
 			     if(trade.isMirrorTrade()) {
 			    	 recSdi = paySdi;
@@ -163,7 +176,9 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 			 }
 				 ruleB.set_payReceive(PAY);
 				 mmRules.addElement(ruleB);
-				
+				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule Ending for First Leg on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " "+tradeTypeBUY);
+				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule Starting for Second Leg on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " "+tradeTypeBUY);
+						
 				 TransferRule ruleS = new TransferRule();
 				 ruleS.setBookId(trade.getBookId());
 				 ruleS.set_tradeId(trade.getId());
@@ -186,6 +201,8 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleS.set_receiverLegalEntityId(ruleB.get_payerLegalEntityId());  // po 
 				 ruleS.set_receiverLegalEntityRole(ruleB.get_payerLegalEntityRole()); // po 
 				 recSdi = getSdiOnEntity(po.getId(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.PO); // po 
+				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting SDI for recSdi on " +   trade.getId() + " on "+trade.getTradedesc().substring(0, 3) + " for PO " + le.getName() + " sdi id == "+recSdi.getId());
+					
 				 if(recSdi != null) {
 				  ruleS.set__sMethod(recSdi);
 				  
@@ -195,6 +212,8 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleS.set_payerLegalEntityId(ruleB.get_receiverLegalEntityId()); // cp 
 				 ruleS.set_payerLegalEntityRole(ruleB.get_receiverLegalEntityRole()); //cp
 				 paySdi =getSdiOnEntity(trade.getCpID(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.COUNTERPARY); // cp 
+				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting SDI for recSdi on " +   trade.getId() + " on "+trade.getTradedesc().substring(0, 3) + " for PO " + le.getName() + " sdi id == "+recSdi.getId());
+					
 				 if(paySdi != null) {
 					ruleS.set_payerSDId(paySdi.getId());
 					ruleS.set_payerAgentID(paySdi.getAgentId());
@@ -209,6 +228,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 
 				 
 			 } else {
+				 
 				 TransferRule ruleB = new TransferRule();
 				 ruleB.set_tradeId(trade.getId());
 				 ruleB.set_productId(trade.getProductId());
@@ -237,8 +257,12 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleB.set_payReceive(RECEIVE);
 				 
 				 Sdi paySdi = getSdiOnEntity(trade.getCpID(),productType,trade.getCurrency(),SDIConstants.COUNTERPARY);  // cp 
+				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting SDI for paySdi on " +   trade.getId() + " on "+trade.getCurrency() + " for CounterParty " + le.getName() + " sdi id == "+paySdi.getId());
+					
 				 setCounterPartySDI(paySdi);
 				 Sdi recSdi = getSdiOnEntity(po.getId(),productType,trade.getCurrency(),SDIConstants.PO);  // po 
+				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting SDI for recSdi on " +   trade.getId() + " on "+trade.getCurrency() + " for PO " + le.getName() + " sdi id == "+recSdi.getId());
+					
 				 setPOSdi(recSdi);
 				 if(paySdi != null) {
 				 ruleB.set_payerLegalEntityRole(paySdi.getRole());  // cp
