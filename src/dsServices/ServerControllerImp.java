@@ -458,7 +458,7 @@ public ServerBean connect(String username, String password,
 	
 	Users user = (Users) UsersSQL.selectUsers(username, password, dsSQL.getConn());
 	if(user == null) {
-		commonUTIL.display("INFO", "Connect "+user.getUser_name() +" Not Register in Database");
+		commonUTIL.display("INFO", "Connect "+ username +" Not Register in Database");
 		
 	} else {
 		sbean.set_dataServerName(sconn.getdefault()._dataServerName);
