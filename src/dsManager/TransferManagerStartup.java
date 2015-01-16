@@ -3,6 +3,8 @@ package dsManager;
 import java.io.InterruptedIOException;
 import java.io.Serializable;
 
+import logAppender.TransferServiceAppenderLog;
+
 import beans.Users;
 
 import dsServices.EngineMonitorUtil;
@@ -38,7 +40,8 @@ public class TransferManagerStartup  extends ServiceManager  {
 		String hostName = commonUTIL.getLocalHostName();
 		String localHost = "localhost";
 		user = new Users();
-		user.setUser_name("DummyTransfer");
+		user.setUser_name("UserTransfer1");
+		user.setPassword("1");
 		user.setHostName(hostName);
 		user.setApplicattionNameLoginOn("TransferManager");
 		setUser(user);
@@ -64,9 +67,10 @@ public class TransferManagerStartup  extends ServiceManager  {
 //		System.out.println(t.getId());
 		
 		try {
-			
+
+			  TransferServiceAppenderLog.printLog("DEBUG", "TransferService Starting Stop process ");
 			amanager.publishStartEvent(managerName,"Stopped");
-			
+			TransferServiceAppenderLog.printLog("DEBUG", "TransferService Publish event to  Stop process ");
 			amanager.stop();
 			amanager = null;
 			throw new InterruptedIOException();
