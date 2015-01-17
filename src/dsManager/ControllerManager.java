@@ -2,7 +2,6 @@ package dsManager;
 
 import java.io.InterruptedIOException;
 import java.io.Serializable;
-import java.rmi.RemoteException;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
@@ -12,30 +11,24 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 
-import logAppender.TransferServiceAppenderLog;
+import logAppender.TransferServiceAppender;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
+import util.commonUTIL;
+import beans.Users;
 import dsEventProcessor.EventProcessor;
 import dsEventProcessor.TaskEventProcessor;
-import dsEventProcessor.TransferEventProcessor;
-import dsServices.RemoteBOProcess;
-import dsServices.RemoteMO;
-import dsServices.RemoteReferenceData;
-import dsServices.RemoteTrade;
 import dsServices.ServerConnectionUtil;
-import beans.Trade;
-import beans.Transfer;
-import beans.Users;
-import util.commonUTIL;
+import dsServices.ServiceManager;
 
 public abstract class ControllerManager  implements Runnable , ExceptionListener {
 	
 	 static private String hostName = "";
 	 public static  ServerConnectionUtil de = null;
 	 public String managerName = "";
+	 public ServiceManager serviceManager;
 	 public String queueName = "TRADE";
 	 Thread managerThread = null;
 	 public String getQueueName() {
@@ -70,10 +63,20 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 		 this.hostName = hostName;
 		 this.managerName = managerName;
 	 }
+	 public ControllerManager(String host,String hostName,String managerName,Users user,ServiceManager serviceManager) {
+		 de =ServerConnectionUtil.connectServer(host, 1099,commonUTIL.getServerIP(),managerName,user);
+		 this.serviceManager = serviceManager;
+		 this.hostName = hostName;
+		 this.managerName = managerName;
+	 }
 	@Override
 		public void onException(JMSException e) {
+		
 			commonUTIL.displayError( getManagerName(),"Error in listening" , e);
-			
+			TransferServiceAppender.printLog("ERROR", "TransferService getting Down as getting Error in listening JMS Service "+e);
+			if(serviceManager != null)
+			serviceManager.stop();
+			System.exit(0);
 		}
 
 		@Override
@@ -121,19 +124,26 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 				 } catch (java.lang.NullPointerException e) {
 						// TODO Auto-generated catch block
 					   commonUTIL.displayError("ControllerManager " +  getManagerName(), "run()", e);
-						//System.exit(0);
+					   if(serviceManager != null)
+							serviceManager.stop();
 					      
 					
 				} catch (java.lang.InterruptedException e) {
 					// TODO Auto-generated catch block
 					commonUTIL.display(manager.getManagerName(), manager.getManagerName() +"  is stop");
+					if(serviceManager != null)
+						serviceManager.stop();
 					//System.exit(0);
 				} catch (JMSException j) {
 					// TODO Auto-generated catch block
 					commonUTIL.display(manager.getManagerName(), manager.getManagerName() +"  is stop");
+					if(serviceManager != null)
+						serviceManager.stop();
 					//System.exit(0);
 				} catch(Exception e) {
 					 commonUTIL.displayError( getManagerName(), "run()", e);
+					 if(serviceManager != null)
+							serviceManager.stop();
 					// System.exit(0);
 				 
 				}
@@ -186,9 +196,11 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 			// TODO Auto-generated catch block
 if(managerThread.isInterrupted()) {
 	System.out.println(manager.getManagerName() + " stop");
-	TransferServiceAppenderLog.printLog("DEBUG", "TransferService is stop ");
+	TransferServiceAppender.printLog("DEBUG", "TransferService is stop ");
 	
 	commonUTIL.display(manager.getManagerName(), manager.getManagerName() +"  is stop");
+	if(serviceManager != null)
+		serviceManager.stop();
 	//System.exit(0);
 			}
 			
