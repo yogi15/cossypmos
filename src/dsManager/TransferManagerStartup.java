@@ -3,7 +3,9 @@ package dsManager;
 import java.io.InterruptedIOException;
 import java.io.Serializable;
 
-import logAppender.TransferServiceAppenderLog;
+import javax.jms.JMSException;
+
+import logAppender.TransferServiceAppender;
 
 import beans.Users;
 
@@ -45,7 +47,15 @@ public class TransferManagerStartup  extends ServiceManager  {
 		user.setHostName(hostName);
 		user.setApplicattionNameLoginOn("TransferManager");
 		setUser(user);
-		amanager = new TransferManager(localHost,hostName,managerName,this);
+		try {
+			amanager = new TransferManager(localHost,hostName,managerName,this);
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("TransferManagerStartUP", "Start ", e);
+			TransferServiceAppender.printLog("ERROR", "TransferService Shutdown not able to listen to Server "+e);
+			
+			System.exit(0);
+		}
 
 		
 		amanager.publishStartEvent(managerName,"Started");
@@ -68,9 +78,9 @@ public class TransferManagerStartup  extends ServiceManager  {
 		
 		try {
 
-			  TransferServiceAppenderLog.printLog("DEBUG", "TransferService Starting Stop process ");
+			  TransferServiceAppender.printLog("DEBUG", "TransferService Starting Stop process ");
 			amanager.publishStartEvent(managerName,"Stopped");
-			TransferServiceAppenderLog.printLog("DEBUG", "TransferService Publish event to  Stop process ");
+			TransferServiceAppender.printLog("DEBUG", "TransferService Publish event to  Stop process ");
 			amanager.stop();
 			amanager = null;
 			throw new InterruptedIOException();

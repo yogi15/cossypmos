@@ -2,6 +2,11 @@ package dsManager;
 
 import java.io.InterruptedIOException;
 
+import javax.jms.JMSException;
+
+import logAppender.MessageServiceAppender;
+import logAppender.TransferServiceAppender;
+
 import beans.Users;
 
 import util.commonUTIL;
@@ -38,16 +43,29 @@ public class MessageManagerStartup extends ServiceManager {
 	public void start() {
 		// TODO Auto-generated method stub
 		user = new Users();
-		user.setUser_name("DummyManager");
+		user.setUser_name("UserTransfer1");
+		user.setPassword("1");
 		user.setHostName(commonUTIL.getServerIP());
 		user.setApplicattionNameLoginOn("MessageApplication");
 		setUser(user);
 		String hostName = commonUTIL.getLocalHostName();
 		String localHost = "localhost";
-		amanager	= new MessageManager(localHost,hostName,managerName,this);
-		amanager.publishStartEvent(managerName,"Started",getClientID());
-		amanager.start(amanager);
-		
+		try {
+			amanager = new MessageManager(localHost,hostName,managerName,this);
+			if(amanager == null) {
+				amanager = null;
+				System.exit(0);
+			}
+			amanager.publishStartEvent(managerName,"Started",getClientID());
+			amanager.start(amanager);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("MessageManagerStartUP", "Start ", e);
+			MessageServiceAppender.printLog("ERROR", "MessageService Shutdown not able to listen to Server "+e);
+			
+			System.exit(0);
+		}
 		
 	}
 
@@ -55,6 +73,8 @@ public class MessageManagerStartup extends ServiceManager {
 	public void stop() {
 		// TODO Auto-generated method stub
 		try {
+			MessageServiceAppender.printLog("INFO", "MessageService Starting  Shutdown Process ");
+			
 			amanager.publishStartEvent(managerName,"Stopped",getClientID());
 			
 			amanager.stop();
@@ -63,6 +83,8 @@ public class MessageManagerStartup extends ServiceManager {
 		} catch (InterruptedIOException e) {
 			// TODO Auto-generated catch block
 			commonUTIL.display("MessageManager", "MessageManager is stop");
+			MessageServiceAppender.printLog("INFO", "MessageService   Shutdown Completed ");
+			
 			System.exit(0);
 		} finally {
 			amanager = null;

@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import logAppender.MessageServiceAppender;
+import logAppender.TransferServiceAppender;
+
 import util.commonUTIL;
 import beans.Message;
 import beans.StartUPData;
@@ -78,15 +81,30 @@ Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
 			remoteAdmin.addEngines(engineName+"_"+siginal,startUpManager.getClientID(),startUpManager.getUser());
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			commonUTIL.displayError("MessageManager", "publishStartEvent", e);
+			MessageServiceAppender.printLog("ERROR", "MessageService getting Error on publishing SiginalEvents "+e);
+			
 		}
 		
 	}
 	
 	public MessageManager(String host,String hostName,String managerName,MessageManagerStartup startUpManager) {
-		super(host,hostName,managerName);
+		
+		
+
+		super(host,hostName,managerName,startUpManager.getUser(),startUpManager);
+		MessageServiceAppender.printLog("INFO", "MessageService connecting... to "+ host + " "+hostName + " with User "+startUpManager.getUser().getUser_name());
+		
+		
 		this.startUpManager = startUpManager;
 		try {
+			if(getDe() == null) {
+				MessageServiceAppender.printLog("INFO", "MessageService not getting connection <<<<<<<<<<<<<<<<<<<< on "+ host + " "+hostName + " with User "+startUpManager.getUser().getUser_name());
+				//publishStartEvent(managerName,"Stopped",0);
+				return;
+			} 
+			MessageServiceAppender.printLog("INFO", "MessageService connected >>>>>>>>>>>>>>>>>>>>> on "+ host + " "+hostName + " with User "+startUpManager.getUser().getUser_name());
+			
 			processor = new MessageProcessor();
 			remoteBO = (RemoteBOProcess) getDe().getRMIService("BOProcess");
 			remoteTrade = (RemoteTrade) getDe().getRMIService("Trade");
@@ -111,6 +129,7 @@ Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			commonUTIL.displayError("MessageManager", "In Constructor", e);
+			MessageServiceAppender.printLog("ERROR", "MessageService  getting Error on Startup "+e);
 		}
    		
    		
@@ -126,6 +145,8 @@ Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
 		  if(adminEvent.getEngineStartedSignal().contains(managerName))  {
 			  if(adminEvent.getEngineStartedSignal().contains(managerName)) {
 				  if(adminEvent.getClientID() == startUpManager.getClientID()) {
+					  MessageServiceAppender.printLog("DEBUG", "MessageService recevied Admin Event to stop MessageService");
+						
 					     startUpManager.stop();
 					  }
 			  }
@@ -135,14 +156,16 @@ Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
 			
 			TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
 			//System.out.println(tradeEvent.getTrade().getId()); 
-			
+			 MessageServiceAppender.printLog("DEBUG", "MessageService Starting process Message for trade "+tradeEvent.getTrade().getId());
+				
 		    	processor.processMessage(tradeEvent);
 			    publishMessage(tradeEvent.getTrade(),null);
 			
 		}if(event instanceof TransferEventProcessor) {
 			TransferEventProcessor transferEvent = (TransferEventProcessor) event;
 			//System.out.println(transferEvent.getTrade().getId());
-			
+			 MessageServiceAppender.printLog("DEBUG", "MessageService Starting process Message for Transfer "+transferEvent.getTransfer().getId());
+				
 		    	processor.processMessage(transferEvent);
 			   publishMessage(transferEvent.getTrade(),transferEvent.getTransfer());
 			
@@ -153,9 +176,13 @@ public void updateEventProcess(EventProcessor event) {
 	    try {
 	    	event.setSubscribableList("Message");
 			remoteTrade.isEventExceuted(event);
+			MessageServiceAppender.printLog("DEBUG", "MessageService processed event "+event.getEventid() + " on event for Trade event "+event.getEventType());
+			
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			commonUTIL.displayError("MessageManager", "updateEventProcess", e);
+			MessageServiceAppender.printLog("ERROR", "MessageService getting Error on updateEventProcess "+e);
+			
 		}
 }
 	
@@ -169,15 +196,23 @@ public void publishMessage(Trade trade,Transfer transfer) {
 				 for(int i=0;i<messages.size();i++)
 					try {
 						commonUTIL.display("MessageManager"," publishing message id "+ messages.get(i).getId() + " for trade   "+ trade.getId() + "  on event " );
+						
 						MessageEventProcessor event = getMessageEvent(messages.get(i),transfer,trade);
+					//	MessageServiceAppender.printLog("DEBUG", "MessageService  publishing message id "+ messages.get(i).getId() + " for trade   "+ trade.getId() + "  on transfer  " +transfer.getId() + " on event type " + event.getEventType() + " "+event.getEventid());
+						
 						if(event != null) {
 						  remoteTrade.publishnewTrade("TRANS_NEWTRANSFER","TRADE",event);
+						  MessageServiceAppender.printLog("DEBUG", "MessageService  published message id "+ messages.get(i).getId() + " for trade   "+ trade.getId() + "  on transfer  " +transfer.getId() + " on event type " + event.getEventType() + " "+event.getEventid());
+							
+							
 						} //else {
 							//commonUTIL.display("MessageManager","Event not publish Trade is Cancel or Terminated  <<<<<<<<<<<<< ");						}
 					} 
 				 catch (RemoteException e) {
 						// TODO Auto-generated catch block
 						commonUTIL.displayError("MessageManager", "publishMessage", e);
+						MessageServiceAppender.printLog("ERROR", "MessageService getting Error on publishMessage save messages "+e);
+						
 					}
 				 
 				// transferexist = false;
@@ -207,6 +242,8 @@ public MessageEventProcessor getMessageEvent(Message message,Transfer transfer,T
 	
 	else 
 	messageEvent.setComments(" Message status on " + message.getStatus() + " for Action "+message.getAction() + " on Trade_"+trade.getId()+"+status_"+trade.getStatus());
+	
+	MessageServiceAppender.printLog("DEBUG", "MessageService creating  messageEvent with"+messageEvent.getEventType() + " on Trade trade "+trade.getId() );
 	
 	commonUTIL.display("MessageManager",messageEvent.getEventType());
 	commonUTIL.display("","");
@@ -241,6 +278,7 @@ public MessageEventProcessor getMessageEvent(Message message,Trade trade,Transfe
 	messageEvent.setType("Message");
 	messageEvent.setObjectID(message.getId());
 	messageEvent.setComments(" Message status on " + message.getStatus() + " for Action "+message.getAction() );
+	MessageServiceAppender.printLog("DEBUG", "MessageService creating  messageEvent with"+messageEvent.getEventType() + " on Trade trade "+trade.getId() + " on transfer id " + transfer.getId());
 	
 	commonUTIL.display("MessageManager",messageEvent.getEventType());
 	
