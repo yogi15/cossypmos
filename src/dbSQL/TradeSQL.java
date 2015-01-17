@@ -138,7 +138,7 @@ public class TradeSQL {
             try {
     stmt.close();
    } catch (SQLException e) {
-    // TODO Auto-generated catch block
+    
     commonUTIL.displayError("TradeSQL","remove",e);
    }
          }
@@ -193,8 +193,7 @@ public static int selectMaxID(Connection con) {
          PreparedStatement stmt = null;
          String sql = "";
    try {
-    
-    int j = 1;
+
     con.setAutoCommit(false);
    
     sql = getUpdateSQL(updateTrade);
@@ -216,7 +215,7 @@ public static int selectMaxID(Connection con) {
             try {
     stmt.close();
    } catch (SQLException e) {
-    // TODO Auto-generated catch block
+    
     commonUTIL.displayError("TradeSQL","edit",e);
    }
          }
@@ -246,7 +245,7 @@ protected static int selectMax(Connection con ) {
             try {
     stmt.close();
    } catch (SQLException e) {
-    // TODO Auto-generated catch block
+    
     commonUTIL.displayError("TradeSQL","selectMax",e);
    }
          }
@@ -259,7 +258,9 @@ protected static int selectMax(Connection con ) {
          int tradeId=0;
    try {
     con.setAutoCommit(false);
-   // System.out.println(con.getAutoCommit());
+    
+    String tradeDate = inserTrade.getAttributeValue("Trade Date");
+
     Trade trade = selectTrade(inserTrade.getId(), con);
     if( (trade != null) && (trade.getId()) > 0) {
       update(inserTrade, con);
@@ -270,9 +271,7 @@ protected static int selectMax(Connection con ) {
          tradeId = selectMax(con) +1;
     else 
     	tradeId = inserTrade.getAllocatedID();
-    
-   //  System.out.println(con.getAutoCommit());
-    int j = 1;
+
     stmt = dsSQL.newPreparedStatement(con, INSERT);
    
     stmt.setInt(1,tradeId);
@@ -282,7 +281,7 @@ protected static int selectMax(Connection con ) {
     stmt.setInt(3, inserTrade.getCpID());
     stmt.setString(4, inserTrade.getStatus());
     stmt.setString(5, inserTrade.getType());
-    stmt.setTimestamp(6, commonUTIL.getStringToTimestamp(inserTrade.getTradeDate()));
+    stmt.setTimestamp(6, commonUTIL.getStringToTimestamp(tradeDate));
     stmt.setInt(7, inserTrade.getBrokerID());
     stmt.setDouble(8, inserTrade.getTradeAmount());
     stmt.setString(9, inserTrade.getEffectiveDate());
@@ -355,7 +354,7 @@ protected static int selectMax(Connection con ) {
              
     
    } catch (SQLException e) {
-    // TODO Auto-generated catch block
+    
     commonUTIL.displayError("TradeSQL "," insert",e);
    }
          }
@@ -363,8 +362,7 @@ protected static int selectMax(Connection con ) {
   }
  
   protected static Collection selectTradec(int TradeID,Connection con ) {
-  
-   int j = 0;
+
          PreparedStatement stmt = null;
          Vector Trades = new Vector();
         
@@ -437,7 +435,7 @@ protected static int selectMax(Connection con ) {
             try {
     stmt.close();
    } catch (SQLException e) {
-    // TODO Auto-generated catch block
+    
     commonUTIL.displayError("TradeSQL ","selectMax",e);
    }
          }
@@ -445,7 +443,7 @@ protected static int selectMax(Connection con ) {
   }
  
   protected static Collection select(Connection con) {
-   int j = 0;
+
       PreparedStatement stmt = null;
       Vector Trades = new Vector();
      
@@ -518,7 +516,7 @@ protected static int selectMax(Connection con ) {
          try {
     stmt.close();
    } catch (SQLException e) {
-    // TODO Auto-generated catch block
+    
     commonUTIL.displayError("TradeSQL","selectMax",e);
    }
       }
@@ -528,7 +526,7 @@ protected static int selectMax(Connection con ) {
 
  
   protected static Trade selectTrade(int tradeId,Connection con ) {
-   int j = 0;
+
       PreparedStatement stmt = null;
       Vector Trades = new Vector();
       Trade trade = new Trade();
@@ -605,7 +603,7 @@ protected static int selectMax(Connection con ) {
          try {
     stmt.close();
    } catch (SQLException e) {
-    // TODO Auto-generated catch block
+    
     commonUTIL.displayError("TradeSQL",SELECTONE,e);
    }
       }
@@ -613,7 +611,7 @@ protected static int selectMax(Connection con ) {
   }
 
   public static Collection getRollBackHierarchies(int parentID,Connection con ) {
-	   int j = 0;
+
 	      PreparedStatement stmt = null;
 	      Vector Trades = new Vector();
 	      String sql = ROLLBACKHIERARCHIES;
@@ -685,7 +683,7 @@ protected static int selectMax(Connection con ) {
 	         try {
 	    stmt.close();
 	   } catch (SQLException e) {
-	    // TODO Auto-generated catch block
+	    
 	    commonUTIL.displayError("TradeSQL"," getRollOverHierarchies  " + sql,e);
 	   }
 	      }
@@ -693,7 +691,7 @@ protected static int selectMax(Connection con ) {
 	  }
   
   public static Collection getRollOverHierarchies(int parentID,Connection con ) {
-	   int j = 0;
+
 	      PreparedStatement stmt = null;
 	      Vector Trades = new Vector();
 	      String sql = ROLLOVERHIERARCHIES;
@@ -766,7 +764,7 @@ protected static int selectMax(Connection con ) {
 	         try {
 	    stmt.close();
 	   } catch (SQLException e) {
-	    // TODO Auto-generated catch block
+	    
 	    commonUTIL.displayError("TradeSQL"," getRollOverHierarchies  " + sql,e);
 	   }
 	      }
@@ -774,8 +772,7 @@ protected static int selectMax(Connection con ) {
 	  }
 
 public static Vector getXccySplitOnOffset(int tradeid, Connection con) {
-	// TODO Auto-generated method stub
-	int j = 0;
+
     PreparedStatement stmt = null;
     Vector Trades = new Vector();
     String sql = SELECTXCCYSPLIT;
@@ -849,7 +846,7 @@ public static Vector getXccySplitOnOffset(int tradeid, Connection con) {
        try {
   stmt.close();
  } catch (SQLException e) {
-  // TODO Auto-generated catch block
+  
   commonUTIL.displayError("TradeSQL"," getRollOverHierarchies  " + sql,e);
  }
     }
@@ -857,8 +854,7 @@ public static Vector getXccySplitOnOffset(int tradeid, Connection con) {
 }
 
 public static Vector getXccySplitOnChild(int tradeID, Connection con) {
-	// TODO Auto-generated method stub
-	 int j = 0;
+
      PreparedStatement stmt = null;
      Vector Trades = new Vector();
      String sql = SELECTXCCYSPLIT;
@@ -932,7 +928,7 @@ public static Vector getXccySplitOnChild(int tradeID, Connection con) {
         try {
    stmt.close();
   } catch (SQLException e) {
-   // TODO Auto-generated catch block
+   
    commonUTIL.displayError("TradeSQL"," getRollOverHierarchies  " + sql,e);
   }
      }
@@ -940,7 +936,7 @@ public static Vector getXccySplitOnChild(int tradeID, Connection con) {
 }
 
 public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
-	   int j = 0;
+	   
 	      PreparedStatement stmt = null;
 	      Vector Trades = new Vector();
 	      String sql = SELECTXCCYSPLIT;
@@ -1014,14 +1010,14 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 	         try {
 	    stmt.close();
 	   } catch (SQLException e) {
-	    // TODO Auto-generated catch block
+	    
 	    commonUTIL.displayError("TradeSQL"," getRollOverHierarchies  " + sql,e);
 	   }
 	      }
 	      return Trades;
 	  }
   public static Collection getXccySplit(int tradeID,Connection con ) {
-	   int j = 0;
+	   
 	      PreparedStatement stmt = null;
 	      Vector Trades = new Vector();
 	      String sql = SELECTXCCYSPLIT;
@@ -1095,7 +1091,7 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 	         try {
 	    stmt.close();
 	   } catch (SQLException e) {
-	    // TODO Auto-generated catch block
+	    
 	    commonUTIL.displayError("TradeSQL"," getRollOverHierarchies  " + sql,e);
 	   }
 	      }
@@ -1103,7 +1099,7 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 	  }
  
   protected static Collection selectOnWherecClause(String wsql,Connection con ) {
-	   int j = 0;
+	  
 	      PreparedStatement stmt = null;
 	      Vector Trades = new Vector();
 	      String sql = "";
@@ -1175,7 +1171,7 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 	         try {
 	    stmt.close();
 	   } catch (SQLException e) {
-	    // TODO Auto-generated catch block
+	    
 	    commonUTIL.displayError("TradeSQL"," selectWhere " + sql,e);
 	   }
 	      }
@@ -1210,7 +1206,7 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
     	         try {
     	    stmt.close();
     	   } catch (SQLException e) {
-    	    // TODO Auto-generated catch block
+    	    
     	    commonUTIL.displayError("TradeSQL"," selectOnWherecClauseReports " + sql,e);
     	   }
     	      }
@@ -1243,7 +1239,7 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
     	         try {
     	    stmt.close();
     	   } catch (SQLException e) {
-    	    // TODO Auto-generated catch block
+    	    
     	    commonUTIL.displayError("TradeSQL"," selectOnWherecClauseReports " + sql,e);
     	   }
     	      }
@@ -1269,7 +1265,7 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 		       //  try {
 		 //   stmt.close();
 		 //  } catch (SQLException e) {
-		    // TODO Auto-generated catch block
+		    
 		 //   commonUTIL.displayError("TradeSQL"," selectOnWherecClauseReports " + sqlw,e);
 		 //  }
 		      }
@@ -1277,8 +1273,7 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 			}
   
   private static Collection selectOnWherecClauseReports(String sqlw, Connection con) {
-		// TODO Auto-generated method stub
-	  int j = 0;
+		
       PreparedStatement stmt = null;
       Vector<Object> Trades = new Vector();
       String sql = sqlw;
@@ -1356,7 +1351,7 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
         	 if(stmt != null)
     stmt.close();
    } catch (SQLException e) {
-    // TODO Auto-generated catch block
+    
     commonUTIL.displayError("TradeSQL"," selectOnWherecClauseReports " + sql,e);
    }
       }
@@ -1364,7 +1359,7 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 	}
 
   public static Collection selectforOpen(String productType, Connection con ) {
-	   int j = 0;
+	   
 	      PreparedStatement stmt = null;
 	      Vector Trades = new Vector();
 	      String sql = SELECTOPEN + productType.toUpperCase().trim() +"' order by id desc" ;
@@ -1395,7 +1390,7 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 	         try {
 	    stmt.close();
 	   } catch (SQLException e) {
-	    // TODO Auto-generated catch block
+	    
 	    commonUTIL.displayError("TradeSQL"," selectWhere " + sql,e);
 	   }
 	      }
@@ -1404,33 +1399,33 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 
 public static Vector getMirrorTrade(int mirrorID,Connection con) {
 	String sql = " autotype = 'Original' and id ="+ mirrorID;
-	// TODO Auto-generated method stub
+	
 	return (Vector) selectOnWherecClause(sql,con);
 }
 public static Vector getMirrorTradeonB2B(int mirrorID,Connection con) {
 	String sql = " autotype = 'MIRROR' and id ="+ mirrorID;
-	// TODO Auto-generated method stub
+	
 	return (Vector) selectOnWherecClause(sql,con);
 }
 public static Vector geB2BTradeOnOriginalID(int b2bID,Connection con) {
 	String sql = " autotype = 'BackToBack' and id ="+ b2bID;
-	// TODO Auto-generated method stub
+	
 	return (Vector) selectOnWherecClause(sql,con);
 }
 public static Vector getB2BTradeonMirrorID(int mirrorTradeID,Connection con) {
 	String sql = " autotype = 'BackToBack' and mirrorid ="+ mirrorTradeID;
-	// TODO Auto-generated method stub
+	
 	return (Vector) selectOnWherecClause(sql,con);
 }
 public static Vector getOrginalTradeOnB2bID(int b2bID,Connection con) {
 	String sql = " autotype = 'Original' and b2bid ="+ b2bID;
-	// TODO Auto-generated method stub
+	
 	return (Vector) selectOnWherecClause(sql,con);
 }
 
 public static Vector getTradesOnB2bTrade(Trade b2bTrade,Connection con) {
 	String sql = " b2bid = " +  b2bTrade.getId() + " or  id  ="+b2bTrade.getMirrorID();
-	// TODO Auto-generated method stub
+	
 	return (Vector) selectOnWherecClause(sql,con);
 }
 
