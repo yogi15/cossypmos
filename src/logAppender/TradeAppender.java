@@ -8,7 +8,7 @@ import constants.logConstants;
 
 public class TradeAppender {
 
-	static Logger logger = Logger.getLogger(ProductAppender.class);
+	static Logger logger = Logger.getLogger(TradeAppender.class);
 	
 
 	
