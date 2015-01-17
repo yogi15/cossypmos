@@ -4,6 +4,9 @@ import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import logAppender.MessageServiceAppender;
+import logAppender.TransferServiceAppender;
+
 import util.commonUTIL;
 
 import beans.Book;
@@ -82,9 +85,12 @@ public class MessageProcessor extends Thread {
 		// TODO Auto-generated method stub
 		Trade trade = null;
 		Transfer transfer = null; 
+		
 		if(event instanceof TradeEventProcessor) {
-			TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
 			
+			TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Entered in  processing of   ****** " +   trade.getId() + " on "+ trade.getStatus() + " status ");
+				
 			trade = tradeEvent.getTrade();
 			if(trade == null) {
 				try {
@@ -100,36 +106,62 @@ public class MessageProcessor extends Thread {
 			duplicateEventCheck.put(trade.getId()+"_"+trade.getStatus()+"_"+trade.getVersion(),tradeEvent.getEventid());
 		}
 		if(event instanceof TransferEventProcessor) {
+			
 			TransferEventProcessor transferEvent = (TransferEventProcessor) event;
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Entered in  processing of   ****** " +   transfer.getId() + " on "+ trade.getStatus() + " status ");
+			
 			trade = transferEvent.getTrade();
 			transfer = transferEvent.getTransfer();
 			duplicateEventCheck.put(transfer.getId()+"_"+transfer.getStatus()+"_"+transfer.getVersion(),transferEvent.getEventid());
 		}
 		Vector<MessageConfig> messConfigs = getMessageConfig(event,trade);
+		MessageServiceAppender.printLog("DEBUG", "MessageProcessor found   ****** " +   messConfigs.size() + " MessageConfig  on "+ trade.getStatus() + " status ");
+		
 		Hashtable<String,Vector<Message>> filterMessages = new Hashtable<String,Vector<Message>>();
 		Vector<Message> messages = new Vector<Message>();
 		if(messConfigs == null || messConfigs.isEmpty() ) {
+			MessageServiceAppender.printLog("DEBUG",  "Message Configuration not Found on " + event.getEventType() + " for Proudct " + trade.getProductType() + " subType " + trade.getTradedesc1());
+			
 			commonUTIL.display("MessageProcessor" , "Message Configuration not Found on " + event.getEventType() + " for Proudct " + trade.getProductType() + " subType " + trade.getTradedesc1());
 			manager.updateEventProcess(event);
 			return;
 		}
 		for(int i=0;i<messConfigs.size();i++) {
 			MessageConfig messConfig = messConfigs.get(i);
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor geneating MessageBOHandler for  productTYpe " + messConfig.getProductType() + " and subTYpe " +   trade.getTradedesc1());
+			
 			BOMessageHandler boHandler = BOMessageHandler.getBOHandler(messConfig.getProductType(), messConfig.getProductSubType());
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Found MessageBOHandler for  productTYpe " + messConfig.getProductType() + " and subTYpe " +   trade.getTradedesc1());
+			
 			if(boHandler == null) {
 				commonUTIL.display("MessageProcessor" , "Message Handler not Found  for Product " + trade.getProductType() + " subType " + trade.getTradedesc1());
+				MessageServiceAppender.printLog("DEBUG", "Message Handler not Found  for Product " + trade.getProductType() + " subType " + trade.getTradedesc1());
+				
 				manager.updateEventProcess(event);
 				return;
 			}
 			LegalEntity receiver = getLegalEntity(messConfig.getReceiverID());
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor get Receiver " + receiver.getName() + " for messConfig " +   messConfig.getId());
+			
 			LegalEntity sender = getLegalEntity(messConfig.getPoid());
-			sender.setRole("PO");// this is might be issue 
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor get Sender " + sender.getName() + " for messConfig " +   messConfig.getId());
+			
+			//sender.setRole("PO");// this is might be issue 
 			Message message = null;
 			if(event instanceof TradeEventProcessor) {
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor Starting process to Fill Message Object " + event.getEventType() + " for messConfig " +   messConfig.getId() + " "+trade.getId());
+				
 			    message = boHandler.fillMessage(trade, null, messConfig,"TRADE",null,(TradeEventProcessor) event,receiver,sender);
 			   // messages.add(message); 
+			    MessageServiceAppender.printLog("DEBUG", "MessageProcessor Starting process filtering of  Message Object " + event.getEventType() + " for messConfig " +   messConfig.getId() + " "+trade.getId());
+				   
 			    filterOldMessages(message.getMessageConfigID(),trade.getId(),message,"TRADE",filterMessages);
+			    MessageServiceAppender.printLog("DEBUG", "MessageProcessor Complete   filtering of  Message Object t" + event.getEventType() + " for messConfig " +   messConfig.getId() + " "+trade.getId());
+			    MessageServiceAppender.printLog("DEBUG", "MessageProcessor Starting saving and update  of  Message Object t" + event.getEventType() + " for messConfig " +   messConfig.getId() + " "+trade.getId());
+				
 				saveFilterMessages(filterMessages,trade,transfer,event);
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor Ending of  saving and update  of  Message Object t" + event.getEventType() + " for messConfig " +   messConfig.getId() + " "+trade.getId());
+				
 			}
 			if(event instanceof TransferEventProcessor) {
 				 message = boHandler.fillMessage(trade, transfer, messConfig,"TRANSFER",(TransferEventProcessor) event,null,receiver,sender);
@@ -189,6 +221,8 @@ public class MessageProcessor extends Thread {
 	
 	private void filterOldMessages(int messageConfigid,int objectID,Message message,String eventTriggerON,Hashtable<String,Vector<Message>> filterMessages) {
 		// TODO Auto-generated method stub
+		   MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages of  Message Object for messageCOnfig " + " "+messageConfigid + " for message eventType " + message.getEventType() + " " + message.getTradeId());
+			
 		Vector<Message> insertMessages = new Vector<Message>();
 		Vector<Message> updatetMessages = new Vector<Message>();
 		if(message == null )
@@ -196,30 +230,41 @@ public class MessageProcessor extends Thread {
 		//for(int i=0;i<messages.size();i++) {
 		//	Message message = messages.get(i);
 			Vector<Message> oldmess = getOLDMessage(messageConfigid,objectID,message.getEventType(),eventTriggerON);
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found "+oldmess.size() +"  oldmessages against messconfig " + message.getMessageConfigID() + " for trade "+ message.getTradeId() + " against event "+ message.getEventType() + " with subAction as " + message.getSubAction()); 
 			if(commonUTIL.isEmpty(oldmess)) {
-				
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found zero oldMessages " + message.getTradeId() + " eventTYpe "+message.getEventType());
 				
 				if(message.getEventType().contains("CANCELLED")) {
+					
 					message.setSubAction("CANCEL");  // this logic needs to be changed as first it must check if confirmation has been send or not if yes then send cancel messages.
 				} else {
 					message.setSubAction("NEW");
 				}
+
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction()); 
 				insertMessages.add(message);
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in filterOldMessage adding message in insert Vector as old message are zero "); 
+				
 			} else {
 				// checkout code need to added.
 			    if(!commonUTIL.isEmpty(oldmess) && oldmess !=null) {
-			    	
-			    		Message oldMessage = oldmess.get(0);  // always going to first record bz of we have used order id by in where clause.
+			    	MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found "+oldmess.size() + "  oldMessages on " + message.getTradeId() + " on eventTYpe "+message.getEventType());
+					
+			    		Message oldMessage = oldmess.get(0);  // always going to first(latest) record bz of we have used order id by in where clause.
 			    		
 			    			
 			    		if(oldMessage.getSubAction().equalsIgnoreCase("NEW") && isMessageWasSend(oldMessage,oldmess)) {
 			    			message.setSubAction("AMEND");
 			    			message.setLinkId(oldMessage.getId());
 			    			insertMessages.add(message);
+			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction() + " oldMessage found with subaction of oldMessage as "+oldMessage.getSubAction()); 
+			    			
 			    		} else {
 			    			message.setSubAction("NEW");
 			    			message.setId(oldMessage.getId());
 			    			message.setUpdateBeforeSend("TRUE");
+			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction() + " oldMessage found with subaction of oldMessage as "+oldMessage.getSubAction()); 
+			    			
 			    			updatetMessages.add(message);
 			    		//	message.setLinkId(oldMessage.getLinkId());
 			    			//message.
@@ -229,11 +274,14 @@ public class MessageProcessor extends Thread {
 			    			message.setLinkId(oldMessage.getId());
 			    			if(isMessageWasSend(oldMessage,oldmess)) {
 			    			 insertMessages.add(message);
+			    				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction() + " oldMessage found with subaction of oldMessage as "+oldMessage.getSubAction()); 
+					    		
 			    		} else {
 			    			message.setId(oldMessage.getId());
 			    			message.setSubAction("NEW");
 			    			message.setUpdateBeforeSend("TRUE");
-			    			updatetMessages.add(message);
+			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction() + " oldMessage found with subaction of oldMessage as "+oldMessage.getSubAction()); 
+					    	updatetMessages.add(message);
 			    		}
 			    				
 			    		}
@@ -345,6 +393,7 @@ public class MessageProcessor extends Thread {
 			Vector<Message> messagesData =	remoteBO.saveMesage(messages, sqlType,trade,transfer);
 			if(messagesData != null ) {
 				for(int i=0;i<messagesData.size();i++) {
+					
 					publishMessage.add(messagesData.get(i));
 				}
 			}
