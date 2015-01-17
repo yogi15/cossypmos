@@ -6,12 +6,17 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.jms.JMSException;
+
+import logAppender.TransferServiceAppender;
+
 
 import util.ClassInstantiateUtil;
 import util.commonUTIL;
 import dsEventProcessor.EventProcessor;
 import dsEventProcessor.TradeEventProcessor;
 import dsManager.TransferManager;
+import dsServices.EngineMonitorUtil;
 import dsServices.RemoteBOProcess;
 import dsServices.RemoteReferenceData;
 import dsServices.RemoteTrade;
@@ -33,6 +38,10 @@ public class TransferProcessor extends Thread {
 	Vector<String> cancelTransferTriggerEvents = new Vector<String>();
 	Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
 	int counter = 0;
+	public TransferProcessor() {
+		// TODO Auto-generated constructor stub
+		//util.startMonitor();
+	} 
 	public Vector<String> getFeeType() {
 		return FeeType;
 	}
@@ -109,29 +118,59 @@ public class TransferProcessor extends Thread {
 		// TODO Auto-generated method stub
 	//	System.out.println("  From TransferProcessor " + trade.getId());
 		System.out.println("Entered in  processing of   ****** " +   trade.getId() + " on "+ trade.getStatus() + " status ");
+		TransferServiceAppender.printLog("DEBUG", "TransferProcessor Entered in  processing of   ****** " +   trade.getId() + " on "+ trade.getStatus() + " status ");
+		
 		duplicateEventCheck.put(trade.getId()+"_"+trade.getStatus()+"_"+trade.getVersion(),trade.getId());
 		TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
 		String productType = trade.getProductType();
 		
 	//	getFeesType();
 		BOTransfer transferHandler = getTransferHandler(productType);
+		if(transferHandler == null)
+			return;
+		TransferServiceAppender.printLog("DEBUG", " TransferProcessor got TransferHandler for Product  "+productType);
+		
 		NettingConfig netConfig = getNettingConfig(trade.getCpID(), trade.getProductType());
+		if(netConfig == null) {
+			TransferServiceAppender.printLog("DEBUG", " TransferProcessor no NEttingConfig found for Product  "+productType);
+		} else {
+			TransferServiceAppender.printLog("DEBUG", " TransferProcessor got NEttingConfig for Product  "+productType);
+		}
+		
 		Vector<Transfer> transfers =  transferHandler.generateTransfer(trade,FeeType,netConfig);
+		if(commonUTIL.isEmpty(transfers)) {
+			TransferServiceAppender.printLog("DEBUG", " TransferProcessor no Transfers found for Product  "+productType);
+			return;
+		} else {
+			TransferServiceAppender.printLog("DEBUG", " TransferProcessor got "+ transfers.size() + " transfers for Product  "+productType);
+		}
 		Vector<Transfer> oldTransfers = getTransfersOnTrade(trade.getId());
+		if(commonUTIL.isEmpty(oldTransfers)) {
+			TransferServiceAppender.printLog("DEBUG", " TransferProcessor no oldTransfers found for trade   "+trade.getId());
+			return;
+		} else {
+			TransferServiceAppender.printLog("DEBUG", " TransferProcessor got "+ oldTransfers.size() + " for trade   "+trade.getId());
+		}
 		Hashtable transfersData = new Hashtable();
 		if(oldTransfers!= null && oldTransfers.size() > 0) {
+			TransferServiceAppender.printLog("DEBUG", " TransferProcessor starting process filtering of   transfers for trade "+trade.getId());
+			
 			       if(cancelTransferTriggerEvents.contains(trade.getStatus())) {
+			    	   
 		            transferHandler.filterTransfer(oldTransfers, transfers, trade,transfersData,true);
 			       } else  {
 		            	transferHandler.filterTransfer(oldTransfers, transfers, trade,transfersData,false);
 			       }
 		} else {
 			transfersData.put("insert", transfers);
+			TransferServiceAppender.printLog("DEBUG", " TransferProcessor got " + transfers.size() + " transfers  for trade "+trade.getId() + " to insert ");
+			
 		}
-
+		
 		if(trade.getId() >0 ) {
 			publishtransfers.removeAllElements();   // this is a problem  can caused data corruption
 			Enumeration<String > keys = transfersData.keys();
+			
 		     while(keys.hasMoreElements()) {
 		    	 String sqlType = keys.nextElement();
 		    	 Vector<Transfer> transfersD = (Vector) transfersData.get(sqlType);
@@ -142,7 +181,10 @@ public class TransferProcessor extends Thread {
 		     }
 		     
 		}
+		manager.updateEventProcess(tradeEvent);
 		System.out.println("End  of ****** processing " +   trade.getId() + " on "+ trade.getStatus() + " status ");
+
+		TransferServiceAppender.printLog("DEBUG", " TEnd  of ****** processing " +   trade.getId() + " on "+ trade.getStatus() + " status ");
 		//setTransfer(transfer);
 		
 	}
@@ -160,7 +202,15 @@ public class TransferProcessor extends Thread {
 				netConfig = netConfigV.elementAt(0);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
+			TransferServiceAppender.printLog("ERROR", " TransferProcessor got Error on  getNettingConfig for productType "+productType + " "+e);
+			
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			TransferServiceAppender.printLog("ERROR", " TransferProcessor got Error on  getNettingConfig for productType "+productType + " "+e);
+			
 		}
 		return netConfig;
 		
@@ -179,7 +229,7 @@ public class TransferProcessor extends Thread {
 				Thread.sleep(300);
 				
 					 
-					
+				
 				
 				
 				if(manager.balance.size() > counter) {
@@ -198,7 +248,14 @@ public class TransferProcessor extends Thread {
 									
 								
 							 processTransfer(tradeEvent,tradeEvent.getTrade());
-							 manager.publishTransfer(tradeEvent.getTrade());
+							 try {
+								manager.publishTransfer(tradeEvent.getTrade());
+							} catch (JMSException e) {
+								// TODO Auto-generated catch block
+								//e.printStackTrace();
+								TransferServiceAppender.printLog("ERROR", " TransferProcessor  Run method  "+ e);
+								
+							}
 							 }
 							 counter = counter + 1;
 							// eventUnderProcess = true;
@@ -210,7 +267,11 @@ public class TransferProcessor extends Thread {
 				 
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				TransferServiceAppender.printLog("ERROR", " TransferProcessor  Run method  "+ e);
+			}catch (NullPointerException e) {
+				commonUTIL.displayError("TransferProcessor", "Run method", e);
+
+				TransferServiceAppender.printLog("ERROR", " TransferProcessor  Run method  "+ e);
 			}
 		  
 		  }
@@ -241,6 +302,8 @@ public class TransferProcessor extends Thread {
 			
 		} catch (Exception e) {
         	commonUTIL.displayError("TransferProcessor", "getFeesType <<<<< not able get Fees Type ", e);
+        	TransferServiceAppender.printLog("ERROR", " TransferProcessor  getting error getFeesType <<<<< not able get Fees Type "+ e);
+			
         }
 	}
 
@@ -263,21 +326,31 @@ public class TransferProcessor extends Thread {
            //  productWindow = (BondPanel) 
         } catch (Exception e) {
         	commonUTIL.displayError("TransferProcessor", "getTransferHandler <<<<< not able to create Handler ", e);
+        	TransferServiceAppender.printLog("ERROR", "getTransferHandler <<<<< not able to create Handler  for " + productTransfer + " "+e);
+    		
         }
 
         return transferHandler;
     }
 	
 	private  Vector<Transfer>  saveTransfer(Vector<Transfer> transfers,String sqlType,String tradeStatus,NettingConfig netConfig,Trade trade) {
+		TransferServiceAppender.printLog("DEBUG", " TransferProcessor  "+ sqlType + " "+ transfers.size() + " transfers  for trade "+trade.getId());
 		
 		Vector<Transfer> transfs = null;
 		try {
 			 transfs = (Vector) remoteBOProcess.saveTransfers(transfers,sqlType,tradeStatus,netConfig,trade);
 			
 			//remoteBOProcess.publishnewTransfer(messageIndicator, messageType, transfs);
-		} catch (RemoteException e) {
+		} catch (NullPointerException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			commonUTIL.displayError("TransferProcessor","saveTransfer", e);
+			TransferServiceAppender.printLog("ERROR", " TransferProcessor  getting error on transfer for "+ sqlType  + "  against  trade "+trade.getId() +" "+ e);
+			
+		}catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("TransferProcessor","saveTransfer", e);
+			TransferServiceAppender.printLog("ERROR", " TransferProcessor  getting error on transfer for "+ sqlType  + "  against  trade "+trade.getId() + " "+ e);
+			
 		}
 		return transfs;
 	}
@@ -286,11 +359,13 @@ public class TransferProcessor extends Thread {
 	private Vector getTransfersOnTrade(int id) {
 		Vector<Transfer> transfers = null;
 		    try {
-		    	transfers = (Vector)	remoteBOProcess.getTransferOnTrade(id);
+		    	transfers = (Vector)	remoteBOProcess.getTransferOnTradeWithNoCancelStatus(id);
 		    	return transfers;
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 			commonUTIL.displayError("TransferProcessor " ,"getTransfersOnTrade " , e);
+			TransferServiceAppender.printLog("ERROR", " TransferProcessor  getting error to get transfer OnTradeWithNoCancelStatus for trade  "+id + " "+ e);
+			
 			return null;
 			}
 	}
