@@ -5,8 +5,8 @@ import java.util.Hashtable;
 public class logConstants {
 
 	public static Hashtable<String, Integer> logTypes = new Hashtable<String, Integer>();
-	public static final String ERROR = "error";
-	public static final String INFO = "info";
+	public static final String ERROR = "ERROR";
+	public static final String INFO = "INFO";
 	
 	public static final String SUCCESSFULLY_SAVED = "Successfully saved with Id and ISIN no: "; 
 	
@@ -21,7 +21,7 @@ public class logConstants {
 
 	static {
 		
-		logTypes.put(ERROR, 1);
+		logTypes.put(ERROR, 2);
 		logTypes.put(INFO, 1);
 		
 	}
