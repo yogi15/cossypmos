@@ -95,7 +95,8 @@ public class FilterValues {
 		replaceColumnNameOnSQL.put("Trade.Bond.Amount", "Trade.Nominal Bond_Amount");
 		replaceColumnNameOnSQL.put("Trade.Broker", "(select NVL(NAME,'') from LE where id= Trade.BrokerId)Broker_Name");
 		replaceColumnNameOnSQL.put("Trade.Bond.Description","Trade.TradeDesc Bond_Description");
-		replaceColumnNameOnSQL.put("Trade.FX.CurrencyPair","Trade.TradeDesc FX_CUrrencyPair");
+		replaceColumnNameOnSQL.put("Trade.FX.CurrencyPair","Trade.TradeDesc FX_CurrencyPair");
+		replaceColumnNameOnSQL.put("Trade.CurrencyPair","Trade.TradeDesc CurrencyPair");
 		replaceColumnNameOnSQL.put("Trade.Bond.Nominal","Trade.Nominal Bond_Quantity");
 		replaceColumnNameOnSQL.put("Trade.Bond.Quantity","Trade.Quantity Bond_Quantity");
 		replaceColumnNameOnSQL.put("Trade.FX.FAR_EndDate","to_char(to_date(substr(Trade.EffectiveDate,1,10), 'dd/mm/yyyy'), 'dd/mm/yyyy') FX_FAR_EndDate");
@@ -182,6 +183,8 @@ public class FilterValues {
 		columnNames.put("TransferId", "ID");
 		columnNames.put("TransferType", "TransferType");
 		columnNames.put("TransferEventType", "EventType");
+		columnNames.put("TransferEventType", "EventType");
+		columnNames.put("OpenpositionDate", "OpenpositionDate");
 		
 		numberDataTypes.put("Book", "Bookid");
 		numberDataTypes.put("LegalEntity", "id");
@@ -666,6 +669,12 @@ public class FilterValues {
 					if (i != jobdetails.size() - 1) {
 						where = where + " and ";
 					}
+				} else if (bean.getColumnName().equals("OpenpositionDate")) {
+
+					where = where 
+							+ tableNames.get(tableName1).toLowerCase() + "."
+							+ createCriteria(bean, tableName1) ;
+
 				} else if (bean.getColumnName().endsWith("Date")) {
 
 					where = where + "  trunc("
@@ -910,7 +919,18 @@ public class FilterValues {
 
 	private String createCriteria(FilterBean bean, String tableName1) {
 		String criteria = "";
-		if (bean.getColumnName().endsWith("Date")) {
+		
+		if (bean.getColumnName().endsWith("OpenpositionDate")) {
+			criteria = columnNames.get(bean.getColumnName())
+			+ getDatesWhereClause(
+					bean.getColumnValues(),
+					bean.getAnd_or(),
+					bean.getSearchCriteria(),
+					tableNames.get(tableName1) + "."
+							+ columnNames.get(bean.getColumnName()));
+			
+		} else if (bean.getColumnName().endsWith("Date")) {
+			
 			criteria = columnNames.get(bean.getColumnName())
 					+ ") "
 					+ " "
@@ -945,8 +965,13 @@ public class FilterValues {
 			
 		} else if (searchCriteria.equalsIgnoreCase("equal")) {
 			
-			dateWhereClause = " = to_date('" + startDate.trim()
-			+ "', 'dd/MM/YYYY')";
+			if (!columnName.contains("OpenpositionDate")) {
+				dateWhereClause = " = to_date('" + startDate.trim()
+				+ "', 'dd/MM/YYYY')";
+			} else {
+				dateWhereClause = " like '"+ startDate.trim() + "'";
+			}
+			
 			
 		} else {
 			dateWhereClause = searchCriteria + "  to_date('" + startDate.trim()
