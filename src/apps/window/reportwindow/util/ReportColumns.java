@@ -108,6 +108,7 @@ public class ReportColumns {
 		
 		columnsMaps.put("Cashposition.ProductSubType","ProductSubType");
 		columnsMaps.put("Cashposition.PositionID","PositionID");
+		columnsMaps.put("Cashposition.Settledate","Tradedate");
 		columnsMaps.put("Cashposition.Settledate","Settledate");
 		columnsMaps.put("Cashposition.Price","Price");
 		//columnsMaps.put("Cashposition.Sign","Sign");
@@ -168,6 +169,7 @@ public class ReportColumns {
 	    columnsMaps.put("Trade.Broker","Broker");
 	    columnsMaps.put("Trade.Bond.Description","Bond.Description");
 	    columnsMaps.put("Trade.FX.CurrencyPair","FX.CurrencyPair");
+	    columnsMaps.put("Trade.CurrencyPair","CurrencyPair");
 		columnsMaps.put("Trade.Bond.Amount","Bond.Amount"); 
 		columnsMaps.put("Trade.EffectiveDate","EffectiveDate");
 		columnsMaps.put("Trade.FX.FAR_EndDate","FX.FAR_EndDate");
@@ -183,6 +185,7 @@ public class ReportColumns {
 	    columnsMaps.put("Trade.FX.FAR_AMT2", "FX_FAR_AMT2");
 	    columnsMaps.put("Trade.FX.FarRate","FX.FarRate"); 
 		columnsMaps.put("Trade.User","userid ");  // to be changed
+		columnsMaps.put("Trade.Rate","Price");
 		columnsMaps.put("Trade.FX.NearRate","FX.NearRate");
 		columnsMaps.put("Trade.Version","Version"); 
 		columnsMaps.put("Trade.Attributes","Attributes");
