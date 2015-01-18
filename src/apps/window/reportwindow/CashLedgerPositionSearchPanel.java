@@ -34,7 +34,7 @@ public class CashLedgerPositionSearchPanel extends SearchCriteriaType {
 	private JLabel jLabel6;
 	private JTextField tradeIdTextField;
 	private JLabel jLabel7;
-	private DateComboBox tradeDate;
+	private DateComboBox OpenpositionDate;
 	private JComboBox<String> currencyComboBox;
 	private JComboBox<String> bookComboBox;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
@@ -68,7 +68,7 @@ public class CashLedgerPositionSearchPanel extends SearchCriteriaType {
 		add(gettradeIdTextField(), new Constraints(new Leading(145, 130, 10, 10), new Leading(61, 18, 10, 10)));
 		add(getJLabel6(), new Constraints(new Leading(18, 74, 12, 12), new Leading(63, 12, 12)));
 		add(getcurrencyComboBox(), new Constraints(new Leading(145, 130, 12, 12), new Leading(16, 12, 12)));
-		add(getTradeDate(), new Constraints(new Leading(145, 130, 12, 12), new Leading(100, 17, 10, 10)));
+		add(getOpenpositionDate(), new Constraints(new Leading(145, 130, 12, 12), new Leading(100, 17, 10, 10)));
 		add(getBookComboBox(), new Constraints(new Leading(145, 127, 12, 12), new Leading(138, 12, 12)));
 		add(getJLabel1(), new Constraints(new Leading(18, 12, 12), new Leading(144, 12, 12)));
 		setSize(486, 397);
@@ -93,20 +93,20 @@ public class CashLedgerPositionSearchPanel extends SearchCriteriaType {
 	}
 
 
-	private DateComboBox getTradeDate() {
-		if (tradeDate == null) {
-			tradeDate = new DateComboBox();
-			tradeDate.setFormat(commonUTIL.getDateFormat());
-			tradeDate.setDate(null);
+	private DateComboBox getOpenpositionDate() {
+		if (OpenpositionDate == null) {
+			OpenpositionDate = new DateComboBox();
+			OpenpositionDate.setFormat(commonUTIL.getDateFormat());
+			OpenpositionDate.setDate(null);
 		}
-		return tradeDate;
+		return OpenpositionDate;
 	}
 
 
 	private JLabel getJLabel7() {
 		if (jLabel7 == null) {
 			jLabel7 = new JLabel();
-			jLabel7.setText("TradeDate");
+			jLabel7.setText("OpenpositionDate");
 		}
 		return jLabel7;
 	}
@@ -161,13 +161,13 @@ public class CashLedgerPositionSearchPanel extends SearchCriteriaType {
 			
 		} 
 		
-		if( (tradeDate.getDate() != null 
-				&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(tradeDate.getDate())))) {
+		if( (OpenpositionDate.getDate() != null 
+				&& !commonUTIL.isEmpty(commonUTIL.convertDateTOString(OpenpositionDate.getDate())))) {
 			
-			Date tradeDt = tradeDate.getDate();
+			Date tradeDt = OpenpositionDate.getDate();
 			
 			filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(tradeDt),		
-													commonUTIL.convertDateTOString(tradeDt), "TradeDate"));
+													commonUTIL.convertDateTOString(tradeDt), "OpenpositionDate"));
 			
 		}
 		
@@ -191,7 +191,7 @@ public class CashLedgerPositionSearchPanel extends SearchCriteriaType {
 		
 		currencyComboBox.setSelectedIndex(-1);
 		tradeIdTextField.setText("");
-		tradeDate.setDate(null);
+		OpenpositionDate.setDate(null);
 		//poComboBox.setSelectedIndex(-1);
 		bookComboBox.setSelectedIndex(-1);
 		
@@ -209,8 +209,8 @@ public class CashLedgerPositionSearchPanel extends SearchCriteriaType {
 			else if(bean.getColumnName().equalsIgnoreCase("otherTradeID")) {
 				tradeIdTextField.setText(bean.getValues());
 			}
-			else if(bean.getColumnName().equalsIgnoreCase("TradeDate")) {
-				tradeDate.setDate(commonUTIL
+			else if(bean.getColumnName().equalsIgnoreCase("OpenpositionDate")) {
+				OpenpositionDate.setDate(commonUTIL
 						.convertStringtoSQLDate(bean.getValues()));
 			}
 			/*else if(bean.getColumnName().equalsIgnoreCase("poId")) {
