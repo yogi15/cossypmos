@@ -121,6 +121,7 @@ public class ReportColumns {
 		columnsMaps.put("Cashposition.Currency","Currency");
 		columnsMaps.put("Cashposition.Type","Type");
 		columnsMaps.put("Cashposition.ActualAmt","ActualAmt");
+		columnsMaps.put("Cashposition.INR_Equi","INR_Equi");
 		
 		
 		columnsMaps.put("Transfer.TransferId","Id");// to be changed
