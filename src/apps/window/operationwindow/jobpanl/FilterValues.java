@@ -125,6 +125,9 @@ public class FilterValues {
 				.put("Posting.DebitAccId",
 						" (select accountname from ACCOUNT where id = Posting.DebitAccId) DebitAcc");
 		
+		replaceColumnNameOnSQL
+		.put("Cashposition.INR_Equi", "(Cashposition.ActualAmt * getSplitRates(trade.id ,'splitBaseNearRate')) INR_Equi_Near");
+		
 		forwardColumnMaps.put("1D", " + 1");
 		forwardColumnMaps.put("2D", " + 2");
 		forwardColumnMaps.put("3D", " + 3");
@@ -807,7 +810,7 @@ public class FilterValues {
 	
 	private String createCriteriaOnBook(Vector<Book> books, FilterBean bean) {
 		String bookCriteria = "";
-		String ids = bean.getColumnValues();
+		String ids = bean.getIdSelected();
 		if (books == null || books.size() == 0 || books.isEmpty())
 			return null;
 		if (ids == null)
