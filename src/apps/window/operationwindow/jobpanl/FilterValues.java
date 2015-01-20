@@ -64,7 +64,7 @@ public class FilterValues {
 		attributesTableName.put("legalentityattribute",
 				"leattribute legalentityattribute ");
 		attributesTableName.put("bookattribute",
-				"bookattributes Bookattributes ");
+				" Bookattributes bookattribute ");
 		attributesTableName.put("Book.Attributes", "Book book");
 		attributesTableName.put("Transfer.attributes", "Transfer transer");
 
@@ -75,6 +75,8 @@ public class FilterValues {
 				"trade.id = tradeattribute.id  ");
 		attributesWhereClause.put("LeKeyword",
 				" legalentity.id = legalentityattribute.le_id  ");
+		attributesWhereClause.put("BookKeyword",
+				" book.bookno = bookattribute.bookid ");
 
 		/*replaceColumnNameOnSQL.put("Trade.DeliveryDate",
 				"to_char(Trade.DeliveryDate,'dd/mm/yyyy') DeliveryDate");
