@@ -1280,10 +1280,19 @@ public class FilterValues {
 						sqlwithoutWhere = sqlwithoutWhere + " , "
 								+ attributesTable;
 					} else {
+						if(!sqlwithoutWhere.contains(attributesTable)) 
 						sqlwithoutWhere = sqlwithoutWhere + " , Book book "
 								+ " , " + attributesTable;
-						where = where + " and trade.bookid = book.bookno";
 					}
+					if(sqlwithoutWhere.contains(attributesTable))  {
+						sqlwithoutWhere = sqlwithoutWhere + " , Book book "
+								;
+					} else {
+						sqlwithoutWhere = sqlwithoutWhere + " , Book book "
+								+ " , " + attributesTable;
+						
+					}
+				where = where + " and trade.bookid = book.bookno";
 
 				}
 			}
