@@ -1261,7 +1261,26 @@ public class FilterValues {
 			containLegalEntityTable = true;
 		if (sqlwithoutWhere.contains("Book book"))
 			containBookTable = true;
+		
 		for (int i = 0; i < attributesObject.length; i++) {
+			if (where.contains(attributesObject[i])) {
+				String attributesTable = attributesTableName
+						.get(attributesObject[i]);
+			
+				if (!sqlwithoutWhere.contains(attributesTable)) {
+					sqlwithoutWhere = sqlwithoutWhere + " , "+attributesTable;
+				}
+			}
+		}
+		if(!containLegalEntityTable) {
+			sqlwithoutWhere = sqlwithoutWhere + " , " + "  le legalentity  " ;
+			where = where + " and trade.cpid = legalentity.id ";
+		}
+		if(!containBookTable) {
+			sqlwithoutWhere = sqlwithoutWhere + " , " + "  Book book  " ;
+			where = where + " and trade.bookid = book.bookno";
+		}
+	/*	for (int i = 0; i < attributesObject.length; i++) {
 
 			if (where.contains(attributesObject[i])) {
 				String attributesTable = attributesTableName
@@ -1285,6 +1304,7 @@ public class FilterValues {
 								+ " , " + attributesTable;
 					}
 					if(sqlwithoutWhere.contains(attributesTable))  {
+						if(!containBookTable)
 						sqlwithoutWhere = sqlwithoutWhere + " , Book book "
 								;
 					} else {
@@ -1294,10 +1314,10 @@ public class FilterValues {
 					}
 				where = where + " and trade.bookid = book.bookno";
 
-				}
+				} 
 			}
-		}
-		return sqlwithoutWhere + " " + where;
+		} */
+		return sqlwithoutWhere + "     " + where;
 	}
 
 	public String changeColumnNameForForwoardReport(String sqlW) {
