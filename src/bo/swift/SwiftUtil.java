@@ -15,6 +15,8 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.Vector;
 
+import constants.CommonConstants;
+
 import beans.Account;
 import beans.Country;
 import beans.ManualProcessSDI;
@@ -698,6 +700,29 @@ public class SwiftUtil {
 	
 	}
 	
+	
+	public static String getCCILDateHeaderFormat(String messagedate) {
+		SimpleDateFormat formatter
+		= new SimpleDateFormat("YYYYMMDD");
+		return "201511014588";
+	//	 SimpleDateFormat format = new SimpleDateFormat(CommonConstants.SDF_CCIL_HEADER_FORMAT);
+	     
+		/*formatter.setLenient(true);
+	        java.util.Date date = null;
+	        boolean flag = false;
+	        try {
+	           date = formatter.parse(messagedate);
+	            
+	        } catch (Exception e) {
+	        	commonUTIL.displayError("SwiftUtil","getCCILDateHeaderFormat",e);
+	            return "";
+	        }
+	        String nowYYYYMMDD = new String(formatter.format(date));
+	        nowYYYYMMDD = formatter.format(date).toString();
+	
+		return commonUTIL.dateToString(date); */
+		
+	}
 	/**
 	 * Returns a Swift Formatted date as YYMMDD.
 	 *
