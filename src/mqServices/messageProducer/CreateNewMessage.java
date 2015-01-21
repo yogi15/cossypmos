@@ -53,7 +53,7 @@ public class CreateNewMessage implements Runnable {
             } else {
             	
             	sendObjectMessage();
-            	Thread.sleep(1000);
+            	Thread.sleep(100);
             }
         }
         catch (Exception e) {
@@ -79,19 +79,21 @@ public class CreateNewMessage implements Runnable {
             // Create the destination (Topic or Queue)
             
             Destination destination = session.createTopic(queueName);
-
+      //      System.out.println("TTTTTTTTTTTTTTTTTTTTTTTTTT producer " +    queueName);
+	          
             // Create a MessageProducer from the Session to the Topic or Queue
             MessageProducer producer = session.createProducer(destination);
+            
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
 
             // Create a messages
            // String text = message;//
-            commonUTIL.display("CreateNewMessage"," = sendObjectMessage  Message send on QueueName  " + queueName +  "  " +   Thread.currentThread().getName() + " : " + message);
+          //  commonUTIL.display("CreateNewMessage"," = sendObjectMessage  Message send on QueueName  " + queueName +  "  " +   Thread.currentThread().getName() + " : " + message);
             ObjectMessage message = session.createObjectMessage(object);
            
 
             // Tell the producer to send the message
-            System.out.println("Message send " + Thread.currentThread().getName() + " : " + message.getObject());
+           // System.out.println("Message send " + Thread.currentThread().getName() + " : " + message.getObject());
        //     System.out.println("Sent message: "+ message.hashCode() + " : " + Thread.currentThread().getName());
             producer.send(message);
            // producer.send(destination, message);
