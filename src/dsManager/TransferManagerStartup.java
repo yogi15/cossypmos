@@ -55,7 +55,12 @@ public class TransferManagerStartup  extends ServiceManager  {
 			TransferServiceAppender.printLog("ERROR", "TransferService Shutdown not able to listen to Server "+e);
 			
 			System.exit(0);
-		}
+		}catch (NullPointerException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("TransferManagerStartUP", "Start ", e);
+			TransferServiceAppender.printLog("ERROR", "TransferService Shutdown not able to listen to Server "+e);
+			System.exit(0);
+		} 
 
 		
 		amanager.publishStartEvent(managerName,"Started");
@@ -84,6 +89,13 @@ public class TransferManagerStartup  extends ServiceManager  {
 			amanager.stop();
 			amanager = null;
 			throw new InterruptedIOException();
+		}
+		catch (NullPointerException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.display("TransferManager", "TransferManager is Stopped");
+			TransferServiceAppender.printLog("ERROR", "TransferManager is Stopped");
+			
+			System.exit(0);
 		} catch (InterruptedIOException e) {
 			// TODO Auto-generated catch block
 			commonUTIL.display("TransferManager", "TransferManager is Stopped");
