@@ -74,6 +74,8 @@ public class SwiftMessage implements Serializable {
      * Four digits that identify the user's session.
      */
     protected String _session = "0000";
+    
+    protected String _sessionCCIL = "XXXXXXXXX";
 
     /**
      * Six digits (ISN of the sender or OSN of the receiver).
@@ -193,7 +195,10 @@ public class SwiftMessage implements Serializable {
 	    public  Vector<SwiftFieldMessage> getFields() {
 	        return _fields;
 	    }
-	    
+	    String _ccilApplication = "XXXXXXXXX";
+	    public String ccilHeaderDataFormat(String date) {
+	    	return SwiftUtil.getCCILDateHeaderFormat(date);
+	    }
 	    public String getBasicHeaderBlock() {
 	        if (_customizer != null) {
 	            String block = _customizer.getBasicHeaderBlock(this, _message);
@@ -205,10 +210,17 @@ public class SwiftMessage implements Serializable {
 	            sender = _receiver;
 	        else
 	            sender = _sender;
-
-	        return "{" + BASIC_HEADER_BLOCK_IDENTIFIER + _application + _service
+           
+	        String ret =  "{" + BASIC_HEADER_BLOCK_IDENTIFIER + _application + _service
 	                + sender + _session + (_application != "L" ? _sequence : "")
 	                + "}";
+	                if(_message.getFormat().equalsIgnoreCase("CCIL")) {
+	                	ret =  "{" + BASIC_HEADER_BLOCK_IDENTIFIER + _application + _service + ccilHeaderDataFormat(_message.getMessageDate())
+	        	                + sender + _ccilApplication 
+	        	                + "}";
+	                }
+	                return ret;
+	       
 	    }
 	    
 	    
@@ -249,7 +261,7 @@ public class SwiftMessage implements Serializable {
 	        String type = _type;
 	        if (_type.length() > 3)
 	            type = type.substring(2);
-
+	       
 	        String result =
 	                getBasicHeaderBlock()
 	                + getApplicationHeaderBlock()
@@ -261,7 +273,30 @@ public class SwiftMessage implements Serializable {
 	                + getFinalBlock();
 	        return result;
 	    }
+	    public String getSwiftText(String swiftMethod) {
 
+			if (_swiftText!=null) return _swiftText;
+
+		        if (commonUTIL.isEmpty(_type)) return new String();
+
+		        if (_sender != null) _sender = _sender.trim();
+		        if (_receiver != null) _receiver = _receiver.trim();
+
+		        String type = _type;
+		        if (_type.length() > 3)
+		            type = type.substring(2);
+
+		        String result =
+		                getBasicHeaderBlock()
+		                + getApplicationHeaderBlock()
+		                + getUserHeaderBlock()
+		                // Text Block
+		                + "{4:" + START_OF_TEXT + getSwiftBody() + END_OF_TEXT + "}"
+		                // TrailerBlock {5:{MAC:41720873}{CHK:123456789ABC}}
+		                // + "{5:}";
+		                + getFinalBlock();
+		        return result;
+		    }
 
 	    public String getFinalBlock() {
 	        if (_customizer != null) {
@@ -345,7 +380,7 @@ public class SwiftMessage implements Serializable {
 			_block3 = sb.toString();
 		}
 	    
-	  
+	  String _ccilInputer = "XXX";
 
 	    public String getApplicationHeaderBlock() {
 	        if (_customizer != null) {
@@ -366,6 +401,9 @@ public class SwiftMessage implements Serializable {
 	            if (receiver.length() > 9 && "A".equalsIgnoreCase(receiver.substring(8, 9))) {
 	                receiver = receiver.substring(0, 8) + "X" + receiver.substring(9);
 	            }
+	            if(_message.getFormat().equalsIgnoreCase("CCIL"))
+	            	return "{2:" +  type + _ccilInputer + ccilHeaderDataFormat(_message.getMessageDate()) + _ccilApplication + "00" + "XXX}";
+	            
 	            return "{2:" + _inputOutput + type + receiver + "N" + "2" + "020}";
 	        } else {
 	            return "{2:" + _inputOutput + type + _inputTime +
