@@ -33,6 +33,7 @@ import org.apache.log4j.PropertyConfigurator;
 import util.LogPublishUtil;
 import util.commonUTIL;
 
+import logAppender.ServerServiceAppender;
 import mqServices.Broker.StartMQBroker;
 
 import dbSQL.UsersSQL;
@@ -68,8 +69,8 @@ static ConcurrentHashMap<String, String> engineSignals = new ConcurrentHashMap<S
    EngineMonitorService monitorService = null;
    public void start()     {
      // get the address of this host.
-	   getLog4IntputStream();
-	   PropertyConfigurator.configure(log4P);
+	  // getLog4IntputStream();
+	 // PropertyConfigurator.configure(log4P);
           
 	
           
@@ -178,10 +179,15 @@ static ConcurrentHashMap<String, String> engineSignals = new ConcurrentHashMap<S
            try {
                System.out.println( "Starting service: "
                        + service);
+               ServerServiceAppender.printLog("INFO", "Starting service: "
+                       + service);
+               
                ConfigService serviceConfig = ServerConnectionUtil.loadServiceConfiguration(service,
                                                                              props);
                ServiceInit.startService(serviceConfig,regist);
            } catch (Exception e) {
+        	    ServerServiceAppender.printLog("ERROR", " Error starting service " + service + " "+e);
+                
            	System.out.println( " Error starting service " + service + " "+ e);
                throw new RuntimeException("Error starting service "
                        + service, e);
@@ -246,6 +252,8 @@ public ServerBean connect(String username,String password) throws RemoteExceptio
 	}
 	
 	System.out.println("Connected ... " + sconn.getdefault()._hostName  + " with user " + user.getUser_name());
+	ServerServiceAppender.printLog("INFO","Connected ... client with client ID " + sbean.getClientID()  + "  "+ sconn.getdefault()._hostName + " with user " + user.getUser_name());
+	
 	
 	
 	return sbean;
@@ -270,6 +278,8 @@ public ServerBean connect() throws RemoteException {
 	sbean.setClientID(clientID++);
 	
 	System.out.println("Connected ... client with client ID " + sbean.getClientID()  + "  "+ sconn.getdefault()._hostName);
+	ServerServiceAppender.printLog("INFO","Connected ... client with client ID " + sbean.getClientID()  + "  "+ sconn.getdefault()._hostName);	
+	
 	
 	
 	return sbean;
@@ -310,13 +320,26 @@ public int publishEvent(String messageIndicator,String queueName, String message
 @Override
 public void addEngines(String engineName,int clientID,Users user) {
 	// TODO Auto-generated method stub
+
+	System.out.println("addEngines addEngines " + engineName + " " + clientID);
 	holdRemoveEngineSignals = true;
 	String engineData [] = engineName.split("_");
 	String name = engineData[0];
 	String siginal =  engineData[1];
 	if(siginal.equalsIgnoreCase("Stopped")) {
 		holdRemoveEngineSignals = false;
-		int id =  Integer.parseInt(engineSignals.get(name));
+		int id =0;
+		try {
+			String applicationID = engineSignals.get(name);
+			if(!commonUTIL.isEmpty(applicationID)) {
+		 id =  Integer.parseInt(applicationID);
+			} else {
+				return;
+			}
+		}catch(NumberFormatException n) {
+			System.out.println("AddEngines " +   engineName + " " +  n);
+			id = 0;
+		}
 		if(id == clientID) {
 		removeEngine(engineName,clientID); 
 		//removeUserforMonitor(name, user, clientID);
@@ -324,6 +347,7 @@ public void addEngines(String engineName,int clientID,Users user) {
 	}else {
 	AdminEventProcessor adminEvent = new AdminEventProcessor();
 	adminEvent.setEngineStartedSignal(name+"_"+siginal+"_"+clientID);
+	//System.out.println("AddEngines Method == " + adminEvent.getEngineStartedSignal());
 	adminEvent.setEngineViewerPanel(true);
 	adminEvent.setClientID(clientID);
 	adminEvent.setUser(user);
@@ -338,6 +362,7 @@ public void addEngines(String engineName,int clientID,Users user) {
 	
 	addEngines(name,siginal+"_"+clientID);
 	synchronized (engineSignals) {
+		
 		engineSignals.put(name,String.valueOf(clientID));
 		holdRemoveEngineSignals = false;
 	}
@@ -351,6 +376,8 @@ public void addEngines(String engineName,int clientID,Users user) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
+
+//	System.out.println("End of addEngines addEngines " + engineName + " " + clientID);
 	}
 }
 
@@ -381,6 +408,7 @@ private synchronized void removeEngines(String engineName,String siginal) {
 @Override
 public void removeEngine(String engineName,int clientID) {
 	// TODO Auto-generated method stub
+	System.out.println("removeEngine method " + engineName + " " + clientID);
 	try {
 	AdminEventProcessor adminE = null;
 	int id = 0;
@@ -412,6 +440,8 @@ public void removeEngine(String engineName,int clientID) {
     		user.setApplicattionNameLoginOn("NONE");
     		monitorConnectedUserData.put(name+"_"+clientID,user);
     		System.out.println("Client ID " +clientID + " Disconneted from .... " + user.getHostName() + " "+ user.getUser_name() + " " + user.getApplicattionNameLoginOn());
+    		ServerServiceAppender.printLog("INFO","Client ID " +clientID + " Disconneted from .... " + user.getHostName() + " "+ user.getUser_name() + " " + user.getApplicattionNameLoginOn());	
+    		
     		adminEvent.setUser(user);
     		
     		try {
@@ -425,6 +455,8 @@ public void removeEngine(String engineName,int clientID) {
     			e.printStackTrace();
     		}
     	}
+
+    	System.out.println("End of removeEngine method " + engineName + " " + clientID);
     }
 	}catch(NumberFormatException e) {
 		System.out.println("ServerControllerImp removeEngine "+ engineName);
@@ -458,7 +490,10 @@ public ServerBean connect(String username, String password,
 	
 	Users user = (Users) UsersSQL.selectUsers(username, password, dsSQL.getConn());
 	if(user == null) {
-		commonUTIL.display("INFO", "Connect "+ username +" Not Register in Database");
+		commonUTIL.display("INFO", "applicationName with username "+ username +" Not Register in Database");
+		
+		ServerServiceAppender.printLog("INFO", " username "+ username +" Not Register in Database for application " + applicationName);			
+		
 		
 	} else {
 		sbean.set_dataServerName(sconn.getdefault()._dataServerName);
@@ -485,6 +520,9 @@ public ServerBean connect(Users user1,
 	//	System.out.println(java.rmi.server.RemoteServer.getClientHost());
 		user = (Users) UsersSQL.selectUsers(user1.getUser_name(), user1.getPassword(), dsSQL.getConn());
 		if(user == null) {
+			
+			ServerServiceAppender.printLog("INFO", " username "+ user1.getUser_name() +" Not Register in Database for application " + applicationName);			
+		
 			ServerBean sbean = new ServerBean();
 			return sbean;
 		}
@@ -506,6 +544,7 @@ public ServerBean connect(Users user1,
 		connectedUserData.put(sbean.getClientID(), user);
 			}
 	System.out.println(  applicationName + "ServiceManager"+applicationName+"  to Server Connected ... with id " + sbean.getClientID() + sconn.getdefault()._hostName  + " with user " + user.getUser_name());
+	ServerServiceAppender.printLog("INFO", applicationName + "ServiceManager"+applicationName+"  to Server Connected ... with id " + sbean.getClientID() + sconn.getdefault()._hostName  + " with user " + user.getUser_name());	
 	
 	return sbean;
 }

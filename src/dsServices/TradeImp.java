@@ -93,7 +93,9 @@ public class TradeImp implements RemoteTrade {
 			} else {
 				EventProcessor event = (EventProcessor) object;
 				if(event.isSavetoDB()) {
+					
 					event = EventSQL.save((EventProcessor) object, dsSQL.getConn());
+				//	System.out.println(event.getType() + "  "+ event.getObjectID());
 				}
 			
 			newMessage.produceNewMessage(messageIndicator,"TRADE",messageType,(Serializable) event,null); 
@@ -186,13 +188,14 @@ public class TradeImp implements RemoteTrade {
 						processAttribues(trade.getId(), trade.getAttributes(), trade.getVersion());
 						
 						
+						
 					//	trade.setId(i);
-						Task task = checkTask(trade,wf,oldTrade);
+						/*Task task = checkTask(trade,wf,oldTrade);
 						if(task  != null) {
 						    int taskID = TaskSQL.save(task,dsSQL.getConn());
 						    if(taskID >0 )
 						    	task.setId(taskID);
-						}
+						}*/
 						//} else {
 							//TaskSQL.update(task, dsSQL.getConn());	
 							//TaskSQL.save(processTask(trade),dsSQL.getConn());
@@ -210,8 +213,8 @@ public class TradeImp implements RemoteTrade {
 					   //publishnewTrade("NEWTRADE","Text",null);
 						
 					   publishnewTrade("POS_NEWTRADE","Object",getTradeEvent(trade));
-					   if(task != null)
-							 publishnewTrade("POS_NEWTRADE","Object",getTaskEvent(task, trade));
+					   //if(task != null)
+						//	 publishnewTrade("POS_NEWTRADE","Object",getTaskEvent(task, trade));
 							
 					   if(originalTrade != null) {
 						 //  originalTrade.setAttribute("B2BID",  Integer.valueOf(i).toString());
@@ -1636,14 +1639,14 @@ return status;
 			public Trade getTradeOldVersion(int tradeID, int tradeVersion)
 					throws RemoteException {
 				// TODO Auto-generated method stub
-				String sql = " id = " + tradeID + " and version = " + tradeVersion;
+				/*String sql = " id = " + tradeID + " and version = " + tradeVersion;
 				Vector v1 = (Vector) AuditSQL.selectwhere(sql,  dsSQL.getConn());
 				String oldTradeValues = "";
 				if(v1 != null || v1.size() > 0) 
 						  oldTradeValues = ((Audit)v1.elementAt(0)).getValues();
-				Trade trade = (Trade) ReflectionUtilObject.getObject("beans.trade", oldTradeValues)	;
+			//	Trade trade = (Trade) ReflectionUtilObject.getObject("beans.trade", oldTradeValues)	;*/
 				
-		      return trade;
+		      return null;
 
 
 
