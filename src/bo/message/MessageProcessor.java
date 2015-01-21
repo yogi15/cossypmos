@@ -13,9 +13,11 @@ import beans.Book;
 import beans.LegalEntity;
 import beans.Message;
 import beans.MessageConfig;
+import beans.Sdi;
 import beans.Trade;
 import beans.Transfer;
 import bo.message.bomessagehandler.BOMessageHandler;
+import bo.util.SDISelectorUtil;
 import dsEventProcessor.EventProcessor;
 import dsEventProcessor.TradeEventProcessor;
 import dsEventProcessor.TransferEventProcessor;
@@ -89,7 +91,7 @@ public class MessageProcessor extends Thread {
 		if(event instanceof TradeEventProcessor) {
 			
 			TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
-			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Entered in  processing of   ****** " +   trade.getId() + " on "+ trade.getStatus() + " status ");
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Entered in  processing of   ****** " +   tradeEvent.getTrade().getId() + " on "+ tradeEvent.getTrade().getStatus() + " status ");
 				
 			trade = tradeEvent.getTrade();
 			if(trade == null) {
@@ -100,7 +102,16 @@ public class MessageProcessor extends Thread {
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					commonUTIL.displayError("MessageProcesser", "processMessage", e);
+					MessageServiceAppender.printLog("ERROR", "MessageProcessor  processMessage "+e );
+
 				}
+				 catch (NullPointerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						MessageServiceAppender.printLog("ERROR", "MessageProcessor  processMessage tradeEventProcessor "+e);
+
+					}
 				
 			}
 			duplicateEventCheck.put(trade.getId()+"_"+trade.getStatus()+"_"+trade.getVersion(),tradeEvent.getEventid());
@@ -108,11 +119,22 @@ public class MessageProcessor extends Thread {
 		if(event instanceof TransferEventProcessor) {
 			
 			TransferEventProcessor transferEvent = (TransferEventProcessor) event;
-			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Entered in  processing of   ****** " +   transfer.getId() + " on "+ trade.getStatus() + " status ");
+         try {
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Received new event   *****************************************************" );
+
 			
 			trade = transferEvent.getTrade();
 			transfer = transferEvent.getTransfer();
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Received new event   *****************");
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Entered in  processing of   ****** " +   transfer.getId() + " on "+ trade.getStatus() + " status ");
+			
 			duplicateEventCheck.put(transfer.getId()+"_"+transfer.getStatus()+"_"+transfer.getVersion(),transferEvent.getEventid());
+         }	catch (NullPointerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				MessageServiceAppender.printLog("ERROR", "MessageProcessor  processMessage transferEventProcessor "+e);
+
+			}
 		}
 		Vector<MessageConfig> messConfigs = getMessageConfig(event,trade);
 		MessageServiceAppender.printLog("DEBUG", "MessageProcessor found   ****** " +   messConfigs.size() + " MessageConfig  on "+ trade.getStatus() + " status ");
@@ -141,14 +163,40 @@ public class MessageProcessor extends Thread {
 				return;
 			}
 			LegalEntity receiver = getLegalEntity(messConfig.getReceiverID());
+			if(receiver == null) {
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor Receiver null for messConfig " +   messConfig.getId());
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor selecting Receiver on basis of messConfig " + messConfig.getId() + " receiveer role  as  "+ messConfig.getReceiverRole() );
+				
+				if(messConfig.getReceiverRole().equalsIgnoreCase("CounterParty")) 
+				receiver =  getLegalEntity(trade.getCpID());
+					
+				
+			}
+			if(receiver != null)
 			MessageServiceAppender.printLog("DEBUG", "MessageProcessor get Receiver " + receiver.getName() + " for messConfig " +   messConfig.getId());
 			
 			LegalEntity sender = getLegalEntity(messConfig.getPoid());
+			if(sender == null) {
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor sender null for messConfig " +   messConfig.getId());
+				manager.updateEventProcess(event);
+				return;
+				
+			}
+			if(receiver == null) {
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor receiver getting  null for messConfig " +   messConfig.getId() + " selecting agent as receiver on the basis of sender role ");
+				
+				String poKey = sender.getRole().toUpperCase()+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+sender.getId();
+				Sdi poPerferedSdi = SDISelectorUtil.getPreferredSdiOnly(poKey);
+				receiver = getLegalEntity(poPerferedSdi.getAgentId());
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor get Sender " + receiver.getName() + " for messConfig " +   messConfig.getId() + " with receiver role as Agent ");
+				
+			}
 			MessageServiceAppender.printLog("DEBUG", "MessageProcessor get Sender " + sender.getName() + " for messConfig " +   messConfig.getId());
 			
 			//sender.setRole("PO");// this is might be issue 
 			Message message = null;
 			if(event instanceof TradeEventProcessor) {
+				try {
 				MessageServiceAppender.printLog("DEBUG", "MessageProcessor Starting process to Fill Message Object " + event.getEventType() + " for messConfig " +   messConfig.getId() + " "+trade.getId());
 				
 			    message = boHandler.fillMessage(trade, null, messConfig,"TRADE",null,(TradeEventProcessor) event,receiver,sender);
@@ -161,13 +209,26 @@ public class MessageProcessor extends Thread {
 				
 				saveFilterMessages(filterMessages,trade,transfer,event);
 				MessageServiceAppender.printLog("DEBUG", "MessageProcessor Ending of  saving and update  of  Message Object t" + event.getEventType() + " for messConfig " +   messConfig.getId() + " "+trade.getId());
+				} catch (NullPointerException e) {
+					// TODO Auto-generated catch block
+					 commonUTIL.displayError("MessageProcessor", "processMessage", e);
+					MessageServiceAppender.printLog("ERROR", "MessageProcessor  processMessage TradeEventProcessor "+e);
+
+				}
 				
 			}
 			if(event instanceof TransferEventProcessor) {
+				try {
 				 message = boHandler.fillMessage(trade, transfer, messConfig,"TRANSFER",(TransferEventProcessor) event,null,receiver,sender);
 			//	 messages.add(message); 
 				 filterOldMessages(message.getMessageConfigID(),transfer.getId(),message,"TRANSFER",filterMessages);
 					saveFilterMessages(filterMessages,trade,transfer,event);
+				}catch (NullPointerException e) {
+						// TODO Auto-generated catch block
+						 commonUTIL.displayError("MessageProcessor", "processMessage", e);
+						MessageServiceAppender.printLog("ERROR", "MessageProcessor  processMessage TransferEventProcessor "+e);
+
+					}
 			}
 			
 			  
@@ -221,7 +282,7 @@ public class MessageProcessor extends Thread {
 	
 	private void filterOldMessages(int messageConfigid,int objectID,Message message,String eventTriggerON,Hashtable<String,Vector<Message>> filterMessages) {
 		// TODO Auto-generated method stub
-		   MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages of  Message Object for messageCOnfig " + " "+messageConfigid + " for message eventType " + message.getEventType() + " " + message.getTradeId());
+		   MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages of  Message Object for messageCOnfig " + " "+messageConfigid + " for message eventType " + message.getEventType() + " trade id  " + message.getTradeId());
 			
 		Vector<Message> insertMessages = new Vector<Message>();
 		Vector<Message> updatetMessages = new Vector<Message>();
@@ -229,21 +290,49 @@ public class MessageProcessor extends Thread {
 			return;
 		//for(int i=0;i<messages.size();i++) {
 		//	Message message = messages.get(i);
-			Vector<Message> oldmess = getOLDMessage(messageConfigid,objectID,message.getEventType(),eventTriggerON);
-			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found "+oldmess.size() +"  oldmessages against messconfig " + message.getMessageConfigID() + " for trade "+ message.getTradeId() + " against event "+ message.getEventType() + " with subAction as " + message.getSubAction()); 
+			Vector<Message> oldmess = null;
+			try {
+			if(!message.getEventType().contains("CANCELLED"))  {
+				oldmess =	getOLDMessage(messageConfigid,objectID,message.getEventType(),eventTriggerON);
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found "+oldmess.size() +"  oldmessages against messconfig " + message.getMessageConfigID() + " for trade ID "+ message.getTradeId() + " against event "+ message.getEventType() + " with subAction as " + message.getSubAction()); 
+				}
 			if(commonUTIL.isEmpty(oldmess)) {
-				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found zero oldMessages " + message.getTradeId() + " eventTYpe "+message.getEventType());
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found zero oldMessages  for trade id " + message.getTradeId() + " eventTYpe "+message.getEventType());
 				
 				if(message.getEventType().contains("CANCELLED")) {
+					Vector<Message> cancelOriginalmessages = getOLDMessageForCancel(message.getEventType(),"TRADE",message.getMessageType(),message.getTradeId(),message.getFormat());
 					
-					message.setSubAction("CANCEL");  // this logic needs to be changed as first it must check if confirmation has been send or not if yes then send cancel messages.
+					if(!commonUTIL.isEmpty(cancelOriginalmessages)) {
+						MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found zero oldMessages  for trade id " + message.getTradeId() + " on Cancel eventTYpe "+message.getEventType());
+						
+						Message originMess = cancelOriginalmessages.get(0);
+						if(originMess.getStatus().equalsIgnoreCase("SEND")) {
+							MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found oldMessages  for trade id " + message.getTradeId() + " on Cancel eventTYpe "+message.getEventType() + " with oldmess status as "+originMess.getStatus());
+							
+							message.setSubAction("CANC");
+							message.setLinkId(originMess.getId());
+							insertMessages.add(message);
+						} else {
+							MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found oldMessages  for trade id " + message.getTradeId() + " on Cancel eventTYpe "+message.getEventType() + " with oldmess status as "+originMess.getStatus());
+							
+						originMess.setSubAction("CANC");
+						originMess.setUpdateBeforeSend("TRUE");
+						updatetMessages.add(originMess);
+						}
+						MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + originMess.getSubAction() + " aganist message Action "+message.getAction()); 
+						
+					
+					}
+					  // this logic needs to be changed as first it must check if confirmation has been send or not if yes then send cancel messages.
 				} else {
 					message.setSubAction("NEW");
+					insertMessages.add(message);
+					MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction()); 
+					
+					
 				}
-
-				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction()); 
-				insertMessages.add(message);
 				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in filterOldMessage adding message in insert Vector as old message are zero "); 
+				
 				
 			} else {
 				// checkout code need to added.
@@ -254,34 +343,52 @@ public class MessageProcessor extends Thread {
 			    		
 			    			
 			    		if(oldMessage.getSubAction().equalsIgnoreCase("NEW") && isMessageWasSend(oldMessage,oldmess)) {
+			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found oldMessage + " +  oldMessage.getId() + " with status " + oldMessage.getStatus() + " and subAction as " + oldMessage.getSubAction() + " on trade "+ message.getTradeId() + " on eventTYpe "+message.getEventType());
+							
 			    			message.setSubAction("AMEND");
 			    			message.setLinkId(oldMessage.getId());
 			    			insertMessages.add(message);
+			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages Adding new Message in insert Vector with subAction as  + " +  message.getSubAction() + " on with status " + message.getStatus()+ " on trade "+ message.getTradeId() + " on eventTYpe "+message.getEventType());
+							
 			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction() + " oldMessage found with subaction of oldMessage as "+oldMessage.getSubAction()); 
 			    			
 			    		} else {
+			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found oldMessage + " +  oldMessage.getId() + " with status " + oldMessage.getStatus() + " and subAction as " + oldMessage.getSubAction() + " on trade "+ message.getTradeId() + " on eventTYpe "+message.getEventType());
+							
 			    			message.setSubAction("NEW");
 			    			message.setId(oldMessage.getId());
 			    			message.setUpdateBeforeSend("TRUE");
 			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction() + " oldMessage found with subaction of oldMessage as "+oldMessage.getSubAction()); 
 			    			
 			    			updatetMessages.add(message);
+			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages not creating new Message and old message in update vector  insert Vector with subAction as  + " +  message.getSubAction() + " on with status " + message.getStatus()+ " on trade "+ message.getTradeId() + " on eventTYpe "+message.getEventType());
+							
 			    		//	message.setLinkId(oldMessage.getLinkId());
 			    			//message.
 			    		}
 			    		if(message.getEventType().contains("CANCELLED") && isMessageWasSend(oldMessage,oldmess)) {
+			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found oldMessage + " +  oldMessage.getId() + " with status " + oldMessage.getStatus() + " and subAction as " + oldMessage.getSubAction() + " on trade "+ message.getTradeId() + " on eventTYpe "+message.getEventType());
+							
+			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages with message " +  message.getId() + " with status " + message.getStatus() + " and subAction as " + message.getSubAction() + " on trade "+ message.getTradeId() + " on eventTYpe "+message.getEventType());
+							
 			    			message.setSubAction("CANCEL");
 			    			message.setLinkId(oldMessage.getId());
 			    			if(isMessageWasSend(oldMessage,oldmess)) {
-			    			 insertMessages.add(message);
-			    				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction() + " oldMessage found with subaction of oldMessage as "+oldMessage.getSubAction()); 
+			    						 insertMessages.add(message);
+			    						 MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages with oldMessage are found in send status so new message " +  message.getId() + " with status " + message.getStatus() + " and subAction are set to  " + message.getSubAction() + " on trade "+ message.getTradeId() + " on eventTYpe "+message.getEventType() +" and added to insert vector ");
+			 										 
+			    				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction() + " as oldMessage found with subaction of oldMessage as "+oldMessage.getSubAction()); 
 					    		
 			    		} else {
+			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found oldMessage + " +  oldMessage.getId() + " with status " + oldMessage.getStatus() + " and subAction as " + oldMessage.getSubAction() + " on trade "+ message.getTradeId() + " on eventTYpe "+message.getEventType());
+			    			 MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages with oldMessage are not  found in send status so new message " +  message.getId() + " with status " + message.getStatus() + " and subAction are set to  " + message.getSubAction() + " on trade "+ message.getTradeId() + " on eventTYpe "+message.getEventType() +" and added to updated  vector ");
+	 							
 			    			message.setId(oldMessage.getId());
 			    			message.setSubAction("NEW");
 			    			message.setUpdateBeforeSend("TRUE");
-			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction() + " oldMessage found with subaction of oldMessage as "+oldMessage.getSubAction()); 
-					    	updatetMessages.add(message);
+			    				updatetMessages.add(message);
+			    				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction() + " oldMessage found with subaction of oldMessage as "+oldMessage.getSubAction()); 
+							    
 			    		}
 			    				
 			    		}
@@ -294,6 +401,11 @@ public class MessageProcessor extends Thread {
 		}
 		filterMessages.put("insert",insertMessages);
 		filterMessages.put("update",updatetMessages);
+			}catch(NullPointerException e) {
+				commonUTIL.displayError("MessageProcessor", "filterOldMessages", e);
+				MessageServiceAppender.printLog("ERROR", "MessageProcessor in  filterOldMessages found error");
+				
+			}
 	}
 
 	
@@ -326,7 +438,18 @@ public class MessageProcessor extends Thread {
 		return message;
 		
 	}
-	
+	private Vector<Message> getOLDMessageForCancel(String event_type,String triggerON,String formattype,int tradeid,String messageType) {
+		Vector<Message> message = null;
+		try {
+			
+			message = (Vector<Message>) remoteBO.getOLDMessageForCancel(event_type,formattype,tradeid,messageType,triggerON);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return message;
+		
+	}
 	
 	private Vector<MessageConfig> getMessageConfig(EventProcessor tradeEvent, Trade trade) {
 		Vector<MessageConfig> messConfigs = null;
@@ -344,6 +467,10 @@ public class MessageProcessor extends Thread {
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}catch(NullPointerException e) {
+			commonUTIL.displayError("MessageProcessor", "getMessageConfig", e);
+			MessageServiceAppender.printLog("ERROR", "MessageProcessor in  getMessageConfig found error");
+			
 		}
 		return messConfigs;
 	}
@@ -375,6 +502,7 @@ public class MessageProcessor extends Thread {
 		if(filterMessages == null || filterMessages.isEmpty()) {
 			return;
 		}
+		try {
 		Vector<Message> insertMessage = filterMessages.get("insert");
 		Vector<Message> updateMessage = filterMessages.get("update");
 			saveMessages(insertMessage,newpublishMessages,"insert",trade,transfer);
@@ -382,7 +510,11 @@ public class MessageProcessor extends Thread {
 			//publishMessages.isEmpty();
 			setPublishMessages(newpublishMessages);
 			manager.updateEventProcess(event);
-			
+		}	catch(NullPointerException e) {
+				commonUTIL.displayError("MessageProcessor", "saveFilterMessages", e);
+				MessageServiceAppender.printLog("ERROR", "MessageProcessor in  saveFilterMessages found error");
+				
+			}
 			
 		//remoteBO.save
 	}
@@ -390,7 +522,13 @@ public class MessageProcessor extends Thread {
 	
     private void saveMessages(Vector<Message> messages,Vector<Message> publishMessage,String sqlType,Trade trade,Transfer transfer) {
     	try {
+    		
 			Vector<Message> messagesData =	remoteBO.saveMesage(messages, sqlType,trade,transfer);
+			if(commonUTIL.isEmpty(messagesData)) {
+				MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  saveMessages Method no message are "+ sqlType+ " againg trade "+ trade.getId()); 
+			    
+				return;
+			}
 			if(messagesData != null ) {
 				for(int i=0;i<messagesData.size();i++) {
 					
@@ -401,6 +539,10 @@ public class MessageProcessor extends Thread {
 	} catch (RemoteException e) {
 	// TODO Auto-generated catch block
 		e.printStackTrace();
+	}catch(NullPointerException e) {
+		commonUTIL.displayError("MessageProcessor", "saveFilterMessages", e);
+		MessageServiceAppender.printLog("ERROR", "MessageProcessor in  saveMessages found error");
+		
 	}
     }
 
@@ -452,7 +594,11 @@ public class MessageProcessor extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		  
+			  catch(NullPointerException e) {
+					commonUTIL.displayError("MessageProcessor", "run", e);
+					MessageServiceAppender.printLog("ERROR", "MessageProcessor in  run found error");
+					
+				}
 		  }
 	  }
     private boolean isDuplicateEvent(Trade trade) {
