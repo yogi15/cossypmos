@@ -33,7 +33,7 @@ public class EngineMonitorService extends Thread {
 		mointerEvntListener.setEngineMonitorService(this);
 		this.monitorserver = monitorserver;
 		
-		this.start();
+	//	this.start();
 	}
 	boolean startTrack = false;
 	public void monitorLiveEngineService(EventProcessor event) {
@@ -47,8 +47,9 @@ public class EngineMonitorService extends Thread {
 			producer++;
 			EngineEventMonitorProcessor  engineMEvt = (EngineEventMonitorProcessor) event;
 			//EngineTracker egnine 
-			//System.out.println("EngineMointer Consuming " + engineMEvt.getEngineName() + " " + engineMEvt.getIsAliveAtdateTime());
+		//	System.out.println("EngineMointer Consuming " + engineMEvt.getEngineName() + " " + engineMEvt.getIsAliveAtdateTime());
 			synchronized (engineTrackersData) {
+				
 				EngineTracker etrack = addEngineForTrack(engineMEvt.getEngineName(),engineMEvt.getClientID());
 				engineTrackersData.put(engineMEvt.getEngineName(),etrack );
 				if(engineTrackersData.size() > 0) {
@@ -58,6 +59,11 @@ public class EngineMonitorService extends Thread {
 			
 			} catch(NullPointerException e) {
 				System.out.println(" EnginMointorService getting NullPointor monitorLiveEngineService ");
+			}
+				catch(NumberFormatException e) {
+					System.out.println(" EnginMointorService getting NumberFormatException "+e);
+				}catch(Exception e) {
+				System.out.println(" EnginMointorService getting Exception  "+e);
 			}
 			}
 		}
@@ -79,7 +85,7 @@ public class EngineMonitorService extends Thread {
 						trackEngine = eng.nextElement();
 						if(trackEngine != null) {
 							if(!isAlive(trackEngine.getLastestTimeUpdate())) {
-								//System.out.println("EngineMointer tracking " + trackEngine.getEngineName() + " Shutdown " + trackEngine.getLastestTimeUpdate());
+								System.out.println("EngineMointer tracking " + trackEngine.getEngineName() + " Shutdown " + trackEngine.getLastestTimeUpdate());
 							
 								try {
 									monitorserver.removeEngine(trackEngine.getEngineName()+"_Stopped",trackEngine.getClientID());
@@ -110,6 +116,11 @@ public class EngineMonitorService extends Thread {
 			
 		} catch(NullPointerException e) {
 			System.out.println(" EnginMointorService getting NullPointor");
+		} catch(NumberFormatException e) {
+			System.out.println(" EnginMointorService getting NumberFormatException  "+e);
+		}
+		 catch(Exception e) {
+			System.out.println(" EnginMointorService getting NullPointor "+e);
 		}
 		}
 	}
@@ -121,7 +132,7 @@ public class EngineMonitorService extends Thread {
 				long diff = commonUTIL.getCurrentDate().getTime() - date1.getTime();
 		    long diffSeconds = diff / 1000 % 60;
 		   // System.out.println(diffSeconds);
-		   if(diffSeconds > 7) 
+		   if(diffSeconds > 1000000000) 
 			   return false;
 		  
 
@@ -132,11 +143,15 @@ public class EngineMonitorService extends Thread {
 	} catch(NullPointerException e) {
 		System.out.println(" EnginMointorService getting NullPointor isAlive method");
 	}
+		catch(NumberFormatException e) {
+			System.out.println(" EnginMointorService getting NumberFormatException isAlive method");
+		}
 		 return flag;
 		
 
 	}
 	public EngineTracker addEngineForTrack(String engine,int clientID) {
+		
 		String timeStampTrack = format.format(commonUTIL.getCurrentDate()); /// how to add the logic of date differene.
 		EngineTracker egineTracker = new EngineTracker();
 		egineTracker.setEngineName(engine);

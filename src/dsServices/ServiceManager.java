@@ -1,9 +1,13 @@
 package dsServices;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
+import java.util.Properties;
 import java.util.Vector;
+
+import org.apache.log4j.PropertyConfigurator;
 
 import dsEventProcessor.EngineEventMonitorProcessor;
 
@@ -14,6 +18,7 @@ public abstract class ServiceManager  implements Runnable, Serializable {
 	String applicationName = "";
 	Thread engineMonitorThread = null;
 	 EngineEventMonitorProcessor  event = null;
+	 String monitorService = "Monitor";
 	 /**
 	 * @param clientID the clientID to set
 	 */
@@ -37,6 +42,20 @@ public abstract class ServiceManager  implements Runnable, Serializable {
 	}
 	public abstract void start();
 	public abstract void stop();
+	public ServiceManager() {
+		// getLog4IntputStream();
+		 //  PropertyConfigurator.configure(log4P);
+	         
+	}
+	 Properties log4P = new Properties();
+	  private void getLog4IntputStream() {
+		   try {
+			   log4P.load(this.getClass().getClassLoader().getResourceAsStream("resources/log4j.properties"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+	   }
 	CreateNewMessage newMessage = null;
 	public void setNewMessage(CreateNewMessage newMessage) {
 		this.newMessage = newMessage;
@@ -48,7 +67,7 @@ public abstract class ServiceManager  implements Runnable, Serializable {
 				if(newMessage == null)
 					startProducingMessage();
 				
-				newMessage.produceNewMessage(messageIndicator,"TRADE",messageType,(Serializable) object,null); 
+				newMessage.produceNewMessage(messageIndicator,monitorService,messageType,(Serializable) object,null); 
 				//newMessage.run();
 				
 				}catch(Exception e){
@@ -61,7 +80,7 @@ public abstract class ServiceManager  implements Runnable, Serializable {
 		  
 			Thread sendMessage =  new Thread(newMessage);
 			 setNewMessage(newMessage);
-			 sendMessage.start();
+			// sendMessage.start();
 			 
 	   }
 	 public void startProducingMessage(String applicationName,String hostName,String portNo,ServiceManager serviceManager) {
@@ -70,7 +89,7 @@ public abstract class ServiceManager  implements Runnable, Serializable {
 		event =  new EngineEventMonitorProcessor();
 		clientID = serviceManager.getClientID();
 		 engineMonitorThread = new Thread(serviceManager,applicationName);
-		 commonUTIL.display("TransferManager", "Registering TransferManager Monitoring Engine ...... to servier at "+hostName);
+		 commonUTIL.display(getApplicationName(), "Registering "+ getApplicationName() + "  Monitoring Engine ...... to servier at "+hostName);
 		   newMessage	 = new CreateNewMessage(hostName+portNo); // this 
 		   engineMonitorThread.start();
 			//Thread sendMessage =  new Thread(newMessage);
@@ -78,7 +97,10 @@ public abstract class ServiceManager  implements Runnable, Serializable {
 			 setNewMessage(newMessage);
 		 } catch(NullPointerException e) {
 				System.out.println(" ServiceManager " +getApplicationName()+ "  startProducingMessage");
-			}
+			
+	 } catch(NumberFormatException e) {
+			System.out.println(" ServiceManager " +getApplicationName()+ "  startProducingMessage");
+		}
 			// sendMessage.start();
 			 
 	   }
@@ -91,9 +113,10 @@ public abstract class ServiceManager  implements Runnable, Serializable {
 	public void run() {
 		 for( ; ; ) {
 			 try {
-				Thread.sleep(7000);
 				
-				publishnewEvent("TRANS_NEWTRANSFER","TRADE",getEngineMonitorEvent(applicationName));
+				
+				publishnewEvent("TRANS_NEWTRANSFER",monitorService,getEngineMonitorEvent(applicationName));
+				Thread.sleep(7000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 			   commonUTIL.displayError("ServiceManager "+getApplicationName(), "Run Method", e);

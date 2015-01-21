@@ -9,6 +9,9 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
+import logAppender.MessageServiceAppender;
+import logAppender.ServerServiceAppender;
+import logAppender.TransferServiceAppender;
 import mqServices.messageProducer.CreateNewMessage;
 
 import util.commonUTIL;
@@ -186,7 +189,7 @@ public void startProducingMessage() {
 				 trs.setId(id);
 				 trs.setVersion(1);  // not sure how this will work but need to tested properly temperary soultion.
 				 Task task =  processTask(trs,trade,userID,wfs);
-				 publishTask(task,trade,trs);
+				// publishTask(task,trade,trs);
 				 newTransfer.addElement(trs);
 				 
 				}
@@ -203,7 +206,7 @@ public void startProducingMessage() {
 			     trs.setStatus(wfs.getOrgStatus());
 			     trs.setUserid(userID);
 					updateTransfer(trs);
-					 publishTaskOnOldTransfer(oldTransfer,trade,userID);
+				//	 publishTaskOnOldTransfer(oldTransfer,trade,userID);
 				//	Task task =  processTask(trs,trade,userID,wfs);
 					// publishTask(task,trade,trs);
 				 newTransfer.addElement(trs);
@@ -221,7 +224,7 @@ public void startProducingMessage() {
 			     trs.setStatus(wfs.getOrgStatus());
 			     updateTransfer(trs);
 			     Task task =  processTask(trs,trade,userID,wfs);
-				 publishTask(task,trade,trs);
+				// publishTask(task,trade,trs);
 				 
 				}
 			}
@@ -507,11 +510,12 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 	
 	
 	public WFConfig getStatusOnTransferAction(Transfer transfer,String status,Vector<String> statusMessages,Trade trade) {
+		try {
 		Product product = ProductSQL.selectProduct(transfer.getProductId(), dsSQL.getConn());
 		String whereClause = "productType ='" + product.getProductType() + "' and productSubType = '"+ product.getProdcutShortName() + "' and currentstatus = '" + transfer.getStatus() + "' and action = '" + transfer.getAction() + "' and type ='TRANSFER'";
 		Vector  wfs = (Vector) WFConfigSQL.selectWhere(whereClause, dsSQL.getConn());// this must alway retunr one transition which is unique .
 		if(commonUTIL.isEmpty(wfs)) {
-			commonUTIL.displayError("BOProcessImp", "getStatusOnTransferAction" + " not getting Transfer workflow rule at " +  whereClause + " ",  null);
+	       commonUTIL.display("BOProcessImp", "getStatusOnTransferAction" + " not getting Transfer workflow rule at " +  whereClause + " ");
 			return null;
 		}
 		WFConfig wf = (WFConfig) wfs.elementAt(0);
@@ -531,20 +535,35 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 		}
 		wf = checkSTPExistsonTransition(product,wf,transfer,statusMessages,trade) ; //check if stp exists on this transition
 		return wf;
+		}catch(NullPointerException e) {
+			commonUTIL.displayError("BOProcessImp", "getStatusOnTransferAction", e);
+			TransferServiceAppender.printLog("ERROR", "BOProcessImp  getStatusOnTransferAction" + e);
+			return null;
+			
+		}
 	}
 	
 	
 	public WFConfig getStatusOnMessageAction(Message message,String status,Vector<String> statusMessages,Trade trade,Transfer transfer) {
+		   MessageServiceAppender.printLog("DEBUG", "BOProcessImp in  getStatusOnMessageAction Method for getting Action and status " );
+			
 		Product product = ProductSQL.selectProduct(message.getproductID(), dsSQL.getConn());
 		String whereClause = "productType ='" + product.getProductType() + "' and productSubType = '"+ product.getProdcutShortName() + "' and currentstatus = '" + message.getStatus() + "' and action = '" + message.getAction() + "' and type ='MESSAGE'";
 		Vector  wfs = (Vector) WFConfigSQL.selectWhere(whereClause, dsSQL.getConn());// this must alway retunr one transition which is unique .
 		if(commonUTIL.isEmpty(wfs)) {
-			commonUTIL.displayError("BOProcessImp", "getStatusOnTransferAction" + " not getting Message  workflow rule at " +  whereClause + " ",  null);
+			 MessageServiceAppender.printLog("ERROR", "BOProcessImp in getStatusOnMessageAction" + " not getting Message  workflow rule at " +  whereClause + " ");
+				
+			commonUTIL.display("BOProcessImp", "getStatusOnMessageAction" + " not getting Message  workflow transition at " +  whereClause + " ");
 			return null;
 		}
 		WFConfig wf = (WFConfig) wfs.elementAt(0);
+		 MessageServiceAppender.printLog("DEBUG", "BOProcessImp in getStatusOnMessageAction" + "  getting Message  workflow transition iD  " +  wf.getId() + " ");
+			
 		if(!commonUTIL.isEmpty(wf.getRule())) {
-			if(wfhandler != null) {				
+			 MessageServiceAppender.printLog("DEBUG", "BOProcessImp in getStatusOnMessageAction" + "  calling  Message  workflow Rule  " +  wf.getRule() + " ");
+				
+			if(wfhandler != null) {		
+					
 				wfhandler.generateMessageRule(trade,transfer,message, wf, statusMessages,dsSQL.getConn());				
 			} else {
 				wfhandler = new WFHandler();				
@@ -558,10 +577,14 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 			wfhandler = new WFHandler();
 		}
 		wf = checkSTPExistsonTransition(product,wf,message,statusMessages,trade,transfer) ; //check if stp exists on this transition
+		 MessageServiceAppender.printLog("DEBUG", "BOProcessImp in getStatusOnMessageAction  after checkSTPExistsonTransition wf transition found   " + wf.getId());
+			
 		return wf;
 	}
 	private WFConfig checkSTPExistsonTransition(Product product,WFConfig wf,Message message,Vector<String> statusMessages,Trade trade,Transfer transfer) {
 		// TODO Auto-generated method stub
+		 MessageServiceAppender.printLog("DEBUG", "BOProcessImp in checkSTPExistsonTransition" + "  checking for STP exist for WF transition id   " +  wf.getId() + " ");
+			
 		WFConfig cf = wf;
 		if(wf != null) {
 			if(wf.getAuto() == 1 ) {
@@ -778,13 +801,19 @@ private Task processTask(Transfer transfer,Trade trade,int userID,WFConfig wfc) 
 			if(message.getTransferId() != 0) {
 				transfer = (Transfer) getTransfer(message.getTransferId());
 			}
+			MessageServiceAppender.printLog("DEBUG", "BOProcessImp in  updateMessageAndPublish Method for updating Message id "+message.getId() );
+			   
 			updateMessage = saveMesage(updateMessage, "update", trade, transfer);
+			MessageServiceAppender.printLog("DEBUG", "BOProcessImp in  updateMessageAndPublish Method for updated >>>  Message id "+message.getId() );
+			
 			// MessageEventProcessor  as there is no sender engine we are not publishing messages. 
 			//saveMessage(message)
 			
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			commonUTIL.displayError("BOProcessImp ", "updateMessageAndPublish ", e);
+			MessageServiceAppender.printLog("ERROR", "BOProcessImp in  updateMessageAndPublish Method for getting error in  updating >>>  Message id "+message.getId() );
+			
 			return null;
 		}
 		return updateMessage;
@@ -924,6 +953,9 @@ return status;
 	public Collection saveTransfers(Vector<Transfer> transfers, String type,
 			String tradeAction, NettingConfig netConfig,Trade trade) throws RemoteException {
 		Vector<Transfer> newTransfer = new Vector();
+		
+		try {
+			
 		if(!transfers.isEmpty()) {
 			if(type.equalsIgnoreCase("insert")) {
 				Iterator<Transfer > trans = transfers.iterator();
@@ -950,7 +982,7 @@ return status;
 				         trs.setId(id);
 				         trs.setVersion(1);  // not sure how this will work but need to tested properly temperary soultion.
 				    	 Task task =  processTask(trs,trade,trade.getUserID(),wfs);
-				 	     publishTask(task,trade,trs);
+				 	    // publishTask(task,trade,trs);
 				 	     newTransfer.addElement(trs);
 			     	 
 				 
@@ -995,7 +1027,7 @@ return status;
 					    	 updateTransfer(trs);
 				     			}
 					
-					 publishTaskOnOldTransfer(oldTransfer,trade,trade.getUserID()); // userid need to be checked. 
+				//	 publishTaskOnOldTransfer(oldTransfer,trade,trade.getUserID()); // userid need to be checked. 
 				//	 Task task =  processTask(trs,trade,trade.getUserID(),wfs);
 					// publishTask(task,trade,trs);
 				    newTransfer.addElement(trs);
@@ -1019,14 +1051,25 @@ return status;
 			    	 trs.setNettedTransferID(0);
 			    //  nettedTransfer.setSettleAmount(nettedTransfer.getSettleAmount() - trs.getAmount());
 			     }
-			     publishTaskOnOldTransfer(oldTransfer,trade,trade.getUserID()); // userid need to be checked. 
+			   //  publishTaskOnOldTransfer(oldTransfer,trade,trade.getUserID()); // userid need to be checked. 
 			     updateTransfer(trs);
 				 
 				}
 			}
 		}
-		
-		
+		}catch(NullPointerException e) {
+			commonUTIL.displayError("BOProcessImpL", "saveTransfers", e);
+			TransferServiceAppender.printLog("BOProcessImp", "saveTransfers  methods error "+e);
+			ServerServiceAppender.printLog("BOProcessImp", "saveTransfers  methods error "+e);
+			return null;
+		}catch(Exception  e) {
+			commonUTIL.displayError("BOProcessImpL", "saveTransfers", e);
+			TransferServiceAppender.printLog("BOProcessImp", "saveTransfers  methods error "+e);
+			ServerServiceAppender.printLog("BOProcessImp", "saveTransfers  methods error "+e);
+			
+			return null;
+		}
+		 
 		
 		return newTransfer;
 	}
@@ -1050,6 +1093,17 @@ return status;
 					} catch (RemoteException e) {
 						// TODO Auto-generated catch block
 						commonUTIL.displayError("BOProcessImpl", "publishTask", e);
+					} catch(NullPointerException e) {
+						commonUTIL.displayError("BOProcessImpL", "publishTask", e);
+						TransferServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+						ServerServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+						
+					}catch(Exception  e) {
+						commonUTIL.displayError("BOProcessImpL", "publishTask", e);
+						TransferServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+						ServerServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+						
+						
 					}
 			    }
 			}
@@ -1071,9 +1125,23 @@ return status;
 			    if(remoteTrade == null)
 			    	initRemoteInterface();
 						remoteTrade.publishnewTrade("TRANS_NEWTRANSFER","TRADE",taskEvent);
-					} catch (RemoteException e) {
+					}catch (RemoteException e) {
 						// TODO Auto-generated catch block
 						commonUTIL.displayError("BOProcessImpl", "publishTask", e);
+						TransferServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+						ServerServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+						
+					} catch(NullPointerException e) {
+						commonUTIL.displayError("BOProcessImpL", "publishTask", e);
+						TransferServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+						ServerServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+						
+					}catch(Exception  e) {
+						commonUTIL.displayError("BOProcessImpL", "publishTask", e);
+						TransferServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+						ServerServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+						
+						
 					}
 			    }
 			}
@@ -1121,7 +1189,7 @@ return status;
 				
 				Task task = getNettedTransferTask(nettedTransfer);
 				task.setTransfer(nettedTransfer);
-				   publishTask(task,null,null);
+				//   publishTask(task,null,null);
 				nettedTransfers.put(nettedTransfer.getDeliveryDate()+"_"+netConfig.getId(),nettedTransfer);
 			} else {
 			
@@ -1140,7 +1208,7 @@ return status;
 			   nettedTransfers.put(nettedTransfer.getDeliveryDate()+"_"+netConfig.getId(),nettedTransfer);
 			   Task task = getNettedTransferTask(nettedTransfer);
 			   task.setTransfer(nettedTransfer);
-			   publishTask(task,null,null);
+			//   publishTask(task,null,null);
 		   }
 		}
 	    
@@ -1327,29 +1395,57 @@ return status;
 	public Vector<Message> saveMesage(Vector<Message> mess, String sqlType,Trade trade,Transfer transfer)
 			throws RemoteException {
 		// TODO Auto-generated method stub
+		try {
 		Vector<Message> messages = null;
+		MessageServiceAppender.printLog("DEBUG", "BOProcessImp in  saveMessages Method found " + mess.size() + "  messages for "+ sqlType+ " againg trade "+ trade.getId()); 
+		   
 		if(mess == null || mess.isEmpty()) 
 			return null;
 		if(sqlType.equalsIgnoreCase("insert")) {
 			messages = processMessageAction(mess,"insert",trade,transfer);
-			messages =  MessageSQL.insert(messages, dsSQL.getConn());
+			
+			if(!commonUTIL.isEmpty(messages)) {
+				messages =  MessageSQL.insert(messages, dsSQL.getConn());
+			MessageServiceAppender.printLog("DEBUG", "BOProcessImp in  saveMessages Method Ready insert  " + messages.size() + "  messages for "+ sqlType); 
+			
 			if(remoteTrade != null) {
 				for(int i=0;i<messages.size();i++) {
 					Message savemess = messages.get(i);
 					if(savemess.getTaskID() == 1) {
 						
 						Task task =  processTask(savemess, transfer, trade, savemess.getUserID(), savemess.getTaskID());
-						publishTask(task, trade, savemess, transfer);
+						//publishTask(task, trade, savemess, transfer);
 					}
 					
 				}
 			}
-		} 
+		}  else {
+			MessageServiceAppender.printLog("DEBUG", "BOProcessImp in  saveMessages Method No message to insert  "); 
+		}
+			
+		}
 		if(sqlType.equalsIgnoreCase("update")) {
 			messages = processMessageAction(mess,"update",trade,transfer);
+			MessageServiceAppender.printLog("DEBUG", "BOProcessImp in  saveMessages Method Ready to update  " + messages.size() + "  messages for "+ sqlType+ " againg trade "+ trade.getId()); 
+			
 			messages =  MessageSQL.update(mess, dsSQL.getConn());
 		}
+
 		return messages;
+		} catch(NullPointerException e) {
+			commonUTIL.displayError("BOProcessImpL", "publishTask", e);
+			TransferServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+			ServerServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+			return null;
+			
+		}catch(Exception  e) {
+			commonUTIL.displayError("BOProcessImpL", "publishTask", e);
+			TransferServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+			ServerServiceAppender.printLog("BOProcessImp", "publishTask  methods error "+e);
+			return null;
+			
+			
+		}
 	}
 	/*
 	
@@ -1416,28 +1512,38 @@ return status;
 	*/
 	private Vector<Message> processMessageAction(Vector<Message> messages,String sqlType,Trade trade,Transfer transfer) {
 		Vector<Message> messsageWithStatus = new Vector<Message>();
+		try {
+		boolean wfFlag = true;
 	   for(int i=0;i<messages.size();i++) {
 		   if(sqlType.equalsIgnoreCase("insert")) {
+			   wfFlag = true;
 			   Message message = messages.get(i);
 			   message.setAction("NEW");
 			   message.setStatus("NONE");
 			 //  message.setSubAction("NEW");
-			   
+			   MessageServiceAppender.printLog("DEBUG", "BOProcessImp in  processMessageAction Method for inserting Message" );
 			   Vector<String> statusMessages = new Vector<String>();
 			   WFConfig wf =  getStatusOnMessageAction(message, message.getStatus(), statusMessages, trade, transfer);
 			   if(wf == null) {
+				   MessageServiceAppender.printLog("DEBUG", "BOProcessImp in  processMessageAction No workflow found for trade message on message status  "+message.getStatus() );
+					  
 				   statusMessages.add(String.valueOf(new Integer(-10)));
-				commonUTIL.displayError("BOProcessImp", "SaveMessage wf is null for message "+message.getId() + " at  " + message.getStatus() + " on action " + message.getAction() , new Exception());
+				commonUTIL.display("BOProcessImp", "SaveMessage wf is null for message "+message.getId() + " at  " + message.getStatus() + " on action " + message.getAction() );
 				statusMessages.add(new String(" Action "+ message.getAction() + " not Valid on status "+ message.getStatus()));
-				
-				return messsageWithStatus;
+				wfFlag = false;
+				 MessageServiceAppender.printLog("ERROR", "BOProcessImp in  processMessageAction SaveMessage wf rule failed for message "+message.getId() + " at  " + message.getStatus() + " on action " + message.getAction() );
+					
+				//return messsageWithStatus;
 		   }
 			   if(statusMessages.size() > 0) {
-				   commonUTIL.displayError("WorkflowImp", "SaveMessage wf rule failed for message "+message.getId() + " at  " + message.getStatus() + " on action " + message.getAction() , new Exception());
+				   wfFlag = false;
+				//   commonUTIL.displayError("WorkflowImp", "SaveMessage wf rule failed for message "+message.getId() + " at  " + message.getStatus() + " on action " + message.getAction() , new Exception());
 					statusMessages.add(new String(" Action "+ message.getAction() + " not Valid on status "+ message.getStatus()));
-					
-				   return messsageWithStatus;
+					  MessageServiceAppender.printLog("ERROR", "BOProcessImp in  processMessageAction SaveMessage wf rule failed for message "+message.getId() + " at  " + message.getStatus() + " on action " + message.getAction() );
+						
+				 //  return messsageWithStatus;
 			   }
+			   if(wfFlag) {
 			   if(wf.isTask())
 			   message.setTaskID(1);  // this will publish task for task Station.
 			   message.setStatus(wf.getOrgStatus());
@@ -1446,6 +1552,7 @@ return status;
 			   }
 			  
 			   messsageWithStatus.add(message);
+			   }
 		   }
 		   if(sqlType.equalsIgnoreCase("update")) {
 			   Message message = messages.get(i);
@@ -1457,6 +1564,26 @@ return status;
 				   message.setStatus("NONE");
 			   }
 			   WFConfig wf =  getStatusOnMessageAction(message, message.getStatus(), statusMessages, trade, transfer);
+			   if(wf == null) {
+				   MessageServiceAppender.printLog("DEBUG", "BOProcessImp in  processMessageAction No workflow found for trade message on message status  "+message.getStatus() );
+					  
+				   statusMessages.add(String.valueOf(new Integer(-10)));
+				commonUTIL.display("BOProcessImp", "SaveMessage wf is null for message "+message.getId() + " at  " + message.getStatus() + " on action " + message.getAction() );
+				statusMessages.add(new String(" Action "+ message.getAction() + " not Valid on status "+ message.getStatus()));
+				wfFlag = false;
+				 MessageServiceAppender.printLog("ERROR", "BOProcessImp in  processMessageAction SaveMessage wf rule failed for message "+message.getId() + " at  " + message.getStatus() + " on action " + message.getAction() );
+					
+				//return messsageWithStatus;
+		   }
+			   if(statusMessages.size() > 0) {
+				   wfFlag = false;
+				//   commonUTIL.displayError("WorkflowImp", "SaveMessage wf rule failed for message "+message.getId() + " at  " + message.getStatus() + " on action " + message.getAction() , new Exception());
+					statusMessages.add(new String(" Action "+ message.getAction() + " not Valid on status "+ message.getStatus()));
+					  MessageServiceAppender.printLog("ERROR", "BOProcessImp in  processMessageAction SaveMessage wf rule failed for message "+message.getId() + " at  " + message.getStatus() + " on action " + message.getAction() );
+						
+				 //  return messsageWithStatus;
+			   }
+			   if(wfFlag) {
 			   message.setStatus(wf.getOrgStatus());
 			   if(wf.isTask())
 				   message.setTaskID(1);  // this will publish task for task Station.
@@ -1466,10 +1593,25 @@ return status;
 				  // message.setSubAction("AMEND");
 			   }
 			   messsageWithStatus.add(message);
+			   }
 		   }
 		   
 	   }
 	   return messsageWithStatus;
+		} catch(NullPointerException e) {
+			commonUTIL.displayError("BOProcessImpL", "processMessageAction", e);
+			TransferServiceAppender.printLog("BOProcessImp", "processMessageAction  methods error "+e);
+			ServerServiceAppender.printLog("BOProcessImp", "processMessageAction  methods error "+e);
+			return null;
+			
+		}catch(Exception  e) {
+			commonUTIL.displayError("BOProcessImpL", "processMessageAction", e);
+			TransferServiceAppender.printLog("BOProcessImp", "processMessageAction  methods error "+e);
+			ServerServiceAppender.printLog("BOProcessImp", "processMessageAction  methods error "+e);
+			return null;
+			
+			
+		}
 	}
 	@Override
 	public Vector<Message> getMessagesOnWhere(String where)
@@ -1535,6 +1677,20 @@ return status;
 		return getTransferOnWhere(sqlwhere);
 		
 		
+	}
+	
+	@Override
+	public Collection getOLDMessageForCancel(String messageEventtype,
+			String messagetype, int tradeid, String messageFormatType,String triggeron)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		Vector<Message> messages = null;
+		if(!commonUTIL.isEmpty(messageEventtype)) {
+			String originalEvnt = messageEventtype.replaceAll("CANCELLED", "APPROVED");
+			String sql = " tradeid = "+tradeid + " and messagetype ='"+messagetype+"' and format = '"+messageFormatType+"' and triggeron = '"+triggeron+"'";
+			messages = 	(Vector<Message>) MessageSQL.getMessageOnWhere(sql, dsSQL.getConn());
+		}
+		return messages;
 	}
 
 }
