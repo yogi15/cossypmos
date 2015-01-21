@@ -51,32 +51,42 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 		 de =ServerConnectionUtil.connect(host, 1099,commonUTIL.getServerIP());
 		 this.hostName = hostName;
 		 this.managerName = managerName;
+		 queueName = "TRADE";
+	 }
+	 public ControllerManager(String host,String hostName,String managerName,String queueName) {
+		 de =ServerConnectionUtil.connect(host, 1099,commonUTIL.getServerIP());
+		 this.hostName = hostName;
+		 this.managerName = managerName;
+		 this.queueName = queueName;
 	 }
 	 public ControllerManager(String host,String hostName,String managerName,String userName,String Password) {
 		 de =ServerConnectionUtil.connectServer(host, 1099,commonUTIL.getServerIP(),managerName,userName,Password);
 		 this.hostName = hostName;
 		 this.managerName = managerName;
+		 queueName = "TRADE";
 	 }
 	 public ControllerManager(String host,String hostName,String managerName,Users user) {
 		 de =ServerConnectionUtil.connectServer(host, 1099,commonUTIL.getServerIP(),managerName,user);
 		
 		 this.hostName = hostName;
 		 this.managerName = managerName;
+		 queueName = "TRADE";
 	 }
 	 public ControllerManager(String host,String hostName,String managerName,Users user,ServiceManager serviceManager) {
 		 de =ServerConnectionUtil.connectServer(host, 1099,commonUTIL.getServerIP(),managerName,user);
 		 this.serviceManager = serviceManager;
 		 this.hostName = hostName;
 		 this.managerName = managerName;
+		 queueName = "TRADE";
 	 }
 	@Override
 		public void onException(JMSException e) {
 		
 			commonUTIL.displayError( getManagerName(),"Error in listening" , e);
-			TransferServiceAppender.printLog("ERROR", "TransferService getting Down as getting Error in listening JMS Service "+e);
-			if(serviceManager != null)
-			serviceManager.stop();
-			System.exit(0);
+			TransferServiceAppender.printLog("ERROR", getManagerName() + "  getting Down as getting Error in listening JMS Service "+e);
+			//if(serviceManager != null)
+		//	serviceManager.stop();
+			//System.exit(0);
 		}
 
 		@Override
@@ -99,11 +109,12 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 			            // Create the destination (Topic or Queue)
 			           
 			            
-			            Destination destination =  session.createTopic("TRADE");
-
+			            Destination destination =  session.createTopic(queueName);
+                    //    System.out.println("TTTTTTTTTTTTTTTTTTTTTTTTTT consumer " +    queueName);
 			            // Create a MessageConsumer from the Session to the Topic or Queue
 			            MessageConsumer consumer = session.createConsumer(destination);
-			            Message message = consumer.receive(19000);
+			           
+			            Message message = consumer.receive(1210000);
 
 			            if (message instanceof ObjectMessage) {
 			            	ObjectMessage oMessage = (ObjectMessage) message;
@@ -120,30 +131,31 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 			            consumer.close();
 			            session.close();
 			            connection.close();
-			            Thread.sleep(800);
+			            Thread.sleep(100);
 				 } catch (java.lang.NullPointerException e) {
 						// TODO Auto-generated catch block
 					   commonUTIL.displayError("ControllerManager " +  getManagerName(), "run()", e);
-					   if(serviceManager != null)
-							serviceManager.stop();
+					   return;
+				//	   if(serviceManager != null)
+							//serviceManager.stop();
 					      
 					
 				} catch (java.lang.InterruptedException e) {
 					// TODO Auto-generated catch block
 					commonUTIL.display(manager.getManagerName(), manager.getManagerName() +"  is stop");
-					if(serviceManager != null)
-						serviceManager.stop();
+					//if(serviceManager != null)
+						//serviceManager.stop();
 					//System.exit(0);
 				} catch (JMSException j) {
 					// TODO Auto-generated catch block
 					commonUTIL.display(manager.getManagerName(), manager.getManagerName() +"  is stop");
-					if(serviceManager != null)
-						serviceManager.stop();
+				//	if(serviceManager != null)
+						//serviceManager.stop();
 					//System.exit(0);
 				} catch(Exception e) {
 					 commonUTIL.displayError( getManagerName(), "run()", e);
-					 if(serviceManager != null)
-							serviceManager.stop();
+					// if(serviceManager != null)
+							//serviceManager.stop();
 					// System.exit(0);
 				 
 				}

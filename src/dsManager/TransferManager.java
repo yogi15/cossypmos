@@ -83,10 +83,15 @@ public class TransferManager extends ControllerManager {
 	}
 	private boolean isDuplicateEvent(Trade trade) {
 		boolean flag = false;
+		 if(trade == null) {
+			 commonUTIL.display("TransferManager", "Trade is null from isDuplicateEvent");
+			 TransferServiceAppender.printLog("ERROR", "TransferService Trade is null from isDuplicateEvent");
+				
+		 }
 		String key = trade.getId()+"_"+trade.getStatus()+"_"+trade.getVersion();
 		 
 		if(duplicateEventCheck.containsKey(key)) {
-			System.out.println(" getting duplicat key ***** for key = " + key);
+		//	System.out.println(" getting duplicat key ***** for key = " + key);
 			flag = true;
 		}
 		return flag;
@@ -96,14 +101,16 @@ public class TransferManager extends ControllerManager {
 	public TransferManager(String host,String hostName,String managerName,TransferManagerStartup startUpManager ) throws JMSException {
 		
 		super(host,hostName,managerName,startUpManager.getUser(),startUpManager);
-		TransferServiceAppender.printLog("INFO", "TransferService connecting... to "+ host + " "+hostName + " with User "+startUpManager.getUser().getUser_name());
 		this.startUpManager = startUpManager;
 		
 		try {
 			if(getDe() == null) {
+				 commonUTIL.display("TransferManager", "getDe() is null from TransferManagerConstructor");
 				TransferServiceAppender.printLog("INFO", "TransferService not getting connection <<<<<<<<<<<<<<<<<<<< on "+ host + " "+hostName + " with User "+startUpManager.getUser().getUser_name());
 				return;
 			} 
+			TransferServiceAppender.printLog("INFO", "TransferService connecting... to "+ host + " "+hostName + " with User "+startUpManager.getUser().getUser_name());
+			
 			TransferServiceAppender.printLog("INFO", "TransferService connected >>>>>>>>>>>>>>>>>>>>> on "+ host + " "+hostName + " with User "+startUpManager.getUser().getUser_name());
 			
 			processor = new TransferProcessor();		
@@ -119,22 +126,31 @@ public class TransferManager extends ControllerManager {
 			processor.setRefData(refData);
 			processor.setRemoteTrade(remoteTrade);
 	   	    processor.setTransferManager(this);
-	   	    
+	   	    startUpManager.setClientID(getDe().getClientID());
+	   	    startUpManager.startProducingMessage(managerName, hostName, ":61616", startUpManager);
+	   	 processor.start();
+	   	 TransferServiceAppender.printLog("DEBUG", "TransferService starting process of all unconsumed events");
 	   	    if(!commonUTIL.isEmpty(eventNotProcess) && eventNotProcess.size() > 0) {
 	   	    	for(int i=0;i<eventNotProcess.size();i++) {  // first process all event are not consumed. 
 	   	    		EventProcessor event = eventNotProcess.get(i); 
 	   	    		handleEvent(event);
 	   	    	}
 	   	    }
-	   	    startUpManager.setClientID(getDe().getClientID());
-	   	    startUpManager.startProducingMessage(managerName, hostName, ":61616", startUpManager);
-	   	   processor.start();
+	   	 TransferServiceAppender.printLog("DEBUG", "TransferService Ending process of all unconsumed events");
+		   	
+	   	   
+	   	  
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			commonUTIL.displayError("TransferManager1", "In Constructor", e);
 			TransferServiceAppender.printLog("ERROR", "TransferService  getting Error on Startup "+e);
 			
-		} 
+		} catch (NullPointerException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("TransferManager1", "In Constructor", e);
+			TransferServiceAppender.printLog("ERROR", "TransferService getting Error on publishing SiginalEvents "+e);
+			
+		}
    		 
    		
 		
@@ -153,6 +169,11 @@ public class TransferManager extends ControllerManager {
 				commonUTIL.displayError("TransferManager2", "publishStartEvent", e);
 				TransferServiceAppender.printLog("ERROR", "TransferService getting Error on publishing SiginalEvents "+e);
 				
+			}catch (NullPointerException e) {
+				// TODO Auto-generated catch block
+				commonUTIL.displayError("TransferManager2", "publishStartEvent", e);
+				TransferServiceAppender.printLog("ERROR", "TransferService getting Error on publishing SiginalEvents "+e);
+				
 			}
 			
 		
@@ -161,7 +182,7 @@ public class TransferManager extends ControllerManager {
 // this event is used when transfer event successfully executed the Event.
 public void updateEventProcess(EventProcessor event) {
 	    try {
-	    		
+	        
 	    	event.setSubscribableList("Transfer");
 			remoteTrade.isEventExceuted(event);
 			TransferServiceAppender.printLog("DEBUG", "TransferService processed event "+event.getEventid() + " on event for Trade event "+event.getEventType());
@@ -171,17 +192,35 @@ public void updateEventProcess(EventProcessor event) {
 			commonUTIL.displayError("TransferManager3", "updateEventProcess", e);
 			TransferServiceAppender.printLog("ERROR", "TransferService getting Error on updateEventProcess "+e);
 			
+		} catch (NullPointerException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("TransferManager2", "updateEventProcess", e);
+			TransferServiceAppender.printLog("ERROR", "TransferService getting Error on publishing SiginalEvents "+e);
+			
 		}
 }
 	
 	private void setTransferTriggerEvt(Collection startUPData) {
 		// TODO Auto-generated method stub
+		try {
+		if(commonUTIL.isEmpty(startUPData)) {
+			TransferServiceAppender.printLog("INFO", "TransferService Triggering Evt are missing");
+			TransferServiceAppender.printLog("DEBUG", "TransferService Triggering Evt are missing");
+		return;
+		}
+		
 		Vector<StartUPData> startupData = (Vector)startUPData;
 		if((startupData != null) || (!startupData.isEmpty())) {
 			for(int i=0;i<startupData.size();i++) {
 				transferTriggerEvts.addElement(((StartUPData) startupData.get(i)).getName());
 			}
 		}
+		} catch (NullPointerException e) {
+				// TODO Auto-generated catch block
+				commonUTIL.displayError("TransferManager2", "setTransferTriggerEvt", e);
+				TransferServiceAppender.printLog("ERROR", "TransferService setTransferTriggerEvt "+e);
+				
+			}
 		
 	}
 
@@ -210,7 +249,7 @@ public void updateEventProcess(EventProcessor event) {
 		//	System.out.println("Starting of  ****** " +   tradeEvent.getTradeID() + " " + transferEvents.size());
 			//System.out.println(tradeEvent.getTrade().getId());
 			if(transferTriggerEvts.contains(event.getEventType())) {
-				  TransferServiceAppender.printLog("DEBUG", "TransferService starting processing  TransferEvent for Trade "+tradeEvent.getTradeID() + " on event of  "+event.getEventType());
+				  TransferServiceAppender.printLog("DEBUG", "TransferService starting processing  TransferEvent for Trade "+tradeEvent.getTrade().getId() + " on event of  "+event.getEventType());
 					
 					      
 					        synchronized (transferEvents) {
@@ -285,13 +324,16 @@ public void publishTransfer(Trade trade) throws JMSException {
 						  remoteTrade.publishnewTrade("TRANS_NEWTRANSFER","TRADE",event);
 						  TransferServiceAppender.printLog("DEBUG", "TransferService published  TransferEvent with"+event.getEventType() + " on Trade trade "+trade.getId());
 							
-						} else {
-							commonUTIL.display("TransferManager","Event not publish Trade is Cancel or Terminated  <<<<<<<<<<<<< ");						
-							}
+						} 
 					} catch (RemoteException e) {
 						// TODO Auto-generated catch block
 						commonUTIL.displayError("TransferManager5", "publishTransfer", e);
 						TransferServiceAppender.printLog("ERROR", "TransferService getting Error in publishTransfer Events "+e);
+						
+					}catch(NullPointerException e) {
+						commonUTIL.displayError("TransferManager5", "publishTransfer", e);
+						TransferServiceAppender.printLog("ERROR", "TransferService getting Error in publishTransfer Events "+e);
+						
 						
 					}
 				 
@@ -304,6 +346,7 @@ public void publishTransfer(Trade trade) throws JMSException {
 
 
 public TransferEventProcessor getTransferEvent(Transfer transfer,Trade trade ) {
+	try {
 	if(transfer == null) {
 		TransferServiceAppender.printLog("INFO", "TransferService not able to create TransferEvent on trade "+trade.getId() +" <<<<<<<<<<<<< ");
 		return null;
@@ -327,6 +370,12 @@ public TransferEventProcessor getTransferEvent(Transfer transfer,Trade trade ) {
 	
 	commonUTIL.display("TransferManager",transferEvent.getEventType());
 	return transferEvent;
+	}catch(NullPointerException e) {
+		commonUTIL.displayError("TransferManager5", "getTransferEvent", e);
+		TransferServiceAppender.printLog("ERROR", "TransferService getting Error in getTransferEvent Events "+e);
+		
+		return null;
+	}
 }
 
  
