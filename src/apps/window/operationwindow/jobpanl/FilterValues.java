@@ -1257,6 +1257,7 @@ public class FilterValues {
 		String sqlwithoutWhere = sql.substring(0, sql.indexOf("where"));
 		boolean containLegalEntityTable = false;
 		boolean containBookTable = false;
+		boolean isAttributeexists = false;
 		if (sqlwithoutWhere.contains("Le legalEntity"))
 			containLegalEntityTable = true;
 		if (sqlwithoutWhere.contains("Book book"))
@@ -1264,6 +1265,7 @@ public class FilterValues {
 		
 		for (int i = 0; i < attributesObject.length; i++) {
 			if (where.contains(attributesObject[i])) {
+				isAttributeexists = true;
 				String attributesTable = attributesTableName
 						.get(attributesObject[i]);
 			
@@ -1272,6 +1274,7 @@ public class FilterValues {
 				}
 			}
 		}
+		if(isAttributeexists) {
 		if(!containLegalEntityTable) {
 			sqlwithoutWhere = sqlwithoutWhere + " , " + "  le legalentity  " ;
 			where = where + " and trade.cpid = legalentity.id ";
@@ -1279,6 +1282,7 @@ public class FilterValues {
 		if(!containBookTable) {
 			sqlwithoutWhere = sqlwithoutWhere + " , " + "  Book book  " ;
 			where = where + " and trade.bookid = book.bookno";
+		}
 		}
 	/*	for (int i = 0; i < attributesObject.length; i++) {
 
