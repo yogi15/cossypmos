@@ -38,7 +38,7 @@ public interface RemoteBOProcess  extends Remote {
 	public Collection getMessageOnTrade(int tradeID)  throws RemoteException;
 	public Collection getMessageOnTransfer(int transferID)  throws RemoteException;
 	public Transfer getTransfer(int transferID) throws RemoteException;
-	
+	public Collection getOLDMessageForCancel(String messageEventtype,String messageformattype,int tradeid,String messageType,String triggeron) throws RemoteException;
 	
 	public Collection saveTransfers(Vector<Transfer> transfers,String type,String tradeAction,Trade trade,int userID) throws RemoteException;
 	public Collection saveTransfers(Vector<Transfer> transfers,String type,String tradeAction,NettingConfig netConfig,Trade trade) throws RemoteException;
