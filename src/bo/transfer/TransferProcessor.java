@@ -117,9 +117,9 @@ public class TransferProcessor extends Thread {
 	public  void  processTransfer(EventProcessor event, Trade trade) {
 		// TODO Auto-generated method stub
 	//	System.out.println("  From TransferProcessor " + trade.getId());
-		System.out.println("Entered in  processing of   ****** " +   trade.getId() + " on "+ trade.getStatus() + " status ");
-		TransferServiceAppender.printLog("DEBUG", "TransferProcessor Entered in  processing of   ****** " +   trade.getId() + " on "+ trade.getStatus() + " status ");
-		
+	//	System.out.println("Entered in  processing of   ****** " +   trade.getId() + " on "+ trade.getStatus() + " status ");
+	//	TransferServiceAppender.printLog("DEBUG", "TransferProcessor Entered in  processing of   ****** " +   trade.getId() + " on "+ trade.getStatus() + " status ");
+		try {
 		duplicateEventCheck.put(trade.getId()+"_"+trade.getStatus()+"_"+trade.getVersion(),trade.getId());
 		TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
 		String productType = trade.getProductType();
@@ -147,7 +147,7 @@ public class TransferProcessor extends Thread {
 		Vector<Transfer> oldTransfers = getTransfersOnTrade(trade.getId());
 		if(commonUTIL.isEmpty(oldTransfers)) {
 			TransferServiceAppender.printLog("DEBUG", " TransferProcessor no oldTransfers found for trade   "+trade.getId());
-			return;
+			
 		} else {
 			TransferServiceAppender.printLog("DEBUG", " TransferProcessor got "+ oldTransfers.size() + " for trade   "+trade.getId());
 		}
@@ -186,7 +186,11 @@ public class TransferProcessor extends Thread {
 
 		TransferServiceAppender.printLog("DEBUG", " TEnd  of ****** processing " +   trade.getId() + " on "+ trade.getStatus() + " status ");
 		//setTransfer(transfer);
-		
+		}catch (NullPointerException e) {
+			commonUTIL.displayError("TransferProcessor", "processTransfer Method ", e);
+
+			TransferServiceAppender.printLog("ERROR", " TransferProcessor  processTransfer  Method "+ e);
+		}
 	}
 	
 	
