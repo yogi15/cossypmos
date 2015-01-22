@@ -20,6 +20,7 @@ import beans.FilterBean;
 import beans.UserJobsDetails;
 
 import com.jidesoft.combobox.DateComboBox;
+import com.jidesoft.combobox.MultiSelectListExComboBox;
 
 import constants.CommonConstants;
 
@@ -76,7 +77,8 @@ public class TransferSearchPanel extends SearchCriteriaType {
 	private JLabel jLabel18;
 	private JLabel jLabel19;
 	private JLabel jLabel20;
-	private JComboBox<String> bookComboBox;
+	private MultiSelectListExComboBox bookComboBox;
+	private JComboBox jComboBox0;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	public TransferSearchPanel() {
 		init();
@@ -97,6 +99,7 @@ public class TransferSearchPanel extends SearchCriteriaType {
 		processDomainData(productTypeAttributeData,  getFilterValues().getDomainValues("ProductType"));
 		processDomainData(transferTypeAttributeData,  getFilterValues().getDomainValues("TransferType"));
 		processDomainData(eventTypeAttributeData,  getFilterValues().getDomainValues("EventType"));
+		processDomainData(methodAttributeData, getFilterValues().getDomainValues("MessageFormateType"));
 		
 	}
 	
@@ -145,12 +148,22 @@ public class TransferSearchPanel extends SearchCriteriaType {
 		add(getNettingTypeComboBox(), new Constraints(new Leading(84, 113, 12, 12), new Leading(206, 12, 12)));
 		add(getSettlementTypeComboBox(), new Constraints(new Leading(84, 112, 12, 12), new Leading(246, 12, 12)));
 		add(getBookComboBox(), new Constraints(new Leading(84, 112, 12, 12), new Leading(288, 10, 10)));
+		add(getMethodComboBox(), new Constraints(new Leading(87, 108, 12, 12), new Leading(318, 10, 10)));
 		setSize(420, 537);
 	}
 
-	private JComboBox<String> getBookComboBox() {
+	private JComboBox<String> getMethodComboBox() {		
+		if (methodComboBox == null) {
+			methodComboBox = new JComboBox<String>();
+			methodComboBox.setModel(methodAttributeData);
+		}
+		return methodComboBox;
+
+	}
+
+	private MultiSelectListExComboBox getBookComboBox() {
 		if (bookComboBox == null) {
-			bookComboBox = new JComboBox<String>();
+			bookComboBox = new MultiSelectListExComboBox();
 			bookComboBox.setModel(bookAttributesData);
 		}
 		return bookComboBox;
@@ -432,13 +445,11 @@ public class TransferSearchPanel extends SearchCriteriaType {
 		
 		Vector<FilterBean> filterBeans = new Vector<FilterBean>();
 		
-		if(!commonUTIL.isEmpty(tradeId.getText())) {
-			
+		if(!commonUTIL.isEmpty(tradeId.getText())) {			
 			filterBeans.add(getOtherId(tradeId.getText()));
 		} 
 		
-		if(!commonUTIL.isEmpty(TransferId.getText())) {
-			
+		if(!commonUTIL.isEmpty(TransferId.getText())) {			
 			filterBeans.add(getTransferId(TransferId.getText()));
 		} 
 	
@@ -452,83 +463,69 @@ public class TransferSearchPanel extends SearchCriteriaType {
 				
 				Date toTradeDate = EndDate.getDate();
 				
-				if (toTradeDate.after(fromTrade)) {
-					
+				if (toTradeDate.after(fromTrade)) {					
 					filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromTrade), 
-							commonUTIL.convertDateTOString(toTradeDate), "TransferDate"));
-				
-					
-				}  else {
-					
-					commonUTIL.showAlertMessage("Start Date should be less then End Date");
-					
+							commonUTIL.convertDateTOString(toTradeDate), "TransferDate"));									
+				}  else {					
+					commonUTIL.showAlertMessage("Start Date should be less then End Date");					
 				}				
 			} 
 			
 			
-			if (fromTrade == null  && EndDate.getDate() != null) {
-				
-				commonUTIL.showAlertMessage("Please select Start Date first");
-			
+			if (fromTrade == null  && EndDate.getDate() != null) {				
+				commonUTIL.showAlertMessage("Please select Start Date first");			
 			}
 			
-			if (fromTrade != null  && EndDate == null) {
-				
+			if (fromTrade != null  && EndDate == null) {				
 				filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(fromTrade), 
-						commonUTIL.convertDateTOString(fromTrade), "TransferDate"));
-				
+						commonUTIL.convertDateTOString(fromTrade), "TransferDate"));				
 			}
 			
 		}
 		
 		if( leComboBox.getSelectedItem()!= null && !commonUTIL.isEmpty(leComboBox.getSelectedItem().toString())) {
-			
-			filterBeans.add(getLegalEntity(leComboBox.getSelectedIndex(), "cpid"));
-			
+			filterBeans.add(getLegalEntity(leComboBox.getSelectedIndex(), "cpid"));			
 		} 
 		
 		if(poComboBOx.getSelectedItem() != null  && !commonUTIL.isEmpty(poComboBOx.getSelectedItem().toString())) {
-			
-			filterBeans.add(getLegalEntity(poComboBOx.getSelectedIndex(), "poId"));
-			
+			filterBeans.add(getLegalEntity(poComboBOx.getSelectedIndex(), "poId"));	
 		}
 
-		if(productTypeComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(productTypeComboBox.getSelectedItem().toString())) {
-			
+		if(productTypeComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(productTypeComboBox.getSelectedItem().toString())) {	
 			filterBeans.add(getProductType(productTypeComboBox.getSelectedItem().toString()));
 		} 	
 		
-		if( currencyComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(currencyComboBox.getSelectedItem().toString())) {
-			
+		if( currencyComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(currencyComboBox.getSelectedItem().toString())) {			
 			filterBeans.add(getCurrency(currencyComboBox.getSelectedItem().toString(), "TrasnferCurrency"));
-	
 		}
 		
-		if( statusComboBox.getSelectedItem() != null &&  !commonUTIL.isEmpty(statusComboBox.getSelectedItem().toString())) {
-			
+		if( statusComboBox.getSelectedItem() != null &&  !commonUTIL.isEmpty(statusComboBox.getSelectedItem().toString())) {			
 			filterBeans.add(getStatus(statusComboBox.getSelectedItem().toString()));
 		} 
 		
 		if( actionComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(actionComboBox.getSelectedItem().toString())) {
-			
 			filterBeans.add(getAction(actionComboBox.getSelectedItem().toString()));
 		} 
 		
-		if( transferTypeComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(transferTypeComboBox.getSelectedItem().toString())) {
-			
+		if( transferTypeComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(transferTypeComboBox.getSelectedItem().toString())) {			
 			filterBeans.add(getTransferType(transferTypeComboBox.getSelectedItem().toString()));
 		}
 		
 		if( eventTypeComboBox.getSelectedItem() != null && !commonUTIL.isEmpty(eventTypeComboBox.getSelectedItem().toString())) {
-			
 			filterBeans.add(getTransferEventType(eventTypeComboBox.getSelectedItem().toString()));
 		}
 		
-		if(bookComboBox.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(bookComboBox.getSelectedItem().toString()))) {
-			filterBeans.add(getBookName(bookComboBox.getSelectedIndex()));
-			
+		/*if(bookComboBox.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(bookComboBox.getSelectedItem().toString()))) {
+			filterBeans.add(getBookName(bookComboBox.getSelectedIndex()));			
+		} */
+		if( (bookComboBox.getSelectedIndex() > 0)) {
+			filterBeans.add(getBookName(bookComboBox));			
 		} 
-
+		
+		if(methodComboBox.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(methodComboBox.getSelectedItem().toString()))) {
+			filterBeans.add(getTransferMethodType(methodComboBox.getSelectedItem().toString()));			
+		} 
+		
 		return filterBeans;
 	
 	}
@@ -552,6 +549,7 @@ public class TransferSearchPanel extends SearchCriteriaType {
 		settlementTypeComboBox.setSelectedIndex(-1);
 		currencyComboBox.setSelectedIndex(-1);
 		bookComboBox.setSelectedIndex(-1);
+		methodComboBox.setSelectedIndex(-1);
 		// method and prodSubType left 
 		
 	}
@@ -627,10 +625,10 @@ public class TransferSearchPanel extends SearchCriteriaType {
 			}
 			
 			else if(bean.getColumnName().equalsIgnoreCase("Book")) {
-				bookComboBox.setSelectedIndex(getBooktoSelected(Integer.parseInt(bean.getValues())));
+				bookComboBox.setSelectedObjects(getMultipleValuesSelected(bean.getValues()));
 			}
 			
-			else if(bean.getColumnName().equalsIgnoreCase("TransferMethod")) {
+			else if(bean.getColumnName().equalsIgnoreCase("TransferMethodType")) {
 				methodComboBox.setSelectedItem(bean.getValues());
 			}
 			
