@@ -19,6 +19,7 @@ import beans.FilterBean;
 import beans.UserJobsDetails;
 
 import com.jidesoft.combobox.DateComboBox;
+import com.jidesoft.combobox.MultiSelectListExComboBox;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class CashLedgerPositionSearchPanel extends SearchCriteriaType {
@@ -36,7 +37,7 @@ public class CashLedgerPositionSearchPanel extends SearchCriteriaType {
 	private JLabel jLabel7;
 	private DateComboBox OpenpositionDate;
 	private JComboBox<String> currencyComboBox;
-	private JComboBox<String> bookComboBox;
+	private MultiSelectListExComboBox bookComboBox;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	
 	public CashLedgerPositionSearchPanel() {
@@ -75,9 +76,9 @@ public class CashLedgerPositionSearchPanel extends SearchCriteriaType {
 	}
 
 
-	private JComboBox<String> getBookComboBox() {
+	private MultiSelectListExComboBox getBookComboBox() {
 		if (bookComboBox == null) {
-			bookComboBox = new JComboBox<String>();
+			bookComboBox = new MultiSelectListExComboBox();
 			bookComboBox.setModel(bookData);
 		}
 		return bookComboBox;
@@ -177,10 +178,8 @@ public class CashLedgerPositionSearchPanel extends SearchCriteriaType {
 			
 		} */
 
-		if( (bookComboBox.getSelectedIndex() > 0)) {
-			
-			filterBeans.add(getBookName(bookComboBox.getSelectedIndex()));
-			
+		if( (bookComboBox.getSelectedIndex() > 0)) {			
+			filterBeans.add(getBookName(bookComboBox));			
 		} 
 		
 		return filterBeans;
@@ -217,7 +216,7 @@ public class CashLedgerPositionSearchPanel extends SearchCriteriaType {
 				poComboBox.setSelectedIndex(getPOtoSelected(Integer.parseInt(bean.getValues())));
 			}*/
 			else if(bean.getColumnName().equalsIgnoreCase("Book")) {
-				bookComboBox.setSelectedIndex(getBooktoSelected(Integer.parseInt(bean.getValues())));
+				bookComboBox.setSelectedObjects(getMultipleValuesSelected(bean.getValues()));
 			}
 		}
 	
