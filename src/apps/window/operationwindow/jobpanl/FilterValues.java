@@ -35,7 +35,7 @@ public class FilterValues {
 			"ProductType", "Currency", "EventType", "WFType", "BUY/SELL",
 			"TransferType", "FEEType", "accEvent", "TaskType",
 			"TradeAttribute", "QuotingCurr", "PrimaryCurr", "LEAttributes",
-			"BookAttributes","MessageFormatType" };
+			"BookAttributes" };
 	String referenceData[] = { "Book" };
 	String datesSearch[] = { "between", ">=", ">", "<=", "<", "=" };
 	Hashtable<Integer, Book> bookValues = new Hashtable<Integer, Book>();
@@ -192,7 +192,6 @@ public class FilterValues {
 		columnNames.put("TransferEventType", "EventType");
 		columnNames.put("TransferEventType", "EventType");
 		columnNames.put("OpenpositionDate", "OpenpositionDate");
-		columnNames.put("TransferMethodType", "Method");
 		
 		numberDataTypes.put("Book", "Bookid");
 		numberDataTypes.put("LegalEntity", "id");
