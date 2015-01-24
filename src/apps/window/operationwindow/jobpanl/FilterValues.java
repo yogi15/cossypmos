@@ -128,7 +128,9 @@ public class FilterValues {
 						" (select accountname from ACCOUNT where id = Posting.DebitAccId) DebitAcc");
 		
 		replaceColumnNameOnSQL
-		.put("Cashposition.INR_Equi", "(Cashposition.ActualAmt * getSplitRates(trade.id ,'splitBaseNearRate')) INR_Equi_Near");
+		.put("Cashposition.INR_Equi_Near", "(Cashposition.ActualAmt * getSplitRates(trade.id ,'splitBaseNearRate')) INR_Equi_Near");
+		replaceColumnNameOnSQL
+		.put("Cashposition.INR_Equi_Far", "(Cashposition.ActualAmt * getSplitRates(trade.id ,'splitBaseFarRate')) INR_Equi_Far");
 		
 		forwardColumnMaps.put("1D", " + 1");
 		forwardColumnMaps.put("2D", " + 2");
