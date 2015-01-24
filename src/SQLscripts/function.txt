@@ -1,0 +1,98 @@
+CREATE OR REPLACE Function checkCurrencyPairWithoutUSD
+   ( name_in IN varchar2) 
+return number
+is 
+currencyPair varchar2(20);
+flag number(10);
+begin
+
+currencyPair := 0;
+
+IF SUBSTR(name_in , 1,3) = 'USD' then 
+  currencyPair := 1;
+end if;
+if SUBSTR(name_in , 5,7) = 'USD' then 
+currencyPair := 1;
+end if; 
+return currencyPair;
+ENd;
+**************************************************************************
+
+create or replace Function getQuoteData
+   ( name_in IN varchar2 , quotedate in varchar2)
+   RETURN number
+IS
+   cnumber varchar2(20);
+
+   CURSOR c1
+   IS
+     SELECT to_number(close)
+     FROM quotedata
+     WHERE quotename  = name_in and to_char(to_date(DATETIME, 'dd/MON/yyyy HH24:MI:SS'), 'dd/mm/yyyy') = quotedate;
+
+BEGIN
+
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+
+   if c1%notfound then
+      cnumber := 1;
+   end if;
+
+   CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+********************************************************************
+
+Function getSplitRates
+   ( tradeID IN number , attributen in varchar2)
+   RETURN varchar2
+IS
+   cnumber varchar2(20);
+
+   CURSOR c1
+   IS
+     SELECT attributeValue
+     FROM  attribute where id = tradeID and attributename =  attributen and type = 'Trade';
+
+BEGIN
+
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+
+   if c1%notfound then
+      cnumber := 1;
+   end if;
+
+   CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+
+*********************************************************************
+
+function getSPOTTtypeDeals(tradedate in timestamp,deliverdate in timestamp) return number
+is
+cnumber number(10);
+begin
+cnumber := trunc(deliverdate) - trunc(tradedate);
+ if(cnumber >= 2) Then
+     cnumber := 2;
+   else
+      cnumber := 1;
+end if;
+  RETURN cnumber;
+
+
+EXCEPTION
+WHEN OTHERS THEN
+   raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
+END;
+
+
+*******************************************************************************
