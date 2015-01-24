@@ -57,7 +57,7 @@ public class JFrameMainApplication extends JFrame {
 			new JMenu("Favorities"), new JMenuItem("MessageConfig") };
 	private static JMenuItem[] reports = { new JMenuItem("TradeReport"),
 			new JMenuItem("TransferReport"), new JMenuItem("PostingReport"),new JMenuItem("MessageReport"),new JMenuItem("CashLedgerPositionReport"),new JMenuItem("CashPositionReport"),new JMenuItem("ForwardLadderReport"),
-			new JMenuItem("PNLReport"), new JMenuItem("Other") };
+			new JMenuItem("PNLReport"), new JMenu("Other") };
 	private static JMenuItem[] favItems = { new JMenuItem("CounterParty"),
 			new JMenuItem("Trader"), new JMenuItem("Tenor"),
 			new JMenuItem("Book"), new JMenuItem("CurrencyPair") };
@@ -65,6 +65,7 @@ public class JFrameMainApplication extends JFrame {
 			new JMenuItem("AccountFlowConfig"), new JMenuItem("AccEventConfig") };
 	private static JMenuItem[] derivativeItems = { new JMenuItem("FutureProduct"),
 		new JMenuItem("FutureOptionContract") };
+	
 	private static JMenuItem[] fxConfigItems = {
 			new JMenuItem("CurrencySplit"), new JMenuItem("B2BConfig"),
 			new JMenuItem("SpotRollOver") };
@@ -75,6 +76,8 @@ public class JFrameMainApplication extends JFrame {
 			new JMenu("PositionManagement"), new JMenuItem("LimitDashBoard") };
 	private static JMenuItem[] fixedIncome = { new JMenuItem("Bond"),
 			new JMenuItem("Repo") };
+	private static JMenuItem[] OtherReport = { new JMenuItem("FTDReport"),new JMenuItem("OtherReport")
+		 };
 	private static JMenuItem[] positionmenu = {
 			new JMenuItem("PositionManager"),
 			new JMenuItem("ManualLiquidation") };
@@ -101,6 +104,8 @@ public class JFrameMainApplication extends JFrame {
 		subMenu.put("Settlements", settlements);
 		subMenu.put("FXAutoConfig", fxConfigItems);
 		subMenu.put("Listed Derivatives", derivativeItems);
+		subMenu.put("Other", OtherReport);
+		
 
 		setTitle(" Main Apps " + user.getUser_name());
 		this.name = user;
@@ -113,6 +118,7 @@ public class JFrameMainApplication extends JFrame {
 
 		for (int i = 0; i < menuitemTrade.length; i++) {
 			// getMenu("Trade").add(menuitemTrade[i]);
+			
 			JMenuItem submenu1[] = getSubMenuItems(menuitemTrade[i].getText());
 			if (submenu1 == null) {
 				menu[2].add(menuitemTrade[i]);
@@ -288,6 +294,8 @@ public class JFrameMainApplication extends JFrame {
 		}
 
 		for (int i = 0; i < reports.length; i++) {
+			JMenuItem submenu1[] = getSubMenuItems(reports[i].getText());
+			if (submenu1 == null) {
 			// getMenu("Trade").add(menuitemTrade[i]);
 			menu[3].add(reports[i]);
 			menu[3].setFont(Font.decode("SansSerif-12"));
@@ -313,6 +321,19 @@ public class JFrameMainApplication extends JFrame {
 				}
 
 			});
+		} else {
+			for (int s = 0; s < submenu1.length; s++) {
+				reports[i].add(submenu1[s]);
+				commonUTIL.setBackGroundColor(reports[i]);
+			}
+			menu[3].add(reports[i]);
+
+			menu[3].setFont(Font.decode("SansSerif-12"));
+			reports[i].setFont(Font.decode("SansSerif-12"));
+			commonUTIL.setBackGroundColor(menu[3]);
+			commonUTIL.setBackGroundColor(menu[3]);
+		}
+
 
 		}
 		for (int i = 0; i < favItems.length; i++) {
@@ -477,6 +498,23 @@ public class JFrameMainApplication extends JFrame {
 					refWindow.setLocationRelativeTo(j);
 					refWindow.setVisible(true);
 					refWindow.setLocation(100, 100);
+
+				}
+			});
+		}
+		for (int r = 0; r < OtherReport.length; r++) {
+			//derivativeItems[s].setFont(Font.decode("SansSerif-12"));
+			commonUTIL.setBackGroundColor(OtherReport[r]);
+			OtherReport[r].addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					JFrameNewReport reports = new JFrameNewReport(arg0
+							.getActionCommand(), name);
+					reports.setIconImage(Toolkit.getDefaultToolkit().getImage(
+							imgURL));
+					reports.setSize(1250, 750);
+					reports.setVisible(true);
+					reports.setTitle(arg0.getActionCommand() + " : "
+							+ name.getUser_name());
 
 				}
 			});
@@ -660,6 +698,7 @@ public class JFrameMainApplication extends JFrame {
 
 		JMenuItem items[] = null;
 		if (subMenu.containsKey(itemname)) {
+		
 			items = subMenu.get(itemname);
 
 		}
