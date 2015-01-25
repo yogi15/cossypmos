@@ -1,5 +1,7 @@
 package dbSQL;
  
+import java.rmi.RemoteException;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +9,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Vector;
+
+import oracle.jdbc.OracleTypes;
 
 import org.apache.log4j.Logger;
 
@@ -48,9 +52,49 @@ public class TradeSQL {
   final static private String SELECTOPEN = 
 	 "select id,tradedesc from trade where version >= 0 and productType ='" ;
   
+  final static private String SELECTFTDSQL = 
+			 "select decode( t.currency,'INR','FCY/INR','FCY/FCY')currencyPair, "+
+			 " t.currency Currency, "+
+			 " decode(substr(t.type,0,3),'BUY','PURCHASE','SALE') as BUYSELL , "+
+			 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARDOPTION', decode(a.ATTRIBUTENAME,'InstrumentType',decode(a.ATTRIBUTEVALUE,'MerchantReady',t.quantity , 0))))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0)  as  MerchantReady  , "+
+		  " nvl(( SUM(DECODE(t.tradedesc1, 'FXFORWARDOPTION', decode(a.ATTRIBUTENAME,'InstrumentType',decode(a.ATTRIBUTEVALUE,'MerchantForward',t.quantity , 0))))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0)   MerchantForward   ," +
+			 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARDOPTION', decode(a.ATTRIBUTENAME,'InstrumentType',decode(a.ATTRIBUTEVALUE,'MerchantCancellationA',t.quantity , 0))))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))) ,0) MerchantCancellationA, " +
+			 " nvl((SUM(DECODE(t.tradedesc1, 'FXSWAP', quantity/2  ))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0) AS  FXSWAP , " +
+			 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),  1,quantity/2 ) ))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0) AS  SPOT, " +
+			 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),  2,quantity/2 ) ))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0) AS  FORWARD " +
+			 " from trade t,attribute  a where t.id = a.ID" +
+			 " and trunc(t.tradedate) = to_date('24/01/2015','dd/mm/yyyy') and a.type = 'Trade'" +
+			 " and a.type = 'Trade'" +
+			 " group by t.currency,substr(t.type,0,3), t.tradedesc " +
+			 " order by t.currency" ;
+
+		
+  public static String getFTDSQL(String currentDate) {
+	  String ftdSQL = "select decode( t.currency,'INR','FCY/INR','FCY/FCY')currencyPair, "+
+				 " t.currency Currency, "+
+				 " decode(substr(t.type,0,3),'BUY','SALE','PURCHASE') as BUYSELL , "+
+				 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARDOPTION', decode(a.ATTRIBUTENAME,'InstrumentType',decode(a.ATTRIBUTEVALUE,'MerchantReady',t.amount2 , 0))))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0)  as  MerchantReady  , "+
+			  " nvl(( SUM(DECODE(t.tradedesc1, 'FXFORWARDOPTION', decode(a.ATTRIBUTENAME,'InstrumentType',decode(a.ATTRIBUTEVALUE,'MerchantForward',t.amount2 , 0))))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0)   MerchantForward   ," +
+				 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARDOPTION', decode(a.ATTRIBUTENAME,'InstrumentType',decode(a.ATTRIBUTEVALUE,'MerchantCancellationA',t.amount2 , 0))))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))) ,0) MerchantCancellationA, " +
+				 " nvl((SUM(DECODE(t.tradedesc1, 'FXSWAP', t.amount2/2  ))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0) AS  FXSWAP , " +
+				 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),  1,t.amount2/2 ) ))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0) AS  SPOT, " +
+				 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),  2,t.amount2/2) ))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0) AS  FORWARD " +
+				 " from trade t,attribute  a where t.id = a.ID" +
+				 " and trunc(t.tradedate) = to_date('"+currentDate+"','dd/mm/yyyy') and a.type = 'Trade'" +
+				 " and a.type = 'Trade'" +
+				 " group by t.currency,substr(t.type,0,3), t.tradedesc " +
+				 " order by t.currency" ;
+	  return ftdSQL;
+  }
+  
+  
+  
+  
+  
+  
   private static String getUpdateSQL(Trade trade) {
       String updateSQL = "UPDATE  trade set  productId=" +trade.getProductId()+ ",type='"+ trade.getType().trim() +
-       "',tradeDate=to_timestamp('" + trade.getTradeDate() +"', 'DD/MM/YYYY hh24:mi:ss'), status='" + trade.getStatus().trim() +"' ,cpID= " + trade.getCpID() + ",TradeAmount= " + trade.getTradeAmount() + 
+       "',tradeDate=to_timestamp('" + trade.getAttributeValue("Trade Date") +"', 'DD/MM/YYYY hh24:mi:ss'), status='" + trade.getStatus().trim() +"' ,cpID= " + trade.getCpID() + ",TradeAmount= " + trade.getTradeAmount() + 
        ",bookId=" +  trade.getBookId() + " ,quantity= " + trade.getQuantity() + " ,nominal= " + trade.getNominal() + " ,price=" + trade.getPrice() + 
        " ,effectiveDate='" + trade.getEffectiveDate() +
        "',currency='" + trade.getCurrency() +
@@ -1125,6 +1169,7 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 	           trade.setTradeAmount(rs.getDouble(8))  ;
 	           trade.setEffectiveDate(rs.getString(9))  ;
 	           trade.setDelivertyDate(rs.getString(10)) ;
+	          
 	           trade.setBookId(rs.getInt(11))  ;
 	           trade.setQuantity(rs.getDouble(12))  ;
 	           trade.setPrice(rs.getDouble(13))  ;
@@ -1427,6 +1472,79 @@ public static Vector getTradesOnB2bTrade(Trade b2bTrade,Connection con) {
 	String sql = " b2bid = " +  b2bTrade.getId() + " or  id  ="+b2bTrade.getMirrorID();
 	
 	return (Vector) selectOnWherecClause(sql,con);
+}
+
+public static Collection getFTDReport(String currentDate, Connection con) {
+	
+	
+	 PreparedStatement stmt = null;
+     Vector<Object> Trades = new Vector();
+     String sql = getFTDSQL(currentDate);
+     ResultSet rs = null;
+  try {
+   con.setAutoCommit(false);
+  	    stmt = dsSQL.newPreparedStatement(con, sql);
+	  rs = stmt.executeQuery();
+	/*  while(rs.next()) {
+   	    System.out.println(rs.getString(3));
+   	 System.out.println(rs.getDouble(4));
+      
+      }*/
+	  if(rs != null)  {
+	     Trades.add(rs);
+   ReportGenerator generateReport = new ReportGenerator();
+   Trades = (Vector) generateReport.generateReportOnSQL(Trades);
+   }
+  
+   
+   
+ 
+  } catch (Exception e) {
+   commonUTIL.displayError("TradeSQL","selectOnWherecClauseReports " + sql,e);
+   return Trades;
+       
+     }
+     finally {
+        try {
+       	 if(stmt != null)
+   stmt.close();
+  } catch (SQLException e) {
+   
+   commonUTIL.displayError("TradeSQL"," selectOnWherecClauseReports " + sql,e);
+  }
+     }
+     return Trades;
+	
+	/*
+	String query = "begin ? := FTD_Data(?); end;";
+	 Vector<Object> Trades = new Vector();
+	CallableStatement stmt;
+	try {
+		stmt = conn.prepareCall(query);
+		stmt.registerOutParameter(1, OracleTypes.CURSOR);
+		stmt.setString(2, "test");
+		stmt.execute();
+		ResultSet rs = (ResultSet)stmt.getObject(1);
+
+		 rs = stmt.executeQuery();
+		  if(rs != null)  {
+	 	     Trades.add(rs);
+	    ReportGenerator generateReport = new ReportGenerator();
+	    Trades = (Vector) generateReport.generateReportOnSQL(Trades);
+		  }
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		commonUTIL.displayError("TradeSQL", " getFTDReport Failed to execute FTD report " , e);
+	} catch (RemoteException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} */
+	
+	
+
+	// TODO Auto-generated method stub
+//	return null;
 }
 
 
