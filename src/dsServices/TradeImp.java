@@ -1,66 +1,45 @@
 package dsServices;
 
 import java.io.Serializable;
-
 import java.rmi.RemoteException;
-import util.ReflectionUtilObject;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 import java.util.Vector;
 
-import javax.rmi.CORBA.Util;
-
-import constants.TradeConstants;
-
-import util.ClassInstantiateUtil;
-import util.ReflectionUtilObject;
+import mqServices.messageProducer.CreateNewMessage;
 import util.commonUTIL;
 import wfManager.WFHandler;
-import dbSQL.AttributSQL;
-import dbSQL.AuditSQL;
-import dbSQL.B2BConfigSQL;
-import dbSQL.BookSQL;
-import dbSQL.EventSQL;
-import dbSQL.FeesSQL;
-import dbSQL.FutureContractSQL;
-import dbSQL.LegalEntitySQL;
-import dbSQL.ProductSQL;
-import dbSQL.SdiSQL;
-import dbSQL.TaskSQL;
-import dbSQL.TradeSQL;
-import dbSQL.TransferSQL;
-import dbSQL.WFConfigSQL;
-import dbSQL.dsSQL;
-import dsEventProcessor.EventProcessor;
-import dsEventProcessor.TaskEventProcessor;
-import dsEventProcessor.TradeEventProcessor;
-import mainServer.PublishEvent;
-import mqServices.messageProducer.CreateNewMessage;
-import apps.window.tradewindow.BackOfficePanel;
 import apps.window.tradewindow.util.FXSplitUtil;
 import beans.Attribute;
 import beans.Audit;
 import beans.B2BConfig;
 import beans.Book;
-import beans.EventController;
 import beans.Fees;
 import beans.LegalEntity;
-import beans.Posting;
 import beans.Product;
 import beans.Sdi;
 import beans.Task;
 import beans.Trade;
-import beans.Transfer;
-import beans.TransferRule;
 import beans.Users;
 import beans.WFConfig;
-import bo.transfer.BOTransfer;
-//import bo.transfer.BOTransfer;
 import bo.transfer.rule.ProductTransferRule;
+import dbSQL.AttributSQL;
+import dbSQL.AuditSQL;
+import dbSQL.BookSQL;
+import dbSQL.EventSQL;
+import dbSQL.FeesSQL;
+import dbSQL.LegalEntitySQL;
+import dbSQL.ProductSQL;
+import dbSQL.SdiSQL;
+import dbSQL.TaskSQL;
+import dbSQL.TradeSQL;
+import dbSQL.WFConfigSQL;
+import dbSQL.dsSQL;
+import dsEventProcessor.EventProcessor;
+import dsEventProcessor.TaskEventProcessor;
+import dsEventProcessor.TradeEventProcessor;
+//import bo.transfer.BOTransfer;
 
 public class TradeImp implements RemoteTrade {
 
@@ -69,7 +48,7 @@ public class TradeImp implements RemoteTrade {
 	boolean startSendingPositionMess = false;
 	final static String cancelStatus = "CANCELLED";
 	WFHandler wfhandler = null;
-	Hashtable<String, ProductTransferRule> handlers = new Hashtable();
+	Hashtable<String, ProductTransferRule> handlers = new Hashtable<String, ProductTransferRule>();
 	 public static  ServerConnectionUtil de = null;
 	 RemoteLimit remoteLimit = null;
 	public TradeImp() {
@@ -975,6 +954,12 @@ return status;
 		// TODO Auto-generated method stub
 		
 		return  TradeSQL.selectwhereforReports(sql, dsSQL.getConn());
+	}
+	@Override
+	public Collection getFTDReport(String sql) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+		return  TradeSQL.getFTDReport(sql, dsSQL.getConn());
 	}
    public void startProducingMessage() {
 	   newMessage	 = new CreateNewMessage(commonUTIL.getLocalHostName()+":61616");
