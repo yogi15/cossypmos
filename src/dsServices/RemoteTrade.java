@@ -53,4 +53,5 @@ public interface RemoteTrade extends Remote {
 //	public Trade undo(Trade trade, int tradeVersion) throws RemoteException;
 	
 	public String selectTradeAttributesAsString(String tradeId) throws RemoteException;
+	public   Collection getFTDReport(String sql) throws RemoteException;
 }
