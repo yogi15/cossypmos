@@ -1,3 +1,55 @@
+
+
+
+**********************************************************************************************
+CREATE OR REPLACE Function getFXForwardOptionType
+   ( tradeid IN number) 
+
+   RETURN varchar2
+IS
+   cnumber varchar2(20);
+
+   CURSOR c1
+   IS
+     SELECT attributeValue
+     FROM  attribute where id = tradeID and attributename =  'InstrumentType' and type = 'Trade';
+
+BEGIN
+
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+
+   if c1%notfound then
+      cnumber := 1;
+   end if;
+
+   CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+************************************************************************
+CREATE OR REPLACE Function checkOnBaseAndQuotingCurr
+   ( name_in IN varchar2) 
+return number
+is 
+currencyPair varchar2(20);
+flag number(10);
+begin
+
+currencyPair := 0;
+
+IF SUBSTR(name_in , 1,3) = 'USD' then 
+  currencyPair := 0;
+end if;
+if SUBSTR(name_in , 5,7) = 'USD' then 
+currencyPair := 1;
+end if; 
+return currencyPair;
+ENd;
+
+***************************************************************************
 CREATE OR REPLACE Function checkCurrencyPairWithoutUSD
    ( name_in IN varchar2) 
 return number
