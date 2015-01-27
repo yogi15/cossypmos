@@ -76,7 +76,7 @@ public class TradeSQL {
 			  "select "+
 			  " (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'    else 'FCY/FCY'    end )  FCY_NONFCY, " +
 			  "  (case  when currency = 'INR' then 'INR'    else 'USD'    end )  Currency, "+
-			  "  (case  when substr(type,0,3) = 'BUY' then 'SALE'   else 'PURCHASE'    end ) BUYSELL,"+
+			  "  (case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ) BUYSELL,"+
 			  "   nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id),'MerchantReady',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0) MerchantReady,"+
 			  " nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id),'MerchantForward',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0) MerchantForward,"+
 			  "  nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id),'MerchantCancellationA',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0) MerchantCancellationA,"+
@@ -90,7 +90,7 @@ public class TradeSQL {
  "     from  trade  where "+
  "       trunc(tradedate) = to_date('"+currentDate+"','dd/mm/yyyy')     "+
  "     group by "+
- "    (case  when substr(type,0,3) = 'BUY' then 'SALE'   else 'PURCHASE'    end ), "+
+ "    (case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ), "+
  "     (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ), "+
  "     (case  when currency = 'INR' then 'INR'   else 'USD'    end ) "+
  "     order by "+
