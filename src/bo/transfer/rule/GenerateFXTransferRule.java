@@ -93,12 +93,12 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 	@Override
 	public Vector<TransferRule> generateRules(Trade trade) {
 		// TODO Auto-generated method stub
-		TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting Called   ****** on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType());
+		TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule getting Called   ****** on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType());
 		
 		 Vector<Fees> fees = null;
 		 Vector<Sdi> sdis = null;
 		if(trade.isFXSwap()) {
-			TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting Called   ****** on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() +" FXSWap");
+			TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule getting Called   ****** on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() +" FXSWap");
 			
 			return generateRulesForFXSwap(trade);
 		} else {
@@ -118,9 +118,9 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 			 Vector<TransferRule>  mmRules = new Vector<TransferRule>();
 			 LegalEntity po = null;
 			 if(trade.getType().equalsIgnoreCase(tradeTypeBUY)) {
-				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule  ****** on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " ");
-				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule processing rules on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " "+tradeTypeBUY);
-				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule Starting for First Leg on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " "+tradeTypeBUY);
+				 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule  ****** on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " ");
+				 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule processing rules on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " "+tradeTypeBUY);
+				 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule Starting for First Leg on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " "+tradeTypeBUY);
 							
 				 TransferRule ruleB = new TransferRule();
 				 ruleB.set_tradeId(trade.getId());
@@ -142,7 +142,15 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 					 
 				 ruleB.set_payerLegalEntityId(book.getLe_id()); // po role 
 				 Sdi paySdi = getSdiOnEntity(po.getId(),productType,trade.getCurrency(),SDIConstants.PO);
-				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting SDI for PaySdi on " +   trade.getId() + " on "+ trade.getCurrency()+ " for PO " + po.getName() + " sdi id == "+paySdi.getId());
+				 
+				 if (paySdi == null) {
+					 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule getting SDI for PaySdi on " 
+							 +   trade.getId() + " on "+ trade.getCurrency()+ " for PO " + po.getName() 
+							 + " sdi id == "+paySdi.getId());
+				 } else {
+					 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule No SDI for PaySdi on " 
+						+  trade.getId() + " on "+ trade.getCurrency()+ " for PO " + po.getName());	 
+				 }				 
 					
 				 setPOSdi(paySdi);
 					if(paySdi != null) {
@@ -163,21 +171,28 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 LegalEntity le =  (LegalEntity) getLegalEntity(trade.getCpID());
 				
 				 Sdi recSdi = getSdiOnEntity(trade.getCpID(),productType,trade.getCurrency(),SDIConstants.COUNTERPARY); // cp 
-				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting SDI for recSdi on " +   trade.getId() + " on "+ trade.getCurrency()+ " for LE " + le.getName() + " sdi id == "+recSdi.getId());
+				 if (recSdi == null) {
+					 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule getting SDI for RecSdi on " 
+							 +   trade.getId() + " on "+ trade.getCurrency()+ " for PO " + po.getName() 
+							 + " sdi id == "+ recSdi.getId());
+				 } else {
+					 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule No SDI for RecSdi on " 
+						+   trade.getId() + " on "+ trade.getCurrency()+ " for PO " + po.getName());	 
+				 }	
 					
 				 setCounterPartySDI(recSdi);
 			     if(trade.isMirrorTrade()) {
 			    	 recSdi = paySdi;
 			     }
 			     if(recSdi != null) {
-				 ruleB.set_receiverLegalEntityRole(SDIConstants.COUNTERPARY); // cp role
-				 ruleB.set_receiverSDId(recSdi.getId()); // cp role
-				 ruleB.set_receiverAgentID(recSdi.getAgentId());
-			 }
+					 ruleB.set_receiverLegalEntityRole(SDIConstants.COUNTERPARY); // cp role
+					 ruleB.set_receiverSDId(recSdi.getId()); // cp role
+					 ruleB.set_receiverAgentID(recSdi.getAgentId());
+			     }
 				 ruleB.set_payReceive(PAY);
 				 mmRules.addElement(ruleB);
-				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule Ending for First Leg on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " "+tradeTypeBUY);
-				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule Starting for Second Leg on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " "+tradeTypeBUY);
+				 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule Ending for First Leg on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " "+tradeTypeBUY);
+				 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule Starting for Second Leg on " +   trade.getId() + " on "+ trade.getStatus() + " status for "+trade.getProductType() + " "+tradeTypeBUY);
 						
 				 TransferRule ruleS = new TransferRule();
 				 ruleS.setBookId(trade.getBookId());
@@ -186,8 +201,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleS.set_productType(trade.getProductType());
 				
 				 ruleS.set__tradeCptyId(trade.getCpID());
-				 if(trade.isMirrorTrade()) {
-					    
+				 if(trade.isMirrorTrade()) {					    
 					 ruleS.set__tradeCptyId(po.getId());
 			     } else {
 			    	 ruleS.set__tradeCptyId(trade.getCpID());
@@ -201,31 +215,25 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleS.set_receiverLegalEntityId(ruleB.get_payerLegalEntityId());  // po 
 				 ruleS.set_receiverLegalEntityRole(ruleB.get_payerLegalEntityRole()); // po 
 				 recSdi = getSdiOnEntity(po.getId(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.PO); // po 
-				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting SDI for recSdi on " +   trade.getId() + " on "+trade.getTradedesc().substring(0, 3) + " for PO " + le.getName() + " sdi id == "+recSdi.getId());
+				 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule getting SDI for recSdi on " +   trade.getId() + " on "+trade.getTradedesc().substring(0, 3) + " for PO " + le.getName() + " sdi id == "+recSdi.getId());
 					
 				 if(recSdi != null) {
-				  ruleS.set__sMethod(recSdi);
+					 ruleS.set__sMethod(recSdi);
 				  
-				 ruleS.set_receiverSDId(recSdi.getId());
-				 ruleS.set_receiverAgentID(recSdi.getAgentId());
-			 }
+					 ruleS.set_receiverSDId(recSdi.getId());
+					 ruleS.set_receiverAgentID(recSdi.getAgentId());
+				 }
 				 ruleS.set_payerLegalEntityId(ruleB.get_receiverLegalEntityId()); // cp 
 				 ruleS.set_payerLegalEntityRole(ruleB.get_receiverLegalEntityRole()); //cp
 				 paySdi =getSdiOnEntity(trade.getCpID(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.COUNTERPARY); // cp 
-				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting SDI for recSdi on " +   trade.getId() + " on "+trade.getTradedesc().substring(0, 3) + " for PO " + le.getName() + " sdi id == "+recSdi.getId());
+				 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule getting SDI for recSdi on " +   trade.getId() + " on "+trade.getTradedesc().substring(0, 3) + " for PO " + le.getName() + " sdi id == "+recSdi.getId());
 					
 				 if(paySdi != null) {
 					ruleS.set_payerSDId(paySdi.getId());
 					ruleS.set_payerAgentID(paySdi.getAgentId());
 				 }
 				 
-					mmRules.addElement(ruleS);
-				 
-				 
-				 
-				
-				 
-				 
+				mmRules.addElement(ruleS);
 				 
 			 } else {
 				 
@@ -240,15 +248,13 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleB.set_transferCurrency(trade.getCurrency());
 				 ruleB.set_transferType(transerTYPEPRINCIPAL);
 				 
-					Book book = (Book) getBook(trade.getBookId());
-					po = (LegalEntity) getLegalEntity(book.getLe_id());
-				
-					
-					ruleB.set_receiverLegalEntityId(book.getLe_id());  // po 
+				 Book book = (Book) getBook(trade.getBookId());
+				 po = (LegalEntity) getLegalEntity(book.getLe_id());
+				 
+				 ruleB.set_receiverLegalEntityId(book.getLe_id());  // po 
 				 LegalEntity le =  (LegalEntity) getLegalEntity(trade.getCpID());
 				 ruleB.set_payerLegalEntityId(le.getId()); // cp 
-				 if(trade.isMirrorTrade()) {
-					    
+				 if(trade.isMirrorTrade()) {					    
 			    	 ruleB.set__tradeCptyId(po.getId());
 			    	 ruleB.set_payerLegalEntityId(po.getId());
 			     } else {
@@ -257,30 +263,28 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleB.set_payReceive(RECEIVE);
 				 
 				 Sdi paySdi = getSdiOnEntity(trade.getCpID(),productType,trade.getCurrency(),SDIConstants.COUNTERPARY);  // cp 
-				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting SDI for paySdi on " +   trade.getId() + " on "+trade.getCurrency() + " for CounterParty " + le.getName() + " sdi id == "+paySdi.getId());
+				 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule getting SDI for paySdi on " +   trade.getId() + " on "+trade.getCurrency() + " for CounterParty " + le.getName() + " sdi id == "+paySdi.getId());
 					
 				 setCounterPartySDI(paySdi);
 				 Sdi recSdi = getSdiOnEntity(po.getId(),productType,trade.getCurrency(),SDIConstants.PO);  // po 
-				 TransferServiceAppenderLog.printLog("DEBUG", " GenerateFXTransferRule getting SDI for recSdi on " +   trade.getId() + " on "+trade.getCurrency() + " for PO " + le.getName() + " sdi id == "+recSdi.getId());
+				 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule getting SDI for recSdi on " +   trade.getId() + " on "+trade.getCurrency() + " for PO " + le.getName() + " sdi id == "+recSdi.getId());
 					
 				 setPOSdi(recSdi);
 				 if(paySdi != null) {
-				 ruleB.set_payerLegalEntityRole(paySdi.getRole());  // cp
-				 ruleB.set_payerAgentID(paySdi.getAgentId());
-			 }
-			 if(recSdi != null) {
-				 ruleB.set_receiverLegalEntityRole(recSdi.getRole()); // po
-				 ruleB.set_receiverSDId(paySdi.getId());
-				 ruleB.set_payerSDId(recSdi.getId());
-				 ruleB.set_receiverAgentID(recSdi.getAgentId());
-			 }
-			 if(paySdi !=null) {
-				 ruleB.set__sMethod(paySdi);
-				 ruleB.set_payerAgentID(paySdi.getAgentId());
-			 }
-				 
-				 
-				 
+					 ruleB.set_payerLegalEntityRole(paySdi.getRole());  // cp
+					 ruleB.set_payerAgentID(paySdi.getAgentId());
+				 }
+				 if(recSdi != null) {
+					 ruleB.set_receiverLegalEntityRole(recSdi.getRole()); // po
+					 ruleB.set_receiverSDId(paySdi.getId());
+					 ruleB.set_payerSDId(recSdi.getId());
+					 ruleB.set_receiverAgentID(recSdi.getAgentId());
+				 }
+				 if(paySdi !=null) {
+					 ruleB.set__sMethod(paySdi);
+					 ruleB.set_payerAgentID(paySdi.getAgentId());
+				 }		 
+				 				 
 				 mmRules.addElement(ruleB);
 				
 				 TransferRule ruleS = new TransferRule();
@@ -289,8 +293,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleS.set_productType(trade.getProductType());
 				
 				 ruleS.set__tradeCptyId(trade.getCpID());
-				 if(trade.isMirrorTrade()) {
-					    
+				 if(trade.isMirrorTrade()) {					    
 			    	 ruleB.set__tradeCptyId(po.getId());
 			    	
 			     } else {
@@ -306,19 +309,19 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleS.set_receiverLegalEntityRole(ruleB.get_payerLegalEntityRole());
 				 ruleS.set_payerLegalEntityId(ruleB.get_receiverLegalEntityId());
 				 ruleS.set_payerLegalEntityRole(ruleB.get_receiverLegalEntityRole());
-				  paySdi =  getSdiOnEntity(po.getId(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.PO);
-				  setPOSdi(paySdi);
-				  recSdi =getSdiOnEntity(trade.getCpID(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.COUNTERPARY);
-				  setPOSdi(recSdi);
-				  if(recSdi != null) {
-				 ruleS.set_receiverSDId(recSdi.getId());
-				 ruleS.set_receiverAgentID(recSdi.getAgentId());
-				  }
-				  if(paySdi != null) {
-				 ruleS.set_payerSDId(paySdi.getId());
-				 ruleS.set__sMethod(paySdi);
-				 ruleS.set_payerAgentID(paySdi.getAgentId());
-				  }
+				 paySdi =  getSdiOnEntity(po.getId(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.PO);
+				 setPOSdi(paySdi);
+				 recSdi =getSdiOnEntity(trade.getCpID(),productType,trade.getTradedesc().substring(0, 3),SDIConstants.COUNTERPARY);
+				 setPOSdi(recSdi);
+				 if(recSdi != null) {
+					 ruleS.set_receiverSDId(recSdi.getId());
+					 ruleS.set_receiverAgentID(recSdi.getAgentId());
+				 }
+				 if(paySdi != null) {
+					 ruleS.set_payerSDId(paySdi.getId());
+					 ruleS.set__sMethod(paySdi);
+					 ruleS.set_payerAgentID(paySdi.getAgentId());
+				 }
 				 mmRules.addElement(ruleS);
 			 }
 				 
@@ -327,7 +330,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 			 return mmRules;
 		}
 			 
-		 }
+	}
 
 
         // how fees will get handle in SWAP trades needs to resolve this. 
