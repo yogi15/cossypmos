@@ -143,7 +143,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleB.set_payerLegalEntityId(book.getLe_id()); // po role 
 				 Sdi paySdi = getSdiOnEntity(po.getId(),productType,trade.getCurrency(),SDIConstants.PO);
 				 
-				 if (paySdi == null) {
+				 if (paySdi != null) {
 					 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule getting SDI for PaySdi on " 
 							 +   trade.getId() + " on "+ trade.getCurrency()+ " for PO " + po.getName() 
 							 + " sdi id == "+paySdi.getId());
@@ -171,7 +171,7 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 LegalEntity le =  (LegalEntity) getLegalEntity(trade.getCpID());
 				
 				 Sdi recSdi = getSdiOnEntity(trade.getCpID(),productType,trade.getCurrency(),SDIConstants.COUNTERPARY); // cp 
-				 if (recSdi == null) {
+				 if (recSdi != null) {
 					 TransferServiceAppenderLog.printLog("INFO", " GenerateFXTransferRule getting SDI for RecSdi on " 
 							 +   trade.getId() + " on "+ trade.getCurrency()+ " for PO " + po.getName() 
 							 + " sdi id == "+ recSdi.getId());
