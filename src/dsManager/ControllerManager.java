@@ -131,7 +131,7 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 			            consumer.close();
 			            session.close();
 			            connection.close();
-			            Thread.sleep(100);
+			            Thread.sleep(10);
 				 } catch (java.lang.NullPointerException e) {
 						// TODO Auto-generated catch block
 					   commonUTIL.displayError("ControllerManager " +  getManagerName(), "run()", e);
