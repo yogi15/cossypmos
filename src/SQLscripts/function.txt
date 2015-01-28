@@ -1,6 +1,33 @@
 
 
 
+FTD SQL ****************************************************************
+
+ select 
+ (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'    else 'FCY/FCY'    end )  FCY_NONFCY, 
+ (case  when currency = 'INR' then 'INR'    else 'USD'    end )  Currency, 
+ (case  when substr(type,0,3) = 'BUY' then 'SALE'   else 'PURCHASE'    end ) BUYSELL,
+  nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id),'MerchantReady',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantReady,
+ nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id),'MerchantForward',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantForward,
+ nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id),'MerchantCancellationA',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantCancellationA,
+
+ nvl(sum(decode(tradedesc1,'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),1,decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) FXSPOT,
+ nvl(sum(decode(tradedesc1,'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),2,decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) FORWARD,
+ nvl(sum(DECODE(tradedesc1, 'FXSWAP',  decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) FXSWAP
+				
+				 	  
+				 	   
+    from  trade  where 
+       trunc(tradedate) = to_date('26/01/2015','dd/mm/yyyy')    
+    group by 
+    (case  when substr(type,0,3) = 'BUY' then 'SALE'   else 'PURCHASE'    end ),
+    (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ), 
+    (case  when currency = 'INR' then 'INR'   else 'USD'    end ) 
+   order by 
+   (case when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY'   end ), 
+   (case  when currency = 'INR' then 'INR'  else 'USD'  end )
+
+
 **********************************************************************************************
 CREATE OR REPLACE Function getFXForwardOptionType
    ( tradeid IN number) 
@@ -99,6 +126,186 @@ END;
 
 ********************************************************************
 
+**************************************************************************
+
+create or replace Function getRealisedOnFirstLeg
+   ( name_in IN number)
+   RETURN number
+IS
+   cnumber varchar2(20);
+
+   CURSOR c1
+   IS
+   
+    select sum(quantity) from trade t ,attribute a where t.id = a.id and a.type = 'Trade' 
+and a.attributename = 'TakeUpType' and a.attributevalue = 'Utilized' and t.parentid = name_in and t.tradedesc1 = 'FXTAKEUP' 
+group by t.parentid;
+
+BEGIN
+
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+
+   if c1%notfound then
+      cnumber := 0;
+   end if;
+
+   CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+********************************************************************
+**************************************************************************
+
+create or replace Function getOutStandingOnFirstLeg
+   ( name_in IN number)
+   RETURN number
+IS
+   cnumber varchar2(20);
+
+   CURSOR c1
+   IS
+     SELECT (amount1 - getRealisedOnFirstLeg(name_in)) outstandingFirstLeg
+     FROM trade
+    where id =  name_in and tradedesc1 = 'FXFORWARDOPTION';
+
+BEGIN
+
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+
+   if c1%notfound then
+      cnumber := 0;
+   end if;
+
+   CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+**************************************************************************
+
+create or replace Function getRealisedOnSecondLeg
+   ( name_in IN number)
+   RETURN number
+IS
+   cnumber varchar2(20);
+
+   CURSOR c1
+   IS
+    
+     select sum(nominal)*-1 from trade t ,attribute a where t.id = a.id and a.type = 'Trade' 
+and a.attributename = 'TakeUpType' and a.attributevalue = 'Utilized' and t.parentid = name_in and t.tradedesc1 = 'FXTAKEUP' 
+group by t.parentid;
+
+BEGIN
+
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+
+   if c1%notfound then
+      cnumber := 0;
+   end if;
+
+   CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+
+create or replace Function getCancelledTakeupOnSecondLeg
+   ( name_in IN number)
+   RETURN number
+IS
+   cnumber varchar2(20);
+
+   CURSOR c1
+   IS
+    
+     select sum(nominal)*-1 from trade t ,attribute a where t.id = a.id and a.type = 'Trade' 
+and a.attributename = 'TakeUpType' and a.attributevalue = 'Cancelled' and t.parentid = name_in and t.tradedesc1 = 'FXTAKEUP' 
+group by t.parentid;
+
+BEGIN
+
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+
+   if c1%notfound then
+      cnumber := 0;
+   end if;
+
+   CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+
+
+create or replace Function getCancelledTakeupOnFirstLeg
+   ( name_in IN number)
+   RETURN number
+IS
+   cnumber varchar2(20);
+
+   CURSOR c1
+   IS
+    
+     select sum(quantity) from trade t ,attribute a where t.id = a.id and a.type = 'Trade' 
+and a.attributename = 'TakeUpType' and a.attributevalue = 'Cancelled' and t.parentid = name_in and t.tradedesc1 = 'FXTAKEUP' 
+group by t.parentid;
+
+BEGIN
+
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+
+   if c1%notfound then
+      cnumber := 0;
+   end if;
+
+   CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+
+
+create or replace Function getOutStandingOnSecondLeg
+   ( name_in IN number)
+   RETURN number
+IS
+   cnumber varchar2(20);
+
+   CURSOR c1
+   IS
+     SELECT ((amount2 *-1)- getRealisedOnSecondLeg(name_in)) outstandingSecondtLeg
+     FROM trade
+    where id =  name_in and tradedesc1 = 'FXFORWARDOPTION';
+
+BEGIN
+
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+
+   if c1%notfound then
+      cnumber := 0;
+   end if;
+
+   CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+********************************************************************
+
 Function getSplitRates
    ( tradeID IN number , attributen in varchar2)
    RETURN varchar2
@@ -120,6 +327,61 @@ BEGIN
    end if;
 
    CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+
+create or replace Function getAttributeValueOnTrade
+   ( tradeID IN number , attributen in varchar2)
+   RETURN varchar2
+IS
+   cnumber varchar2(20);
+
+   CURSOR c1
+   IS
+     SELECT attributeValue
+     FROM  attribute where id = tradeID and attributename =  attributen and type = 'Trade';
+
+BEGIN
+
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+
+   if c1%notfound then
+      cnumber := '';
+   end if;
+
+   CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+*********************************************************************
+
+create or replace Function getINREquivaluent
+   ( amount1 number ,amount2 number , currencyPair in varchar2, tradeID IN number,attributeName varchar2)
+   RETURN number
+IS
+   cnumber number(30,20);
+   currenyP varchar2(20);
+  
+
+BEGIN
+
+  cnumber := 0;
+ IF SUBSTR(currencyPair , 5,7) = 'INR' then 
+ cnumber := amount2;
+end if;
+if SUBSTR(currencyPair , 5,7) <> 'INR' then 
+ cnumber := amount1 * getSplitRates(tradeID,attributeName);
+
+end if; 
+
+  
+  
 
 RETURN cnumber;
 
