@@ -121,8 +121,8 @@ public class ReportColumns {
 		columnsMaps.put("Cashposition.Currency","Currency");
 		columnsMaps.put("Cashposition.Type","Type");
 		columnsMaps.put("Cashposition.ActualAmt","ActualAmt");
-		columnsMaps.put("Cashposition.INR_Equi_Near","INR_Equi_Near");
-		columnsMaps.put("Cashposition.INR_Equi_Far","INR_Equi_Far");
+		columnsMaps.put("Trade.INR_Equi_Near","INR_Equi_Near");
+		columnsMaps.put("Trade.INR_Equi_Far","INR_Equi_Far");
 		
 		
 		columnsMaps.put("Transfer.TransferId","Id");// to be changed
