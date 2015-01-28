@@ -121,7 +121,8 @@ public class ReportColumns {
 		columnsMaps.put("Cashposition.Currency","Currency");
 		columnsMaps.put("Cashposition.Type","Type");
 		columnsMaps.put("Cashposition.ActualAmt","ActualAmt");
-		columnsMaps.put("Cashposition.INR_Equi","INR_Equi");
+		columnsMaps.put("Cashposition.INR_Equi_Near","INR_Equi_Near");
+		columnsMaps.put("Cashposition.INR_Equi_Far","INR_Equi_Far");
 		
 		
 		columnsMaps.put("Transfer.TransferId","Id");// to be changed
@@ -192,6 +193,13 @@ public class ReportColumns {
 		columnsMaps.put("Trade.Attributes","Attributes");
 		columnsMaps.put("Trade.BaseCurrency","BaseCurrency");
 		columnsMaps.put("Trade.FX.Near_EndDate","FX.Near_EndDate");
+		columnsMaps.put("Trade.FirstLegOutstanding","FirstLegOutstanding");
+		columnsMaps.put("Trade.SecondLegOutstanding","SecondLegOutstanding");
+		columnsMaps.put("Trade.FirstLegRealised","FirstLegRealised");
+		columnsMaps.put("Trade.SecondLegRealised","SecondLegRealised");
+		columnsMaps.put("Trade.FirstLegCancelledTakeup","FirstLegCancelledTakeup");
+		columnsMaps.put("Trade.SecondLegCancelledTakeup","SecondLegCancelledTakeup");
+		
 		
 		//columnsMaps.put("Trade.Yield","Yield ");
 		//columnsMaps.put("Trade.BrokerID","BrokerID ");
@@ -209,6 +217,7 @@ public class ReportColumns {
 		reversecolumnsMaps.put("Trade.Quantity","Trade.FX.NEAR_AMT1");
 		reversecolumnsMaps.put("Trade.Nominal","Trade.FX.NEAR_AMT2");
 		reversecolumnsMaps.put("Trade.TradeAmount","Trade.Bond.Amount");
+		
 		
 		
 	//	columnsMaps.put("Trade.Trader","traderID ");
