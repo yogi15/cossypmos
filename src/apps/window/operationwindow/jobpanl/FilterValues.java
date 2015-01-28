@@ -92,6 +92,14 @@ public class FilterValues {
 		replaceColumnNameOnSQL.put("Trade.FX.NEAR_AMT1", "Trade.quantity FX_NEAR_AMT1");
 		replaceColumnNameOnSQL.put("Trade.FX.NEAR_AMT2", "Trade.nominal FX_NEAR_AMT2");
 		replaceColumnNameOnSQL.put("Trade.FX_FAR_AMT1", "Trade.TradeAmount FX_FAR_AMT1");
+		replaceColumnNameOnSQL.put("Trade.FirstLegOutstanding","getOutStandingOnFirstLeg(Trade.id) FirstLegOutstanding");
+		replaceColumnNameOnSQL.put("Trade.SecondLegOutstanding","getOutStandingOnSecondLeg(Trade.id) SecondLegOutstanding");
+		replaceColumnNameOnSQL.put("Trade.FirstLegRealised","getRealisedOnFirstLeg(Trade.id) FirstLegRealised");
+		replaceColumnNameOnSQL.put("Trade.SecondLegRealised","getRealisedOnSecondLeg(Trade.id) SecondLegRealised");
+		replaceColumnNameOnSQL.put("Trade.FirstLegCancelledTakeup","getCancelledTakeupOnFirstLeg(Trade.id) FirstLegCancelledTakeup");
+		replaceColumnNameOnSQL.put("Trade.SecondLegCancelledTakeup","getCancelledTakeupOnSecondLeg(Trade.id) SecondLegCancelledTakeup");
+		
+		
 		replaceColumnNameOnSQL.put("Trade.FX_FAR_AMT2", "Trade.yield FX_FAR_AMT2");
 		replaceColumnNameOnSQL.put("Trade.Price", "Trade.Price Rate ");
 		replaceColumnNameOnSQL.put("Trade.Bond.Amount", "Trade.Nominal Bond_Amount");
@@ -128,9 +136,9 @@ public class FilterValues {
 						" (select accountname from ACCOUNT where id = Posting.DebitAccId) DebitAcc");
 		
 		replaceColumnNameOnSQL
-		.put("Cashposition.INR_Equi_Near", "(Cashposition.ActualAmt * getSplitRates(trade.id ,'splitBaseNearRate')) INR_Equi_Near");
+		.put("Cashposition.INR_Equi_Near", "(getINREquivaluent(trade.amount1,trade.amount2,trade.tradedesc,trade.id,'splitBaseNearRate')) INR_Equi_Near");
 		replaceColumnNameOnSQL
-		.put("Cashposition.INR_Equi_Far", "(Cashposition.ActualAmt * getSplitRates(trade.id ,'splitBaseFarRate')) INR_Equi_Far");
+		.put("Cashposition.INR_Equi_Far", "(getINREquivaluent(trade.tradeamount,trade.yield,trade.tradedesc,trade.id,'splitBaseFarRate')) INR_Equi_Far");
 		
 		forwardColumnMaps.put("1D", " + 1");
 		forwardColumnMaps.put("2D", " + 2");
