@@ -136,9 +136,9 @@ public class FilterValues {
 						" (select accountname from ACCOUNT where id = Posting.DebitAccId) DebitAcc");
 		
 		replaceColumnNameOnSQL
-		.put("Cashposition.INR_Equi_Near", "(getINREquivaluent(trade.amount1,trade.amount2,trade.tradedesc,trade.id,'splitBaseNearRate')) INR_Equi_Near");
+		.put("Trade.INR_Equi_Near", "(getINREquivaluent(Trade.amount1,Trade.amount2,Trade.tradedesc,Trade.id,'splitBaseNearRate')) INR_Equi_Near");
 		replaceColumnNameOnSQL
-		.put("Cashposition.INR_Equi_Far", "(getINREquivaluent(trade.tradeamount,trade.yield,trade.tradedesc,trade.id,'splitBaseFarRate')) INR_Equi_Far");
+		.put("Trade.INR_Equi_Far", "(getINREquivaluent(Trade.tradeamount,Trade.yield,Trade.tradedesc,Trade.id,'splitBaseFarRate')) INR_Equi_Far");
 		
 		forwardColumnMaps.put("1D", " + 1");
 		forwardColumnMaps.put("2D", " + 2");
