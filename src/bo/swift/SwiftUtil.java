@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -702,25 +703,30 @@ public class SwiftUtil {
 	
 	
 	public static String getCCILDateHeaderFormat(String messagedate) {
-		SimpleDateFormat formatter
-		= new SimpleDateFormat("YYYYMMDD");
-		return "201511014588";
-	//	 SimpleDateFormat format = new SimpleDateFormat(CommonConstants.SDF_CCIL_HEADER_FORMAT);
-	     
-		/*formatter.setLenient(true);
-	        java.util.Date date = null;
-	        boolean flag = false;
-	        try {
-	           date = formatter.parse(messagedate);
-	            
-	        } catch (Exception e) {
-	        	commonUTIL.displayError("SwiftUtil","getCCILDateHeaderFormat",e);
-	            return "";
-	        }
-	        String nowYYYYMMDD = new String(formatter.format(date));
-	        nowYYYYMMDD = formatter.format(date).toString();
+		
+		String messageStr = messagedate.substring(0, 18);
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		
+		String dateTimeStr = null;
+		try {
+			dateTimeStr = new SimpleDateFormat("yyyyMMdd").format(formatter.parse(messageStr));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}	
+	    
+		String timeStr = messageStr.substring(10, 15);
+		
+		String timeArr[] = timeStr.split(":");
+		
+		String finalTime = ""; 
+			
+		for(String time: timeArr) {			
+			finalTime = finalTime + time;
+		}
+				
+		return (dateTimeStr + finalTime).trim();
 	
-		return commonUTIL.dateToString(date); */
 		
 	}
 	/**
@@ -2971,5 +2977,48 @@ final static String EMPTYSTRING = "";
 		return false;
 	}
 	
+	public static String getRate(double rate ) {
 
+		String[] noSplit = String.valueOf(rate).split("\\.");
+		String intPart = noSplit[0];
+		String decimalPart = noSplit[1];
+	
+		
+		String  rateDec = "";
+		String  rateInt = "";
+		
+		int addInterger = 4;
+		
+		if (decimalPart.length() > 0) {
+			if (!decimalPart.equals("0")) {
+				addInterger = addInterger - decimalPart.length();
+			} else {
+				decimalPart = "";
+			}
+		}
+		
+		if (addInterger == 0 || addInterger < 1) {
+			rateDec = decimalPart.substring(decimalPart.length() -4);
+			intPart = "";
+		} else {
+			
+			rateDec = decimalPart;
+			int rateIntLen = intPart.length();
+			
+			int noofZeros =  addInterger - rateIntLen;
+			
+			if (noofZeros > 0) {
+				
+				for(int k =0; k < noofZeros; k++) {
+					intPart	 =  "0" + intPart;
+				}
+			} else {
+				intPart = intPart.substring(rateIntLen - addInterger);
+			}
+						
+			
+		}
+		
+		return (intPart+rateDec).trim();
+	}
 }
