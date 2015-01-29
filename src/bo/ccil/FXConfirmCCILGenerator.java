@@ -101,21 +101,10 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
         field.setStatus((byte)'M');
         field.setTAG(":22:");
         field.setName("Common Reference");
-        String receiver = message.getReceiverAddressCode().substring(0,3);
-        //*********************************
-        
-        
-        
-        //   add Location code in 22
-        
-        
-        
-        
-        //*********************************
-        double price = trade.getPrice(); 
-        field.setValue(SwiftUtil.getSwiftCommonReferenceNoRounding(price,
-                                                         message.getSenderAddressCode(),
-                                                         message.getReceiverAddressCode()));
+        String receiver = message.getReceiverAddressCode().substring(0,4);
+        String location = ReferenceDataCache.getParty(trade.getCpID()).getAttributeValue("Location").substring(0, 2);
+        String price = SwiftUtil.getRate(trade.getPrice());         
+        field.setValue(receiver+location+price);
         fields.addElement(field);
         
     //Date Contract Agreed ?
@@ -141,7 +130,29 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
         field.setStatus((byte)'M');
         field.setTAG(":72:/");
         field.setName("Sender to Receiver Information");
-        field.setValue(senderMessageCode + "" + receiverMessageCode);
+        
+        Sdi cpSDI = fxTransferRule.getSdi("CounterParty");
+		
+		Vector<LeContacts> cpContacts =  ReferenceDataCache.getLecContacts(cpSDI.getCpId()); 
+		Vector<LeContacts> poContacts =  ReferenceDataCache.getLecContacts(cpSDI.getPoId());
+		
+		String cpCCIL = "";
+		String poCCIL = "";
+		for (int ii=0; ii < cpContacts.size(); ii++) {
+			LeContacts contacts = (LeContacts) cpContacts.get(ii);
+			if (contacts.getContactCategory().equals("CCIL")) {
+				cpCCIL = contacts.getSwift();
+			}
+		}
+		
+		for (int ii=0; ii < poContacts.size(); ii++) {
+			LeContacts contacts = (LeContacts) poContacts.get(ii);
+			if (contacts.getContactCategory().equals("CCIL")) {
+				poCCIL = contacts.getSwift();
+			}
+		}
+		
+        field.setValue(poCCIL+cpCCIL);
         fields.addElement(field);
 	 
 	//    :32R:Value Date(8n)/Currency Code(3a)/Amount Bought(15 Number)
@@ -287,9 +298,8 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
 
             }
         }*/
- 
-
-        field = SwiftUtil.getTAG53(fxTransferRule,"PAY", trade,null,"Delivery Agent",true,message,transferRules,null);
+		
+        field = SwiftUtil.getTAG57(fxTransferRule,"PAY", trade,null,"Delivery Agent",true,message,transferRules,null);
         if (field != null) fields.addElement(field);
 
         //field = SwiftUtil.getTAG56(fxTransferRule,"PAY", trade,null,"Intermediary",false,message,transferRules,dsCon);
