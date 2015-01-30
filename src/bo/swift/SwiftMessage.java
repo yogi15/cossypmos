@@ -402,7 +402,7 @@ public class SwiftMessage implements Serializable {
 	                receiver = receiver.substring(0, 8) + "X" + receiver.substring(9);
 	            }
 	            if(_message.getFormat().equalsIgnoreCase("CCIL"))
-	            	return "{2:" +  type + _ccilInputer + ccilHeaderDataFormat(_message.getMessageDate()) + _ccilApplication + "00" + "XXX}";
+	            	return "{2:" +  type + _ccilInputer + ccilHeaderDataFormat(_message.getMessageDate()) + _message.getAttributeValue("CCILTagCode") +_ccilApplication + "00" + "XXX}";
 	            
 	            return "{2:" + _inputOutput + type + receiver + "N" + "2" + "020}";
 	        } else {
@@ -414,6 +414,8 @@ public class SwiftMessage implements Serializable {
 	    }
 
 	    public String getUserHeaderBlock() {
+	    	if(_message.getFormat().equalsIgnoreCase("CCIL")) // CCIL don't require this tag in header
+	    		return "";
 	        if (_customizer != null) {
 	            String block = _customizer.getUserHeaderBlock(this, _message);
 	            if (!commonUTIL.isEmpty(block)) return block;
