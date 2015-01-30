@@ -2,16 +2,21 @@ package apps.window.referencewindow;
 
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -19,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
+import javax.swing.table.DefaultTableModel;
 
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
@@ -27,6 +33,7 @@ import org.dyno.visual.swing.layouts.Leading;
 import constants.CommonConstants;
 import util.RemoteServiceUtil;
 import util.commonUTIL;
+import apps.window.utilwindow.attributeUtil;
 import apps.window.utilwindow.propertypane.Combox.AccountSelectorCombox;
 import apps.window.utilwindow.propertypane.Combox.LESelectionPropertyCombox;
 import beans.Account;
@@ -94,7 +101,8 @@ public class SDIInternalPanel extends JPanel {
 	public JTextField im2AccountTextField;
 	public Account account;
 	private Collection acc = null;
-	
+	JButton  jButtonAttribute;
+	Vector sdiAttributesVec = null;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	
 	DefaultComboBoxModel<String> agentLeDatamodel = new DefaultComboBoxModel<String>();
@@ -102,16 +110,24 @@ public class SDIInternalPanel extends JPanel {
 	Collection<LegalEntity> le = new Vector<LegalEntity>();
 	private RemoteAccount remoteAccount = null;
 	private RemoteReferenceData remoteR = null;
-	
+	 final  attributeUtil attUtilSDI= new attributeUtil();
+	 Hashtable<String,String> hasSDIattributes = new Hashtable<String,String>();
+		DefaultTableModel attributeModel = null;
+
 	public SDIInternalPanel(RemoteReferenceData remoteD) {
 		remoteR = remoteD;
+		
 		initComponents();
+		
+		
 	}
 
 	private void initComponents() {
 		
 		try {
 			le = remoteR.selectAllLs();
+			sdiAttributesVec = (Vector) remoteR.getStartUPData("SDIAttributes");
+			
 			
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
@@ -119,7 +135,26 @@ public class SDIInternalPanel extends JPanel {
 		}
 		
 		add(getJPanel0());
+		
 		setSize(372, 574);
+		attUtilSDI.setLocationRelativeTo(this);
+		attUtilSDI.jButton0.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				for(int i=0;i<attUtilSDI.jTable0.getRowCount();i++) {
+					String attName =(String) attUtilSDI.jTable0.getValueAt(i, 0);
+					String value =(String) attUtilSDI.jTable0.getValueAt(i, 1);
+					 if(!commonUTIL.isEmpty(value)) {
+						 hasSDIattributes.put(attName, value);
+						 
+					 }
+					
+				}
+				attUtilSDI.dispose();
+			}
+		});
 		
 	}
 
@@ -362,7 +397,27 @@ public class SDIInternalPanel extends JPanel {
 		}
 		return jPanel3;
 	}
-
+	private JButton getJButtonAttribute() {
+		
+		if (jButtonAttribute == null) {
+			jButtonAttribute= new JButton();
+			jButtonAttribute.setText("Attribute"); 
+			
+			jButtonAttribute.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				
+				
+					attUtilSDI.fillAttribute(sdiAttributesVec, hasSDIattributes);
+				
+				attUtilSDI.setVisible(true);
+	        
+	             
+	          }
+	      });
+		}
+		return jButtonAttribute;
+	}
 	private JLabel getJLabel11() {
 		if (jLabel11 == null) {
 			jLabel11 = new JLabel();
@@ -469,6 +524,8 @@ public class SDIInternalPanel extends JPanel {
 			
 			jPanel0.add(getJLabel6(), new Constraints(new Leading(3, 86, 12, 12), new Leading(203, 17, 12, 12)));
 			jPanel0.add(getRolesData(), new Constraints(new Leading(96, 177, 10, 10), new Leading(9, 27, 12, 12)));
+			jPanel0.add(getJButtonAttribute(), new Constraints(new Leading(286, 66,4, 4), new Leading(9, 27,1, 4)));
+			
 			jPanel0.add(getProductTypeData(), new Constraints(new Leading(96, 177, 12, 12), new Leading(113, 27, 12, 12)));
 			jPanel0.add(getCashsecurityData(), new Constraints(new Leading(95, 57, 12, 12), new Leading(191, 27, 12, 12)));
 			jPanel0.add(getBeneficiaryData(), new Constraints(new Leading(95, 177, 12, 12), new Leading(43, 27, 12, 12)));
@@ -896,11 +953,12 @@ public class SDIInternalPanel extends JPanel {
 			
 			while(it.hasNext()) {				
 				LegalEntity data = (LegalEntity) it.next();
-				
-				if (data.getAlias().equals(leName)) {				
+				if(data != null) {
+				if (!commonUTIL.isEmpty( data.getAlias()) && data.getAlias().equalsIgnoreCase(leName)) {				
 					id= data.getId();
 					break;
-				}				
+				}		
+				}
 			}	
 			
 			it = null;
@@ -926,4 +984,32 @@ public class SDIInternalPanel extends JPanel {
 			it = null;			
 			return name;
 	 }
+
+	 public String getAttributes() {
+		 String atts = "";
+			Enumeration<String> enums = hasSDIattributes.keys();
+			while(enums.hasMoreElements()) {
+				String key = enums.nextElement();
+				String value = hasSDIattributes.get(key);
+				if(!commonUTIL.isEmpty(value))
+				atts = atts + key +"="+value+";";
+			}
+			return atts;
+	 }
+	public void setAttributes(String attr1) {
+		if(commonUTIL.isEmpty(attr1))
+			return;
+		hasSDIattributes.clear();
+		String attributes [] = attr1.split(";");
+		String value = "";
+		for(int i=0;i<attributes.length;i++) {
+		String attribute = 	attributes[i].substring(0, attributes[i].indexOf("="));
+		
+			value = attributes[i].substring(attributes[i].indexOf("=")+1, attributes[i].length());
+			hasSDIattributes.put(attribute, value);
+		
+		}
+		// TODO Auto-generated method stub
+		
+	}
 }

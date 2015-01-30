@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.rmi.RemoteException;
 import java.text.ParseException;
-
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -44,6 +43,7 @@ import com.jidesoft.docking.DockableFrame;
 import com.jidesoft.grid.RowStripeTableStyleProvider;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideScrollPane;
+
 import constants.CommonConstants;
 import constants.SDIConstants;
 import dsServices.RemoteAccount;
@@ -60,8 +60,370 @@ public class SDIWindow extends JPanel {
 
 		DockableFrame searchframe;
 	    private JPanel sdiStatusBar = new JPanel();
-	    private JLabel sdiLabel = new JLabel("SDI");
-	    private NumericTextField selectSDI = null;
+	    /**
+		 * @return the sdiStatusBar
+		 */
+		public JPanel getSdiStatusBar() {
+			return sdiStatusBar;
+		}
+		/**
+		 * @param sdiStatusBar the sdiStatusBar to set
+		 */
+		public void setSdiStatusBar(JPanel sdiStatusBar) {
+			this.sdiStatusBar = sdiStatusBar;
+		}
+
+		private JLabel sdiLabel = new JLabel("SDI");
+	    /**
+		 * @return the col
+		 */
+		public String[] getCol() {
+			return col;
+		}
+		/**
+		 * @param col the col to set
+		 */
+		public void setCol(String[] col) {
+			this.col = col;
+		}
+		/**
+		 * @return the sdi
+		 */
+		public Sdi getSdi() {
+			return sdi;
+		}
+		/**
+		 * @param sdi the sdi to set
+		 */
+		public void setSdi(Sdi sdi) {
+			this.sdi = sdi;
+		}
+		/**
+		 * @return the beneficiary
+		 */
+		public LegalEntity getBeneficiary() {
+			return beneficiary;
+		}
+		/**
+		 * @param beneficiary the beneficiary to set
+		 */
+		public void setBeneficiary(LegalEntity beneficiary) {
+			this.beneficiary = beneficiary;
+		}
+		/**
+		 * @return the data
+		 */
+		public Vector<Sdi> getData() {
+			return data;
+		}
+		/**
+		 * @param data the data to set
+		 */
+		public void setData(Vector<Sdi> data) {
+			this.data = data;
+		}
+		/**
+		 * @return the searchframe
+		 */
+		public DockableFrame getSearchframe() {
+			return searchframe;
+		}
+		/**
+		 * @param searchframe the searchframe to set
+		 */
+		public void setSearchframe(DockableFrame searchframe) {
+			this.searchframe = searchframe;
+		}
+		/**
+		 * @return the sdiLabel
+		 */
+		public JLabel getSdiLabel() {
+			return sdiLabel;
+		}
+		/**
+		 * @param sdiLabel the sdiLabel to set
+		 */
+		public void setSdiLabel(JLabel sdiLabel) {
+			this.sdiLabel = sdiLabel;
+		}
+		/**
+		 * @return the selectSDI
+		 */
+		public NumericTextField getSelectSDI() {
+			return selectSDI;
+		}
+		/**
+		 * @param selectSDI the selectSDI to set
+		 */
+		public void setSelectSDI(NumericTextField selectSDI) {
+			this.selectSDI = selectSDI;
+		}
+		/**
+		 * @return the selectSDIActionListener
+		 */
+		public ActionListener getSelectSDIActionListener() {
+			return selectSDIActionListener;
+		}
+		/**
+		 * @param selectSDIActionListener the selectSDIActionListener to set
+		 */
+		public void setSelectSDIActionListener(ActionListener selectSDIActionListener) {
+			this.selectSDIActionListener = selectSDIActionListener;
+		}
+		/**
+		 * @return the oldPropertyTablePanel
+		 */
+		public JPanel getOldPropertyTablePanel() {
+			return oldPropertyTablePanel;
+		}
+		/**
+		 * @param oldPropertyTablePanel the oldPropertyTablePanel to set
+		 */
+		public void setOldPropertyTablePanel(JPanel oldPropertyTablePanel) {
+			this.oldPropertyTablePanel = oldPropertyTablePanel;
+		}
+		/**
+		 * @return the sdiTablePanel
+		 */
+		public JPanel getSdiTablePanel() {
+			return sdiTablePanel;
+		}
+		/**
+		 * @param sdiTablePanel the sdiTablePanel to set
+		 */
+		public void setSdiTablePanel(JPanel sdiTablePanel) {
+			this.sdiTablePanel = sdiTablePanel;
+		}
+		/**
+		 * @return the sdiPropertiesPanel
+		 */
+		public JPanel getSdiPropertiesPanel() {
+			return sdiPropertiesPanel;
+		}
+		/**
+		 * @param sdiPropertiesPanel the sdiPropertiesPanel to set
+		 */
+		public void setSdiPropertiesPanel(JPanel sdiPropertiesPanel) {
+			this.sdiPropertiesPanel = sdiPropertiesPanel;
+		}
+		/**
+		 * @return the model
+		 */
+		public TableModelSDIUtil getModel() {
+			return model;
+		}
+		/**
+		 * @param model the model to set
+		 */
+		public void setModel(TableModelSDIUtil model) {
+			this.model = model;
+		}
+		/**
+		 * @return the loadButton
+		 */
+		public JButton getLoadButton() {
+			return loadButton;
+		}
+		/**
+		 * @param loadButton the loadButton to set
+		 */
+		public void setLoadButton(JButton loadButton) {
+			this.loadButton = loadButton;
+		}
+		/**
+		 * @return the newButton
+		 */
+		public JButton getNewButton() {
+			return newButton;
+		}
+		/**
+		 * @param newButton the newButton to set
+		 */
+		public void setNewButton(JButton newButton) {
+			this.newButton = newButton;
+		}
+		/**
+		 * @return the deleteButton
+		 */
+		public JButton getDeleteButton() {
+			return deleteButton;
+		}
+		/**
+		 * @param deleteButton the deleteButton to set
+		 */
+		public void setDeleteButton(JButton deleteButton) {
+			this.deleteButton = deleteButton;
+		}
+		/**
+		 * @return the saveButton
+		 */
+		public JButton getSaveButton() {
+			return saveButton;
+		}
+		/**
+		 * @param saveButton the saveButton to set
+		 */
+		public void setSaveButton(JButton saveButton) {
+			this.saveButton = saveButton;
+		}
+		/**
+		 * @return the saveAsNewButton
+		 */
+		public JButton getSaveAsNewButton() {
+			return saveAsNewButton;
+		}
+		/**
+		 * @param saveAsNewButton the saveAsNewButton to set
+		 */
+		public void setSaveAsNewButton(JButton saveAsNewButton) {
+			this.saveAsNewButton = saveAsNewButton;
+		}
+		/**
+		 * @return the closeButton
+		 */
+		public JButton getCloseButton() {
+			return closeButton;
+		}
+		/**
+		 * @param closeButton the closeButton to set
+		 */
+		public void setCloseButton(JButton closeButton) {
+			this.closeButton = closeButton;
+		}
+		/**
+		 * @return the remoteAccount
+		 */
+		public RemoteAccount getRemoteAccount() {
+			return remoteAccount;
+		}
+		/**
+		 * @param remoteAccount the remoteAccount to set
+		 */
+		public void setRemoteAccount(RemoteAccount remoteAccount) {
+			this.remoteAccount = remoteAccount;
+		}
+		/**
+		 * @return the remoteRef
+		 */
+		public RemoteReferenceData getRemoteRef() {
+			return remoteRef;
+		}
+		/**
+		 * @param remoteRef the remoteRef to set
+		 */
+		public void setRemoteRef(RemoteReferenceData remoteRef) {
+			this.remoteRef = remoteRef;
+		}
+		/**
+		 * @return the futureProduct
+		 */
+		public FutureProduct getFutureProduct() {
+			return futureProduct;
+		}
+		/**
+		 * @param futureProduct the futureProduct to set
+		 */
+		public void setFutureProduct(FutureProduct futureProduct) {
+			this.futureProduct = futureProduct;
+		}
+		/**
+		 * @return the dateLabel
+		 */
+		public JLabel getDateLabel() {
+			return dateLabel;
+		}
+		/**
+		 * @param dateLabel the dateLabel to set
+		 */
+		public void setDateLabel(JLabel dateLabel) {
+			this.dateLabel = dateLabel;
+		}
+		/**
+		 * @return the dateText
+		 */
+		public JTextField getDateText() {
+			return dateText;
+		}
+		/**
+		 * @param dateText the dateText to set
+		 */
+		public void setDateText(JTextField dateText) {
+			this.dateText = dateText;
+		}
+		/**
+		 * @return the sdiSearch
+		 */
+		public sdiSearchPanel getSdiSearch() {
+			return sdiSearch;
+		}
+		/**
+		 * @param sdiSearch the sdiSearch to set
+		 */
+		public void setSdiSearch(sdiSearchPanel sdiSearch) {
+			this.sdiSearch = sdiSearch;
+		}
+		/**
+		 * @return the buttonsPanel
+		 */
+		public JPanel getButtonsPanel() {
+			return buttonsPanel;
+		}
+		/**
+		 * @param buttonsPanel the buttonsPanel to set
+		 */
+		public void setButtonsPanel(JPanel buttonsPanel) {
+			this.buttonsPanel = buttonsPanel;
+		}
+		/**
+		 * @return the scrollPane
+		 */
+		public JScrollPane getScrollPane() {
+			return scrollPane;
+		}
+		/**
+		 * @param scrollPane the scrollPane to set
+		 */
+		public void setScrollPane(JScrollPane scrollPane) {
+			this.scrollPane = scrollPane;
+		}
+		/**
+		 * @return the sdiTables
+		 */
+		public JTable getSdiTables() {
+			return sdiTables;
+		}
+		/**
+		 * @param sdiTables the sdiTables to set
+		 */
+		public void setSdiTables(JTable sdiTables) {
+			this.sdiTables = sdiTables;
+		}
+		/**
+		 * @return the propertyTable
+		 */
+		public SDIPropertyTable getPropertyTable() {
+			return propertyTable;
+		}
+		/**
+		 * @param propertyTable the propertyTable to set
+		 */
+		public void setPropertyTable(SDIPropertyTable propertyTable) {
+			this.propertyTable = propertyTable;
+		}
+		/**
+		 * @return the sdiInternal
+		 */
+		public SDIInternalPanel getSdiInternal() {
+			return sdiInternal;
+		}
+		/**
+		 * @param sdiInternal the sdiInternal to set
+		 */
+		public void setSdiInternal(SDIInternalPanel sdiInternal) {
+			this.sdiInternal = sdiInternal;
+		}
+
+		private NumericTextField selectSDI = null;
 	    ActionListener selectSDIActionListener = null;
 	    private JPanel oldPropertyTablePanel = null;
 		private JPanel sdiTablePanel = new JPanel(new BorderLayout());
@@ -356,7 +718,7 @@ public class SDIWindow extends JPanel {
 		return name;
 	 }
 	 private void setAndShowSDI(Sdi sdi) {
-		 	
+		 sdiInternal.hasSDIattributes.clear();
 		 sdiInternal.rolesData.setSelectedItem(sdi.getRole());
 		 sdiInternal.beneficiaryData.setSelectedItem((sdiInternal.getLeName(sdi.getCpId())));
 		 sdiInternal.currencyData.setSelectedItem(sdi.getCurrency()); 
@@ -384,6 +746,7 @@ public class SDIWindow extends JPanel {
 		 sdiInternal.InterM2Data.setSelectedItem(sdiInternal.getLeName(sdi.getInterMid2()));
 		 sdiInternal.InterM2Contacts.setSelectedItem(sdi.getInterMid2Contact());
 		 sdiInternal.im2AccountTextField.setText(sdi.getInterMid2glName());
+		 sdiInternal.setAttributes(sdi.getAttributes());
 		 
 			
 	 }
@@ -814,7 +1177,8 @@ public class SDIWindow extends JPanel {
 				 
 			 if (sdiInternal.glAccountData.getSelectedIndex() > -1) {
 				 				 
-				 sdi.setAccountID(Integer.parseInt((sdiInternal.glAccountData.getSelectedItem().toString())));
+				// sdi.setAccountID(Integer.parseInt((sdiInternal.glAccountData.getSelectedItem().toString())));
+				 sdi.setAccountID(53);
 				 
 			 }
 			 
@@ -870,9 +1234,14 @@ public class SDIWindow extends JPanel {
 					 }
 				 
 			 }
+			 sdi.setAttributes(sdiInternal.getAttributes());
 			 
 			 return true;
 		 
 		 }
+		private void initComponents() {
+			setLayout(new BorderLayout());
+			setSize(421, 675);
+		}
 		
 }
