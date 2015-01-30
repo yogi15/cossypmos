@@ -1,8 +1,7 @@
 package beans;
 
 import java.io.Serializable;
-
-
+import java.util.Hashtable;
 
 import util.ReferenceDataCache;
 import util.commonUTIL;
@@ -16,6 +15,31 @@ public class Sdi extends BOObject implements Serializable,Cloneable {
 	int id;
 	int preferred = 0;
 	int interMid1 =0;
+	transient   Hashtable<String, String> attributesData = new Hashtable<String, String>();
+	
+	public void setAttribute(String attributeName, String Values) {
+		String att1 = getAttributes();
+		att1 = att1 + ";"+attributeName+"="+Values;
+		this.attributes = att1;
+		// TODO Auto-generated method stub
+		
+	}
+	public String getAttributeValue(String attributesDataName) {
+		// TODO Auto-generated method stub
+		String attr1 = getAttributes();
+		String attributes [] = attr1.split(";");
+		String value = "";
+		for(int i=0;i<attributes.length;i++) {
+		String attribute = 	attributes[i];
+		if(attribute.contains(attributesDataName)) {
+			value = attribute.substring(attribute.indexOf("=")+1, attribute.length());
+			if(!commonUTIL.isEmpty(value))
+				 break;
+		}
+		}
+		return value;
+		
+	}
 	/**
 	 * @return the interMid1
 	 */

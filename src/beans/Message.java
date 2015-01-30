@@ -1,10 +1,12 @@
 package beans;
 
+import java.beans.Transient;
 import java.io.Serializable;
+import java.util.Hashtable;
 
 public class Message implements Serializable, Cloneable {
-	 
-	public static final String FORMAT_ISSUE_MSG_ATTR = "FORMAT ISSUE";
+	transient   Hashtable<String, String> attributesData = new Hashtable<String, String>();
+		public static final String FORMAT_ISSUE_MSG_ATTR = "FORMAT ISSUE";
 	 /**
      * Msg Attribute for Message references.
      * In certain instances, messages must have awareness of
@@ -261,7 +263,19 @@ public class Message implements Serializable, Cloneable {
 	}
 	public void setAttributes(String attributes) {
 		this.attributes = attributes;
+		
 	}
+	
+	public void setAttributes(String attributeName,String value) {
+		if(attributesData == null) 
+			attributesData = new Hashtable<String,String>();
+attributesData.put(attributeName,value);
+		
+	}
+	public String getAttributeValue(String attributeName) {
+		return attributesData.get(attributeName);
+				
+			}
 	String format = "";
 	private String _senderAddressCode;
 	public void setFormat(String formatType) {
