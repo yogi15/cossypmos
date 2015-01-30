@@ -176,6 +176,8 @@ public class MessageProcessor extends Thread {
 			MessageServiceAppender.printLog("DEBUG", "MessageProcessor get Receiver " + receiver.getName() + " for messConfig " +   messConfig.getId());
 			
 			LegalEntity sender = getLegalEntity(messConfig.getPoid());
+			sender.setRole("PO"); // messageConfig must know which is sender role , in config window we must provied
+			messConfig.setSenderRole("PO");
 			if(sender == null) {
 				MessageServiceAppender.printLog("DEBUG", "MessageProcessor sender null for messConfig " +   messConfig.getId());
 				manager.updateEventProcess(event);
@@ -185,8 +187,18 @@ public class MessageProcessor extends Thread {
 			if(receiver == null) {
 				MessageServiceAppender.printLog("DEBUG", "MessageProcessor receiver getting  null for messConfig " +   messConfig.getId() + " selecting agent as receiver on the basis of sender role ");
 				
-				String poKey = sender.getRole().toUpperCase()+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+sender.getId();
+				String poKey = messConfig.getSenderRole()+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+sender.getId();
 				Sdi poPerferedSdi = SDISelectorUtil.getPreferredSdiOnly(poKey);
+				if(poPerferedSdi == null) {
+					 SDISelectorUtil.selectSdiOntrade(trade, refData);
+					 poPerferedSdi = SDISelectorUtil.getPreferredSdiOnly(poKey);
+					
+				}
+				if( poPerferedSdi  == null) {
+					MessageServiceAppender.printLog("DEBUG", "MessageProcessor not able to trace  with receiver role as Agent ");
+					
+					return;
+					}
 				receiver = getLegalEntity(poPerferedSdi.getAgentId());
 				MessageServiceAppender.printLog("DEBUG", "MessageProcessor get Sender " + receiver.getName() + " for messConfig " +   messConfig.getId() + " with receiver role as Agent ");
 				
@@ -459,7 +471,7 @@ public class MessageProcessor extends Thread {
 			synchronized (messageConfigs) {
 				messConfigs = messageConfigs.get(messConfig);				
 			}
-			if(messConfigs == null) {
+			if(messConfigs == null || messConfigs.isEmpty()) {
 				messConfigs = (Vector<MessageConfig>) refData.getMessageConfig(trade.getProductType(), trade.getTradedesc1(), tradeEvent.getEventType(), getBook(trade.getBookId()).getLe_id());
 			   if(messConfigs != null)
 				messageConfigs.put(messConfig, messConfigs);
