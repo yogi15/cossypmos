@@ -39,7 +39,7 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
 		fxTransferRule.setRemoteTrade(remoteTrade);
 		fxTransferRule.setRefDate(remoteRef);
 		Vector<TransferRule> transferRules =  fxTransferRule.generateRules(trade);
-		String type = "CCIL";
+		String type = "MT300";
 		refeCache = ReferenceDataCache.getSingleInstatnce();
 		LegalEntity po = refeCache.getPO(trade.getBookId());
 		String poKey = "PO|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+po.getId();
@@ -61,6 +61,12 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
 	 // Message Intitialization
 
        
+	    String ccilHeaderTag = poPerferedSdi.getAttributeValue("CCILTagCode");
+	    if(!commonUTIL.isEmpty(ccilHeaderTag))
+	       message.setAttributes("CCILTagCode", ccilHeaderTag);
+	       
+	    
+	    
         swift = new  SwiftMessage(message, type);
         Vector fields = new Vector();
         swift.setFields(fields);
