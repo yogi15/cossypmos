@@ -109,4 +109,15 @@ public class MessageConfig implements Serializable {
 		// TODO Auto-generated method stub
 		this.receiverRole = receiverRole;
 	}
+	String senderRole  = "";
+	public void setSenderRole(String senderRole) {
+		// TODO Auto-generated method stub
+		this.senderRole = senderRole;
+				
+	}
+	public String getSenderRole() {
+		// TODO Auto-generated method stub
+		return senderRole;
+				
+	}
 }
