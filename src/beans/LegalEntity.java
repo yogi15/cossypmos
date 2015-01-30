@@ -2,6 +2,8 @@ package beans;
 
 import java.io.Serializable;
 
+import util.commonUTIL;
+
 public class LegalEntity implements Serializable {
 
 	int id;
@@ -61,5 +63,24 @@ public class LegalEntity implements Serializable {
 	public void setCountry(String country) {
 		this.country = country;
 	}
-
+	
+	public String getAttributeValue(String attributeDataName) {
+		
+		String attr1 = getAttributes();
+		String attributes [] = attr1.split(";");
+		String value = "";
+		
+		for(int i=0;i<attributes.length;i++) {
+			String attribute = 	attributes[i];
+			
+			if(attribute.contains(attributeDataName)) {
+				value = attribute.substring(attribute.indexOf("=")+1, attribute.length());
+				if(!commonUTIL.isEmpty(value))
+					break;
+			}
+		}
+		
+		return value;
+		
+	}
 }
