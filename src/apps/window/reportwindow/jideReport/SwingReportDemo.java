@@ -145,8 +145,8 @@ public class SwingReportDemo extends JPanel {
 
         // Choose formatting of doubles
         NumberFormat format = NumberFormat.getNumberInstance();
-        format.setMinimumFractionDigits(9);
-        format.setMaximumFractionDigits(10);
+        format.setMinimumFractionDigits(2);
+        format.setMaximumFractionDigits(2);
         DoubleConverter converter = new DoubleConverter(format);
         ObjectConverterManager.registerConverter(Double.class, converter);
         ObjectConverterManager.registerConverter(double.class, converter);
