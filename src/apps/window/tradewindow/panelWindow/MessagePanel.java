@@ -25,6 +25,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import logAppender.MessageServiceAppender;
+
 import org.dyno.visual.swing.layouts.Bilateral;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
@@ -701,12 +703,15 @@ public class MessagePanel  extends BackOfficePanel {
 	protected void updateMessageOnAction(Message message, int userID, int row) {
 		// TODO Auto-generated method stub
 		try {
-
+			MessageServiceAppender.printLog("DEBUG", "MessagePanel in  updateMessageOnAction Method for updateing >>>  Message id "+message.getId() );
+			
 			remoteBO.updateMessageAndPublish(message, userID);
 			model.udpateValueAt(message, row, jTable0.getSelectedColumn());
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MessageServiceAppender.printLog("ERROR", "MessagePanel in  updateMessageOnAction Method for updateing <<<<<  Message id "+message.getId() );
+			
 		}
 
 	}
