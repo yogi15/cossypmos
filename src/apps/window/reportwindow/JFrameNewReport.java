@@ -392,8 +392,10 @@ public class JFrameNewReport extends DefaultDockableHolder {
 		choiceColumns.setLocationRelativeTo(this);
 		columnconfigure.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				choiceColumns.setSize(380, 410);
+				choiceColumns.setSize(519, 400);
 				choiceColumns.setVisible(true);
+				choiceColumns.cmodList2.clear();
+			//	choiceColumns._root.removeAllChildren();
 				choiceColumns.fillListWithSQLColumns(reportPanel.getColumnSQL());
 
 			}
@@ -479,11 +481,15 @@ public class JFrameNewReport extends DefaultDockableHolder {
 			    searchColumn = (Vector) remoteBORef.getStartUPData(reportType + "Column");// understand which column to display on 	// selected report
 		}
 			
-			if(reportType.equalsIgnoreCase("CashPosition") || reportType.equalsIgnoreCase("PNL") || reportType.equalsIgnoreCase("CashLedgerPosition"))
-			   columnsTreeNode = columns.getTreeNodes(true);
-			else 
+			if(reportType.equalsIgnoreCase("CashPosition") || reportType.equalsIgnoreCase("PNL") || reportType.equalsIgnoreCase("CashLedgerPosition")){
+			  if(columnsTreeNode!= null) 
+				  columnsTreeNode.removeAllChildren();
+				columnsTreeNode = columns.getTreeNodes(true);
+		} else  {
+			 if(columnsTreeNode!= null) 
+				  columnsTreeNode.removeAllChildren();
 				 columnsTreeNode = columns.getTreeNodes(false);
-			
+		}
 			filterValues = new FilterValues(remoteBORef, remoteTrade,remoteTask, remoteBo);
 			Vector<UserJob> userjobs = remoteTask.getUserJob(getUser().getId(),"Report"+reportType.toUpperCase());
 			processTeamplates(listModel, userjobs);
