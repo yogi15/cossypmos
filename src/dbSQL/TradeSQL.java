@@ -88,7 +88,7 @@ public class TradeSQL {
 			 				 	  
 			 				 	   
  "     from  trade  where "+
- "       trunc(tradedate) = to_date('"+currentDate+"','dd/mm/yyyy')     "+
+ "       trunc(tradedate) = to_date('"+currentDate+"','dd/mm/yyyy')       and  parentid = 0   "+
  "     group by "+
  "    (case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ), "+
  "     (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ), "+
