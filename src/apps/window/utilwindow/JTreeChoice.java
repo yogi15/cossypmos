@@ -22,7 +22,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import org.dyno.visual.swing.layouts.Bilateral;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
@@ -138,8 +137,8 @@ public class JTreeChoice extends JDialog {
 		setBackground(Color.white);
 		setForeground(Color.black);
 		setLayout(new GroupLayout());
-		add(getJPanel0(), new Constraints(new Bilateral(4, 12, 0), new Leading(7, 351, 10, 10)));
-		setSize(366, 367);
+		add(getJPanel0(), new Constraints(new Leading(4, 466, 10, 10), new Leading(7, 351, 10, 10)));
+		setSize(480, 368);
 	}
 
 	private JButton getJButton4() {
@@ -202,12 +201,12 @@ public class JTreeChoice extends JDialog {
 			jPanel0 = new JPanel();
 			jPanel0.setBorder(new LineBorder(Color.black, 1, false));
 			jPanel0.setLayout(new GroupLayout());
-			jPanel0.add(getJScrollPane0(), new Constraints(new Leading(7, 124, 10, 10), new Leading(8, 336, 10, 10)));
-			jPanel0.add(getJScrollPane1(), new Constraints(new Leading(216, 124, 10, 10), new Leading(9, 335, 12, 12)));
-			jPanel0.add(getJButton0(), new Constraints(new Leading(140, 62, 10, 10), new Leading(114, 10, 10)));
-			jPanel0.add(getJButton1(), new Constraints(new Leading(140, 62, 12, 12), new Leading(152, 12, 12)));
-			jPanel0.add(getJButton3(), new Constraints(new Leading(143, 62, 10, 10), new Leading(185, 10, 10)));
-			jPanel0.add(getJButton4(), new Constraints(new Leading(143, 62, 12, 12), new Leading(220, 12, 12)));
+			jPanel0.add(getJScrollPane0(), new Constraints(new Leading(7, 182, 10, 10), new Leading(8, 336, 10, 10)));
+			jPanel0.add(getJButton0(), new Constraints(new Leading(207, 62, 12, 12), new Leading(112, 10, 10)));
+			jPanel0.add(getJButton1(), new Constraints(new Leading(207, 62, 12, 12), new Leading(150, 10, 10)));
+			jPanel0.add(getJButton3(), new Constraints(new Leading(207, 62, 12, 12), new Leading(184, 10, 10)));
+			jPanel0.add(getJButton4(), new Constraints(new Leading(207, 62, 12, 12), new Leading(217, 10, 10)));
+			jPanel0.add(getJScrollPane1(), new Constraints(new Leading(281, 178, 10, 10), new Leading(4, 340, 12, 12)));
 		}
 		return jPanel0;
 	}
