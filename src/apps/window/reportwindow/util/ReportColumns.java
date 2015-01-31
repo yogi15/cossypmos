@@ -310,10 +310,37 @@ public class ReportColumns {
 		
 	}
 	public  DefaultMutableTreeNode getTreeNodes(boolean showOpenPosition) {
-		buildTreeNodes(showOpenPosition);
 		 DefaultMutableTreeNode _root = new  DefaultMutableTreeNode("Columns");
+			_root.removeAllChildren();
+			_root.removeFromParent();
+			parentTradeColumns.removeAllChildren();
+			parentTradeColumns.removeFromParent();
+			parentProductColumns.removeAllChildren();
+			parentProductColumns.removeFromParent();
+			parentCouponColumns.removeAllChildren();
+			parentCouponColumns.removeFromParent();
+			parentBookColumns.removeAllChildren();
+			parentBookColumns.removeFromParent();
+			parentTraderColumns.removeAllChildren();
+			parentTraderColumns.removeFromParent();
+			parentLEColumns.removeAllChildren();
+			parentLEColumns.removeFromParent();
+			parentFeesColumns.removeAllChildren();
+			parentFeesColumns.removeFromParent();
+			parentTransferColumns.removeAllChildren();
+			parentTransferColumns.removeFromParent();
+			parentCashpositionColumns.removeAllChildren();
+			parentCashpositionColumns.removeFromParent();
+			parentCashLedgerPositionColumns.removeAllChildren();
+			parentCashLedgerPositionColumns.removeFromParent();
+			parentOpenPosColumns.removeAllChildren();
+			parentOpenPosColumns.removeFromParent();
+			parentPNLColumns.removeAllChildren();
+			parentPNLColumns.removeFromParent();
+			
+		buildTreeNodes(showOpenPosition);
 		
-		 System.out.println(parentTradeColumns.getChildCount());
+		// System.out.println(parentTradeColumns.getChildCount());
 		 _root.add(parentTradeColumns);
 		 _root.add(parentProductColumns);
 		 _root.add(parentCouponColumns);
