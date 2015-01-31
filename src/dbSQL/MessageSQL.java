@@ -17,30 +17,30 @@ public class MessageSQL {
 	final static private String INSERT_FROM_message = "INSERT into message("
 			+ " id,  tradeid,  transferid, messagetype, sendername, senderRole, receiverName, "
 			+ " receiverRole, tradeversion, transferversion, action, status, addresstype, templateName, "
-			+ " linkid,messagedate, tradedate, messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid" + ") " 
-			+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			+ " linkid,messagedate, tradedate, messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid,isUpdateBeforeSend" + ") " 
+			+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	
 	final static private String SELECT_MAX = "SELECT MESSAGE_SEQ.NEXTVAL DESC_ID FROM dual ";
 	
 	final static private String SELECTALL = "SELECT id, tradeid, transferid, messageType, sendername, senderRole, " 
 			+ " receiverName, receiverRole, tradeversion, "
 			+ " transferversion, action, status, addresstype, templateName, linkid, messagedate, tradedate,"
-			+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid FROM message order by id";
+			+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid,isUpdateBeforeSend FROM message order by id";
 	final static private String SELECT = "SELECT tradeid FROM message where id =  ?";
 	static private String SELECTONE = "SELECT id, tradeid, transferid, messageType, sendername, senderRole, " 
 		+ " receiverName, receiverRole, tradeversion, "
 		+ " transferversion, action, status, addresstype, templateName, linkid, messagedate, tradedate,"
-		+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid FROM message order by id";
+		+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid,isUpdateBeforeSend FROM message where id = ";
 	final static private String SELECTONPRODUCT = "SELECT id, tradeid, transferid, messageType, sendername, senderRole, " 
 		+ " receiverName, receiverRole, tradeversion, "
 		+ " transferversion, action, status, addresstype, templateName, linkid, messagedate, tradedate,"
-		+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid  FROM message order by id";
+		+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid,isUpdateBeforeSend  FROM message order by id";
 
 	
 	final static private String SELECTWHERE = "SELECT id, tradeid, transferid, messageType, sendername, senderRole, " 
 			+ " receiverName, receiverRole, tradeversion, "
 			+ " transferversion, action, status, addresstype, templateName, linkid, messagedate, tradedate,"
-			+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid  FROM message  where ";
+			+ " messagegateway, productsubtype,eventtype,triggerON,productid,attributes,format,producttype,senderContactType,receiverContactType,senderID,receiverID,messConfigID,subAction,userid,isUpdateBeforeSend  FROM message  where ";
 	
 	
 	private static String getUpdateSQL(Message message) {
@@ -77,7 +77,9 @@ public class MessageSQL {
 				.append(" receiverID = ").append(message.getReceiverId()).append(",")
 				.append(" messConfigID = ").append(message.getMessageConfigID()).append(",")
 				.append(" subAction = '").append(message.getSubAction()).append("',")
-				.append(" userid = ").append(message.getUserID()).append("")
+				.append(" userid = ").append(message.getUserID()).append(",")
+				.append(" isUpdateBeforeSend = '").append(message.getUpdateBeforeSend()).append("'")
+				
 				.toString();
 	//	updateSQL = updateSQL + " and  messagedate = to_date('" + message.getMessageDate() +"', 'DD/MM/YYYY hh24:mi:ss')";
 	//	updateSQL = updateSQL + " and tradedate = to_date('" + message.getTradeDate() +"', 'DD/MM/YYYY hh24:mi:ss')";
@@ -246,14 +248,14 @@ public class MessageSQL {
 		Message newMessage = null;
 		
 		try {
-			
+			int id = selectMax(con);
 			commonUTIL.display("MessageSQL", INSERT_FROM_message);
 			
 			con.setAutoCommit(false);
 	
 			stmt = dsSQL.newPreparedStatement(con, INSERT_FROM_message);
 			
-			stmt.setInt(1, selectMax(con));
+			stmt.setInt(1, id);
 			stmt.setInt(2, inserMessage.getTradeId());
 			stmt.setInt(3, inserMessage.getTransferId());
 			stmt.setString(4, inserMessage.getMessageType());
@@ -285,9 +287,11 @@ public class MessageSQL {
 			stmt.setInt(30, inserMessage.getMessageConfigID());
 			stmt.setString(31, inserMessage.getSubAction());
 			stmt.setInt(32, inserMessage.getUserID());
+			stmt.setString(33, "FALSE");  // first insert is going to false always. 
 			newMessage = inserMessage;
 			if (stmt.executeUpdate() > 0) {
 				newMessage = inserMessage;
+				newMessage.setId(id);
 				con.commit();
 				isSave = true;
 
@@ -341,9 +345,10 @@ public class MessageSQL {
 		PreparedStatement stmt = null;
 		Vector Messages = new Vector();
 		Message message = new Message();
+		String sql = "";
 		try {
-
-			stmt = dsSQL.newPreparedStatement(con, SELECTONE + messageIn);
+			sql = SELECTONE + messageIn + "   order by id ";
+			stmt = dsSQL.newPreparedStatement(con, sql);
 
 			ResultSet rs = stmt.executeQuery();
 
@@ -381,11 +386,12 @@ public class MessageSQL {
 				message.setMessageConfigID(rs.getInt(30));
 				message.setSubAction(rs.getString(31));
 				message.setUserID(rs.getInt(32));
+				message.setUpdateBeforeSend(rs.getString(33));
 				return message;
 
 			}
 		} catch (Exception e) {
-			commonUTIL.displayError("messageSQL", "select", e);
+			commonUTIL.displayError("messageSQL", "select " + sql, e);
 			return message;
 
 		} finally {
@@ -446,6 +452,7 @@ public class MessageSQL {
 				message.setMessageConfigID(rs.getInt(30));
 				message.setSubAction(rs.getString(31));
 				message.setUserID(rs.getInt(32));
+				message.setUpdateBeforeSend(rs.getString(33));
 				messages.add(message);
 
 			}
@@ -510,11 +517,12 @@ public class MessageSQL {
 				message.setMessageConfigID(rs.getInt(30));
 				message.setSubAction(rs.getString(31));
 				message.setUserID(rs.getInt(32));
+				message.setUpdateBeforeSend(rs.getString(33));
 				messages.add(message);
 
 			}
 		} catch (Exception e) {
-			commonUTIL.displayError("messageSQL", "selectmessage", e);
+			commonUTIL.displayError("messageSQL", "selectmessage  " + SELECTONE, e);
 			return messages;
 
 		} finally {
@@ -522,7 +530,7 @@ public class MessageSQL {
 				stmt.close();
 				//con.close();
 			} catch (SQLException e) {
-				commonUTIL.displayError("messageSQL", "selectMax", e);
+				commonUTIL.displayError("messageSQL", "selectmessage " + SELECTONE, e);
 			}
 		}
 		return messages;
@@ -533,10 +541,10 @@ public class MessageSQL {
 		int j = 0;
 		PreparedStatement stmt = null;
 		Vector messages = new Vector();
-
+		String sql = "";
 		try {
 			con.setAutoCommit(true);
-			String sql = SELECTONPRODUCT + messageid;
+			sql  = SELECTONPRODUCT + messageid;
 			stmt = dsSQL.newPreparedStatement(con, sql);
 
 			ResultSet rs = stmt.executeQuery();
@@ -576,12 +584,13 @@ public class MessageSQL {
 				message.setMessageConfigID(rs.getInt(30));
 				message.setSubAction(rs.getString(31));
 				message.setUserID(rs.getInt(32));
+				message.setUpdateBeforeSend(rs.getString(33));
 				messages.add(message);
 
 			}
 			commonUTIL.display("messageSQL", sql);
 		} catch (Exception e) {
-			commonUTIL.displayError("messageSQL", "selectmessageOnProduct", e);
+			commonUTIL.displayError("messageSQL", "selectmessageOnProduct " +sql, e);
 			return messages;
 
 		} finally {
@@ -602,10 +611,10 @@ public class MessageSQL {
 		int j = 0;
 		PreparedStatement stmt = null;
 		Vector messages = new Vector();
-
+		String sql = "";
 		try {
 			con.setAutoCommit(true);
-			String sql = SELECTWHERE  + where;
+			sql = SELECTWHERE  + where;
 			stmt = dsSQL.newPreparedStatement(con, sql);
 
 			ResultSet rs = stmt.executeQuery();
@@ -645,12 +654,13 @@ public class MessageSQL {
 				message.setMessageConfigID(rs.getInt(30));
 				message.setSubAction(rs.getString(31));
 				message.setUserID(rs.getInt(32));
+				message.setUpdateBeforeSend(rs.getString(33));
 				messages.add(message);
 
 			}
 			commonUTIL.display("messageSQL", sql);
 		} catch (Exception e) {
-			commonUTIL.displayError("messageSQL", "selectmessageOnProduct", e);
+			commonUTIL.displayError("messageSQL", "selectmessageOnProduct " + sql, e);
 			return messages;
 
 		} finally {
