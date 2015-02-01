@@ -26,10 +26,12 @@ import org.dyno.visual.swing.layouts.Leading;
 
 import util.NumericTextField;
 import util.RemoteServiceUtil;
+import util.commonUTIL;
 import beans.LegalEntity;
 import beans.StartUPData;
 import beans.Trade;
 
+import com.jidesoft.combobox.DateComboBox;
 import com.standbysoft.component.date.swing.JDatePicker;
 
 import dsServices.RemoteReferenceData;
@@ -52,10 +54,10 @@ public class TakeUPWindow extends JFrame {
 	public NumericTextField jTextField3;
 	private JLabel jLabel12;
 	private JLabel jLabel13;
-	public JTextField jTextField5;
+	public DateComboBox jTextField5;
 	public JTextField jTextField4;
 	public JLabel jLabel14;
-	public JDatePicker jTextField6;
+	public DateComboBox jTextField6;
 	public JTextField jTextField7;
 	public JLabel jLabel2;
 	public JButton jButton0;
@@ -166,9 +168,13 @@ public TakeUPWindow() {
 		return jTextField7;
 	}
 
-	private JDatePicker getJTextField6() {
+	private DateComboBox getJTextField6() {
 		if (jTextField6 == null) {
-			jTextField6 = new com.standbysoft.component.date.swing.JDatePicker();
+			jTextField6 = new DateComboBox();
+			jTextField6.setFormat(commonUTIL.getDateTimeFormat());
+			jTextField6.setTimeDisplayed(true);
+			jTextField6.setDate(commonUTIL.stringToDate(commonUTIL.getCurrentDateTime(), true));
+			jTextField6.setEditable(false);
 		//	jTextField6.setText("settleDate");
 		}
 		return jTextField6;
@@ -192,12 +198,13 @@ public TakeUPWindow() {
 		return jTextField4;
 	}
 
-	private JTextField getJTextField5() {
+	private DateComboBox getJTextField5() {
 		if (jTextField5 == null) {
-			jTextField5 = new JTextField(); 
-		//	jTextField5.setText("Trade Date");
-			//jTextField5.setEditable(false);
-			//jTextField5.setEnabled(false);
+			jTextField5 = new DateComboBox(); 
+			jTextField5.setFormat(commonUTIL.getDateTimeFormat());
+			jTextField5.setTimeDisplayed(true);
+			jTextField5.setDate(commonUTIL.stringToDate(commonUTIL.getCurrentDateTime(), true));
+			jTextField5.setEditable(false);
 		}
 		return jTextField5;
 	}
