@@ -328,6 +328,8 @@ public class MessageProcessor extends Thread {
 							MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages found oldMessages  for trade id " + message.getTradeId() + " on Cancel eventTYpe "+message.getEventType() + " with oldmess status as "+originMess.getStatus());
 							
 						originMess.setSubAction("CANC");
+						originMess.setAction("CANCEL");
+						originMess.setEventType(message.getEventType());
 						originMess.setUpdateBeforeSend("TRUE");
 						updatetMessages.add(originMess);
 						}
@@ -370,6 +372,7 @@ public class MessageProcessor extends Thread {
 			    			message.setSubAction("NEW");
 			    			message.setId(oldMessage.getId());
 			    			message.setUpdateBeforeSend("TRUE");
+			    			message.setLinkId(oldMessage.getLinkId());
 			    			MessageServiceAppender.printLog("DEBUG", "MessageProcessor in  filterOldMessages setting subAction " + message.getSubAction() + " aganist message Action "+message.getAction() + " oldMessage found with subaction of oldMessage as "+oldMessage.getSubAction()); 
 			    			
 			    			updatetMessages.add(message);
