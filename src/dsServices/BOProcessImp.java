@@ -1560,8 +1560,16 @@ return status;
 			// this is used when existing old message with same key(advcieconfig,tradeid or transferid,producytype,currency,po) are same with new message so it's treated as OLD message only. 
 				 
 			   if(message.getUpdateBeforeSend().equalsIgnoreCase("TRUE") && commonUTIL.isEmpty(message.getAction()) &&  commonUTIL.isEmpty(message.getStatus())) {
-				   message.setAction("NEW");    
-				   message.setStatus("NONE");
+				  if(trade.getStatus().equalsIgnoreCase("CANCELLED")) {
+					//  message.setAction("CANCEL");
+				  } else {
+					  message.setAction("NEW"); 
+					  message.setStatus("NONE");
+				  }
+				  
+			   }
+			   if(trade.getStatus().equalsIgnoreCase("CANCELLED")) {
+					//  message.setAction("CANCEL");
 			   }
 			   WFConfig wf =  getStatusOnMessageAction(message, message.getStatus(), statusMessages, trade, transfer);
 			   if(wf == null) {
@@ -1588,7 +1596,7 @@ return status;
 			   if(wf.isTask())
 				   message.setTaskID(1);  // this will publish task for task Station.
 			   if(message.getStatus().equalsIgnoreCase("CANCELLED")) {
-				  // message.setSubAction("CANCEL");
+				 //  message.setSubAction("CANCEL");
 			   } else {
 				  // message.setSubAction("AMEND");
 			   }
