@@ -383,5 +383,10 @@ attributesData.put(attributeName,value);
 		// TODO Auto-generated method stub
 		isUpdatedBeforeSend =  flagforUpdate;
 	}
+	public Object clone() throws CloneNotSupportedException {
+
+		return super.clone();
+
+		}
 	
 }
