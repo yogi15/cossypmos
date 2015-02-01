@@ -259,7 +259,7 @@ public class TradeAttributesD extends JPanel {
 	                    if ((jTable1.getValueAt(i,0)).toString().equalsIgnoreCase("InstrumentType") && 
 	                                    (instrumenTypeVal.contains(String.valueOf(jTable1.getValueAt(i,1))))){
 	                    	setCheckBox(true);
-	                    	fwdOp.startDate.setSelectedItem((commonUTIL.getCurrentDate()));
+	                    	fwdOp.startDate.setDate((commonUTIL.getCurrentDate()));
 	                        	                            
 	                    } else {
 	                    	//fwdOp.startDate.setSelectedItem(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
