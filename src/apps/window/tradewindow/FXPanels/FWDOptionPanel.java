@@ -12,7 +12,10 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
+import com.jidesoft.combobox.DateComboBox;
+
 import util.NumericTextField;
+import util.commonUTIL;
 
 
 //VS4E -- DO NOT REMOVE THIS LINE!
@@ -21,7 +24,7 @@ public class FWDOptionPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	public JLabel jLabel0;
 	public JLabel jLabel1;
-	public JTextField startDate;
+	public DateComboBox startDate;
 	public JLabel jLabel2;
 	public NumericTextField primaryC;
 	public NumericTextField quotingC;
@@ -122,10 +125,12 @@ public class FWDOptionPanel extends JPanel {
 		return jLabel2;
 	}
 
-	private JTextField getStartdate() {
+	private DateComboBox getStartdate() {
 		if (startDate == null) {
-			startDate = new JTextField();
+			startDate = new DateComboBox();
 		//	startDate.setText("jTextField0");
+			startDate.setFormat(commonUTIL.getDateFormat());
+			startDate.setEditable(false);
 			startDate.setEnabled(false);
 		}
 		return startDate;
