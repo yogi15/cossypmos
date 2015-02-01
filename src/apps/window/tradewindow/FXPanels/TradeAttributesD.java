@@ -56,7 +56,9 @@ public class TradeAttributesD extends JPanel {
         public JTable jTable1;
         private JScrollPane jScrollPane0;
         private JTabbedPane jTabbedPane0;
-        public static String tradeAction = "";
+        public  String tradeAction = "";
+        public  boolean isfwOpTrade= false;
+        
         private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
         FWDOptionPanel fwdOp;
         RemoteReferenceData remoteReferenceData;
@@ -256,10 +258,11 @@ public class TradeAttributesD extends JPanel {
 	                    
 	                    if ((jTable1.getValueAt(i,0)).toString().equalsIgnoreCase("InstrumentType") && 
 	                                    (instrumenTypeVal.contains(String.valueOf(jTable1.getValueAt(i,1))))){
-	                    	fwdOp.startDate.setText(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
-	                        setCheckBox(true);	                            
+	                    	setCheckBox(true);
+	                    	fwdOp.startDate.setSelectedItem((commonUTIL.getCurrentDate()));
+	                        	                            
 	                    } else {
-	                    	fwdOp.startDate.setText(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
+	                    	//fwdOp.startDate.setSelectedItem(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
 	                        setCheckBox(false);
 	                    }
                                     
@@ -337,85 +340,81 @@ public class TradeAttributesD extends JPanel {
                 }
 
                 public String getColumnName(int col) {
-                        return columnNames[col];
+                    return columnNames[col];
                 }
 
                 public Object getValueAt(int row, int col) {
-                        Object value = null;
+                    Object value = null;
 
-                        Attribute attribute = (Attribute) data.get(row);
+                    Attribute attribute = (Attribute) data.get(row);
 
-                        switch (col) {
+                    switch (col) {
 
-                        case 0:
-                                value = attribute.getName();
-                                break;
-                        case 1:
-                                value = attribute.getValue()==null?"":attribute.getValue();
-                                break;
-                        
-                        }
-                        return value;
+                    case 0:
+                            value = attribute.getName();
+                            break;
+                    case 1:
+                            value = attribute.getValue()==null?"":attribute.getValue();
+                            break;
+                    
+                    }
+                    return value;
                 }
 
-                public boolean isCellEditable(int row, int col) {
+                public boolean isCellEditable(int row, int col) {                        
+                    String attrName = getValueAt(row, 0).toString();
                         
-                        String attrName = getValueAt(row, 0).toString();
-                        
-                        if ((attrName.equals("Trade Date")|| attrName.equals("TradeModifiedDateTime")) && !tradeAction.equals("New")) {
-                                
-                                return false;
-                        }
-                        
-                        return true;            
+                    if ((attrName.equals("Trade Date")|| attrName.equals("TradeModifiedDateTime")) 
+                    		&& !tradeAction.equals("New")) {                                
+                    	return false;
+                    } 
+                    
+                    //@yogesh 01/02/2015
+                    // if it is fwdOption then it cant change the Instrumenttype
+                    else if (isfwOpTrade && attrName.equals("InstrumentType")) {
+                    	return false;
+                    }
+                    return true;            
                 }
                 
                 public void setValueAt(Object value, int row, int col) {
-                        if(row == -1)
-                                return;
-                        if (value == null)
-                                return;
-                        System.out.println("Setting value at " + row + "," + col + " to "
-                                        + value + " (an instance of " + value.getClass() + ")");
-                        Attribute ff = (Attribute)      data.get(row);
-                        ff.setValue((String) value);
-                        
-                        
-                                data.set(row, ff);
-                                this.fireTableDataChanged();
-                                System.out.println("New value of data:");
-                        
-
+                	if(row == -1)
+                		return;
+                    if (value == null)
+                            return;
+                    System.out.println("Setting value at " + row + "," + col + " to "
+                                    + value + " (an instance of " + value.getClass() + ")");
+                    Attribute ff = (Attribute)      data.get(row);
+                    ff.setValue((String) value);
+  
+                    data.set(row, ff);
+                    this.fireTableDataChanged();
+                        //System.out.println("New value of data:");           
                 }
 
                 public void addRow(Object value) {
-
-                        data.add((Attribute) value);
-                        this.fireTableDataChanged();
-
+	                data.add((Attribute) value);
+	                this.fireTableDataChanged();
                 }
 
                 public void delRow(int row) {
-                        if (row != -1) {
-                                data.remove(row);
-                                this.fireTableDataChanged();
-                        }
-
+                    if (row != -1) {
+                        data.remove(row);
+                        this.fireTableDataChanged();
+                    }
                 }
 
                 public void udpateValueAt(Object value, int row, int col) {
-
-                        data.set(row, (Attribute) value);
-                        for (int i = 0; i < columnNames.length; i++)
-                                fireTableCellUpdated(row, i);
-
+                    data.set(row, (Attribute) value);
+                    for (int i = 0; i < columnNames.length; i++)
+                        fireTableCellUpdated(row, i);
                 }
                 public void removeALL() {
-                        if (data != null) {
-                                data.removeAllElements();
-                        }
-                        // data = null;
-                        this.fireTableDataChanged();
+                    if (data != null) {
+                        data.removeAllElements();
+                    }
+                    // data = null;
+                    this.fireTableDataChanged();
                 }
         }
 
@@ -433,9 +432,9 @@ public class TradeAttributesD extends JPanel {
                  * @see DefaultCellEditor
                  */
                 public EachRowEditor(JTable table) {
-                        this.table = table;
-                        editors = new Hashtable();
-                        defaultEditor = new DefaultCellEditor(new JTextField());
+                    this.table = table;
+                    editors = new Hashtable();
+                    defaultEditor = new DefaultCellEditor(new JTextField());
                 }
 
                 /**
@@ -445,69 +444,68 @@ public class TradeAttributesD extends JPanel {
                  *            table cell editor
                  */
                 public void setEditorAt(int row, TableCellEditor editor) {
-                        editors.put(new Integer(row), editor);
+                    editors.put(new Integer(row), editor);
                 }
                  public void setEditorForRowCol(int row, int col,TableCellEditor e )
-             {
-                 System.out.println("From roweditors adding row " + row + " col " + col + " "+ e.getCellEditorValue());
-                Vector columns = (Vector) editors.get(new Integer(row));
-                if(columns != null) {
-                        columns.add(col-1, e);
-                } else {
-                        columns = new Vector();
-                        columns.add(col-1, e);
-                }
-                 
-                 
-                editors.put(new Integer(row), columns);
+                 {
+                	//System.out.println("From roweditors adding row " + row + " col " + col + " "+ e.getCellEditorValue());
+	                Vector columns = (Vector) editors.get(new Integer(row));
+	                if(columns != null) {
+	                        columns.add(col-1, e);
+	                } else {
+	                        columns = new Vector();
+	                        columns.add(col-1, e);
+	                }
+  
+	                editors.put(new Integer(row), columns);
              }
                  public TableCellEditor getEditor(int row,int col)
              {
-                System.out.println("From getEditor row " + row + " col " + col);
+                //System.out.println("From getEditor row " + row + " col " + col);
                 TableCellEditor c1 = null;
                 if(row >= 0 && col >= 0) {
                 Vector columns = (Vector) editors.get(new Integer(row)); 
                 if(!commonUTIL.isEmpty(columns))
-                 return (TableCellEditor)columns.get(col-1);
-                return c1;
+                	return (TableCellEditor)columns.get(col-1);
+                	return c1;
                 }
                  return c1;
              }
                 public Component getTableCellEditorComponent(JTable table,
                                 Object value, boolean isSelected, int row, int column) {
-                        // editor = (TableCellEditor)editors.get(new Integer(row));
-                        // if (editor == null) {
-                        // editor = defaultEditor;
-                        // }
-                        return editor.getTableCellEditorComponent(table, value, isSelected,
-                                        row, column);
+                    // editor = (TableCellEditor)editors.get(new Integer(row));
+                    // if (editor == null) {
+                    // editor = defaultEditor;
+                    // }
+                    return editor.getTableCellEditorComponent(table, value, isSelected,
+                                    row, column);
                 }
 
                 public Object getCellEditorValue() {
-                        if(editor.getCellEditorValue() instanceof String) 
-                                return (String) editor.getCellEditorValue();
-                        if(editor.getCellEditorValue() instanceof Date) 
-                                return (String) commonUTIL.dateToString((Date)editor.getCellEditorValue());
-                        return null;
+                    if(editor.getCellEditorValue() instanceof String) 
+                            return (String) editor.getCellEditorValue();
+                    if(editor.getCellEditorValue() instanceof Date) 
+                            return (String) commonUTIL.dateToString((Date)editor.getCellEditorValue());
+                    return null;
                 }
 
                 public boolean stopCellEditing() {
-                        return editor.stopCellEditing();
+                    return editor.stopCellEditing();
                 }
 
                 public void cancelCellEditing() {
-                        editor.cancelCellEditing();
+                    editor.cancelCellEditing();
                 }
 
                 public boolean isCellEditable(EventObject anEvent) {
-                        if(anEvent instanceof KeyEvent) {
-                                selectEditor((KeyEvent) anEvent);
-                        } else {
-                        selectEditor((MouseEvent) anEvent);
-                        }
-                        if(editor == null)
-                                return false;
-                        return editor.isCellEditable(anEvent);
+                    if(anEvent instanceof KeyEvent) {
+                            selectEditor((KeyEvent) anEvent);
+                    } else {
+                    	selectEditor((MouseEvent) anEvent);
+                    }
+                    if(editor == null)
+                            return false;
+                    return editor.isCellEditable(anEvent);
                 }
 
                 public void addCellEditorListener(CellEditorListener l) {
@@ -515,70 +513,65 @@ public class TradeAttributesD extends JPanel {
                 }
 
                 public void removeCellEditorListener(CellEditorListener l) {
-                        editor.removeCellEditorListener(l);
+                    editor.removeCellEditorListener(l);
                 }
 
                 public boolean shouldSelectCell(EventObject anEvent) {
-                        if(anEvent instanceof KeyEvent) {
-                                selectEditor((KeyEvent) anEvent);
-                        } else {
-                        selectEditor((MouseEvent) anEvent);
-                        }
-                        return editor.shouldSelectCell(anEvent);
+                    if(anEvent instanceof KeyEvent) {
+                        selectEditor((KeyEvent) anEvent);
+                    } else {
+                    	selectEditor((MouseEvent) anEvent);
+                    }
+                    return editor.shouldSelectCell(anEvent);
                 }
                 
                 protected void selectEditor(MouseEvent e) {
-                        int row =0;
-                        int col =0;
-                        
-                        if (e == null) {
-                                row = table.getSelectionModel().getAnchorSelectionIndex();
-                                col = table.getSelectedColumn();
-                        } else {
-                                row = table.rowAtPoint(e.getPoint());
-                                col = table.columnAtPoint(e.getPoint());
-                        }
-                        System.out.println("From selectEditor row == " + row + " col == " + col);
-                        if(col == -1) {
-                                editor = defaultEditor;
-                        } else 
-                        if(col == 0) {
-                                editor = defaultEditor;
-                        } else {
-                        
-                        Vector cols = (Vector) editors.get(new Integer(row));
-                        if(!commonUTIL.isEmpty(cols)) 
-                        editor = (TableCellEditor) cols.get(col-1);
-                        }
-                        
-                        if (editor == null) {
-                                editor = defaultEditor;
-                        }
+                    int row =0;
+                    int col =0;
+                    
+                    if (e == null) {
+                        row = table.getSelectionModel().getAnchorSelectionIndex();
+                        col = table.getSelectedColumn();
+                    } else {
+                        row = table.rowAtPoint(e.getPoint());
+                        col = table.columnAtPoint(e.getPoint());
+                    }
+                    //System.out.println("From selectEditor row == " + row + " col == " + col);
+                    if(col == -1) {
+                        editor = defaultEditor;
+                    } else if(col == 0) {
+                        editor = defaultEditor;
+                    } else {                    
+		                Vector cols = (Vector) editors.get(new Integer(row));
+		                
+		                if(!commonUTIL.isEmpty(cols)) 
+		                	editor = (TableCellEditor) cols.get(col-1);
+		                }
+                    
+		                if (editor == null) {
+		                	editor = defaultEditor;
+		                }
                 }
                 protected void selectEditor(KeyEvent e) {
-                        int row =0;
-                        int col =0;
-                        
-                        
-                                row = table.getSelectionModel().getAnchorSelectionIndex();
-                                col = table.getSelectedColumn();
-                        
-                        System.out.println("From selectEditor row == " + row + " col == " + col);
-                        if(col == -1) {
-                                editor = defaultEditor;
-                        } else 
-                        if(col == 0) {
-                                editor = defaultEditor;
-                        } else {
-                        
-                        Vector cols = (Vector) editors.get(new Integer(row));
-                        
-                        editor = (TableCellEditor) cols.get(col-1);
-                        }
-                        
-                        if (editor == null) {
-                                editor = defaultEditor;
-                        }
+	                int row =0;
+	                int col =0;
+                       
+                    row = table.getSelectionModel().getAnchorSelectionIndex();
+                    col = table.getSelectedColumn();
+            
+                    //System.out.println("From selectEditor row == " + row + " col == " + col);
+                    if(col == -1) {
+                        editor = defaultEditor;
+                    } else if(col == 0) {
+                        editor = defaultEditor;
+                    } else {                    
+                    	Vector cols = (Vector) editors.get(new Integer(row));
+                    	editor = (TableCellEditor) cols.get(col-1);
+                    }
+                    
+                    if (editor == null) {
+                        editor = defaultEditor;
+                    }
                 }
         }
 
