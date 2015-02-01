@@ -79,6 +79,7 @@ import constants.CommonConstants;
 	import productPricing.Pricer;
 import util.NumericTextField;
 import util.ReferenceDataCache;
+import util.RemoteServiceUtil;
 import util.commonUTIL;
 import util.common.DateU;
 import apps.window.tradewindow.FXPanels.BasicData;
@@ -107,6 +108,7 @@ import beans.Trade;
 import beans.Users;
 import bo.util.SDISelectorUtil;
 import dsEventProcessor.TaskEventProcessor;
+import dsEventProcessor.TradeEventProcessor;
 import dsServices.RemoteBOProcess;
 import dsServices.RemoteProduct;
 import dsServices.RemoteReferenceData;
@@ -119,7 +121,8 @@ import dsServices.ServerConnectionUtil;
 	public class FXTradePanel extends  TradePanel {
 	
 		  boolean isTradeProper = false;
-		  
+		  Collection<StartUPData> instrumenTypeStartupData = new Vector<StartUPData>();
+		  Collection<String> instrumenTypeVal = new Vector<String>();
 		  BasicData basicData = null;
 		  int instrumentType = 0;
 		  static String FXSWAP = "FXSWAP";
@@ -431,11 +434,7 @@ import dsServices.ServerConnectionUtil;
 		public void setFavEnableFlag(boolean favEnableFlag) {
 			this.favEnableFlag = favEnableFlag;
 		}
-	
-		
-		
-		
-		
+
 		private static final long serialVersionUID = 1L;
 		private JPanel jPanel0;
 		private JPanel jPanel1;
@@ -444,50 +443,49 @@ import dsServices.ServerConnectionUtil;
 		private JPanel jPanel4;
 		private rollPanel rollpanel;
 		 void initJide() {
-		        // Initialize JIDE settings.
-		        // JIDE Licenses Verification
-
-		        LookAndFeelFactory.installDefaultLookAndFeelAndExtension();
-
-		        //---------------------------------------------------------------------
-		        // JIDE ObjectConverterManager.initDefaultConverter
-		        CellEditorManager.initDefaultEditor();
-		        CellRendererManager.initDefaultRenderer();
-		        ObjectConverterManager.initDefaultConverter();
-		        ObjectGrouperManager.initDefaultGrouper();
-
-		        // Note: Apply special converters to display class in something useful to the user.
-		        ObjectConverterManager.registerConverter(Date.class, new DateConverter(), DateConverter.DATE_CONTEXT);
-		        ObjectConverterManager.registerConverter(Date.class, new DateConverter(), DateConverter.DATETIME_CONTEXT);
-		        ObjectConverterManager.registerConverter(boolean.class, new BooleanConverter());
-		        ObjectConverterManager.registerConverter(Boolean.class, new BooleanConverter());
-
-		        // Special formatting of integers
-		        DecimalFormat myFormatter = new DecimalFormat("#########"); // removes the thousand separator
-		        IntegerConverter intConverter = new IntegerConverter();
-		        intConverter.setNumberFormat(myFormatter);
-		        ObjectConverterManager.registerConverter(int.class, intConverter);
-		        ObjectConverterManager.registerConverter(Integer.class, intConverter);
-
-		        // Choose formatting of doubles
-		        NumberFormat format = NumberFormat.getNumberInstance();
-		        format.setMinimumFractionDigits(9);
-		        format.setMaximumFractionDigits(10);
-		        DoubleConverter converter = new DoubleConverter(format);
-		        ObjectConverterManager.registerConverter(Double.class, converter);
-		        ObjectConverterManager.registerConverter(double.class, converter);
-
-		        ObjectConverterManager.registerConverter(double.class,
-		            new PercentConverter(), PercentConverter.CONTEXT);
-		        ObjectConverterManager.registerConverter(Double.class,
-		            new PercentConverter(), PercentConverter.CONTEXT);
-
-		        // Register convertors for date class.
-		        ObjectConverterManager.registerConverter(Date.class, new YearNameConverter(), YearNameConverter.CONTEXT);
-		        ObjectConverterManager.registerConverter(Date.class, new QuarterNameConverter(), QuarterNameConverter.CONTEXT);
-		        ObjectConverterManager.registerConverter(Date.class, new MonthNameConverter(), MonthNameConverter.CONTEXT);
-		    }
-
+	        // Initialize JIDE settings.
+	        // JIDE Licenses Verification
+	
+	        LookAndFeelFactory.installDefaultLookAndFeelAndExtension();
+	
+	        //---------------------------------------------------------------------
+	        // JIDE ObjectConverterManager.initDefaultConverter
+	        CellEditorManager.initDefaultEditor();
+	        CellRendererManager.initDefaultRenderer();
+	        ObjectConverterManager.initDefaultConverter();
+	        ObjectGrouperManager.initDefaultGrouper();
+	
+	        // Note: Apply special converters to display class in something useful to the user.
+	        ObjectConverterManager.registerConverter(Date.class, new DateConverter(), DateConverter.DATE_CONTEXT);
+	        ObjectConverterManager.registerConverter(Date.class, new DateConverter(), DateConverter.DATETIME_CONTEXT);
+	        ObjectConverterManager.registerConverter(boolean.class, new BooleanConverter());
+	        ObjectConverterManager.registerConverter(Boolean.class, new BooleanConverter());
+	
+	        // Special formatting of integers
+	        DecimalFormat myFormatter = new DecimalFormat("#########"); // removes the thousand separator
+	        IntegerConverter intConverter = new IntegerConverter();
+	        intConverter.setNumberFormat(myFormatter);
+	        ObjectConverterManager.registerConverter(int.class, intConverter);
+	        ObjectConverterManager.registerConverter(Integer.class, intConverter);
+	
+	        // Choose formatting of doubles
+	        NumberFormat format = NumberFormat.getNumberInstance();
+	        format.setMinimumFractionDigits(9);
+	        format.setMaximumFractionDigits(10);
+	        DoubleConverter converter = new DoubleConverter(format);
+	        ObjectConverterManager.registerConverter(Double.class, converter);
+	        ObjectConverterManager.registerConverter(double.class, converter);
+	
+	        ObjectConverterManager.registerConverter(double.class,
+	            new PercentConverter(), PercentConverter.CONTEXT);
+	        ObjectConverterManager.registerConverter(Double.class,
+	            new PercentConverter(), PercentConverter.CONTEXT);
+	
+	        // Register convertors for date class.
+	        ObjectConverterManager.registerConverter(Date.class, new YearNameConverter(), YearNameConverter.CONTEXT);
+	        ObjectConverterManager.registerConverter(Date.class, new QuarterNameConverter(), QuarterNameConverter.CONTEXT);
+	        ObjectConverterManager.registerConverter(Date.class, new MonthNameConverter(), MonthNameConverter.CONTEXT);
+		  }
 
 		public FXTradePanel() {
 			initComponents();
@@ -495,6 +493,10 @@ import dsServices.ServerConnectionUtil;
 	
 		private void initComponents() {
 			//initJide();
+			//@ yogesh 01/02/2015
+			// takeup type default is set to utilize 
+			takeupW.typeComboBox.setSelectedItem("Utilize");
+			
 			setBorder(new LineBorder(Color.black, 1, false));
 			setLayout(new GroupLayout());
 			add(getSwap(), new Constraints(new Leading(7, 12, 12), new Leading(193, 89, 12, 12)));
@@ -540,7 +542,7 @@ import dsServices.ServerConnectionUtil;
 		}
 		@Override
 		public void openTrade(Trade trade) {
-			// TODO Auto-generated method stubthis.trade = trade;
+			this.trade = trade;
 			if(trade == null)
 				return;
 			this.trade = trade; 
@@ -554,34 +556,30 @@ import dsServices.ServerConnectionUtil;
 			try {
 				String autoType = trade.getAutoType();
 				if(!commonUTIL.isEmpty(autoType)) {
-				        if(trade.getTradedesc1().equalsIgnoreCase(FX) || trade.getTradedesc1().equalsIgnoreCase(FXSWAP) || trade.getTradedesc1().equalsIgnoreCase(FXFORWARD) ) {
-				        	
-				        	routingTrades  = remoteTrade.getSplitTrades(trade);  // i know only 5 records are going to come. 
-				        	if(routingTrades.size() == 5) {
+			        if(trade.getTradedesc1().equalsIgnoreCase(FX) || trade.getTradedesc1().equalsIgnoreCase(FXSWAP) || trade.getTradedesc1().equalsIgnoreCase(FXFORWARD) ) {
+			        	
+			        	routingTrades  = remoteTrade.getSplitTrades(trade);  // i know only 5 records are going to come. 
+			        	if(routingTrades.size() == 5) {
 				        	out.jCheckBox2.setSelected(true);
 				        	functionality.jLabel2.setText(routingTrades.get(1).getTradedesc());
 				        	functionality.jLabel3.setText(routingTrades.get(3).getTradedesc()); 
 				        	functionality.jTextField2.setText(String.valueOf(routingTrades.get(1).getPrice())); // bad programming.
 				        	functionality.jTextField3.setText(String.valueOf(routingTrades.get(3).getPrice())); // bad programming.
 				        	if(trade.getTradedesc1().equalsIgnoreCase(FXSWAP)) {
-				        	functionality.FarRate1.setText(String.valueOf(routingTrades.get(1).getSecondPrice())); // bad programming.
-				        	functionality.FarRate2.setText(String.valueOf(routingTrades.get(3).getSecondPrice())); // bad programming.
+				        		functionality.FarRate1.setText(String.valueOf(routingTrades.get(1).getSecondPrice())); // bad programming.
+				        		functionality.FarRate2.setText(String.valueOf(routingTrades.get(3).getSecondPrice())); // bad programming.
 				        	}
-				        	}
-				        	functionality.setRoutingData(routingTrades);
-				        }
-				    		
+			        	}
+			        	functionality.setRoutingData(routingTrades);
+			        }   		
 			      			
 				}
 				
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
+			} catch (RemoteException e) {				
 				e.printStackTrace();
-			}
+			}		
 			
-			
-			rollpanel.setVisible(false);
-			
+			rollpanel.setVisible(false);			
 		}
 		private JPanel getJPanel4() {
 			if (jPanel4 == null) {
@@ -628,52 +626,47 @@ import dsServices.ServerConnectionUtil;
 			return attributes;
 		}
 		public void getDataForcurrencySplitOnBook() {
-			 Favorities fav = new Favorities();
-				fav.setType("CurrencyPair");
+			Favorities fav = new Favorities();
+			fav.setType("CurrencyPair");
 				 
-				fav.setUserId(user.getId());
-			   Vector favData;
+			fav.setUserId(user.getId());
+			Vector favData;
 			try {
 				favData = (Vector) remoteReference.selectFavourites(fav);
 				functionality.fillCurrencyPair(favData);
-				   fav.setType("Book");
-				    favData = 	(Vector) remoteReference.selectFavourites(fav);
-				    functionality.fillBooks(favData);
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
+				fav.setType("Book");
+				favData = 	(Vector) remoteReference.selectFavourites(fav);
+				functionality.fillBooks(favData);
+			} catch (RemoteException e) {				
 				e.printStackTrace();
-			}
-			   
+			}			   
 		}
+		
 		public void getDataForB2bCps() {
-			 Favorities fav = new Favorities();
-				
-			   Vector favData;
+			Favorities fav = new Favorities();
+			Vector favData;
 			try {
 				fav.setUserId(getUser().getId());
-				   fav.setType("CounterParty");
-				    favData = 	(Vector) remoteReference.selectFavourites(fav);
-				    functionality.fillB2bCPs(favData);
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
+				fav.setType("CounterParty");
+				favData = 	(Vector) remoteReference.selectFavourites(fav);
+				functionality.fillB2bCPs(favData);
+			} catch (RemoteException e) {				
 				e.printStackTrace();
-			}
-			   
+			}			   
 		}
+		
 		public void getDataForcurrencySplitOnCp() {
-			 Favorities fav = new Favorities();
-				fav.setType("CurrencyPair");
-				 
-				fav.setUserId(user.getId());
-			   Vector favData;
+			Favorities fav = new Favorities();
+			fav.setType("CurrencyPair");
+			fav.setUserId(user.getId());
+			Vector favData;
 			try {
 				favData = (Vector) remoteReference.selectFavourites(fav);
 				functionality.fillCurrencyPair(favData);
-				   fav.setType("CounterParty");
-				    favData = 	(Vector) remoteReference.selectFavourites(fav);
-				    functionality.fillCPs(favData);
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
+				fav.setType("CounterParty");
+				favData = 	(Vector) remoteReference.selectFavourites(fav);
+				functionality.fillCPs(favData);
+			} catch (RemoteException e) {				
 				e.printStackTrace();
 			}
 			   
@@ -686,810 +679,771 @@ import dsServices.ServerConnectionUtil;
 		   		remoteTask = (RemoteTask) de.getRMIService("Task");
 		   		remoteReference = (RemoteReferenceData) de.getRMIService("ReferenceData");
 		   		remoteProduct = (RemoteProduct) de.getRMIService("Product");
-		   		       product = (Product) remoteProduct.selectProductOnType(productType, productSubType);     
-		   		    remoteBO = (RemoteBOProcess) de.getRMIService("BOProcess");
-		   		    Vector startupDataInstrumentType = (Vector) remoteReference.getStartUPData("InstrumentType");
-		   		 JComboBox startupDataInstrumentTypecomboBox = new JComboBox( convertVectortoSringArray(startupDataInstrumentType) );
-		   		  startupDataInstrumentTypeDC = new DefaultCellEditor(startupDataInstrumentTypecomboBox);
+		   		product = (Product) remoteProduct.selectProductOnType(productType, productSubType);     
+		   		remoteBO = (RemoteBOProcess) de.getRMIService("BOProcess");
+		   		Vector startupDataInstrumentType = (Vector) remoteReference.getStartUPData("InstrumentType");
+		   		JComboBox startupDataInstrumentTypecomboBox = new JComboBox( convertVectortoSringArray(startupDataInstrumentType) );
+		   		startupDataInstrumentTypeDC = new DefaultCellEditor(startupDataInstrumentTypecomboBox);
 		   	//	trade = new Trade();
 				//	System.out.println(remoteTrade);
 		   		 functionality.setRemoteRef(remoteReference);
 		   		 functionality.jButton6.setEnabled(false);
 		   		 functionality.jButton8.setEnabled(false);
-					actionstatus.insertElementAt("NEW", 0);
-					actionstatus.setSelectedItem("NEW");
-					basicData.buysell.setEditable(false);
-					basicData.counterPary.setEditable(false);
-					basicData.book.setEditable(false);
-					out.jComboBox1.removeAll();
-					out.jComboBox1.setModel(actionstatus);
-					basicData.jTextField7.setEditable(false);
+		   		 actionstatus.insertElementAt("NEW", 0);
+		   		 actionstatus.setSelectedItem("NEW");
+		   		 basicData.buysell.setEditable(false);
+		   		 basicData.counterPary.setEditable(false);
+		   		 basicData.book.setEditable(false);
+		   		 out.jComboBox1.removeAll();
+		   		 out.jComboBox1.setModel(actionstatus);
+		   		 basicData.jTextField7.setEditable(false);
 				 out.jTextField6.setEditable(false);
-					out.jLabel2.setText("");
-					out.jTextField5.setText("0"); // id
-					out.jTextField1.setText("0"); // amt1
-					out.jTextField2.setText("0"); // amt2
+				 out.jLabel2.setText("");
+				 out.jTextField5.setText("0"); // id
+				 out.jTextField1.setText("0"); // amt1
+				 out.jTextField2.setText("0"); // amt2
 					
-					out.outRightDate.setDateFormat(commonUTIL.getDateFormat()); // date
-					out.outRightDate.setSelectedDate(commonUTIL.getCurrentDate());
-					swap.swapDate.setDateFormat(commonUTIL.getDateFormat());
-					swap.swapDate.setSelectedDate(commonUTIL.getCurrentDate());
-					rollpanel.jTextField0.setDateFormat(commonUTIL.getDateFormat());
-					out.jTextField4.setText("0"); // spot 
-					basicData.jTextField7.setText("0");  
-					//String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
-		             
-			     //   attributeModel = new DefaultTableModel(attributeColumnName,0);
-			        processTableData(attributeDataValue,attributeModel);
+				 out.outRightDate.setDateFormat(commonUTIL.getDateFormat()); // date
+				 out.outRightDate.setSelectedDate(commonUTIL.getCurrentDate());
+				 swap.swapDate.setDateFormat(commonUTIL.getDateFormat());
+				 swap.swapDate.setSelectedDate(commonUTIL.getCurrentDate());
+				 rollpanel.jTextField0.setDateFormat(commonUTIL.getDateFormat());
+				 out.jTextField4.setText("0"); // spot 
+				 basicData.jTextField7.setText("0");  
+				//String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
+	             
+				 //   attributeModel = new DefaultTableModel(attributeColumnName,0);
+				 processTableData(attributeDataValue,attributeModel);
 			        //attributes.jTable1.setModel(attributeModel);
 			       
-			        swap.jTextField1.setText("0.0");
-					swap.jTextField2.setText("0.0");
-					swap.jTextField4.setText("0.0");
-					 swap.setVisible(false);
-			        basicData.jRadioButton0.setSelected(false);
-			        basicData.jRadioButton1.setSelected(false);
-			        basicData.jRadioButton2.setSelected(false);
-			        basicData.jRadioButton5.setSelected(false);
-			        getBookDataCombo1(booktablemodel,books);
-			        basicData.book.addKeyListener(new KeyAdapter() {
-						 public void  keyTyped(KeyEvent e) {
-				int count =  functionality.jTabbedPane1.getTabCount();
-				for(int i = 0;i < count ;i++) {
-					String tabName = functionality.jTabbedPane1.getTitleAt(i);
-					if(tabName.equalsIgnoreCase("Book")) {
-						functionality.jTabbedPane1.setSelectedIndex(i);
-						
-					}
-				}
-			 }
-			 
-		});
-			        // takeup jbutton
-			        
-			        functionality.jButton0.addMouseListener(new java.awt.event.MouseAdapter() {
-	
-						@Override
-						public void mouseClicked(MouseEvent e) {
-							if( !functionality.jButton0.isEnabled()) 
-								return;
-							if(!productSubType.equalsIgnoreCase(FXFORWARDOPTION))
-								return;
-						//	takeupW  = new TakeUPWindow();
-							takeupW.setVisible(true);
-							takeupW.setLocationRelativeTo(basicData);
-							takeupW.setResizable(false);
-							URL imgURL = this.getClass().getResource("/resources/icon/sql.jpg");
-							 
-							takeupW.setIconImage(Toolkit.getDefaultToolkit()
-					      		   .getImage(imgURL));
-							takeupW.setTitle("Cosmos TakeUP Window : " + user.getUser_name()    );
-							try {
-								takeupW.jTextField0.setValue(fwdOp.primaryC.getDoubleValue());
-								takeupW.jTextField2.setValue(fwdOp.quotingC.getDoubleValue());
-								takeupW.jLabel10.setText(trade.getCurrency());
-								takeupW.jLabel11.setText(trade.getCurrency());
-								takeupW.jLabel5.setText(basicData.currencyPair.getText().substring(0, 3));
-								takeupW.jLabel4.setText(basicData.currencyPair.getText().substring(0, 3));
-							//	takeupW.jTextField4.setDateFormat(commonUTIL.getDateTimeFormat());
-			                  //   takeupW.jTextField7.setDateFormat(commonUTIL.getDateTimeFormat());
-			                     takeupW.jTextField5.setText(commonUTIL.getCurrentDateInString());
-			                     takeupW.jTextField5.setEditable(false);
-			                     takeupW.jTextField6.setDateFormat(commonUTIL.getDateTimeFormat());
-			                     
-			                     if (!commonUTIL.stringToDate(trade.getDelivertyDate(), true).equals(
-			                    		 commonUTIL.stringToDate(trade.getEffectiveDate(), true))) {
-			                    	 
-			                    	 takeupW.jTextField7.setText(trade.getEffectiveDate());
-			                    	 
-			                     } else {
-			                    	 
-			                    	 takeupW.jTextField7.setText(trade.getTradeDate());
-			                    	 
-			                     }
-			                     
-			                     takeupW.jTextField4.setText(trade.getDelivertyDate());
-			                   
-			                     takeupW.jTextField1.setValue(0);
-									takeupW.jTextField3.setValue(0);
-			                     takeupW.model.setData((Vector) childTrades);
-							} catch (ParseException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-							//takeupW.setUser(user);
+			     swap.jTextField1.setText("0.0");
+			     swap.jTextField2.setText("0.0");
+			     swap.jTextField4.setText("0.0");
+			     swap.setVisible(false);
+			     basicData.jRadioButton0.setSelected(false);
+			     basicData.jRadioButton1.setSelected(false);
+			     basicData.jRadioButton2.setSelected(false);
+			     basicData.jRadioButton5.setSelected(false);
+			     getBookDataCombo1(booktablemodel,books);
+			     basicData.book.addKeyListener(new KeyAdapter() {
+			     public void  keyTyped(KeyEvent e) {
+					int count =  functionality.jTabbedPane1.getTabCount();
+					for(int i = 0;i < count ;i++) {
+						String tabName = functionality.jTabbedPane1.getTitleAt(i);
+						if(tabName.equalsIgnoreCase("Book")) {
+							functionality.jTabbedPane1.setSelectedIndex(i);
 							
 						}
-			        });
-			        	functionality.FarRate2.addActionListener(new ActionListener() {
-						
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							// TODO Auto-generated method stub
-							setRoutingDataCal();
-						}
-  });
-  functionality.FarRate1.addActionListener(new ActionListener() {
+					}
+			     }
+			 
+		});
+	    
+	    // takeup button        
+        functionality.jButton0.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if( !functionality.jButton0.isEnabled()) 
+					return;
+				if(!productSubType.equalsIgnoreCase(FXFORWARDOPTION))
+					return;
+			//	takeupW  = new TakeUPWindow();
+				takeupW.setVisible(true);
+				takeupW.setLocationRelativeTo(basicData);
+				takeupW.setResizable(false);
+				URL imgURL = this.getClass().getResource("/resources/icon/sql.jpg");
+				 
+				takeupW.setIconImage(Toolkit.getDefaultToolkit()
+		      		   .getImage(imgURL));
+				takeupW.setTitle("Cosmos TakeUP Window : " + user.getUser_name()    );
+				try {
+					takeupW.jTextField0.setValue(fwdOp.primaryC.getDoubleValue());
+					takeupW.jTextField2.setValue(fwdOp.quotingC.getDoubleValue());
+					takeupW.jLabel10.setText(trade.getCurrency());
+					takeupW.jLabel11.setText(trade.getCurrency());
+					takeupW.jLabel5.setText(basicData.currencyPair.getText().substring(0, 3));
+					takeupW.jLabel4.setText(basicData.currencyPair.getText().substring(0, 3));
+				//	takeupW.jTextField4.setDateFormat(commonUTIL.getDateTimeFormat());
+                  //   takeupW.jTextField7.setDateFormat(commonUTIL.getDateTimeFormat());
+                     //takeupW.jTextField5.setText(commonUTIL.getCurrentDateInString());
+                     //takeupW.jTextField5.setEditable(false);
+					//takeupW.jTextField5.setDate(commonUTIL.getDateTimeFormat());
+                     //takeupW.jTextField6.setFormat(commonUTIL.getDateTimeFormat());
+                     
+                     /*if (!commonUTIL.stringToDate(trade.getDelivertyDate(), true).equals(
+                    		 commonUTIL.stringToDate(trade.getEffectiveDate(), true))) {                    	 
+                    	 takeupW.jTextField7.setText(trade.getEffectiveDate());                    	 
+                     } else {                    	 
+                    	 takeupW.jTextField7.setText(trade.getTradeDate());                    	 
+                     }*/
+                     
+                     takeupW.jTextField7.setText(trade.getEffectiveDate());
+                     takeupW.jTextField4.setText(trade.getTradeDate());                  
+                     takeupW.jTextField1.setValue(0);
+                     takeupW.jTextField3.setValue(0);
+                     takeupW.model.setData((Vector) childTrades);
+				} catch (ParseException e1) {
+					
+					e1.printStackTrace();
+				}
+				//takeupW.setUser(user);				
+			}
+        });
+    	functionality.FarRate2.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+								setRoutingDataCal();
+			}
+    	});
+	  functionality.FarRate1.addActionListener(new ActionListener() {		
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				setRoutingDataCal();
+			}
+	  });
+  
+	  functionality.FarRate1.addKeyListener(new KeyAdapter() { 
+	  		@Override		        
+		  	public void keyTyped(KeyEvent e) {
+		  		if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+		  		}
+		  	}
+	  });
+			        
+	  // this is used only we press enter on NearRate of  Quoting Leg			        
+    functionality.jTextField3.addActionListener(new ActionListener() {
 		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
+			
+			
 			setRoutingDataCal();
+		/*	try {
+				double rate1 = 0.0 ;
+				double rate2 = 0.0 ;	
+				double farRate1 = 0.0;
+				double farRate2 = 0.0;
+				if(!commonUTIL.isEmpty( functionality.jTextField2.getText()))
+					rate1 =  functionality.jTextField2.getDoubleValue();
+				if(!commonUTIL.isEmpty( functionality.jTextField3.getText()))
+					rate2 =  functionality.jTextField3.getDoubleValue();
+				if(!commonUTIL.isEmpty( functionality.FarRate1.getText()))
+					farRate1 =  functionality.FarRate1.getDoubleValue();
+				if(!commonUTIL.isEmpty( functionality.FarRate2.getText()))
+					farRate2 =  functionality.FarRate2.getDoubleValue();
+				
+				  
+				if(commonUTIL.isEmpty( functionality.getRoutingData()))
+					return;
+				if( functionality.getRoutingData().size() > 4) {
+					Trade orignalTrade = functionality.getRoutingData().get(0);
+					if( orignalTrade.getId() == 0) {
+							Trade xsplit1  =  functionality.getRoutingData().get(1);									
+							Trade xsplit2  =  functionality.getRoutingData().get(3);
+						Vector<Trade>	rounting =     FXSplitUtil.splitTrade(xsplit1, xsplit2, functionality.getRoutingData().get(0), rate1, rate2,farRate1,farRate2);
+						functionality.setRoutingData(rounting);
+					}  else {
+						Vector<Trade> rounting =  FXSplitUtil.splitTrade(functionality.getRoutingData(), rate1, rate2,farRate1,farRate2);
+						if(commonUTIL.isEmpty(rounting)) 
+							return;
+						functionality.setRoutingData(rounting);
+						functionality. jTextField3.setText(String.valueOf(rate2));
+						functionality. jTextField2.setText(String.valueOf(rate1));
+						functionality. FarRate1.setText(String.valueOf(farRate1));
+						functionality. FarRate2.setText(String.valueOf(farRate2));
+						attributes.changeXccySplitRate("splitBaseNearRate",String.valueOf(rate1));
+						attributes.changeXccySplitRate("splitQuoteNearRate",String.valueOf(rate2));
+						attributes.changeXccySplitRate("splitBaseFarRate",String.valueOf(farRate1));
+						attributes.changeXccySplitRate("splitQuoteFarRate",String.valueOf(farRate2));
+					}
+                 //  getJTable1().repaint();
+                  
+				}
+                   
+			} catch (ParseException e) {
+				
+				e.printStackTrace();
+			} */
 		}
-});
-  
-  functionality.FarRate1.addKeyListener(new KeyAdapter() { 
-  	@Override		        
-  	public void keyTyped(KeyEvent e) {
-  		if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-  		}
-  	}
-  });
+	
+		
+		
+	});
+    // this is used when we press enter on Near rate of base currency
+	functionality.jTextField2.addActionListener(new ActionListener() {							
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+		setRoutingDataCal();
+		/*try {
+			double rate1 = 0.0 ;
+			double rate2 = 0.0 ;	
+			double farRate1 = 0.0;
+			double farRate2 = 0.0;
+			if(!commonUTIL.isEmpty( functionality.jTextField2.getText()))
+				rate1 =  functionality.jTextField2.getDoubleValue();
+			if(!commonUTIL.isEmpty( functionality.jTextField3.getText()))
+				rate2 =  functionality.jTextField3.getDoubleValue();
+			if(!commonUTIL.isEmpty( functionality.FarRate1.getText()))
+				farRate1 =  functionality.FarRate1.getDoubleValue();
+			if(!commonUTIL.isEmpty( functionality.FarRate2.getText()))
+				farRate2 =  functionality.FarRate2.getDoubleValue();
+			
+			  
+			if(commonUTIL.isEmpty( functionality.getRoutingData()))
+				return;
+			if( functionality.getRoutingData().size() > 4) {
+				Trade orignalTrade = functionality.getRoutingData().get(0);
+				if( orignalTrade.getId() == 0) {
+						Trade xsplit1  =  functionality.getRoutingData().get(1);									
+						Trade xsplit2  =  functionality.getRoutingData().get(3);
+					Vector<Trade>	rounting =     FXSplitUtil.splitTrade(xsplit1, xsplit2, functionality.getRoutingData().get(0), rate1, rate2,farRate1,farRate2);
+					functionality.setRoutingData(rounting);
+				}  else {
+					Vector<Trade> rounting =  FXSplitUtil.splitTrade(functionality.getRoutingData(), rate1, rate2,farRate1,farRate2);
+					if(commonUTIL.isEmpty(rounting)) 
+						return;
+					functionality.setRoutingData(rounting);
+					functionality. jTextField3.setText(String.valueOf(rate2));
+					functionality. jTextField2.setText(String.valueOf(rate1));
+					functionality. FarRate1.setText(String.valueOf(farRate1));
+					functionality. FarRate2.setText(String.valueOf(farRate2));
+					attributes.changeXccySplitRate("splitBaseNearRate",String.valueOf(rate1));
+					attributes.changeXccySplitRate("splitQuoteNearRate",String.valueOf(rate2));
+					attributes.changeXccySplitRate("splitBaseFarRate",String.valueOf(farRate1));
+					attributes.changeXccySplitRate("splitQuoteFarRate",String.valueOf(farRate2));
+				}
+	         //  getJTable1().repaint();
+	          
+			}
+	           
+		} catch (ParseException e) {
+			
+			e.printStackTrace();
+		}*/
+		}
+	
+	});
 			        
-			        // this is used only we press enter on NearRate of  Quoting Leg
-			        
-			        functionality.jTextField3.addActionListener(new ActionListener() {
-						
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							// TODO Auto-generated method stub
-							
-							setRoutingDataCal();
-						/*	try {
-								double rate1 = 0.0 ;
-								double rate2 = 0.0 ;	
-								double farRate1 = 0.0;
-								double farRate2 = 0.0;
-								if(!commonUTIL.isEmpty( functionality.jTextField2.getText()))
-									rate1 =  functionality.jTextField2.getDoubleValue();
-								if(!commonUTIL.isEmpty( functionality.jTextField3.getText()))
-									rate2 =  functionality.jTextField3.getDoubleValue();
-								if(!commonUTIL.isEmpty( functionality.FarRate1.getText()))
-									farRate1 =  functionality.FarRate1.getDoubleValue();
-								if(!commonUTIL.isEmpty( functionality.FarRate2.getText()))
-									farRate2 =  functionality.FarRate2.getDoubleValue();
-								
-								  
-								if(commonUTIL.isEmpty( functionality.getRoutingData()))
-									return;
-								if( functionality.getRoutingData().size() > 4) {
-									Trade orignalTrade = functionality.getRoutingData().get(0);
-									if( orignalTrade.getId() == 0) {
-											Trade xsplit1  =  functionality.getRoutingData().get(1);									
-											Trade xsplit2  =  functionality.getRoutingData().get(3);
-										Vector<Trade>	rounting =     FXSplitUtil.splitTrade(xsplit1, xsplit2, functionality.getRoutingData().get(0), rate1, rate2,farRate1,farRate2);
-										functionality.setRoutingData(rounting);
-									}  else {
-										Vector<Trade> rounting =  FXSplitUtil.splitTrade(functionality.getRoutingData(), rate1, rate2,farRate1,farRate2);
-										if(commonUTIL.isEmpty(rounting)) 
-											return;
-										functionality.setRoutingData(rounting);
-										functionality. jTextField3.setText(String.valueOf(rate2));
-										functionality. jTextField2.setText(String.valueOf(rate1));
-										functionality. FarRate1.setText(String.valueOf(farRate1));
-										functionality. FarRate2.setText(String.valueOf(farRate2));
-										attributes.changeXccySplitRate("splitBaseNearRate",String.valueOf(rate1));
-										attributes.changeXccySplitRate("splitQuoteNearRate",String.valueOf(rate2));
-										attributes.changeXccySplitRate("splitBaseFarRate",String.valueOf(farRate1));
-										attributes.changeXccySplitRate("splitQuoteFarRate",String.valueOf(farRate2));
-									}
-				                 //  getJTable1().repaint();
-				                  
-								}
-				                   
-							} catch (ParseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} */
+    takeupW.jTextField1.addKeyListener(new KeyAdapter() { 
+    	@Override		        
+    	public void keyTyped(KeyEvent e) {
+    		if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+    			try {
+					double amt1 = takeupW.jTextField1.getDoubleValue();
+					double quant = fwdOp.primaryC.getDoubleValue();
+					if(quant >  0.0) {
+						if(amt1 < 0.0)  {
+							commonUTIL.showAlertMessage("TakeUp  Direction must same as FX Time Option");
+							return;
 						}
-					
-						
-						
-					});
-			        // this is used when we press enter on Near rate of base currency
-functionality.jTextField2.addActionListener(new ActionListener() {
-						
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							// TODO Auto-generated method stub
-							setRoutingDataCal();
-							/*try {
-								double rate1 = 0.0 ;
-								double rate2 = 0.0 ;	
-								double farRate1 = 0.0;
-								double farRate2 = 0.0;
-								if(!commonUTIL.isEmpty( functionality.jTextField2.getText()))
-									rate1 =  functionality.jTextField2.getDoubleValue();
-								if(!commonUTIL.isEmpty( functionality.jTextField3.getText()))
-									rate2 =  functionality.jTextField3.getDoubleValue();
-								if(!commonUTIL.isEmpty( functionality.FarRate1.getText()))
-									farRate1 =  functionality.FarRate1.getDoubleValue();
-								if(!commonUTIL.isEmpty( functionality.FarRate2.getText()))
-									farRate2 =  functionality.FarRate2.getDoubleValue();
-								
-								  
-								if(commonUTIL.isEmpty( functionality.getRoutingData()))
-									return;
-								if( functionality.getRoutingData().size() > 4) {
-									Trade orignalTrade = functionality.getRoutingData().get(0);
-									if( orignalTrade.getId() == 0) {
-											Trade xsplit1  =  functionality.getRoutingData().get(1);									
-											Trade xsplit2  =  functionality.getRoutingData().get(3);
-										Vector<Trade>	rounting =     FXSplitUtil.splitTrade(xsplit1, xsplit2, functionality.getRoutingData().get(0), rate1, rate2,farRate1,farRate2);
-										functionality.setRoutingData(rounting);
-									}  else {
-										Vector<Trade> rounting =  FXSplitUtil.splitTrade(functionality.getRoutingData(), rate1, rate2,farRate1,farRate2);
-										if(commonUTIL.isEmpty(rounting)) 
-											return;
-										functionality.setRoutingData(rounting);
-										functionality. jTextField3.setText(String.valueOf(rate2));
-										functionality. jTextField2.setText(String.valueOf(rate1));
-										functionality. FarRate1.setText(String.valueOf(farRate1));
-										functionality. FarRate2.setText(String.valueOf(farRate2));
-										attributes.changeXccySplitRate("splitBaseNearRate",String.valueOf(rate1));
-										attributes.changeXccySplitRate("splitQuoteNearRate",String.valueOf(rate2));
-										attributes.changeXccySplitRate("splitBaseFarRate",String.valueOf(farRate1));
-										attributes.changeXccySplitRate("splitQuoteFarRate",String.valueOf(farRate2));
-									}
-				                 //  getJTable1().repaint();
-				                  
-								}
-				                   
-							} catch (ParseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}*/
+						if(amt1 > quant)  {
+							commonUTIL.showAlertMessage("TakeUp PrimaryCurr greater then FX Time Option PrimaryCurr");
+							return;
 						}
+						takeupW.jTextField3.setValue((amt1 * trade.getPrice()) * -1);
+					}
+					if(quant <  0.0) {
+						if(amt1 > 0.0)  {
+							commonUTIL.showAlertMessage("TakeUp  Direction must same as FX Time Option");
+							return;
+						}
+						if(amt1 < quant)  {
+							commonUTIL.showAlertMessage("TakeUp PrimaryCurr greater then FX Time Option PrimaryCurr");
+							return;
+						}
+						takeupW.jTextField3.setValue((amt1 * trade.getPrice()) * -1);
+					}
 					
-						
-						
-					});
-			        
-			        takeupW.jTextField1.addKeyListener(new KeyAdapter() { 
-			        	@Override		        
-			        	public void keyTyped(KeyEvent e) {
-			        		if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-			        			try {
-									double amt1 = takeupW.jTextField1.getDoubleValue();
-									double quant = fwdOp.primaryC.getDoubleValue();
-									if(quant >  0.0) {
-										if(amt1 < 0.0)  {
-											commonUTIL.showAlertMessage("TakeUp  Direction must same as FX Time Option");
-											return;
-										}
-										if(amt1 > quant)  {
-											commonUTIL.showAlertMessage("TakeUp PrimaryCurr greater then FX Time Option PrimaryCurr");
-											return;
-										}
-										takeupW.jTextField3.setValue((amt1 * trade.getPrice()) * -1);
-									}
-									if(quant <  0.0) {
-										if(amt1 > 0.0)  {
-											commonUTIL.showAlertMessage("TakeUp  Direction must same as FX Time Option");
-											return;
-										}
-										if(amt1 < quant)  {
-											commonUTIL.showAlertMessage("TakeUp PrimaryCurr greater then FX Time Option PrimaryCurr");
-											return;
-										}
-										takeupW.jTextField3.setValue((amt1 * trade.getPrice()) * -1);
-									}
-									
-								} catch (ParseException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-			        		}
-			        	}
-			        	
-			        });
-			        takeupW.jTextField3.addKeyListener(new KeyAdapter() { 
-			        	@Override		        
-			        	public void keyTyped(KeyEvent e) {
-			        		if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-			        			try {
-									double amt1 = takeupW.jTextField3.getDoubleValue();
-									double noma = fwdOp.quotingC.getDoubleValue();
-									if(noma >  0.0) {
-										if(amt1 < 0.0)  {
-											commonUTIL.showAlertMessage("TakeUp  Direction must same as FX Time Option");
-											return;
-										}
-										if(amt1 >noma)  {
-											commonUTIL.showAlertMessage("TakeUp Quoting greater then FX Time Option Quoting Curr");
-											return;
-										}
-										takeupW.jTextField1.setValue((amt1 / trade.getPrice()) * -1);
-									}
-									if(noma <  0.0) {
-										if(amt1 > 0.0)  {
-											commonUTIL.showAlertMessage("TakeUp  Direction must same as FX Time Option");
-											return;
-										}
-										if(amt1 < noma)  {
-											commonUTIL.showAlertMessage("TakeUp  Quoting greater then FX Time Option Quoting Curr");
-											return;
-										}
-										takeupW.jTextField1.setValue((amt1 /  trade.getPrice()) * -1);
-									}
-									
-								} catch (ParseException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-			        		}
-			        	}
-			        	
-			        });
+				} catch (ParseException e1) {
+					
+					e1.printStackTrace();
+				}
+    		}
+    	}
+    	
+    });
+    takeupW.jTextField3.addKeyListener(new KeyAdapter() { 
+    	@Override		        
+    	public void keyTyped(KeyEvent e) {
+    		if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+    			try {
+					double amt1 = takeupW.jTextField3.getDoubleValue();
+					double noma = fwdOp.quotingC.getDoubleValue();
+					if(noma >  0.0) {
+						if(amt1 < 0.0)  {
+							commonUTIL.showAlertMessage("TakeUp  Direction must same as FX Time Option");
+							return;
+						}
+						if(amt1 >noma)  {
+							commonUTIL.showAlertMessage("TakeUp Quoting greater then FX Time Option Quoting Curr");
+							return;
+						}
+						takeupW.jTextField1.setValue((amt1 / trade.getPrice()) * -1);
+					}
+					if(noma <  0.0) {
+						if(amt1 > 0.0)  {
+							commonUTIL.showAlertMessage("TakeUp  Direction must same as FX Time Option");
+							return;
+						}
+						if(amt1 < noma)  {
+							commonUTIL.showAlertMessage("TakeUp  Quoting greater then FX Time Option Quoting Curr");
+							return;
+						}
+						takeupW.jTextField1.setValue((amt1 /  trade.getPrice()) * -1);
+					}
+					
+				} catch (ParseException e1) {
+					
+					e1.printStackTrace();
+				}
+    		}
+    	}
+    	
+    });
 			     
-			        takeupW.jTable0.addMouseListener(new java.awt.event.MouseAdapter() {
-	
-						@Override
-						public void mouseClicked(MouseEvent e) {
-							int selectRow = takeupW.jTable0.getSelectedRow();
-							Trade trade =takeupW.tableData.get(selectRow);
-							try {
-								trade = remoteTrade.selectTrade(trade.getId());
-							} catch (RemoteException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-							TradeApplication tradeWindow = new TradeApplication("FX", getUser());
-	                        //JFrameTradeWindowApplication tradeWindow = new JFrameTradeWindowApplication(trade.getProductType(),user);
-				        	
-	                      //  tradeWindow.setUserName(user);
-	                        tradeWindow.setOpenTrade(trade);
-	                        tradeWindow.setVisible(true);
-						}
-					});
-			     //  if(takeupW != null) {
-			        	 takeupW.jButton0.addMouseListener(new java.awt.event.MouseAdapter() {
-	
-								@Override
-								public void mouseClicked(MouseEvent e) {
-									Trade tradeTakeUp = new Trade();
-									double noma;
-									try {
-										noma = takeupW.jTextField3.getDoubleValue();
-									double	prim = takeupW.jTextField1.getDoubleValue();
-										if(noma == 0 && prim ==0 ) {
-											commonUTIL.showAlertMessage("Takeup Quoting/Primary Currency is Zero");
-											return;
-										}
-									} catch (ParseException e2) {
-										// TODO Auto-generated catch block
-										e2.printStackTrace();
-									}
-									
-									 try {
-										 if(takeUPproduct == null)
-										 takeUPproduct	 = (Product) remoteProduct.selectProductOnType(productType, FXTAKEUP);
-										   
-									DateU tradedate = DateU.valueOf(commonUTIL.stringToDate(trade.getTradeDate(),true));
-									DateU tradeDeliverydate = DateU.valueOf(commonUTIL.stringToDate(trade.getDelivertyDate(),true));
-									DateU takeUPTradeDate = DateU.valueOf(commonUTIL.stringToDate(takeupW.jTextField5.getText(), true));
-									DateU takeUPSettleDate = DateU.valueOf(takeupW.jTextField6.getSelectedDate());
-									if(!commonUTIL.between2dates(tradedate.getDate(), tradeDeliverydate.getDate(), takeUPTradeDate.getDate())) {
-										commonUTIL.showAlertMessage("Take-up Trade date(s) has to be within the Start and End dates of the FX Time Option");
-										return;
-									}
-									if(!commonUTIL.between2dates(tradedate.getDate(), tradeDeliverydate.getDate(), takeUPSettleDate.getDate())) {
-										commonUTIL.showAlertMessage("Take-up Settle date(s) has to be within the Start and End dates of the FX Time Option");
-										return;
-									}
-									tradeTakeUp.setId(0);
-									tradeTakeUp.setTradedesc1(FXTAKEUP);
-									tradeTakeUp.setAction("NEW");
-									tradeTakeUp.setStatus("NONE");
-									tradeTakeUp.setParentID(trade.getId());
-									tradeTakeUp.setBookId(trade.getBookId());
-									tradeTakeUp.setCpID(trade.getCpID());
-									tradeTakeUp.setType(trade.getType());
-									tradeTakeUp.setProductType(trade.getProductType());
-									tradeTakeUp.setCurrency(trade.getCurrency());
-									tradeTakeUp.setTradedesc(trade.getTradedesc());
-									tradeTakeUp.setPrice(trade.getPrice());
-									tradeTakeUp.setTraderID(trade.getTraderID());
-									tradeTakeUp.setAttribute("ParentID",Integer.toString(trade.getId()));
-									
-									if ( takeupW.typeComboBox.getSelectedItem() == null) {
-										commonUTIL.showAlertMessage("Please select Takeup Type");
-									} else{
-										tradeTakeUp.setAttribute("TakeUpType", takeupW.typeComboBox.getSelectedItem().toString());	
-									}
-									
-									
-									tradeTakeUp.setUserID(user.getId());
-										double amt1 = takeupW.jTextField1.getDoubleValue();
-										double amt2 = takeupW.jTextField3.getDoubleValue();
-										if(amt1 > 0.) {
-										    if(  amt1 > takeupW.jTextField0.getDoubleValue()) {
-										    	commonUTIL.showAlertMessage("Take-up amount greater then Outstanding FX Time Option");
-										    	return;
-										    }
-										}
-										if(amt1 < 0.) {
-										    if( amt1 < takeupW.jTextField0.getDoubleValue() ) {
-										    	commonUTIL.showAlertMessage("Take-up amount greater then Outstanding FX Time Option");
-										    	return;
-										    }
-										}
-										tradeTakeUp.setQuantity(amt1);
-										tradeTakeUp.setNominal(amt2);
-										tradeTakeUp.setTradeDate(takeupW.jTextField5.getText());
-										tradeTakeUp.setDelivertyDate(commonUTIL.getOnlyDateFromStringDate(takeupW.jTextField6.getSelectedDateAsText()));
-										tradeTakeUp.setEffectiveDate(commonUTIL.getOnlyDateFromStringDate(takeupW.jTextField5.getText()));
-										tradeTakeUp.setAttribute("Trade Date",tradeTakeUp.getTradeDate());
-										tradeTakeUp.setProductId(takeUPproduct.getId());
-										Vector tradestatus = new Vector();
-										tradestatus = remoteTrade.saveTrade(tradeTakeUp,tradestatus);
-										
-						               	 String statusT = (String) tradestatus.elementAt(0);
-						               	 
-						               	 int i = ((Integer) tradestatus.elementAt(1)).intValue();
-						               	if(i <= -10) {
-						               		commonUTIL.showAlertMessage((statusT));
-					            			return;
-						               	 }
-						               	 if(i == -4) {
-						         			commonUTIL.showAlertMessage((statusT));
-						            			return;
-						            		 }
-						               	 if(i == -3) {
-						            			commonUTIL.showAlertMessage((statusT));
-						            			return;
-						            		 }
-						               	 if(i > 0) 
-						               		commonUTIL.showAlertMessage((statusT));
-						               	 tradeTakeUp.setId(i);
-						               	takeupW.model.addRow(tradeTakeUp);
-						               	if(tradeTakeUp.getQuantity() > 0.) {
-						               		fwdOp.primaryC.setValue(fwdOp.primaryC.getDoubleValue() - tradeTakeUp.getQuantity() );
-						               		fwdOp.quotingC.setValue(fwdOp.quotingC.getDoubleValue() + (tradeTakeUp.getNominal() * -1));
-						               		takeupW.jTextField0.setValue(takeupW.jTextField0.getDoubleValue() -tradeTakeUp.getQuantity() );
-						               		takeupW.jTextField2.setValue(takeupW.jTextField2.getDoubleValue()+ (tradeTakeUp.getNominal() * -1));
-						               		
-						               	}
-						               	if(tradeTakeUp.getQuantity() < 0.) {
-						               		fwdOp.primaryC.setValue(fwdOp.primaryC.getDoubleValue() + (tradeTakeUp.getQuantity() * -1) );
-						               		fwdOp.quotingC.setValue(fwdOp.quotingC.getDoubleValue() -tradeTakeUp.getNominal());
-						               		takeupW.jTextField0.setValue(takeupW.jTextField0.getDoubleValue() +(tradeTakeUp.getQuantity() *-1));
-						               		takeupW.jTextField2.setValue(takeupW.jTextField2.getDoubleValue() - tradeTakeUp.getNominal() );
-						               		
-						               	}
-										
-										
-										
-									} catch (ParseException e1) {
-										// TODO Auto-generated catch block
-										e1.printStackTrace();
-									} catch (RemoteException e1) {
-										// TODO Auto-generated catch block
-										e1.printStackTrace();
-									}
-									
-									
-									
-								}
-			        	 });
-			       // }
-			        	// functionality.j
-			        	 
-			        	 // B2B config button
-			        	  functionality.jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
-			        			@Override
-								public void mouseClicked(MouseEvent e) {
-			        				String BookID =basicData.book.getName();
-			        				if(BookID == null || commonUTIL.isEmpty(BookID.trim())) {
-			        					commonUTIL.showAlertMessage("Select Book & Currency Pair");
-			        					return;
-			        				}
-			        				int bookID = Integer.parseInt(basicData.book.getName());
-			        				String currencyPair = basicData.currencyPair.getText();
-			        				
-			        				/*	try {
-											Vector b2b = (Vector) remoteReference.getB2BConfig(bookID, currencyPair);
-											if(b2b == null || b2b.isEmpty()) {
-												commonUTIL.showAlertMessage("B2b Configuration Missing");
-											return;
-			        					} */
-											 b2bconfig = new B2BConfig();
-											 functionality.jPanel2.setVisible(false);
-											functionality.jPanel6.setVisible(true);
-										   functionality.b2bCurrencyPair.setText(basicData.currencyPair.getText());
-										   getDataForB2bCps();
-										   // functionality.b2bBook.setText(getBook(b2bconfig.getBookid()).getBook_name());
-										    functionality.b2bTransferTo.setText("0");
-										   
-										    
-									/*	} catch (RemoteException e1) {
-											// TODO Auto-generated catch block
-											e1.printStackTrace();
-										} */
-			        				
-			        				
-			        			}
-			        	  });
-			        // saveasnew or DEAL is new
-			        functionality.jButton5.addMouseListener(new java.awt.event.MouseAdapter() {
-	
-						@Override
-						public void mouseClicked(MouseEvent e) {
-							if(trade != null) {
-							String autoType = trade.getAutoType();
-							if(!commonUTIL.isEmpty(autoType)) {
-								if(autoType.equalsIgnoreCase("INTERNAL")) { // internal trade can't be save as new trade
-									commonUTIL.showAlertMessage("Please click on New as this Trade is Internal Trade can't save as New");
-									return;
-								}
-							}
-							}
-							
-							if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {
-								
-						    	if (commonUTIL.addSubtractDate(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true), 31).before(
-										 commonUTIL.stringToDate(fwdOp.startDate.getText(), true))) {
-						    		
-						    		commonUTIL.showAlertMessage("Option End date falls beyond 31 days after Trade end date");
-						    		 return;
-						    		
-						    	}
-							}
-							
-						    if(validdateALLFields("NEW")) {
-						    	trade = new Trade();
-						    	mirrorBook.setBookno(0);
-						    	
-						    	removeAttributeFromTrade(trade);
-					            fillTrade(trade,"NEW");
-					             
-						    	int isHoliday = 0;
-								try {
-									
-									isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(0, 3), 
-											trade.getDelivertyDate());
-									
-									if (isHoliday == 1) {
-										
-										commonUTIL.showAlertMessage("Near Date selected is a Holiday or a weekend. " +
-												"Please select another date");
-										out.outRightDate.setBackground(Color.red);
-									}
-									
-									if (isHoliday != 1) {
-										
-										isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(4, 7), 
-												trade.getEffectiveDate());
-										
-										if (isHoliday == 1) {
-											
-											commonUTIL.showAlertMessage("Far Date selected is a Holiday or a weekend. " +
-													"Please select another date");
-											out.outRightDate.setBackground(Color.red);
-										}
-										
-									} else if (isHoliday == -1) {
-										commonUTIL.showAlertMessage("Server Problem");
-										return;
-									}
-									
-								} catch (RemoteException e2) {
-									// TODO Auto-generated catch block
-									e2.printStackTrace();
-								}
-							
-						    	
-						    	/**/
-						    	
-					             if(trade.getTradedesc1() == null || trade.getTradedesc1().trim().length() == 0) {
-					            	 commonUTIL.showAlertMessage("Product not Registered");
-					            	 return;
-					             }
-					             
-					             if ( (commonUTIL.stringToDate(trade.getEffectiveDate(), true)).before( 
-					            		 commonUTIL.stringToDate(trade.getDelivertyDate(), true)) ) {
-					            	 	
-					            	 commonUTIL.showAlertMessage("Far Date cannot be less than Near Date");
-					            	 return;
-					            	 
-					             }
-					             if(trade.getTradedesc1() != null && trade.getTradedesc1().trim().length() > 0)  {
-				            		
-				            		 trade.setUserID( getUser().getId());
-				            		 try {
-				               	         
-						               	 trade.setId(0);
-						               	 trade.setStatus("NONE");
-						               	 trade.setAction("NEW");
-						               	 Vector<String> message = new Vector<String>();
-						               	
-						               	 //setAttribute is already done in fillTrade so commented 
-						               //trade.setAttributes(getAttributeValue());
-						               	trade.setMirrorBookid(0);
-						        		trade.setMirrorID(0);
-						        		trade.setAutoType("");
-						        		// No need to add attributes without any value. Below attributes can be set whenever it has value like been 
-						        		//done in tradeImp for swap split trade. so commented below
-						        	//	trade.setAttribute("MirrorID","");	
-						        	//	trade.setAttribute("B2BID","");	
-						        	//	trade.setAttribute("B2BFlag","");		
-						        	//	trade.setAttribute("XCurrSOriginalTradeID","");		
-						        	//	trade.setAttribute("ParitialTo","");		
-						        	//	trade.setAttribute("SXccySplitID","");		
-						        	//	trade.setAttribute("ParitialFrom","");		
-						        	//	trade.setAttribute("XccySplitFrom","");		
-						        	//	trade.setAttribute("FXccySplitID","");		
-						        	//	trade.setAttribute("OffsetID","");		
-						        	//	trade.setAttribute("OriginalTradeID","");		
-									//	trade.setAttribute("MirrorFromTradeID","");	
-										trade.setOffsetid(0);
-									//trade.seto
-						        		trade.setParentID(0);
-						        		trade.setB2Bflag(false);
-						        		trade.setB2bid(0);
-						        		trade.setXccySPlitid(0);
-						      
-						        		trade.setMirrorBookid(0);
-						        		trade.setFees(feesPanel.getFeesDataV());
-						        		Vector tradestatus = null;
-						        		if(!commonUTIL.isEmpty(functionality.getRoutingData())  && functionality.getRoutingData().size() > 1) {
-						        		  // trade.clearAttributes();
-						        		   Vector<Trade> rountingTrades;
-						        		   try {
-											rountingTrades = FXSplitUtil.getRountingData(trade,remoteReference,functionality.FarRate1.getDoubleValue(),functionality.FarRate2.getDoubleValue());
-										
-											if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >1 ) {
-												
-													rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3),
-															trade,functionality.jTextField2.getDoubleValue(), functionality.jTextField3.getDoubleValue(),functionality.FarRate1.getDoubleValue(),functionality.FarRate2.getDoubleValue());
-													trade.setRountingTrades(rountingTrades);
-								        		    tradestatus  = 	remoteTrade.saveBatchSplitTrades(trade.getRountingTrades(),trade,message);
-												} 
-						        		   }
-												catch (ParseException e2) {
-													// TODO Auto-generated catch block
-													e2.printStackTrace();
-												
-											}
-											 
-						        		    
-						        		} else {
-						        			
-						        			 trade.setAllocatedID(0);
-						        			 trade.setAutoType("Original");
-						        			tradestatus  = 	remoteTrade.saveTrade(trade,message);
-						        		}
-						               	 if(commonUTIL.isEmpty(tradestatus)) {
-						               		commonUTIL.showAlertMessage("Error in ServerSide in saving Trade");
-						               		 return;
-						               	 }
-						               	 String statusT = (String) tradestatus.elementAt(0);
-						               	 int i = ((Integer) tradestatus.elementAt(1)).intValue();
-						               	 if(i == -4) {
-						         			commonUTIL.showAlertMessage((statusT));
-						            			return;
-						            		 }
-						               	 if(i == -3) {
-						            			commonUTIL.showAlertMessage((statusT));
-						            			return;
-						            		 }
-						               	 if(i > 0) 
-						               		commonUTIL.showAlertMessage((statusT));
-						               	 //System.out.println("*************** " +i);
-						               	 trade = (Trade) remoteTrade.selectTrade(i);
-						               	 
-						               	openTrade(trade);
-						        	
-						               	
-			            		 } catch (RemoteException e1) {
-			            			 // TODO Auto-generated catch block
-			            			 e1.printStackTrace();
-			            		 } 
-					             } 
-					             functionality.jButton5.setText("SAVEASNEW");
-					             functionality.jButton6.setEnabled(true);
-				            	
-						    }
-						    
-						    
-						    
-						    
-						    
-						
-							}
+    takeupW.jTable0.addMouseListener(new java.awt.event.MouseAdapter() {
 
-			    	
-			    });
-			        // for currency split functionality. 
-			        out.jCheckBox2.addMouseListener(new java.awt.event.MouseAdapter() {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			int selectRow = takeupW.jTable0.getSelectedRow();
+			Trade trade =takeupW.tableData.get(selectRow);
+			try {
+				trade = remoteTrade.selectTrade(trade.getId());
+			} catch (RemoteException e1) {
+				
+				e1.printStackTrace();
+			}
+			TradeApplication tradeWindow = new TradeApplication("FX", getUser());
+            //JFrameTradeWindowApplication tradeWindow = new JFrameTradeWindowApplication(trade.getProductType(),user);
+        	
+          //  tradeWindow.setUserName(user);
+            tradeWindow.setOpenTrade(trade);
+            tradeWindow.setVisible(true);
+		}
+	});
+    //  if(takeupW != null) {
+    // takeUp window save button	
+	 takeupW.jButton0.addMouseListener(new java.awt.event.MouseAdapter() {
 	
-						@Override
-						public void mouseClicked(MouseEvent e) {
-							
-							if( out.jCheckBox2.isSelected()) {
-							//	if(trade == null) {
-								//	commonUTIL.showAlertMessage("Select Trade ");
-								//	out.jCheckBox2.setSelected(false);
-								//	return;
-								//}
-								functionality.jPanel6.setVisible(false);
-								// functionality.jButton8.setEnabled(true);
-								 functionality.jPanel2.setVisible(true);
-								 try {
-								//	 basicData.book.getName() 
-									 if(commonUTIL.isEmpty(basicData.book.getName()) && commonUTIL.isEmpty(basicData.currencyPair.getText())) {
-										 commonUTIL.showAlertMessage("Select Book & CurrencyPair");
-										 out.jCheckBox2.setSelected(false);
-										 return;
-									 }
-									 if(productSubType.equalsIgnoreCase(FXSWAP)) {
-										 functionality.FarRate1.setVisible(true);
-										 functionality.FarRate2.setVisible(true);
-										 functionality.jLabel4.setVisible(true);
-										 functionality.jLabel5.setVisible(true);
-									 } else {
-										 functionality.FarRate1.setVisible(false);
-										 functionality.FarRate2.setVisible(false);
-										 functionality.jLabel4.setVisible(false);
-										 functionality.jLabel5.setVisible(false);
-									 }
-									System.out.println();
-									Vector vector = (Vector) remoteReference.getCurrencySplitConfig(Integer.parseInt(basicData.book.getName()), basicData.currencyPair.getText());
-									 
-									if(!commonUTIL.isEmpty(vector)) {
-										
-										if(trade == null || trade.getId() == 0)
-										     functionality.clearRounting();
-										sconfig =  (CurrencySplitConfig)vector.elementAt(0);
-										functionality.jLabel2.setText(sconfig.getFirstCurrencySplit());
-										populateRountingData();
-									
-									functionality.jLabel3.setText(sconfig.getSecondCurrencySPlit());
-									
-									 } else {
-										 
-										 commonUTIL.
-										 showAlertMessage("Currency split config for selected Currency Pair and Book not found.");
-										 out.jCheckBox2.setSelected(false);
-										 functionality.jPanel2.setVisible(false);
-									 }
-								} catch (RemoteException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-								//	if(vector == null || vector.isEmpty())
-									//	return;
-									 sconfig = null;// (CurrencySplitConfig)vector.elementAt(0);
-								 
-									//Book firstbook = new Book();
-									//firstbook.setBookno(sconfig.getFirstSpotBook());
-								//	firstbook = (Book) remoteReference.selectBook(firstbook);
-									//functionality.jTextField0.setText(firstbook.getBook_name());
-								//	Book secbook = new Book();
-								//	secbook.setBookno(sconfig.getSecondSpotBook());
-								//	secbook = (Book) remoteReference.selectBook(secbook);
-								/*	if(functionality.jCheckBox0.isSelected()) {
-									      getDataForcurrencySplitOnBook();
-									      functionality.jLabel4.setText("First Spot Book");
-											functionality.jLabel5.setText("Second Spot Book");
-									} else {
-										getDataForcurrencySplitOnCp();
-										functionality.jLabel4.setText("First Legal Entity");
-										functionality.jLabel5.setText("Second Legal Entity");
-									}*/
-									//functionality.jTextField1.setText(secbook.getBook_name());
-							} else {
-								 functionality.jButton8.setEnabled(false);
-								 functionality.jPanel2.setVisible(false);
-								// functionality.jLabel2.setText("    ");
-								 //functionality.jLabel3.setText("    ");
-								 functionality.jTextField2.setText("");
-								 functionality.jTextField3.setText("");
-								
-							}
-							
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Trade tradeTakeUp = new Trade();
+				double noma;
+				try {
+					noma = takeupW.jTextField3.getDoubleValue();
+				double	prim = takeupW.jTextField1.getDoubleValue();
+					if(noma == 0 && prim ==0 ) {
+						commonUTIL.showAlertMessage("Takeup Quoting/Primary Currency is Zero");
+						return;
+				}
+			} catch (ParseException e2) {				
+				e2.printStackTrace();
+			}
+			
+			 try {
+				 if(takeUPproduct == null)
+				 takeUPproduct	 = (Product) remoteProduct.selectProductOnType(productType, FXTAKEUP);
+				   
+				DateU tradedate = DateU.valueOf(commonUTIL.stringToDate(trade.getTradeDate(),true));
+				DateU tradeEffectiveDate= DateU.valueOf(commonUTIL.stringToDate(trade.getEffectiveDate(),true));
+				DateU tradeDeliverydate = DateU.valueOf(commonUTIL.stringToDate(trade.getDelivertyDate(),true));
+				DateU takeUPTradeDate = DateU.valueOf(takeupW.jTextField5.getDate());
+				DateU takeUPSettleDate = DateU.valueOf(takeupW.jTextField6.getDate());
+				
+				if(!commonUTIL.between2dates(tradedate.getDate(), tradeEffectiveDate.getDate(), takeUPTradeDate.getDate())) {
+					commonUTIL.showAlertMessage("Take-up Trade date(s) has to be within the Start and End dates of the FX Time Option");
+					return;
+				}
+				if(!commonUTIL.between2dates(tradedate.getDate(), tradeEffectiveDate.getDate(), takeUPSettleDate.getDate())) {
+					commonUTIL.showAlertMessage("Take-up Settle date(s) has to be within the FwdOption Start date and FwdOption End date");
+					return;
+				}
+				tradeTakeUp.setId(0);
+				tradeTakeUp.setTradedesc1(FXTAKEUP);
+				tradeTakeUp.setAction("NEW");
+				tradeTakeUp.setStatus("NONE");
+				tradeTakeUp.setParentID(trade.getId());
+				tradeTakeUp.setBookId(trade.getBookId());
+				tradeTakeUp.setCpID(trade.getCpID());
+				tradeTakeUp.setType(trade.getType());
+				tradeTakeUp.setProductType(trade.getProductType());
+				tradeTakeUp.setCurrency(trade.getCurrency());
+				tradeTakeUp.setTradedesc(trade.getTradedesc());
+				tradeTakeUp.setPrice(trade.getPrice());
+				tradeTakeUp.setTraderID(trade.getTraderID());
+				tradeTakeUp.setAttribute("ParentID",Integer.toString(trade.getId()));
+				
+				if ( takeupW.typeComboBox.getSelectedItem() == null) {
+					commonUTIL.showAlertMessage("Please select Takeup Type");
+				} else{
+					tradeTakeUp.setAttribute("TakeUpType", takeupW.typeComboBox.getSelectedItem().toString());	
+				}
+			
+			
+				tradeTakeUp.setUserID(user.getId());
+				double amt1 = takeupW.jTextField1.getDoubleValue();
+				double amt2 = takeupW.jTextField3.getDoubleValue();
+				if(amt1 > 0.) {
+				    if(  amt1 > takeupW.jTextField0.getDoubleValue()) {
+				    	commonUTIL.showAlertMessage("Take-up amount greater then Outstanding FX Time Option");
+				    	return;
+				    }
+				}
+				if(amt1 < 0.) {
+				    if( amt1 < takeupW.jTextField0.getDoubleValue() ) {
+				    	commonUTIL.showAlertMessage("Take-up amount greater then Outstanding FX Time Option");
+				    	return;
+				    }
+				}
+				tradeTakeUp.setQuantity(amt1);
+				tradeTakeUp.setNominal(amt2);
+				tradeTakeUp.setTradeDate(commonUTIL.convertDateTOString(takeUPTradeDate.getDate()));
+				tradeTakeUp.setDelivertyDate(commonUTIL.convertDateTOString(takeUPSettleDate.getDate()));
+				tradeTakeUp.setEffectiveDate(commonUTIL.convertDateTOString(takeUPSettleDate.getDate()));
+				tradeTakeUp.setAttribute("Trade Date",tradeTakeUp.getTradeDate());
+				tradeTakeUp.setProductId(takeUPproduct.getId());
+				Vector tradestatus = new Vector();
+				tradestatus = remoteTrade.saveTrade(tradeTakeUp,tradestatus);
+				
+               	 String statusT = (String) tradestatus.elementAt(0);
+               	 
+               	 int i = ((Integer) tradestatus.elementAt(1)).intValue();
+               	if(i <= -10) {
+               		commonUTIL.showAlertMessage((statusT));
+        			return;
+               	 }
+               	 if(i == -4) {
+         			commonUTIL.showAlertMessage((statusT));
+            			return;
+            		 }
+               	 if(i == -3) {
+            			commonUTIL.showAlertMessage((statusT));
+            			return;
+            		 }
+               	 if(i > 0) 
+               		commonUTIL.showAlertMessage((statusT));
+               	tradeTakeUp.setId(i);
+               	takeupW.model.addRow(tradeTakeUp);
+               	if(tradeTakeUp.getQuantity() > 0.) {
+               		fwdOp.primaryC.setValue(fwdOp.primaryC.getDoubleValue() - tradeTakeUp.getQuantity() );
+               		fwdOp.quotingC.setValue(fwdOp.quotingC.getDoubleValue() + (tradeTakeUp.getNominal() * -1));
+               		takeupW.jTextField0.setValue(takeupW.jTextField0.getDoubleValue() -tradeTakeUp.getQuantity() );
+               		takeupW.jTextField2.setValue(takeupW.jTextField2.getDoubleValue()+ (tradeTakeUp.getNominal() * -1));
+               		
+               	}
+               	if(tradeTakeUp.getQuantity() < 0.) {
+               		fwdOp.primaryC.setValue(fwdOp.primaryC.getDoubleValue() + (tradeTakeUp.getQuantity() * -1) );
+               		fwdOp.quotingC.setValue(fwdOp.quotingC.getDoubleValue() -tradeTakeUp.getNominal());
+               		takeupW.jTextField0.setValue(takeupW.jTextField0.getDoubleValue() +(tradeTakeUp.getQuantity() *-1));
+               		takeupW.jTextField2.setValue(takeupW.jTextField2.getDoubleValue() - tradeTakeUp.getNominal() );
+               		
+               	}					
+				              
+			} catch (ParseException e1) {				
+				e1.printStackTrace();
+			} catch (RemoteException e1) {					
+					e1.printStackTrace();
+			}				
+		}
+	 });
+       // }
+	// functionality.j
+	 
+	 // B2B config button
+	  functionality.jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String BookID =basicData.book.getName();
+				if(BookID == null || commonUTIL.isEmpty(BookID.trim())) {
+					commonUTIL.showAlertMessage("Select Book & Currency Pair");
+					return;
+				}
+				int bookID = Integer.parseInt(basicData.book.getName());
+				String currencyPair = basicData.currencyPair.getText();
+				
+				/*	try {
+						Vector b2b = (Vector) remoteReference.getB2BConfig(bookID, currencyPair);
+						if(b2b == null || b2b.isEmpty()) {
+							commonUTIL.showAlertMessage("B2b Configuration Missing");
+						return;
+					} */
+						 b2bconfig = new B2BConfig();
+						 functionality.jPanel2.setVisible(false);
+						functionality.jPanel6.setVisible(true);
+					   functionality.b2bCurrencyPair.setText(basicData.currencyPair.getText());
+					   getDataForB2bCps();
+					   // functionality.b2bBook.setText(getBook(b2bconfig.getBookid()).getBook_name());
+					    functionality.b2bTransferTo.setText("0");
+					   
+					    
+				/*	} catch (RemoteException e1) {
+						
+						e1.printStackTrace();
+					} */
+				
+				
+			}
+	  });
+	  
+	  // saveasnew or DEAL is new
+	  functionality.jButton5.addMouseListener(new java.awt.event.MouseAdapter() {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if(trade != null) {
+				String autoType = trade.getAutoType();
+				if(!commonUTIL.isEmpty(autoType)) {
+					if(autoType.equalsIgnoreCase("INTERNAL")) { 
+						// internal trade can't be save as new trade
+						commonUTIL.showAlertMessage("Please click on New as this Trade is Internal Trade can't save as New");
+						return;
+					}
+				}
+			}
+			
+			if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {				
+		    	if (commonUTIL.addSubtractDate(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true), 31).before(
+						 fwdOp.startDate.getDate())) {		    		
+		    		commonUTIL.showAlertMessage("Option End date falls beyond 31 days after Trade end date");
+		    		return;		    		
+		    	}
+		    	
+		    	if (fwdOp.startDate.getDate().before(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true))){
+		    		commonUTIL.showAlertMessage("Option End date cannot be before Trade end date");
+		    		return;	
+		    	}
+			}
+			
+		    if(validdateALLFields("NEW")) {
+		    	trade = new Trade();
+		    	mirrorBook.setBookno(0);
+		    	
+		    	removeAttributeFromTrade(trade);
+	            fillTrade(trade,"NEW");
+	             
+		    	int isHoliday = 0;
+				try {					
+					isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(0, 3), 
+					trade.getDelivertyDate());
+					
+					if (isHoliday == 1) {				
+						commonUTIL.showAlertMessage("Near Date selected is a Holiday or a weekend. " +
+								"Please select another date");
+						out.outRightDate.setBackground(Color.red);
+					}
+					
+					if (isHoliday != 1) {						
+						isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(4, 7), 
+								trade.getEffectiveDate());
+						
+						if (isHoliday == 1) {							
+							commonUTIL.showAlertMessage("Far Date selected is a Holiday or a weekend. " +
+									"Please select another date");
+							out.outRightDate.setBackground(Color.red);
 						}
-			        });
+						
+					} else if (isHoliday == -1) {
+						commonUTIL.showAlertMessage("Server Problem");
+						return;
+					}
+					
+				} catch (RemoteException e2) {					
+					e2.printStackTrace();
+				}	
+		    	
+		    	/**/
+		    	
+	             if(trade.getTradedesc1() == null || trade.getTradedesc1().trim().length() == 0) {
+	            	 commonUTIL.showAlertMessage("Product not Registered");
+	            	 return;
+	             }
+	             
+	             if ( (commonUTIL.stringToDate(trade.getEffectiveDate(), true)).before( 
+	            		 commonUTIL.stringToDate(trade.getDelivertyDate(), true)) ) {	            	 	
+	            	 commonUTIL.showAlertMessage("Far Date cannot be less than Near Date");
+	            	 return;	            	 
+	             }
+	             
+	             if(trade.getTradedesc1() != null && trade.getTradedesc1().trim().length() > 0)  {            		
+            		 trade.setUserID( getUser().getId());
+            		 try {
+               	         
+		               	 trade.setId(0);
+		               	 trade.setStatus("NONE");
+		               	 trade.setAction("NEW");
+		               	 Vector<String> message = new Vector<String>();
+		               	
+		               	 //setAttribute is already done in fillTrade so commented 
+		               //trade.setAttributes(getAttributeValue());
+		               	trade.setMirrorBookid(0);
+		        		trade.setMirrorID(0);
+		        		trade.setAutoType("");
+		        		// No need to add attributes without any value. Below attributes can be set whenever it has value like been 
+		        		//done in tradeImp for swap split trade. so commented below
+		        	//	trade.setAttribute("MirrorID","");	
+		        	//	trade.setAttribute("B2BID","");	
+		        	//	trade.setAttribute("B2BFlag","");		
+		        	//	trade.setAttribute("XCurrSOriginalTradeID","");		
+		        	//	trade.setAttribute("ParitialTo","");		
+		        	//	trade.setAttribute("SXccySplitID","");		
+		        	//	trade.setAttribute("ParitialFrom","");		
+		        	//	trade.setAttribute("XccySplitFrom","");		
+		        	//	trade.setAttribute("FXccySplitID","");		
+		        	//	trade.setAttribute("OffsetID","");		
+		        	//	trade.setAttribute("OriginalTradeID","");		
+					//	trade.setAttribute("MirrorFromTradeID","");	
+						trade.setOffsetid(0);
+					//trade.seto
+		        		trade.setParentID(0);
+		        		trade.setB2Bflag(false);
+		        		trade.setB2bid(0);
+		        		trade.setXccySPlitid(0);
+		      
+		        		trade.setMirrorBookid(0);
+		        		trade.setFees(feesPanel.getFeesDataV());
+		        		Vector tradestatus = null;
+		        		if(!commonUTIL.isEmpty(functionality.getRoutingData())  && functionality.getRoutingData().size() > 1) {
+		        		  // trade.clearAttributes();
+		        		   Vector<Trade> rountingTrades;
+		        		   try {
+								rountingTrades = FXSplitUtil.getRountingData(trade,remoteReference,functionality.FarRate1.getDoubleValue(),functionality.FarRate2.getDoubleValue());
+							
+								if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >1 ) {								
+										rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3),
+												trade,functionality.jTextField2.getDoubleValue(), functionality.jTextField3.getDoubleValue(),functionality.FarRate1.getDoubleValue(),functionality.FarRate2.getDoubleValue());
+										trade.setRountingTrades(rountingTrades);
+					        		    tradestatus  = 	remoteTrade.saveBatchSplitTrades(trade.getRountingTrades(),trade,message);
+								} 
+		        		   } catch (ParseException e2) {									
+		        			   e2.printStackTrace();								
+							}					 
+		        		    
+		        		} else {	        			
+		        			 trade.setAllocatedID(0);
+		        			 trade.setAutoType("Original");
+		        			 tradestatus  = 	remoteTrade.saveTrade(trade,message);
+		        		}
+		               	 if(commonUTIL.isEmpty(tradestatus)) {
+		               		commonUTIL.showAlertMessage("Error in ServerSide in saving Trade");
+		               		 return;
+		               	 }
+		               	 String statusT = (String) tradestatus.elementAt(0);
+		               	 int i = ((Integer) tradestatus.elementAt(1)).intValue();
+		               	 if(i == -4) {
+		               		 commonUTIL.showAlertMessage((statusT));
+		               		 return;
+		               	 }
+		               	 if(i == -3) {
+		            		commonUTIL.showAlertMessage((statusT));
+		            		return;
+		               	 }
+		               	 if(i > 0) 
+		               		commonUTIL.showAlertMessage((statusT));
+		               	 	//System.out.println("*************** " +i);
+	               	 	trade = (Trade) remoteTrade.selectTrade(i);
+		               	 
+	               	 	openTrade(trade);	        	
+		               	
+            		 } catch (RemoteException e1) {        			 
+            			 e1.printStackTrace();
+            		 } 	             
+	             } 
+	             functionality.jButton5.setText("SAVEASNEW");
+	             functionality.jButton6.setEnabled(true);            	
+		    }
+		}	
+	  });
+		// for currency split functionality. 
+	    out.jCheckBox2.addMouseListener(new java.awt.event.MouseAdapter() {	
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				
+				if( out.jCheckBox2.isSelected()) {
+				//	if(trade == null) {
+					//	commonUTIL.showAlertMessage("Select Trade ");
+					//	out.jCheckBox2.setSelected(false);
+					//	return;
+					//}
+					functionality.jPanel6.setVisible(false);
+					// functionality.jButton8.setEnabled(true);
+					 functionality.jPanel2.setVisible(true);
+					 try {
+					//	 basicData.book.getName() 
+						 if(commonUTIL.isEmpty(basicData.book.getName()) && commonUTIL.isEmpty(basicData.currencyPair.getText())) {
+							 commonUTIL.showAlertMessage("Select Book & CurrencyPair");
+							 out.jCheckBox2.setSelected(false);
+							 return;
+						 }
+						 if(productSubType.equalsIgnoreCase(FXSWAP)) {
+							 functionality.FarRate1.setVisible(true);
+							 functionality.FarRate2.setVisible(true);
+							 functionality.jLabel4.setVisible(true);
+							 functionality.jLabel5.setVisible(true);
+						 } else {
+							 functionality.FarRate1.setVisible(false);
+							 functionality.FarRate2.setVisible(false);
+							 functionality.jLabel4.setVisible(false);
+							 functionality.jLabel5.setVisible(false);
+						 }
+						System.out.println();
+						Vector vector = (Vector) remoteReference.getCurrencySplitConfig(Integer.parseInt(basicData.book.getName()), basicData.currencyPair.getText());
+						 
+						if(!commonUTIL.isEmpty(vector)) {
+							
+							if(trade == null || trade.getId() == 0)
+							     functionality.clearRounting();
+							sconfig =  (CurrencySplitConfig)vector.elementAt(0);
+							functionality.jLabel2.setText(sconfig.getFirstCurrencySplit());
+							populateRountingData();
+						
+						functionality.jLabel3.setText(sconfig.getSecondCurrencySPlit());
+						
+						 } else {
+							 
+							 commonUTIL.
+							 showAlertMessage("Currency split config for selected Currency Pair and Book not found.");
+							 out.jCheckBox2.setSelected(false);
+							 functionality.jPanel2.setVisible(false);
+						 }
+					} catch (RemoteException e1) {
+						
+						e1.printStackTrace();
+					}
+					//	if(vector == null || vector.isEmpty())
+						//	return;
+						 sconfig = null;// (CurrencySplitConfig)vector.elementAt(0);
+					 
+						//Book firstbook = new Book();
+						//firstbook.setBookno(sconfig.getFirstSpotBook());
+					//	firstbook = (Book) remoteReference.selectBook(firstbook);
+						//functionality.jTextField0.setText(firstbook.getBook_name());
+					//	Book secbook = new Book();
+					//	secbook.setBookno(sconfig.getSecondSpotBook());
+					//	secbook = (Book) remoteReference.selectBook(secbook);
+					/*	if(functionality.jCheckBox0.isSelected()) {
+						      getDataForcurrencySplitOnBook();
+						      functionality.jLabel4.setText("First Spot Book");
+								functionality.jLabel5.setText("Second Spot Book");
+						} else {
+							getDataForcurrencySplitOnCp();
+							functionality.jLabel4.setText("First Legal Entity");
+							functionality.jLabel5.setText("Second Legal Entity");
+						}*/
+						//functionality.jTextField1.setText(secbook.getBook_name());
+				} else {
+					 functionality.jButton8.setEnabled(false);
+					 functionality.jPanel2.setVisible(false);
+					// functionality.jLabel2.setText("    ");
+					 //functionality.jLabel3.setText("    ");
+					 functionality.jTextField2.setText("");
+					 functionality.jTextField3.setText("");
+					
+				}
+				
+			}
+	    });
 			        
 			     /*   functionality.jCheckBox0.addMouseListener(new java.awt.event.MouseAdapter() {
 	
@@ -1539,410 +1493,402 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 						}
 			        }); */
 			        
-			        functionality.jTableR2.addMouseListener(new java.awt.event.MouseAdapter() {
-			        	@Override
-						public void mouseClicked(MouseEvent e) {
-			        		int rowselected = functionality.jTableR2.getSelectedRow();
-			        		if(rowselected == -1)
-			        			return;
-			        		int tradeID = (Integer) functionality.jTableR2.getValueAt(rowselected,0);
-			        		if(tradeID == 0)
-			        			return;
-			        		app.trade = null;
-			        		Trade trade  = null;
-							try {
-								trade = remoteTrade.selectTrade(tradeID);
-							} catch (RemoteException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-			        		openTrade(trade);
-			        		
-			        	}
-			        });
+    functionality.jTableR2.addMouseListener(new java.awt.event.MouseAdapter() {
+    	@Override
+		public void mouseClicked(MouseEvent e) {
+    		int rowselected = functionality.jTableR2.getSelectedRow();
+    		if(rowselected == -1)
+    			return;
+    		int tradeID = (Integer) functionality.jTableR2.getValueAt(rowselected,0);
+    		if(tradeID == 0)
+    			return;
+    		app.trade = null;
+    		Trade trade  = null;
+			try {
+				trade = remoteTrade.selectTrade(tradeID);
+			} catch (RemoteException e1) {
+				
+				e1.printStackTrace();
+			}
+    		openTrade(trade);
+    		
+    	}
+    });        
 			        
+	 // currencySPlit button
+    functionality.jButton8.addMouseListener(new java.awt.event.MouseAdapter() {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+		/*	boolean usedCP = true;
+			if(functionality.jCheckBox0.isSelected())
+				usedCP = false;
+			if(!functionality.jButton8.isEnabled())
+				return;
+			if(trade == null) {
+				commonUTIL.showAlertMessage("Select Trade ");
+				return;
+			}
+			if(out.jComboBox1.getSelectedIndex() == -1) {
+				commonUTIL.showAlertMessage("Select Action");
+				return;
+			} else {
+				trade.setAction(out.jComboBox1.getSelectedItem().toString());
+			}
+			try {
+				sconfig = new CurrencySplitConfig();
+				sconfig.setBookid(trade.getBookId());
+			//	sconfig.setCurrencyToSplit(trade.get)
+				sconfig.setFirstCurrencySplit(functionality.jLabel2.getSelectedItem().toString());
+				sconfig.setSecondCurrencySPlit(functionality.jLabel3.getSelectedItem().toString());
+			    if(usedCP) {
+			    	sconfig.setFirstSpotBook(	(functionality.getCurrSPlitCP(functionality.jTextField0.getSelectedIndex())).getId());
+			    	sconfig.setSecondSpotBook(	(functionality.getCurrSPlitCP(functionality.jTextField1.getSelectedIndex())).getId());
+			    } else {
+			    	sconfig.setFirstSpotBook(	(functionality.getCurrSPlitBook(functionality.jTextField0.getSelectedIndex())).getBookno());
+			    	sconfig.setSecondSpotBook(	(functionality.getCurrSPlitBook(functionality.jTextField1.getSelectedIndex())).getBookno());
+			    }
+				//if(!isValidCurrencyPairSplit(sconfig.getFirstCurrencySplit(),sconfig.getSecondCurrencySPlit())) {
+				//	commonUTIL.showAlertMessage("Select Valid CurrencyPair Selection");
+					//return;
+				//}
+				if(sconfig == null)
+					return;
+			//	functionality.jLabel2.setText(sconfig.getFirstCurrencySplit());
+			//	functionality.jLabel3.setText(sconfig.getSecondCurrencySPlit());
+				Book orignalBook = new Book();
+				orignalBook.setBookno(sconfig.getBookid());
+				 orignalBook = (Book) remoteReference.selectBook(orignalBook);
+			
+				
+					double frate = functionality.jTextField2.getDoubleValue();
+					
+					double srate = functionality.jTextField3.getDoubleValue();
+				if(frate == 0. || srate == 0.) {
+					commonUTIL.showAlertMessage("Currency Split rate is Zero");
+					return ;
+				}
+			   // Trade offSetTrade = buildOffSetTrade(trade,orignalBook);
+			    Trade xccY1 = (Trade) trade.clone();
+			   	Trade xccY2 = (Trade) trade.clone();
+			   	xccY1.setId(0);
+				xccY2.setId(0);
+			 	xccY1.setAction("NEW");
+			 	xccY2.setAction("NEW");
+			 	xccY1.setStatus("NONE");
+			 	xccY2.setStatus("NONE");
+			 	if(usedCP) {
+			 	   xccY1.setBookId(orignalBook.getBookno()); // if cp used book will be trade book id 
+			 	   xccY1.setCpID(sconfig.getFirstSpotBook());  // cp used from selected curr split config
+			 	   xccY1.setTradedesc(sconfig.getFirstCurrencySplit());
+			 	  xccY2.setBookId(orignalBook.getBookno());
+			 	   xccY2.setCpID(sconfig.getSecondSpotBook());
+			 	   xccY2.setTradedesc(sconfig.getSecondCurrencySPlit());
+			 	   xccY2.setCurrency(xccY2.getTradedesc().substring(4, 7));
+			 	  xccY1.setCurrency(xccY1.getTradedesc().substring(4, 7));
+			 	} else {
+			 		xccY1.setBookId(sconfig.getFirstSpotBook()); 
+				 	xccY1.setCpID(trade.getCpID());
+				 	xccY1.setTradedesc(sconfig.getSecondCurrencySPlit());
+			 		xccY2.setBookId(sconfig.getSecondSpotBook());
+				 	xccY2.setCpID(trade.getCpID());
+				 	xccY2.setTradedesc(sconfig.getSecondCurrencySPlit());
+				 	 xccY2.setCurrency(xccY2.getTradedesc().substring(4, 7));
+				 	  xccY1.setCurrency(xccY1.getTradedesc().substring(4, 7));
+			 	}
+			 	
+			   
+			   Vector<Trade> splitTrades = buildXccySplit(xccY1,xccY2,trade,sconfig);
+			   if(splitTrades == null)
+				   return;
+			 //  splitTrades.add(offSetTrade);
+			   if(splitTrades.size() > 0) {
+			  trade = remoteTrade.saveBatchSplitTrades(splitTrades, trade);
+			  openTrade(trade);
+			//  Vector splictrde = remoteTrade.getSplitTrades(trade.getId());
+			 // splictrde.add(trade);
+			//  functionality.setRountingData(splictrde);
+			   }
+			    
+			} catch (RemoteException e1) {
+				
+				e1.printStackTrace();
+			} catch (NumberFormatException e1) {
+				
+				commonUTIL.showAlertMessage("Enter Number in Rate Field");
+				return;
+			}
+			catch (CloneNotSupportedException e1) {
+				
+				e1.printStackTrace();
+			}	catch (ParseException oe) {
+					
+					oe.printStackTrace();
+				} */
+			
+		}
+		
+		private Vector<Trade> buildXccySplit(Trade xccY1,Trade xccY2,Trade trade,CurrencySplitConfig sconfig) {
+			Vector<Trade> xccySplit = new Vector<Trade>();
+			
+				double frate;
+				Vector<Trade> trades = null;
+				try {
+				
+			
+			double srate = functionality.jTextField3.getDoubleValue();
+			frate = functionality.jTextField2.getDoubleValue();
+			if(frate == 0. || srate == 0.) {
+				commonUTIL.showAlertMessage("Currency Split rate is Zero");
+				return null;
+			}
+			
+	//		trades  = FXSplitUtil.splitTrade(xccY1,xccY2,trade,frate,srate);
+				} catch (ParseException e) {
+					
+					e.printStackTrace();
+				}
+		
+			return trades;
+			/*if(trade.getType().equalsIgnoreCase("BUY")) {
+				xccY1.setType("BUY");
+				xccY2.setType("SELL");
+				xccY1.setCurrency(xccY1.getTradedesc().substring(5, 7));
+				xccY2.setCurrency(xccY2.getTradedesc().substring(5, 7));
+				xccY1.setNominal(trade.getQuantity() * -1); //
+				xccY1.setQuantity(trade.getQuantity() / frate);
+				xccY1.setPrice(frate);
+				
+				
+				xccY2.setQuantity(xccY1.getQuantity() *-1);
+				xccY2.setNominal(xccY2.getQuantity() * srate * -1);
+				xccY2.setPrice(frate);
+				
+			
+				
+				
+				xccY1.setAttribute("XccySplitFrom",  Integer.valueOf(trade.getId()).toString());
+				xccY2.setAttribute("XccySplitFrom",  Integer.valueOf(trade.getId()).toString());
+				xccY2.setPrice(srate);
+				xccY1.setPrice(frate);
+				xccY2.setAutoType("XccySplit");
+				xccY1.setAutoType("XccySplit");
+				xccY1.setXccySPlitid(trade.getId());
+				xccY2.setXccySPlitid(trade.getId());
+			} else {
+				xccY1.setType("SELL");
+				xccY2.setType("BUY");
+				xccY2.setPrice(srate);
+				xccY1.setPrice(frate);
+				
+				xccY1.setCurrency(xccY1.getTradedesc().substring(5, 7));
+				xccY2.setCurrency(xccY2.getTradedesc().substring(5, 7));
+				xccY1.setNominal(trade.getQuantity() * -1); //
+				xccY1.setQuantity(trade.getQuantity() / frate);
+				xccY1.setPrice(frate);
+				
+				
+				xccY2.setQuantity(xccY1.getQuantity() *-1);
+				xccY2.setNominal(xccY2.getQuantity() * srate * -1);
+				xccY2.setPrice(frate);
+				
+			
+				
+				xccY1.setAttribute("XccySplitFrom",  Integer.valueOf(trade.getId()).toString());
+				xccY2.setAttribute("XccySplitFrom",  Integer.valueOf(trade.getId()).toString());
+				xccY2.setAutoType("XccySplit");
+				xccY1.setAutoType("XccySplit");
+				xccY1.setXccySPlitid(trade.getId());
+				xccY2.setXccySPlitid(trade.getId());
+				
+			}
+			xccySplit.add(xccY1);
+			xccySplit.add(xccY2);
+			} catch (ParseException e) {
+				
+				e.printStackTrace();
+			}
+			return xccySplit; */
+		}
+
+		// this logic is wrong needs to be correct
+		private boolean isValidCurrencyPairSplit(String firstCP,String secondCP) {
+			String fcp = firstCP.substring(0, 3);
+			String scp = secondCP.substring(4, 7);
+			if(trade.getTradedesc().equalsIgnoreCase(fcp+"/"+scp))
+				return true;
+			if(trade.getTradedesc().equalsIgnoreCase(scp+"/"+fcp))
+				return true;
+			fcp = firstCP.substring(4, 7);
+			 scp = secondCP.substring(0, 3);
+			 if(trade.getTradedesc().equalsIgnoreCase(fcp+"/"+scp))
+					return true;
+			 if(trade.getTradedesc().equalsIgnoreCase(fcp+"/"+scp))
+					return true;
+			 fcp = secondCP.substring(0, 3);
+			 scp = firstCP.substring(4, 7);
+			 if(trade.getTradedesc().equalsIgnoreCase(fcp+"/"+scp))
+					return true;
+			 fcp = secondCP.substring(4, 7);
+			 scp = firstCP.substring(0, 3);
+			 if(trade.getTradedesc().equalsIgnoreCase(fcp+"/"+scp))
+					return true;
+			 
+			 return false;
+		}
+		private Trade buildOffSetTrade(Trade trade,Book poBook) {
+			
+			Trade offSetTrade = null;
+			try {
+				offSetTrade = (Trade) trade.clone();
+				offSetTrade.setId(0);
+				offSetTrade.setAction("NEW");
+				offSetTrade.setStatus("NONE");
+				if(offSetTrade.getType().equalsIgnoreCase("BUY")) {
+				     offSetTrade.setType("SELL");
+				     offSetTrade.setQuantity(offSetTrade.getQuantity() * -1);
+				     offSetTrade.setNominal(offSetTrade.getNominal() * -1);
+				} else  {
+					 offSetTrade.setType("BUY");
+					 offSetTrade.setQuantity(offSetTrade.getQuantity() * -1);
+				     offSetTrade.setNominal(offSetTrade.getNominal() * -1);
+				}
+				offSetTrade.setAutoType("Offset");
+				offSetTrade.setOffsetid(trade.getId());
+				offSetTrade.setCpID(poBook.getLe_id());
+				
+				offSetTrade.setAttribute("XCurrSOriginalTradeID", Integer.valueOf(trade.getId()).toString());
+				
+				
+			} catch (CloneNotSupportedException e) {
+				
+				e.printStackTrace();
+			}
+			return offSetTrade;
+		}
+    });
+	        
+    out.jTextField4.addActionListener(new java.awt.event.ActionListener() {
+	    public void actionPerformed(java.awt.event.ActionEvent e) {
+	    	 if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL") || basicData.buysell.getText().equalsIgnoreCase("BUY")) {
+					
+					double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+					amt1 = Math.abs(amt1);
+					double spot = (new Double(out.jTextField4.getText()).doubleValue());
+					out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
+					double amt2 = amt1* spot;								
+					out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2));
+					
+					 double farAmt1 = amt1 * -1;
+			    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1));
+			    	// System.out.println("farAmt1 " + farAmt1);
+			    	// System.out.println("out.jTextField2"+ out.jTextField2.getText());
+			    	 //System.out.println("out.jTextField1"+ out.jTextField1.getText());
+			    	 //System.out.println("swap.jTextField2"+ swap.jTextField1.getText());
+			    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText()) && (!swap.jTextField4.getText().equalsIgnoreCase("0"))) {
+			    		 
+			    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
+			    		 double farAmt2 = Math.abs(farAmt1);								
+			    		 if(farRate !=0)
+			    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2*farRate));
+			    	 }
+					
+	    	 } else {
+	    		 
+	    		 	double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+					double spot = (new Double(out.jTextField4.getText()).doubleValue());
+					out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
+					double amt2 = Math.abs(amt1) * -1;		
+				//	System.out.println("------------- "+commonUTIL.getStringFromDoubleExp(amt2*spot));
+					out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot));
+					
+					 double farAmt1 = amt1 * -1;
+			    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1));
+			    	 
+			    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText())) {
+			    		 
+			    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
+			    		 double farAmt2 = Math.abs(farAmt1) * -1;	
+			    		 if(farRate != 0)
+			    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2*farRate).toString());
+			    	 }	    		 																
+	    	 }	    	
+	          populateRountingData();		
+	    }
+    });
 			        
-			        // currencySPlit button
-			        functionality.jButton8.addMouseListener(new java.awt.event.MouseAdapter() {
-	
-						@Override
-						public void mouseClicked(MouseEvent e) {
-						/*	boolean usedCP = true;
-							if(functionality.jCheckBox0.isSelected())
-								usedCP = false;
-							if(!functionality.jButton8.isEnabled())
-								return;
-							if(trade == null) {
-								commonUTIL.showAlertMessage("Select Trade ");
-								return;
-							}
-							if(out.jComboBox1.getSelectedIndex() == -1) {
-								commonUTIL.showAlertMessage("Select Action");
-								return;
-							} else {
-								trade.setAction(out.jComboBox1.getSelectedItem().toString());
-							}
-							try {
-								sconfig = new CurrencySplitConfig();
-								sconfig.setBookid(trade.getBookId());
-							//	sconfig.setCurrencyToSplit(trade.get)
-								sconfig.setFirstCurrencySplit(functionality.jLabel2.getSelectedItem().toString());
-								sconfig.setSecondCurrencySPlit(functionality.jLabel3.getSelectedItem().toString());
-							    if(usedCP) {
-							    	sconfig.setFirstSpotBook(	(functionality.getCurrSPlitCP(functionality.jTextField0.getSelectedIndex())).getId());
-							    	sconfig.setSecondSpotBook(	(functionality.getCurrSPlitCP(functionality.jTextField1.getSelectedIndex())).getId());
-							    } else {
-							    	sconfig.setFirstSpotBook(	(functionality.getCurrSPlitBook(functionality.jTextField0.getSelectedIndex())).getBookno());
-							    	sconfig.setSecondSpotBook(	(functionality.getCurrSPlitBook(functionality.jTextField1.getSelectedIndex())).getBookno());
-							    }
-								//if(!isValidCurrencyPairSplit(sconfig.getFirstCurrencySplit(),sconfig.getSecondCurrencySPlit())) {
-								//	commonUTIL.showAlertMessage("Select Valid CurrencyPair Selection");
-									//return;
-								//}
-								if(sconfig == null)
-									return;
-							//	functionality.jLabel2.setText(sconfig.getFirstCurrencySplit());
-							//	functionality.jLabel3.setText(sconfig.getSecondCurrencySPlit());
-								Book orignalBook = new Book();
-								orignalBook.setBookno(sconfig.getBookid());
-								 orignalBook = (Book) remoteReference.selectBook(orignalBook);
-							
-								
-									double frate = functionality.jTextField2.getDoubleValue();
-									
-									double srate = functionality.jTextField3.getDoubleValue();
-								if(frate == 0. || srate == 0.) {
-									commonUTIL.showAlertMessage("Currency Split rate is Zero");
-									return ;
-								}
-							   // Trade offSetTrade = buildOffSetTrade(trade,orignalBook);
-							    Trade xccY1 = (Trade) trade.clone();
-							   	Trade xccY2 = (Trade) trade.clone();
-							   	xccY1.setId(0);
-								xccY2.setId(0);
-							 	xccY1.setAction("NEW");
-							 	xccY2.setAction("NEW");
-							 	xccY1.setStatus("NONE");
-							 	xccY2.setStatus("NONE");
-							 	if(usedCP) {
-							 	   xccY1.setBookId(orignalBook.getBookno()); // if cp used book will be trade book id 
-							 	   xccY1.setCpID(sconfig.getFirstSpotBook());  // cp used from selected curr split config
-							 	   xccY1.setTradedesc(sconfig.getFirstCurrencySplit());
-							 	  xccY2.setBookId(orignalBook.getBookno());
-							 	   xccY2.setCpID(sconfig.getSecondSpotBook());
-							 	   xccY2.setTradedesc(sconfig.getSecondCurrencySPlit());
-							 	   xccY2.setCurrency(xccY2.getTradedesc().substring(4, 7));
-							 	  xccY1.setCurrency(xccY1.getTradedesc().substring(4, 7));
-							 	} else {
-							 		xccY1.setBookId(sconfig.getFirstSpotBook()); 
-								 	xccY1.setCpID(trade.getCpID());
-								 	xccY1.setTradedesc(sconfig.getSecondCurrencySPlit());
-							 		xccY2.setBookId(sconfig.getSecondSpotBook());
-								 	xccY2.setCpID(trade.getCpID());
-								 	xccY2.setTradedesc(sconfig.getSecondCurrencySPlit());
-								 	 xccY2.setCurrency(xccY2.getTradedesc().substring(4, 7));
-								 	  xccY1.setCurrency(xccY1.getTradedesc().substring(4, 7));
-							 	}
-							 	
-							   
-							   Vector<Trade> splitTrades = buildXccySplit(xccY1,xccY2,trade,sconfig);
-							   if(splitTrades == null)
-								   return;
-							 //  splitTrades.add(offSetTrade);
-							   if(splitTrades.size() > 0) {
-							  trade = remoteTrade.saveBatchSplitTrades(splitTrades, trade);
-							  openTrade(trade);
-							//  Vector splictrde = remoteTrade.getSplitTrades(trade.getId());
-							 // splictrde.add(trade);
-							//  functionality.setRountingData(splictrde);
-							   }
-							    
-							} catch (RemoteException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							} catch (NumberFormatException e1) {
-								// TODO Auto-generated catch block
-								commonUTIL.showAlertMessage("Enter Number in Rate Field");
-								return;
-							}
-							catch (CloneNotSupportedException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}	catch (ParseException oe) {
-									// TODO Auto-generated catch block
-									oe.printStackTrace();
-								} */
-							
-						}
-						
-						private Vector<Trade> buildXccySplit(Trade xccY1,Trade xccY2,Trade trade,CurrencySplitConfig sconfig) {
-							Vector<Trade> xccySplit = new Vector<Trade>();
-							
-								double frate;
-								Vector<Trade> trades = null;
-								try {
-								
-							
-							double srate = functionality.jTextField3.getDoubleValue();
-							frate = functionality.jTextField2.getDoubleValue();
-							if(frate == 0. || srate == 0.) {
-								commonUTIL.showAlertMessage("Currency Split rate is Zero");
-								return null;
-							}
-							
-					//		trades  = FXSplitUtil.splitTrade(xccY1,xccY2,trade,frate,srate);
-								} catch (ParseException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-						
-							return trades;
-							/*if(trade.getType().equalsIgnoreCase("BUY")) {
-								xccY1.setType("BUY");
-								xccY2.setType("SELL");
-								xccY1.setCurrency(xccY1.getTradedesc().substring(5, 7));
-								xccY2.setCurrency(xccY2.getTradedesc().substring(5, 7));
-								xccY1.setNominal(trade.getQuantity() * -1); //
-								xccY1.setQuantity(trade.getQuantity() / frate);
-								xccY1.setPrice(frate);
-								
-								
-								xccY2.setQuantity(xccY1.getQuantity() *-1);
-								xccY2.setNominal(xccY2.getQuantity() * srate * -1);
-								xccY2.setPrice(frate);
-								
-							
-								
-								
-								xccY1.setAttribute("XccySplitFrom",  Integer.valueOf(trade.getId()).toString());
-								xccY2.setAttribute("XccySplitFrom",  Integer.valueOf(trade.getId()).toString());
-								xccY2.setPrice(srate);
-								xccY1.setPrice(frate);
-								xccY2.setAutoType("XccySplit");
-								xccY1.setAutoType("XccySplit");
-								xccY1.setXccySPlitid(trade.getId());
-								xccY2.setXccySPlitid(trade.getId());
-							} else {
-								xccY1.setType("SELL");
-								xccY2.setType("BUY");
-								xccY2.setPrice(srate);
-								xccY1.setPrice(frate);
-								
-								xccY1.setCurrency(xccY1.getTradedesc().substring(5, 7));
-								xccY2.setCurrency(xccY2.getTradedesc().substring(5, 7));
-								xccY1.setNominal(trade.getQuantity() * -1); //
-								xccY1.setQuantity(trade.getQuantity() / frate);
-								xccY1.setPrice(frate);
-								
-								
-								xccY2.setQuantity(xccY1.getQuantity() *-1);
-								xccY2.setNominal(xccY2.getQuantity() * srate * -1);
-								xccY2.setPrice(frate);
-								
-							
-								
-								xccY1.setAttribute("XccySplitFrom",  Integer.valueOf(trade.getId()).toString());
-								xccY2.setAttribute("XccySplitFrom",  Integer.valueOf(trade.getId()).toString());
-								xccY2.setAutoType("XccySplit");
-								xccY1.setAutoType("XccySplit");
-								xccY1.setXccySPlitid(trade.getId());
-								xccY2.setXccySPlitid(trade.getId());
-								
-							}
-							xccySplit.add(xccY1);
-							xccySplit.add(xccY2);
-							} catch (ParseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							return xccySplit; */
-						}
-	
-						// this logic is wrong needs to be correct
-						private boolean isValidCurrencyPairSplit(String firstCP,String secondCP) {
-							String fcp = firstCP.substring(0, 3);
-							String scp = secondCP.substring(4, 7);
-							if(trade.getTradedesc().equalsIgnoreCase(fcp+"/"+scp))
-								return true;
-							if(trade.getTradedesc().equalsIgnoreCase(scp+"/"+fcp))
-								return true;
-							fcp = firstCP.substring(4, 7);
-							 scp = secondCP.substring(0, 3);
-							 if(trade.getTradedesc().equalsIgnoreCase(fcp+"/"+scp))
-									return true;
-							 if(trade.getTradedesc().equalsIgnoreCase(fcp+"/"+scp))
-									return true;
-							 fcp = secondCP.substring(0, 3);
-							 scp = firstCP.substring(4, 7);
-							 if(trade.getTradedesc().equalsIgnoreCase(fcp+"/"+scp))
-									return true;
-							 fcp = secondCP.substring(4, 7);
-							 scp = firstCP.substring(0, 3);
-							 if(trade.getTradedesc().equalsIgnoreCase(fcp+"/"+scp))
-									return true;
-							 
-							 return false;
-						}
-						private Trade buildOffSetTrade(Trade trade,Book poBook) {
-							// TODO Auto-generated method stub
-							Trade offSetTrade = null;
-							try {
-								offSetTrade = (Trade) trade.clone();
-								offSetTrade.setId(0);
-								offSetTrade.setAction("NEW");
-								offSetTrade.setStatus("NONE");
-								if(offSetTrade.getType().equalsIgnoreCase("BUY")) {
-								     offSetTrade.setType("SELL");
-								     offSetTrade.setQuantity(offSetTrade.getQuantity() * -1);
-								     offSetTrade.setNominal(offSetTrade.getNominal() * -1);
-								} else  {
-									 offSetTrade.setType("BUY");
-									 offSetTrade.setQuantity(offSetTrade.getQuantity() * -1);
-								     offSetTrade.setNominal(offSetTrade.getNominal() * -1);
-								}
-								offSetTrade.setAutoType("Offset");
-								offSetTrade.setOffsetid(trade.getId());
-								offSetTrade.setCpID(poBook.getLe_id());
-								
-								offSetTrade.setAttribute("XCurrSOriginalTradeID", Integer.valueOf(trade.getId()).toString());
-								
-								
-							} catch (CloneNotSupportedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							return offSetTrade;
-						}
-			        });
-			        
-			        
-			        out.jTextField4.addActionListener(new java.awt.event.ActionListener() {
-					    public void actionPerformed(java.awt.event.ActionEvent e) {
-					    	 if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL") || basicData.buysell.getText().equalsIgnoreCase("BUY")) {
-									
-									double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1);
-									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
-									double amt2 = amt1* spot;								
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2));
-									
-									 double farAmt1 = amt1 * -1;
-							    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1));
-							    	// System.out.println("farAmt1 " + farAmt1);
-							    	// System.out.println("out.jTextField2"+ out.jTextField2.getText());
-							    	 //System.out.println("out.jTextField1"+ out.jTextField1.getText());
-							    	 //System.out.println("swap.jTextField2"+ swap.jTextField1.getText());
-							    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText()) && (!swap.jTextField4.getText().equalsIgnoreCase("0"))) {
-							    		 
-							    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
-							    		 double farAmt2 = Math.abs(farAmt1);								
-							    		 if(farRate !=0)
-							    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2*farRate));
-							    	 }
-									
-					    	 } else {
-					    		 
-					    		 	double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
-									double amt2 = Math.abs(amt1) * -1;		
-								//	System.out.println("------------- "+commonUTIL.getStringFromDoubleExp(amt2*spot));
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot));
-									
-									 double farAmt1 = amt1 * -1;
-							    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1));
-							    	 
-							    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText())) {
-							    		 
-							    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
-							    		 double farAmt2 = Math.abs(farAmt1) * -1;	
-							    		 if(farRate != 0)
-							    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2*farRate).toString());
-							    	 }
-					    		 																
-					    	 }
-					    	
-					          	 populateRountingData();
-						
-					 }
-				 });
-			        
-			        basicData.jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
-						 public void mouseClicked(MouseEvent e) {
-							 
-							 if( basicData.buysell.getText().equalsIgnoreCase("BUY")) {
-								 basicData. buysell.setText("SELL");
-								 
-							} else {
-								if(!productSubType.equalsIgnoreCase("FXSWAP")) {
-								      basicData.buysell.setText("BUY");
-								}
-								 
-													}
-							 
-							 if( basicData.buysell.getText().equalsIgnoreCase("BUY/SELL") ) {
-								 basicData. buysell.setText("SELL/BUY");
-								 basicData. buysell.setBackground(Color.red);
-								 
-							} else {
-								if(productSubType.equalsIgnoreCase("FXSWAP")) {
-								basicData.buysell.setText("BUY/SELL");
-								 basicData. buysell.setBackground(Color.green);
-								}
-								 
-													}
-							 
-							 if(basicData.buysell.getText().equalsIgnoreCase("SELL")) {
-								
-								double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-								amt1 = Math.abs(amt1) * -1;
-								out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-								 double amt2 = Math.abs( (new Double(out.jTextField2.getText()).doubleValue()));
-								 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
-								
-							 }  else if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
-								 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
-								 amt2 = Math.abs(amt2) * -1;
-								 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
-								 double amt1= Math.abs( (new Double(out.jTextField1.getText()).doubleValue()));
-								 out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-							 }
-							 
-							 if(basicData.buysell.getText().equalsIgnoreCase("SELL/BUY")) {
-									
-								 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) * -1;
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-									 double amt2 = Math.abs( (new Double(out.jTextField2.getText()).doubleValue()));
-									 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
-									 
-									 double samt2 =  (new Double(swap.jTextField1.getText()).doubleValue());
-									 samt2 = Math.abs(samt2) * -1;
-									 double samt1= Math.abs( (new Double(swap.jTextField2.getText()).doubleValue()));
-									 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2));
-									
-									 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(samt1).toString());
-									
-								 }  else if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL")) {
-									 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
-									 amt2 = Math.abs(amt2) * -1;
-									 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
-									 double amt1= Math.abs( (new Double(out.jTextField1.getText()).doubleValue()));
-									 out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-									 
-									 double samt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
-										samt1 = Math.abs(samt1) * -1;
-										swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(samt1).toString());
-										 double samt2 = Math.abs( (new Double(swap.jTextField2.getText()).doubleValue()));
-										 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(samt2).toString());
-									
-								 }
-							 
-							 populateRountingData();
-							 
-						 }
-					 });
+    basicData.jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
+		 public void mouseClicked(MouseEvent e) {
+			 
+			 if( basicData.buysell.getText().equalsIgnoreCase("BUY")) {
+				 basicData. buysell.setText("SELL");
+				 
+			} else {
+				if(!productSubType.equalsIgnoreCase("FXSWAP")) {
+				      basicData.buysell.setText("BUY");
+				}
+			}
+			 
+			 if( basicData.buysell.getText().equalsIgnoreCase("BUY/SELL") ) {
+				 basicData. buysell.setText("SELL/BUY");
+				 basicData. buysell.setBackground(Color.red);				 
+			} else {
+				if(productSubType.equalsIgnoreCase("FXSWAP")) {
+					basicData.buysell.setText("BUY/SELL");
+					basicData. buysell.setBackground(Color.green);
+				}
+			}
+			 
+		 if(basicData.buysell.getText().equalsIgnoreCase("SELL")) {
+			
+			double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+			amt1 = Math.abs(amt1) * -1;
+			out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+			 double amt2 = Math.abs( (new Double(out.jTextField2.getText()).doubleValue()));
+			 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
+			
+		 }  else if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
+				 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
+				 amt2 = Math.abs(amt2) * -1;
+				 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
+				 double amt1= Math.abs( (new Double(out.jTextField1.getText()).doubleValue()));
+				 out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+			 }
+			 
+			 if(basicData.buysell.getText().equalsIgnoreCase("SELL/BUY")) {
+					
+				 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+					amt1 = Math.abs(amt1) * -1;
+					out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+					 double amt2 = Math.abs( (new Double(out.jTextField2.getText()).doubleValue()));
+					 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
+					 
+					 double samt2 =  (new Double(swap.jTextField1.getText()).doubleValue());
+					 samt2 = Math.abs(samt2) * -1;
+					 double samt1= Math.abs( (new Double(swap.jTextField2.getText()).doubleValue()));
+					 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2));
+					
+					 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(samt1).toString());
+					
+				 }  else if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL")) {
+					 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
+					 amt2 = Math.abs(amt2) * -1;
+					 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
+					 double amt1= Math.abs( (new Double(out.jTextField1.getText()).doubleValue()));
+					 out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+					 
+					 double samt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
+						samt1 = Math.abs(samt1) * -1;
+						swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(samt1).toString());
+						 double samt2 = Math.abs( (new Double(swap.jTextField2.getText()).doubleValue()));
+						 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(samt2).toString());
+					
+				 }
+			 
+			 populateRountingData();
+			 
+		 }
+	 });
 			        
 			    /*    out.jCheckBox1.addMouseListener(new java.awt.event.MouseAdapter() {
 						 public void mouseClicked(MouseEvent e) {
@@ -1977,7 +1923,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 						
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							// TODO Auto-generated method stub
+							
 							out.jLabel2.setText(basicData.currencyPair.getText());
 							
 						}
@@ -1997,10 +1943,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 					}
 				}
 			 }
-			 
-						 
-					
-						 
+	 
 		          });  
 					 
 					 
@@ -2505,15 +2448,15 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 								
 							
 						} catch (ParseException e1) {
-							// TODO Auto-generated catch block
+							
 							e1.printStackTrace();
 						} catch (RemoteException e1) {
-							// TODO Auto-generated catch block
+							
 							e1.printStackTrace();
 						
 						
 							}catch (NumberFormatException e1) {
-								// TODO Auto-generated catch block
+								
 								commonUTIL.showAlertMessage("Enter Number ");
 							
 							
@@ -2596,11 +2539,14 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 								if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {
 									
 							    	if (commonUTIL.addSubtractDate(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true), 31).before(
-											 commonUTIL.stringToDate(fwdOp.startDate.getText(), true))) {
-							    		
+											 fwdOp.startDate.getDate())) {							    		
 							    		commonUTIL.showAlertMessage("Option End date falls beyond 31 days after Trade end date");
-							    		 return;
-							    		
+							    		 return;							    		
+							    	}
+							    	
+							    	if (fwdOp.startDate.getDate().before(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true))){
+							    		commonUTIL.showAlertMessage("Option End date cannot be after Trade end date");
+							    		return;	
 							    	}
 								}
 								
@@ -2637,7 +2583,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 									}
 									
 								} catch (RemoteException e2) {
-									// TODO Auto-generated catch block
+									
 									e2.printStackTrace();
 								}
 								
@@ -2668,7 +2614,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 														rountingTrades =     FXSplitUtil.splitTrade(rountingTrades, functionality.jTextField2.getDoubleValue(),
 																functionality.jTextField3.getDoubleValue(), trade,functionality.FarRate1.getDoubleValue(),functionality.FarRate2.getDoubleValue(),true);
 													} catch (ParseException e1) {
-														// TODO Auto-generated catch block
+														
 														e1.printStackTrace();
 													}
 													trade.setRountingTrades(rountingTrades);
@@ -2715,7 +2661,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 						        		functionality.refreshTables(trade.getTradedesc(),basicData.book.getText(),new Integer(basicData.book.getName()).intValue());
 						        	
 			       		} catch (RemoteException e1) {
-			       			// TODO Auto-generated catch block
+			       			
 			       			e1.printStackTrace();
 			       		} 
 			                  
@@ -2844,7 +2790,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 	
 						@Override
 						public void itemStateChanged(ItemEvent arg0) {
-							// TODO Auto-generated method stub
+							
 							if(actionController) 
 								return;
 							 if(out.jComboBox1.getSelectedIndex() == -1)
@@ -2877,7 +2823,10 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 							basicData.jRadioButton5.setSelected(true);
 							
 							String currP = basicData.currencyPair.getText();
-							if(currP.isEmpty()) {
+							
+							//@ yogesh 01/02/2015
+							//@ no action id currency pair is not selected
+							/*if(currP.isEmpty()) {
 								basicData.jRadioButton1.setSelected(true);
 								basicData.jRadioButton2.setSelected(false);
 								
@@ -2890,7 +2839,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 						    	basicData.jRadioButton0.setSelected(false);
 								commonUTIL.showAlertMessage("Select Currency Pair");
 								return;
-							}
+							}*/
 							out.jCheckBox2.setEnabled(false);
 							functionality.jButton2.setEnabled(false);
 							functionality.jButton3.setEnabled(false);
@@ -2905,22 +2854,19 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 							swap.setVisible(false);
 							fwdOp.setVisible(true);
 							fwdOp.primaryC.setValue(0);
-							fwdOp.quotingC.setValue(0);
+							fwdOp.quotingC.setValue(0);							
 							
+							//@ yogesh 01/02/2015
+							//@ date should be displayes even though currency pair is not selected
+							fwdOp.startDate.setDate(commonUTIL.getCurrentDate());
 							
-								
-							if(!currP.isEmpty())
-							     fwdOp.jLabel2.setText(currP.substring(0, 3));
-							 fwdOp.jLabel3.setText(currP.substring(4, 7));
-							 fwdOp.startDate.setText(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
-							
-						} 
-							
-						
-						
-			    
-			    	
-			    });
+							if(!currP.isEmpty()) {
+								fwdOp.jLabel2.setText(currP.substring(0, 3));
+							 	fwdOp.jLabel3.setText(currP.substring(4, 7));
+							}								
+							 	//fwdOp.startDate.setText(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
+							} 
+			        });
 			        basicData.jRadioButton6.addMouseListener(new java.awt.event.MouseAdapter() {
 	
 						@Override
@@ -2975,7 +2921,14 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 						}
 			        });
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
+					
+					e.printStackTrace();
+				}
+			
+	        	try {
+	        		instrumenTypeStartupData = remoteReference.getStartUPData("InstrumentTypeVal");
+	        		getInstrumentVal();
+				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
 		}
@@ -3023,7 +2976,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		    		i++;
 			}	
 			}catch (RemoteException e) {
-						// TODO Auto-generated catch block
+						
 				commonUTIL.displayError("FXTradePanel","getBookDataCombo1", e);
 					}
 			
@@ -3032,25 +2985,25 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 	
 		@Override
 		public void setTaskPanel(BackOfficePanel panel) {
-			// TODO Auto-generated method stub
+			
 			taskPanel = (TaskPanel) panel;
 		}
 	
 		@Override
 		public void setTrade(Trade trade) {
-			// TODO Auto-generated method stub
+			
 			this.trade = trade;
 		}
 	
 		@Override
 		public Trade getTrade() {
-			// TODO Auto-generated method stub
+			
 			return trade;
 		}
 	
 		@Override
 		public void saveASNew(Trade trade) {
-			// TODO Auto-generated method stub
+			
 		 if(trade != null) {
 			out.jTextField5.setText(new Integer(trade.getId()).toString());
 			out.jTextField6.setText(trade.getStatus());
@@ -3100,7 +3053,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 	 
 		@Override
 		public void setUser(Users user1) {
-			// TODO Auto-generated method stub
+			
 			this.user = user1;
 			
 		}
@@ -3109,7 +3062,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 	    }
 		@Override
 		public String getAction() {
-			// TODO Auto-generated method stub
+			
 			String action = null;
 			if(out.jComboBox1.getSelectedIndex() == -1) {
 				return null;
@@ -3123,7 +3076,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 	
 		@Override
 		public void buildTrade(Trade trade, String actionType) {
-			// TODO Auto-generated method stub
+			
 			if(actionType.equalsIgnoreCase("NEW")) {
 				newTradeView();
 			} else {
@@ -3241,7 +3194,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				}
                    
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -3264,25 +3217,25 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 	
 		@Override
 		public void setPanelValue(CommonPanel tradeValue) {
-			// TODO Auto-generated method stub
+			
 			
 		}
 	
 		@Override
 		public void setTradePanelValue(CommonPanel tradeValue) {
-			// TODO Auto-generated method stub
+			
 			
 		}
 	
 		@Override
 		public Collection getCashFlows() {
-			// TODO Auto-generated method stub
+			
 			return null;
 		}
 	
 		@Override
 		public Pricer getPricer() {
-			// TODO Auto-generated method stub
+			
 			return null;
 		}
 		
@@ -3290,7 +3243,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		
 		
 		private void processTableData(Hashtable<String,String> attributes,DefaultTableModel model) {
-			// TODO Auto-generated method stub
+			
 	    	Vector vector;
 			try {
 				this.attributes.clearllCriteriaModel();
@@ -3333,7 +3286,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		    		} */
 		    		
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 	    }
@@ -3371,7 +3324,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 	
 		@Override
 		public void setFEESPanel(BackOfficePanel panel) {
-			// TODO Auto-generated method stub
+			
 			feesPanel = (FeesPanel) panel;
 			
 		}
@@ -3384,7 +3337,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				
 					panel.fillJTabel((Vector)remoteTask.selectTaskWhere("tradeId = " + trade.getId()));
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 			}
@@ -3392,18 +3345,18 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 	
 		@Override
 		public void setTradePostings(BackOfficePanel panel) {
-			// TODO Auto-generated method stub
+			
 			
 		}
 	
 		@Override
 		public void processTask(TaskEventProcessor taskEvent, Users WindowUser) {
-			// TODO Auto-generated method stub
+			
 			
 		}
 		@Override
 		public void setTradeTransfers(BackOfficePanel panel) {
-			// TODO Auto-generated method stub
+			
 			transferPanel = (TransferPanel) panel;
 		} 
 		public void getTradeTransfers(BackOfficePanel panel) {
@@ -3411,7 +3364,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				transferPanel.setTrade(trade);
 				panel.fillJTabel((Vector)remoteBO.queryWhere("Transfer", "tradeId = " + trade.getId()));
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -3526,7 +3479,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		    functionality.jPanel6.setVisible(false);
 		  //  functionality.jTabbedPane2.setVisible(false);
 		  //  functionality.jTabbedPane1.setVisible(true);
-		    fwdOp.startDate.setText(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
+		    fwdOp.startDate.setDate(commonUTIL.getCurrentDate());
 		    fwdOp.startDate.setEnabled(false);	
 		}
 		public int fillRollParitialOutRightTrade(Trade rolltrade,String type,int rollFROMID,boolean isParital,double rollAmt)  {
@@ -3586,14 +3539,14 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				    	newrolltrade.setYield((newrolltrade.getTradeAmount() *-1) * rollpanel.jTextField1.getDoubleValue());
 				    }
 					} catch (ParseException e1) {
-						// TODO Auto-generated catch block
+						
 						e1.printStackTrace();
 					}         // used as fwd amt for FXSWAP in FX
 				    newrolltrade.setEffectiveDate(rollpanel.jTextField0.getSelectedDateAsText());
 				    try {
 				    	newrolltrade.setSecondPrice(rollpanel.jTextField1.getDoubleValue());  // used as forward rate 
 					} catch (ParseException e) {
-						// TODO Auto-generated catch block
+						
 						e.printStackTrace();
 					}
 		    } 
@@ -3604,7 +3557,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				  try {
 					rollparitialtrade = (Trade) trade.clone();
 				} catch (CloneNotSupportedException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 				  rollparitialtrade.setId(0);
@@ -3642,7 +3595,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				  rollID=  remoteTrade.saveTrade(newrolltrade);
 				  
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 					return -1;
 				} 
@@ -3713,14 +3666,14 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 					    	newrolltrade.setYield((trade.getQuantity() *-1 *  rollpanel.jTextField1.getDoubleValue()) );
 					    }
 						} catch (ParseException e1) {
-							// TODO Auto-generated catch block
+							
 							e1.printStackTrace();
 						}         // used as fwd amt for FXSWAP in FX
 					    newrolltrade.setEffectiveDate(rollpanel.jTextField0.getSelectedDateAsText());
 					    try {
 					    	newrolltrade.setSecondPrice(rollpanel.jTextField1.getDoubleValue());  // used as forward rate 
 						} catch (ParseException e) {
-							// TODO Auto-generated catch block
+							
 							e.printStackTrace();
 						}
 			    } 
@@ -3730,7 +3683,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 					 
 					  rollID=  remoteTrade.saveTrade(newrolltrade);
 					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
+						
 						e.printStackTrace();
 						return -1;
 					}  
@@ -3806,34 +3759,30 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 					   
 			    
 				
-					  rollProduct = (Product) remoteProduct.selectProductOnType(productType, rollProductSubType);
-					  tradeSwap.setProductId(rollProduct.getId());
-					 
-					  rollID=  remoteTrade.saveTrade(tradeSwap);
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						return -1;
-					}  catch (ParseException e) {
-						e.printStackTrace();
-						return -1;
-					}
+					rollProduct = (Product) remoteProduct.selectProductOnType(productType, rollProductSubType);
+					tradeSwap.setProductId(rollProduct.getId());
+				 
+					rollID=  remoteTrade.saveTrade(tradeSwap);
+				} catch (RemoteException e) {
+					
+					e.printStackTrace();
+					return -1;
+				}  catch (ParseException e) {
+					e.printStackTrace();
+					return -1;
+				}
 			  
-			 return rollID;
-				  
+					return rollID;				  
 			    
 			} 
-		/// to remove the attribute we this methods. 
 		
+		/// to remove the attribute we this methods. 		
 		public void removeAttributeFromTrade(Trade trade) {
 			attributeDataValue.remove("rollOverTO");
 			attributeDataValue.remove("rollBackTo");
 			attributeDataValue.remove("FXccySplitID");
-			attributeDataValue.remove("SXccySplitID");
-			
-			
-		}
-		
+			attributeDataValue.remove("SXccySplitID");			
+		}		
 		
 		public void fillTrade(Trade trade,String type) {
 		//
@@ -3851,19 +3800,18 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				commonUTIL.showAlertMessage("Select ProductType");
 				return;
 			}
-			   try {
+			
+			try {
 				product = (Product) remoteProduct.selectProductOnType(productType, productSubType);
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
+			} catch (RemoteException e) {				
 				e.printStackTrace();
 			}    
-			   if(commonUTIL.isEmpty(basicData.book.getName()))
-				   return;
+			if(commonUTIL.isEmpty(basicData.book.getName()))
+			   return;
 			trade.setBookId(new Integer(basicData.book.getName()).intValue());
 			if(mirrorBook.getBookno()> 0) {
 			//	trade.setCpID(counterPartyID);
-				trade.setMirrorBookid(mirrorBook.getBookno());
-				
+				trade.setMirrorBookid(mirrorBook.getBookno());				
 			} else {
 				trade.setMirrorID(0);
 				if(commonUTIL.isEmpty(basicData.counterPary.getName().trim())) {
@@ -3871,11 +3819,11 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 					return;
 				}
 				if(commonUTIL.isEmpty(basicData.counterPary.getName()))
-					   return;
+					return;
 			trade.setCpID(new Integer(basicData.counterPary.getName()).intValue());
 			}
 			if(commonUTIL.isEmpty(basicData.jTextField7.getName()))
-				   return;
+				return;
 			trade.setTraderID(new Integer(basicData.jTextField7.getName()).intValue());
 			trade.setTradeDate(commonUTIL.getCurrentDateTime());
 		    trade.setDelivertyDate(out.outRightDate.getSelectedDateAsText());
@@ -3892,48 +3840,46 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		    trade.setAttributes(getAttributeValue());
 		    trade.setPrice(new Double(out.jTextField4.getText()).doubleValue());
 
-		     
-		   trade.setQuantity(new Double(out.jTextField1.getText()).doubleValue());  // amt1 (negotiated amt for negotiable curr) 
-		  	trade.setNominal(new Double(out.jTextField2.getText()).doubleValue());  // amt2  (negotiated amt for non-negotiable curr) nominal =  quantity * price
+		    // amt1 (negotiated amt for negotiable curr) 
+		    trade.setQuantity(new Double(out.jTextField1.getText()).doubleValue()); 
+		    // amt2  (negotiated amt for non-negotiable curr) nominal =  quantity * price
+		    trade.setNominal(new Double(out.jTextField2.getText()).doubleValue());  
 		    
 		    trade.setTradedesc1(product.getProductname());
-		    if(productSubType.equalsIgnoreCase("FXSWAP")) {
-				   
-				    double fwdAmt = 0.0;
-					try {
-						if(trade.getType().equalsIgnoreCase("BUY/SELL")) {
-							 trade.setTradeAmount(new Double(swap.jTextField1.getText()).doubleValue());   // used as quantity for FXSWAP in FX 
-						         fwdAmt = ((trade.getTradeAmount() * -1) * swap.jTextField4.getDoubleValue());
-						} else  {
-							 trade.setTradeAmount(new Double(swap.jTextField1.getText()).doubleValue());   // used as quantity for FXSWAP in FX 
-							fwdAmt = ((swap.jTextField1.getDoubleValue()) * swap.jTextField4.getDoubleValue());
-						}
-						  trade.setYield(swap.jTextField2.getDoubleValue());
-					} catch (ParseException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+		    if(productSubType.equalsIgnoreCase("FXSWAP")) {	    	
+		    	double fwdAmt = 0.0;
+				try {
+					if(trade.getType().equalsIgnoreCase("BUY/SELL")) {
+						 trade.setTradeAmount(new Double(swap.jTextField1.getText()).doubleValue());   // used as quantity for FXSWAP in FX 
+					         fwdAmt = ((trade.getTradeAmount() * -1) * swap.jTextField4.getDoubleValue());
+					} else  {
+						 trade.setTradeAmount(new Double(swap.jTextField1.getText()).doubleValue());   // used as quantity for FXSWAP in FX 
+						fwdAmt = ((swap.jTextField1.getDoubleValue()) * swap.jTextField4.getDoubleValue());
 					}
-				           // used as fwd amt for FXSWAP in FX
-				    trade.setEffectiveDate(swap.swapDate.getSelectedDateAsText());
-				    try {
-						trade.setSecondPrice(swap.jTextField4.getDoubleValue());  // used as forward rate 
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					  trade.setYield(swap.jTextField2.getDoubleValue());
+				} catch (ParseException e1) {					
+					e1.printStackTrace();
+				}
+			    
+				// used as fwd amt for FXSWAP in FX
+			    trade.setEffectiveDate(swap.swapDate.getSelectedDateAsText());
+			    try {
+					trade.setSecondPrice(swap.jTextField4.getDoubleValue());  // used as forward rate 
+				} catch (ParseException e) {						
+					e.printStackTrace();
+				}
+				
 		    } else {
 		    	trade.setTradeAmount(0);   // used as quantity 0 if not fxswap
 			    trade.setYield(0);         // used as fwd amt 0 if not fxswap
 			    trade.setEffectiveDate(trade.getDelivertyDate());
-		    }
+		    }		    
 		    
+		    //@yogesh 01/02/2015
 		    // for merchant float trade effective date is fwdOp.start da
-		    String instrumentType = trade.getAttributeValue("InstrumentType");
-			 
-			 if (instrumentType.equals("FCNR")) {
-				 
-				 trade.setEffectiveDate(fwdOp.startDate.getText().toString());
-				 
+		    String instrumentType = trade.getAttributeValue("InstrumentType");			 
+			 if (instrumenTypeVal.contains(instrumentType)) {				 
+				 trade.setEffectiveDate(commonUTIL.convertDateTOString(fwdOp.startDate.getDate()));				 
 			 } 
 		    
 		    trade.setProductId(product.getId());
@@ -3958,9 +3904,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				
 		    }
 		    isTradeProper = true;
-		   // trade.setVersionID(0);
-		    
-		    
+		   // trade.setVersionID(0);		    
 		}
 		
 		// this method is used to populate currencysplit data
@@ -3975,8 +3919,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 			if(trade == null) {
 				originaltrade = new Trade();
 				if(commonUTIL.isEmpty(basicData.book.getName()) || commonUTIL.isEmpty(basicData.currencyPair.getText()))
-				   return;
-				
+				   return;		
 				
 			    fillTrade(originaltrade,"NEW");
 			}	else {
@@ -3998,8 +3941,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 			double rate1 = 0;
 			double rate2 = 0;
 			double farrate1 =0;
-			double farrate2 = 0;
-			
+			double farrate2 = 0;			
 			
 				try {
 					if(!commonUTIL.isEmpty(functionality.jTextField2.getText()) && commonUTIL.isNumeric(functionality.jTextField2.getText()))
@@ -4010,20 +3952,18 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 						farrate1 = functionality.FarRate1.getDoubleValue();
 					if(!commonUTIL.isEmpty(functionality.FarRate2.getText()) && commonUTIL.isNumeric(functionality.FarRate2.getText()))
 						farrate2 = functionality.FarRate2.getDoubleValue();
-				
-					
-					
+		
 				 // Vector<Trade> rountingTrades =	FXSplitUtil.getRountingData(trade,remoteReference);
 					Vector<Trade> rountingTrades  =             functionality.getRoutingData();
 					if(commonUTIL.isEmpty(rountingTrades)) {
 						rountingTrades = FXSplitUtil.getRountingData(originaltrade,remoteReference,farrate1,farrate2);
 						if(!commonUTIL.isEmpty(rountingTrades) && rountingTrades.size() >0 ) {
 							if(trade == null || trade.getId() == 0) {
-								         if(rountingTrades.size() == 1) {
-								        	 FXSplitUtil.splitTrade(null, null, originaltrade, 0, 0,0,0);
-								         } else {
-						                    rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2,farrate1,farrate2);
-								         }
+						         if(rountingTrades.size() == 1) {
+						        	 FXSplitUtil.splitTrade(null, null, originaltrade, 0, 0,0,0);
+						         } else {
+				                    rountingTrades =     FXSplitUtil.splitTrade(rountingTrades.get(1), rountingTrades.get(3), originaltrade, rate1, rate2,farrate1,farrate2);
+						         }
 							} else  {
 								rountingTrades = FXSplitUtil.splitTrade(rountingTrades, rate1, rate2,farrate1,farrate2);
 							}
@@ -4048,7 +3988,6 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 					}
                //  functionality.setRoutingData(rounting);
 				//  fillTrade(trade,"NEW");
-				
 				 
 				  if(!commonUTIL.isEmpty(rountingTrades)) {
 						functionality.setRoutingData(rountingTrades);
@@ -4093,22 +4032,27 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 			
 			int atRows = attributes.jTable1.getRowCount();
 			for(int t=0;t <atRows; t++) {
-			 
-			  
-				   attributes.jTable1.setValueAt("", t, 1);
-			    
+				attributes.jTable1.setValueAt("", t, 1);
+			}
+			
+			//@yogesh 01/02/2015
+			// this has to be before setAttribute(trade.getAttributes());
+			if(trade.getTradedesc1().equalsIgnoreCase(FXFORWARDOPTION) && trade.getVersion() > 1) {
+				attributes.isfwOpTrade = true;
 			}
 			getDataFromTrade(trade.getBookId(),"Book");
-			
-			//always first setAttribute because in this method a hashtable is set with all attributes and ite values. This hastable is used to get 
+
+			//@yogesh
+			//always first setAttribute because in this method a hashtable is set 
+			//with all attributes and ite values. This hastable is used to get 
 			//values ahead.
 			setAttribute(trade.getAttributes());
 			  
 			if(trade.isMirrorTrade()) {
 				mirrorBook = getBook(trade.getMirrorBookid());
 				Book book = getBook(trade.getCpID());
-				 basicData.counterPary.setText(book.getBook_name());
-				   basicData.counterPary.setName(new Integer(book.getBookno()).toString());
+				basicData.counterPary.setText(book.getBook_name());
+				basicData.counterPary.setName(new Integer(book.getBookno()).toString());
 			} else {
 				getDataFromTrade(trade.getCpID(),"CounterParty");
 			}
@@ -4123,9 +4067,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 			productSubType = trade.getTradedesc1();
 		    trade.setStatus(out.jTextField6.getText());
 		    trade.setProductType(productType);
-		   
-		  
-		   
+
 		    out.jTextField4.setText(Double.toString(trade.getPrice()).toString());
 		    if(trade.getType().equalsIgnoreCase("BUY") || trade.getType().equalsIgnoreCase("BUY/SELL")) {
 		       out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(trade.getQuantity()).toString());
@@ -4153,7 +4095,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		    	try {
 					System.out.println(swap.jTextField4.getDoubleValue());
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 		    	swap.setVisible(true);
@@ -4171,7 +4113,9 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		    	
 		    	rollpanel.setVisible(false);
 		    	productSubType = "FXSWAP";
-		    }if(trade.getTradedesc1().equalsIgnoreCase(FXFORWARDOPTION)) {
+		    }
+		    
+		    if(trade.getTradedesc1().equalsIgnoreCase(FXFORWARDOPTION)) {
 		    	
 		    	swap.jTextField1.setText("0.0");
 				swap.jTextField2.setText("0.0");
@@ -4195,39 +4139,34 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				 // attributeDataValue is set in setAttributes method
 				 String instrumentType = trade.getAttributeValue("InstrumentType");
 				 
-				 if (instrumentType.equals("FCNR")) {
-					 
-					 fwdOp.startDate.setText(trade.getEffectiveDate());
-					 fwdOp.startDate.setEnabled(true);		
-					 
-				 } else {
-					 
-					 fwdOp.startDate.setText(
-								commonUTIL.separteDateTime(attributeDataValue.get("Trade Date")));
-					 
+				 //@ yogesh
+				 // fwdoption date shown
+				 if (instrumenTypeVal.contains(instrumentType)) {
+					 fwdOp.startDate.setEnabled(true);
+					 fwdOp.startDate.setEditable(false);
+					 fwdOp.startDate.setDate(commonUTIL.convertStringtoSQLDate(trade.getEffectiveDate()));									 				 
+				 } else {					 
+					 fwdOp.startDate.setDate(commonUTIL.convertStringtoSQLDate(attributeDataValue.get("Trade Date")));					 
 				 }
-				
-				 
+								 
 				 functionality.jButton0.setEnabled(true);
 				 fwdOp.primaryC.setValue(trade.getQuantity());
 				 fwdOp.quotingC.setValue(trade.getNominal());
 				 rollpanel.setVisible(false);
 				 productSubType = FXFORWARDOPTION;
-		    	 try {
-		    		
+		    	 try {		    		
 		    		childTrades 	= remoteTrade.getChildTrades(trade.getId());
 		    		Vector childes = (Vector) childTrades;
-		    		if(!childes.isEmpty())  {
-		    			 
-		    		setOutStandingBalONFwdOption(childes,trade);
-		    		
-		    		}
-		    		
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
+		    		if(!childes.isEmpty())  {		    			
+		    			setOutStandingBalONFwdOption(childes,trade);		    		
+		    		}		    		
+				} catch (RemoteException e) {					
 					e.printStackTrace();
 				}
-		    } if(trade.getTradedesc1().equalsIgnoreCase(FXFORWARD))  {
+				
+		    } 
+		    
+		    if(trade.getTradedesc1().equalsIgnoreCase(FXFORWARD))  {
 		    	
 		    	basicData.jRadioButton1.setSelected(true);
 		    	basicData.jRadioButton1.setEnabled(true);
@@ -4247,7 +4186,8 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		    	fwdOp.setVisible(false);
 		    	  rollpanel.setVisible(false);
 		    	//productSubType = "FXSWAP";
-		    }if(trade.getTradedesc1().equalsIgnoreCase(FXTAKEUP))  {
+		    }
+		    if(trade.getTradedesc1().equalsIgnoreCase(FXTAKEUP))  {
 		    	productSubType = FXTAKEUP;
 		    	basicData.jRadioButton1.setSelected(false);
 		    	basicData.jRadioButton1.setEnabled(false);
@@ -4271,8 +4211,6 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		    basicData.jRadioButton7.setEnabled(true);
 		    rollpanel.setVisible(false);
 		    setTrade(trade);
-		    
-		    
 		}
 		
 		private void getBooksOnPoDataCombo1(DefaultTableModel booktablemodel ,int poID) {
@@ -4302,10 +4240,8 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		    		}	    		
 		    		
 			}	*/
-		    	cloneBooks.clear();
-		    	cloneBooks = null;
-			
-			
+		    cloneBooks.clear();
+		    cloneBooks = null;			
 		}
 		
 		private void setOutStandingBalONFwdOption(Vector<Trade> childTrade,Trade trade) {
@@ -4332,40 +4268,36 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 				  }
 				fwdOp.primaryC.setValue(primaryCurrAmt);
 				fwdOp.quotingC.setValue(qoutCurrAmt);
-				}
-			
-			
+			}
 		}
 		private void setAttribute(String attributesV) {
 	    	String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
 	        
 	    //    DefaultTableModel attributeModel = new DefaultTableModel(attributeColumnName,0);
-	        
-	        
-	    		if(attributesV != null && attributesV.length() > 0) {
-	    		String atttoken [] = attributesV.trim().split(";"); 
-	    		
-	    		
-	    		for(int i =0;i<atttoken.length;i++) {
-	    				String att = (String) atttoken[i];
-	    				if(att.contains("=")) {
-	    						String attvalue = att.substring(att.indexOf('=')+1, att.length());
-	    						String attnameName = att.substring(0, att.indexOf('='));
-	    						int atRows = attributes.jTable1.getRowCount();
-	    						for(int t=0;t <atRows; t++) {
-	    									String atName = (String) attributes.jTable1.getModel().getValueAt(t,0);
-	    									if(atName.trim().equalsIgnoreCase(attnameName)) {
-	    										attributes.jTable1.setValueAt(attvalue, t, 1);
-	    										attributeDataValue.put(attnameName,attvalue);
-	    										
-	    										if(atName.trim().equalsIgnoreCase("Trade Date")){
-	    											
-	    											attributes.tradeAction = "open";
-	    										}
-	    									} 
-	    						}
-	    				}
-	    		}
+	    	
+	    	if(attributesV != null && attributesV.length() > 0) {
+	    	String atttoken [] = attributesV.trim().split(";"); 
+	
+    		for(int i =0;i<atttoken.length;i++) {
+    			String att = (String) atttoken[i];
+    			
+    			if(att.contains("=")) {
+					String attvalue = att.substring(att.indexOf('=')+1, att.length());
+					String attnameName = att.substring(0, att.indexOf('='));
+					int atRows = attributes.jTable1.getRowCount();
+					for(int t=0;t <atRows; t++) {
+						String atName = (String) attributes.jTable1.getModel().getValueAt(t,0);
+						if(atName.trim().equalsIgnoreCase(attnameName)) {
+							attributes.jTable1.setValueAt(attvalue, t, 1);
+							attributeDataValue.put(attnameName,attvalue);
+							
+							if(atName.trim().equalsIgnoreCase("Trade Date")){								
+								attributes.tradeAction = "open";
+							}
+						} 
+					}
+    				}
+    		}
 	    	//	attributes.jTable1.removeAll();
 	    	//	attributes.jTable1.setModel(attributeModel);
 	    		}
@@ -4449,23 +4381,18 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 		
 			try {
 			//	if(name.equalsIgnoreCase("Book")) {
-					Favorities fav = new Favorities();
-					fav.setType(name);
-					 
-					fav.setUserId(user.getId());
-				   Vector favData = 	(Vector) remoteReference.selectFavourites(fav);
-				   rows =  fillRows(favData);
+				Favorities fav = new Favorities();
+				fav.setType(name);
+				fav.setUserId(user.getId());
+				Vector favData = 	(Vector) remoteReference.selectFavourites(fav);
+				rows =  fillRows(favData);
 				//}
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-		
+			} catch (RemoteException e) {				
+				e.printStackTrace();		
 			}
 			return rows;
 		
 		}
-		
-		
 		
 		public Object [][] fillRows(Vector rows) {
 			int size = rows.size()%4;
@@ -4504,7 +4431,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 			 }
 			
 			private String getAttributeValue() {
-				// TODO Auto-generated method stub
+				
 				String attributesV  = "";
 				
 					/*Enumeration<String> keys =  attributeDataValue.keys();
@@ -4557,8 +4484,7 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 			}
 			
 	
-	class JTableButtonMouseListener implements MouseListener {
-		
+	class JTableButtonMouseListener implements MouseListener {		
 		
 		  private JTable __table;
 		  JTextField comp = null;
@@ -4606,8 +4532,8 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 			   
 			   
 		   } else {
-		  comp.setText(button.getText());
-		  comp.setName(button.getName());
+			  comp.setText(button.getText());
+			  comp.setName(button.getName());
 		   }
 		  if(label != null){
 			  label.setText(comp.getText().substring(0, 3)); // negiotated currency
@@ -4728,19 +4654,19 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 	
 	@Override
 	public void setTradeApplication(TradeApplication app) {
-		// TODO Auto-generated method stub
+		
 		this.app = app;
 	}
 		TradeApplication app = null;
 		@Override
 		public void setLimitPanel(BackOfficePanel panel) {
-			// TODO Auto-generated method stub
+			
 			
 		}
 	
 		@Override
 		public void setLimitBreachMarkOnAction(int i) {
-			// TODO Auto-generated method stub
+			
 			if(i < 0) {
 					int red = 240;
 					int green = 31;
@@ -4762,4 +4688,14 @@ functionality.jTextField2.addActionListener(new ActionListener() {
 			if(realTimeFlag == true) 
 				realTimeFlag = false;
 		}
+	//@yogesh 01/02/2015
+	// instrumentTypeVal
+	 private void getInstrumentVal() {
+        	Iterator it = instrumenTypeStartupData.iterator();
+        	
+        	while (it.hasNext()) {
+        		StartUPData data = (StartUPData)it.next();
+        		instrumenTypeVal.add(data.getName());
+        	}
+        }
 	}
