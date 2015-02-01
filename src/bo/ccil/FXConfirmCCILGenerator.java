@@ -2,6 +2,8 @@ package bo.ccil;
 
 import java.util.Vector;
 
+import constants.SDIConstants;
+
 import util.ReferenceDataCache;
 import util.commonUTIL;
 import beans.LeContacts;
@@ -59,7 +61,11 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
 	    LeContacts cptyMatchingContact = null;
 	    boolean isMatchingSystem = (matchingSystem != null);
 	 // Message Intitialization
-
+	    
+	    LeContacts cpDefaultContact =  ReferenceDataCache.getLEContact("CounterParty", null, trade.getCpID(),
+	    		trade.getProductType(), "Default"); 
+	    LeContacts poDefaultContact =  ReferenceDataCache.getLEContact("PO", null, poId,
+	    		trade.getProductType(), "Default");
        
 	    String ccilHeaderTag = poPerferedSdi.getAttributeValue("CCILTagCode");
 	    if(!commonUTIL.isEmpty(ccilHeaderTag))
@@ -107,10 +113,15 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
         field.setStatus((byte)'M');
         field.setTAG(":22:");
         field.setName("Common Reference");
-        String receiver = message.getReceiverAddressCode().substring(0,4);
+        String poBicCode = poDefaultContact.getSwift(); 
+        String cpBicCode = cpDefaultContact.getSwift();
         String location = ReferenceDataCache.getParty(trade.getCpID()).getAttributeValue("Location").substring(0, 2);
         String price = SwiftUtil.getRate(trade.getPrice());         
-        field.setValue(receiver+location+price);
+        field.setValue(
+        		poBicCode.substring(0, 4)+poBicCode.substring(6, 8)
+        		+price
+        		+cpBicCode.substring(0, 4)+cpBicCode.substring(6, 8)
+        		);
         fields.addElement(field);
         
     //Date Contract Agreed ?
@@ -136,27 +147,14 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
         field.setStatus((byte)'M');
         field.setTAG(":72:/");
         field.setName("Sender to Receiver Information");
-        
-        Sdi cpSDI = fxTransferRule.getSdi("CounterParty");
 		
-		Vector<LeContacts> cpContacts =  ReferenceDataCache.getLecContacts(cpSDI.getCpId()); 
-		Vector<LeContacts> poContacts =  ReferenceDataCache.getLecContacts(cpSDI.getPoId());
+		LeContacts cpCCILContact =  ReferenceDataCache.getLEContact("CounterParty", null, trade.getCpID(),
+		    		trade.getProductType(), "CCIL"); 
+		LeContacts poCCILContact =  ReferenceDataCache.getLEContact("PO", null, poId,
+		    		trade.getProductType(), "CCIL");
 		
-		String cpCCIL = "";
-		String poCCIL = "";
-		for (int ii=0; ii < cpContacts.size(); ii++) {
-			LeContacts contacts = (LeContacts) cpContacts.get(ii);
-			if (contacts.getContactCategory().equals("CCIL")) {
-				cpCCIL = contacts.getSwift();
-			}
-		}
-		
-		for (int ii=0; ii < poContacts.size(); ii++) {
-			LeContacts contacts = (LeContacts) poContacts.get(ii);
-			if (contacts.getContactCategory().equals("CCIL")) {
-				poCCIL = contacts.getSwift();
-			}
-		}
+		String cpCCIL = cpCCILContact.getSwift();
+		String poCCIL = poCCILContact.getSwift();
 		
         field.setValue(poCCIL+cpCCIL);
         fields.addElement(field);
@@ -187,6 +185,18 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
 	
 	//>>>>>>>>>>>>: 57A:
 	
+		 LeContacts payPoSWIFTContacts =  ReferenceDataCache.getLEContact("Agent", null, poPerferedSdi.getAgentId(),
+		    		trade.getProductType(), "Default");
+		 
+		 String  payPoSWIFT = payPoSWIFTContacts.getSwift();
+		 
+		field = new SwiftFieldMessage();
+		field.setStatus((byte) 'M');
+		field.setTAG(":57A:");
+		field.setName("Account with Institution");		
+		field.setValue(payPoSWIFT);
+		fields.addElement(field);
+
 	
 	//:33P:Value Date(8n)/Currency Code(3a)/Amount Bought(15 Number)
 		field = new SwiftFieldMessage();
@@ -305,16 +315,23 @@ public class FXConfirmCCILGenerator  extends SwiftGenerator {
             }
         }*/
 		
-        field = SwiftUtil.getTAG57(fxTransferRule,"PAY", trade,null,"Delivery Agent",true,message,transferRules,null);
-        if (field != null) fields.addElement(field);
-
+		
         //field = SwiftUtil.getTAG56(fxTransferRule,"PAY", trade,null,"Intermediary",false,message,transferRules,dsCon);
-       // if (field != null) fields.addElement(field);
-
-        field = SwiftUtil.getTAG57(fxTransferRule,"PAY", trade,null,"Receiving Agent",false,message,transferRules,null);
-        if (field != null) fields.addElement(field);
-
-        // Tag 58A should only be displayed if beneficiary is not counterparty
+       // if (field != null) fields.addElement(field); "PO|"+trade.getCurrency())
+		 Sdi recSdi = SDISelectorUtil.getPreferredSdiOnly("PO|"+trade.getTradedesc().substring(0, 3)
+				 +"|"+trade.getProductType()+
+				 "|"+po.getId());
+		 
+		 LeContacts recPoSWIFTContacts =  ReferenceDataCache.getLEContact("Agent", null, recSdi.getAgentId(),
+		    		trade.getProductType(), "Default");
+		 String  recPoSWIFT = recPoSWIFTContacts.getSwift();
+        
+		field = new SwiftFieldMessage();
+		field.setStatus((byte) 'M');
+		field.setTAG(":57A:");
+		field.setName("Account with Institution");		
+		field.setValue(recPoSWIFT);
+		fields.addElement(field);
 
         
 		   return swift;
