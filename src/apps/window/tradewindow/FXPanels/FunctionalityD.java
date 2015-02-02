@@ -222,21 +222,21 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	private NumericTextField getJTextField3() {
 		if (jTextField3 == null) {
 			jTextField3 = new NumericTextField(10,format);
-			jTextField3.setText("0");
+			jTextField3.setText("0.0");
 		}
 		return jTextField3;
 	}
 	private NumericTextField getJTextFieldFarRate1() {
 		if (FarRate1 == null) {
 			FarRate1 = new NumericTextField(10,format);
-			FarRate1.setText("01");
+			FarRate1.setText("0.0");
 		}
 		return FarRate1;
 	}
 	private NumericTextField getJTextFieldFarRate2() {
 		if (FarRate2 == null) {
 			FarRate2 = new NumericTextField(10,format);
-			FarRate2.setText("02");
+			FarRate2.setText("0.0");
 		}
 		return FarRate2;
 	}
@@ -273,7 +273,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	private NumericTextField getJTextField2() {
 		if (jTextField2 == null) {
 			jTextField2 =  new NumericTextField(10,format);
-			jTextField2.setText("0");
+		//	jTextField2.setText("0");
 		/*	jTextField2.addActionListener(new ActionListener() {
 				
 				@Override
@@ -407,8 +407,8 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 			jPanel2.add(getJTextFieldFarRate1(), new Constraints(new Leading(15, 68, 12, 12), new Leading(134, 10, 10))); 
 		//	jPanel2.add(getJCheckBox0(), new Constraints(new Leading(222, 31, 12, 12), new Leading(12, 12, 12))); 
 			
-		
-			jPanel2.setVisible(true);
+		//@ mpankaj
+			//jPanel2.setVisible(true);
 		}
 		//jPanel2.setVisible(false);
 		return jPanel2;

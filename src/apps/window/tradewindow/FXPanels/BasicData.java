@@ -1,8 +1,6 @@
 package apps.window.tradewindow.FXPanels;
 
 import java.awt.Color;
-import java.awt.event.InputMethodEvent;
-import java.awt.event.InputMethodListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
