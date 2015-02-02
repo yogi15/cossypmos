@@ -1,18 +1,16 @@
 package dbSQL;
 
-import java.rmi.RemoteException;
-import java.sql.ResultSet;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Vector;
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.rmi.RemoteException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Vector;
 
 import util.commonUTIL;
 public class ReportGenerator {
@@ -20,7 +18,7 @@ public class ReportGenerator {
 	final Vector<String> header = new Vector<String>();
 
 	final static transient SimpleDateFormat FORMAT =new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-
+	final static transient SimpleDateFormat FORMAT1 =new SimpleDateFormat("DD/MM/YYYY");
 	@SuppressWarnings("unchecked")
 	final Vector<Class> types = new Vector<Class>();
     
@@ -163,8 +161,15 @@ public class ReportGenerator {
 	                try {
 	                    // Sun Mar 13 19:00:00 CDT 2011
 	                    // EEE MMM dd HH:mm:ss z yyyy
-	                    final Date date = FORMAT.parse(rs.getString(i+1));
-	                    record.add(date); // order date
+	                  //  final Date date = FORMAT.parse(rs.getString(i+1));
+	                    if(header.get(i+1).equalsIgnoreCase("TradeDate")) {
+	                    	 final Date date = FORMAT.parse(rs.getString(i+1));
+	                    	 record.add(date); 
+	                    }  else {
+	                    	 final Date date = FORMAT1.parse(rs.getString(i+1));
+	                    	 record.add(date); 
+	                    }
+	                   // order date
 	                } catch (final ParseException e) {
 	                    e.printStackTrace();
 	                }
@@ -192,7 +197,9 @@ public class ReportGenerator {
 		            		 record.add(Integer.valueOf(rs.getString(i+1)));
 		
 		            } else {
-		            	record.add(rs.getString(i+1));
+		            	 if(header.get(i+1).equalsIgnoreCase("TradeDate")) {
+		            	            record.add(rs.getString(i+1));
+		            	 }
 		            }
  			
 	}
@@ -218,8 +225,13 @@ public class ReportGenerator {
 	                try {
 	                    // Sun Mar 13 19:00:00 CDT 2011
 	                    // EEE MMM dd HH:mm:ss z yyyy
-	                    final Date date = FORMAT.parse(rs.getString(i+1));
-	                    record.add(date); // order date
+	                	if(header.get(i+1).equalsIgnoreCase("TradeDate")) {
+	                    	 final Date date = FORMAT.parse(rs.getString(i+1));
+	                    	 record.add(date); 
+	                    }  else {
+	                    	 final Date date = FORMAT1.parse(rs.getString(i+1));
+	                    	 record.add(date); 
+	                    }	
 	                } catch (final ParseException e) {
 	                    e.printStackTrace();
 	                }
@@ -228,10 +240,13 @@ public class ReportGenerator {
 		
 		            } else if (classType.equals(double.class)
 		                || classType.equals(Double.class)) {
-		            	record.add(Double.valueOf(rs.getString(i+1)));
+		            //	System.out.println(rs.getDouble(i+1));
+		            
+		            	record.add(Double.valueOf(rs.getDouble(i+1)));
 		
 		            } else if (classType.equals(int.class)
 		                || classType.equals(Integer.class)) {
+		            	if(!commonUTIL.isEmpty(rs.getString(i+1)))
 		            	record.add(Integer.valueOf(rs.getString(i+1)));
 		
 		            } else if (classType.equals(Math.class)
@@ -247,15 +262,21 @@ public class ReportGenerator {
 		            		 record.add(Integer.valueOf(rs.getString(i+1)));
 		
 		            } else {
-		            	record.add(rs.getString(i+1));
+		            	record.add(rs.getString(i+1)); /// date Column 
 		            }
  			
 	}
 				tableData.add(record);
 				
 			}
-			
+		}catch (NullPointerException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("ReportImp", "processtableData" , e);
+		
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("ReportImp", "processtableData" , e);
+		}catch (Exception e) {
 			// TODO Auto-generated catch block
 			commonUTIL.displayError("ReportImp", "processtableData" , e);
 		}
