@@ -1356,6 +1356,7 @@ public class FilterValues {
 	public String changeColumnNameForNormalReport(String sqlW) {
 		
 		String sql = sqlW;
+		
 		Enumeration keys = replaceColumnNameOnSQL.keys();
 		while (keys.hasMoreElements()) {
 			String key = (String) keys.nextElement();
@@ -1366,7 +1367,29 @@ public class FilterValues {
 
 			}
 		}	
+		String sqlS = "select";
+		String columns = sql.substring(sql.indexOf("select")+6,sql.indexOf("from"));
+		String where = sql.substring(sql.indexOf("from"),sql.length());
+		String col [] = columns.split(",");
+		columns = "";
+		for(int i=0;i<col.length;i++) {
+			String colName = col[i];
+			if(colName.contains("tradeAttribute")) {
+				String attributeName  = colName.substring(colName.indexOf(".")+1, colName.length());
+				columns = columns + getAttributeFunction(attributeName) + " ,";
+			} else {
+				columns = columns + colName + ",";
+			}
+		}
+		columns = columns.substring(0, columns.length() -1);
+		sql  =  sqlS + columns + where;
 		return sql;
+	}
+	
+	
+	public String getAttributeFunction(String attributeName) {
+		String attributeFun = " getAttributeValueOnTrade(Trade.id,'"+	attributeName+"') "+attributeName;
+		return attributeFun;
 	}
 
 }
