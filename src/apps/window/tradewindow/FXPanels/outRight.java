@@ -29,7 +29,9 @@ public class outRight extends JPanel {
 	public JLabel jLabel4;
 	public JLabel jLabel5;
 	public JTextField jTextField5;
+	DecimalFormat format1 = new DecimalFormat("##,###,#######.######");
 	DecimalFormat format = new DecimalFormat("##,###,#######.##");
+	
 	public NumericTextField jTextField1;
 	public NumericTextField jTextField2;
 	public JLabel jLabel6;
@@ -154,8 +156,8 @@ public class outRight extends JPanel {
 
 	private JTextField getJTextField4() {
 		if (jTextField4 == null) {
-			jTextField4 = new  NumericTextField(10,format);
-		//	jTextField4.setText("jTextField0");
+			jTextField4 = new  NumericTextField(10,format1);
+		//	jTextField4.setText("4");
 			jTextField4.addActionListener(new java.awt.event.ActionListener() {
 			    public void actionPerformed(java.awt.event.ActionEvent e) {
 			    //	double dd = new Double(jTextField1.getText()).doubleValue();
@@ -194,7 +196,7 @@ public class outRight extends JPanel {
 	private JTextField getJTextField1() {
 		if (jTextField1 == null) {
 			jTextField1 = new NumericTextField(10,format);
-		//	jTextField1.setText("jTextField0");
+		//	jTextField1.setText("0");
 		}
 		return jTextField1;
 	}
@@ -202,7 +204,7 @@ public class outRight extends JPanel {
 	private JTextField getJTextField5() {
 		if (jTextField5 == null) {
 			jTextField5 = new JTextField();
-			jTextField5.setText("0");
+			//jTextField5.setText("5");
 		}
 		return jTextField5;
 	}
