@@ -126,7 +126,7 @@ public class FilterValues {
 		replaceColumnNameOnSQL.put("Transfer.TransferStatus","Transfer.Status");
 		replaceColumnNameOnSQL.put("trade.substr(trade.tradedesc,0,3)","substr(trade.tradedesc,0,3)");
 		replaceColumnNameOnSQL.put("trade.substr(trade.currencypair,5,6)","substr(trade.currencypair,5,6)");
-		
+		replaceColumnNameOnSQL.put("trunc(transfer.ValueDate)", "transfer.ValueDate");
 		
 		replaceColumnNameOnSQL
 				.put("Posting.CreditAccId",
@@ -198,7 +198,8 @@ public class FilterValues {
 		columnNames.put("TransferId", "ID");
 		columnNames.put("TransferType", "TransferType");
 		columnNames.put("TransferEventType", "EventType");
-		columnNames.put("TransferEventType", "EventType");
+		columnNames.put("TransferDate", "ValueDate");
+		columnNames.put("TransferMethodType", "Method");
 		columnNames.put("OpenpositionDate", "OpenpositionDate");
 		
 		numberDataTypes.put("Book", "Bookid");
