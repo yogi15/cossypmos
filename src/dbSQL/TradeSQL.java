@@ -52,7 +52,7 @@ public class TradeSQL {
 		  "SELECT id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,to_char(deliverydate, 'DD/MM/YYYY') ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc ,traderID,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased   FROM " + tableName + " where version >= 0 and ";
 	 
   final static private String SELECTOPEN = 
-	 "select id,tradedesc from trade where version >= 0 and productType ='" ;
+	 "select id,producttype,tradedesc1  from trade  " ;
   
   final static private String SELECTFTDSQL = 
 			 "select decode( t.currency,'INR','FCY/INR','FCY/FCY')currencyPair, "+
@@ -64,7 +64,7 @@ public class TradeSQL {
 			 " nvl((SUM(DECODE(t.tradedesc1, 'FXSWAP', quantity/2  ))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0) AS  FXSWAP , " +
 			 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),  1,quantity/2 ) ))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0) AS  SPOT, " +
 			 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),  2,quantity/2 ) ))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0) AS  FORWARD " +
-			 " from trade t,attribute  a where t.id = a.ID" +
+			 " from trade t,attribute  a where t.id = a.ID  " +
 			 " and trunc(t.tradedate) = to_date('24/01/2015','dd/mm/yyyy') and a.type = 'Trade'" +
 			 " and a.type = 'Trade'" +
 			 " group by t.currency,substr(t.type,0,3), t.tradedesc " +
@@ -88,7 +88,7 @@ public class TradeSQL {
 			 				 	  
 			 				 	   
  "     from  trade  where "+
- "       trunc(tradedate) = to_date('"+currentDate+"','dd/mm/yyyy')       and  parentid = 0   "+
+ "       trunc(tradedate) = to_date('"+currentDate+"','dd/mm/yyyy')    and  parentid = 0 "+
  "     group by "+
  "    (case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ), "+
  "     (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ), "+
@@ -1416,11 +1416,11 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
       return Trades;
 	}
 
-  public static Collection selectforOpen(String productType, Connection con ) {
+  public static Collection selectforOpen(String sqlWhere, Connection con ) {
 	   
 	      PreparedStatement stmt = null;
 	      Vector Trades = new Vector();
-	      String sql = SELECTOPEN + productType.toUpperCase().trim() +"' order by id desc" ;
+	      String sql = SELECTOPEN + sqlWhere +" order by id desc" ;
 	   try {
 	    con.setAutoCommit(false);
 	    
@@ -1434,7 +1434,8 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 	    	   trade.setId(rs.getInt(1));
 	           
 	          
-	           trade.setTradedesc(rs.getString(2));
+	           trade.setProductType(rs.getString(2));
+	           trade.setTradedesc1(rs.getString(3));
 	            Trades.add(trade);
 	       
 	       }
