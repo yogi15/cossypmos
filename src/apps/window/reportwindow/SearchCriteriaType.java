@@ -386,6 +386,18 @@ public abstract class SearchCriteriaType extends JPanel
     	 return bean;
      }
      
+     public FilterBean getTransferMethodType(String transferMethodType)  {
+    	 FilterBean bean = null;
+    	 if(!commonUTIL.isEmpty(transferMethodType)) {
+    		 bean = new FilterBean();
+ 			bean.setColumnName("TransferMethodType");
+ 		
+ 			bean.setSearchCriteria("in");
+ 			bean.setAnd_or("And");
+ 			
+ 		}
+    	 return bean;
+     }
      
      public FilterBean getBookName(int bookID)  {
          FilterBean bean = null;
