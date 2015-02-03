@@ -2,9 +2,7 @@ package apps.window.tradewindow;
 
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,10 +31,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
-import javax.swing.Box.Filler;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
@@ -47,34 +43,30 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
-import com.jidesoft.docking.DefaultDockableHolder;
-import com.jidesoft.docking.DockContext;
-import com.jidesoft.docking.DockableFrame;
-import com.jidesoft.icons.JideIconsFactory;
-
 import util.ClassInstantiateUtil;
 import util.commonUTIL;
 import apps.window.operationwindow.trialBalance.JTreeTable;
 import apps.window.operationwindow.trialBalance.TradeTreeView;
-import apps.window.tradewindow.BackOfficePanel;
-import apps.window.tradewindow.CommonPanel;
-import apps.window.tradewindow.TradePanel;
 import apps.window.tradewindow.cashflowpanel.CashFlowPanel;
 import apps.window.tradewindow.panelWindow.FeesPanel;
 import apps.window.tradewindow.panelWindow.LimitPanel;
 import apps.window.tradewindow.panelWindow.MessagePanel;
 import apps.window.tradewindow.panelWindow.PostingPanel;
-import apps.window.tradewindow.panelWindow.RollTradePanel;
 import apps.window.tradewindow.panelWindow.TaskPanel;
 import apps.window.tradewindow.panelWindow.TransferPanel;
 import apps.window.utilwindow.AuditTradeWindow;
 import apps.window.utilwindow.ButtonsIconsFactory;
-import apps.window.utilwindow.JDialogTable;
+import apps.window.utilwindow.openTradeDialog;
 import beans.Audit;
 import beans.Trade;
 import beans.Users;
 import bo.transfer.rule.ProductTransferRule;
-import dsEventProcessor.LimitEventProcessor;
+
+import com.jidesoft.docking.DefaultDockableHolder;
+import com.jidesoft.docking.DockContext;
+import com.jidesoft.docking.DockableFrame;
+import com.jidesoft.icons.JideIconsFactory;
+
 import dsEventProcessor.TaskEventProcessor;
 import dsManager.TaskManager;
 import dsServices.RemoteAccount;
@@ -159,9 +151,8 @@ public class TradeApplication extends DefaultDockableHolder {
 
 	};
 
-	final JDialogTable showAllTrades = new JDialogTable(tablemodel);
-
-	// new javax.swing.JPanel();
+//	final JDialogTable showAllTrades = new JDialogTable(tablemodel);
+      openTradeDialog  showAllTrades = null; // new javax.swing.JPanel();
 
 	public TradeApplication(String name, int tradeId, Users user) {
 		TradeApplication task = new TradeApplication(name, user);
@@ -264,6 +255,8 @@ public class TradeApplication extends DefaultDockableHolder {
 	//	setLayout(new GroupLayout());
 		toFront();
 		setVisible(true);
+		showAllTrades = new openTradeDialog(this,"SelectTrade",remoteTrade,remoteReference,boremote,remoteTask);
+		
 		showAllTrades.setLocationRelativeTo(this);
 	//	add(getJPanel0(), new Constraints(new Bilateral(6, 9, 978),
 			//	new Bilateral(8, 7, 10, 499)));
@@ -548,11 +541,11 @@ public class TradeApplication extends DefaultDockableHolder {
 		
 		opemAction.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String s[] = { "Tradeid", "ProductName" };
-				showAllTrades.jTable1.removeAll();
-				DefaultTableModel tablemodel = new DefaultTableModel(s, 0);
-				processTableDataOpen(tablemodel, getProductTypeName());
-				showAllTrades.jTable1.setModel(tablemodel);
+			//	String s[] = { "Tradeid", "ProductName" };
+			//	showAllTrades.jTable1.removeAll();
+			//	DefaultTableModel tablemodel = new DefaultTableModel(s, 0);
+			//	processTableDataOpen(tablemodel, getProductTypeName());
+			//	showAllTrades.jTable1.setModel(tablemodel);
 				showAllTrades.setVisible(true);
 
 			}
@@ -745,10 +738,10 @@ public class TradeApplication extends DefaultDockableHolder {
 		jButton5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String s[] = { "Tradeid", "ProductName" };
-				showAllTrades.jTable1.removeAll();
+				/*showAllTrades.jTable1.removeAll();
 				DefaultTableModel tablemodel = new DefaultTableModel(s, 0);
 				processTableDataOpen(tablemodel, getProductTypeName());
-				showAllTrades.jTable1.setModel(tablemodel);
+				showAllTrades.jTable1.setModel(tablemodel);*/
 				showAllTrades.setVisible(true);
 
 			}
@@ -1115,6 +1108,7 @@ public class TradeApplication extends DefaultDockableHolder {
 			remoteAccount = (RemoteAccount) de.getRMIService("Account");
 			remoteProduct = (RemoteProduct) de.getRMIService("Product");
 			remoteLimit = (RemoteLimit) de.getRMIService("Limit");
+			
 			// System.out.println(remoteTrade);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
