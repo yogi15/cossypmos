@@ -391,7 +391,7 @@ public abstract class SearchCriteriaType extends JPanel
     	 if(!commonUTIL.isEmpty(transferMethodType)) {
     		 bean = new FilterBean();
  			bean.setColumnName("TransferMethodType");
- 		
+ 			bean.setColumnValues(transferMethodType);
  			bean.setSearchCriteria("in");
  			bean.setAnd_or("And");
  			
