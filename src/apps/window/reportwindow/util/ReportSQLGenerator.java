@@ -198,14 +198,20 @@ public class ReportSQLGenerator {
 					sqlJoins = reportType + ".id = attribute.id ";
 	        } */
 		
+		//@ yogesh
+		// 04/02/2015
+		//where part was generating like transfer.is = trade.id. if is added to generate
+		// reportType + ".tradeid = trade.id
 		if ((tablename.contains("trade"))
 				&& (!reportType.equalsIgnoreCase("Trade"))) {
 			attachWhere = true;
 			if (sqlJoins.length() > 0)
 				sqlJoins = sqlJoins + " and " + reportType + ".id = trade.id ";
-			else
+			else if (!reportType.equalsIgnoreCase("Trade")) {
+				sqlJoins = reportType + ".tradeid = trade.id ";
+			} else {
 				sqlJoins = reportType + ".id = trade.id ";
-
+			}		
 		}
 		if (attachWhere)
 			return " where " + sqlJoins;
