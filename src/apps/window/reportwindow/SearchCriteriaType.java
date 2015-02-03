@@ -70,7 +70,17 @@ public abstract class SearchCriteriaType extends JPanel
 		}
     	 
      }
-     
+     public SearchCriteriaType(RemoteTrade remoteTrade,RemoteReferenceData remoteRef,RemoteBOProcess remoteBO,RemoteTask remoteTask) {
+    	
+ 		
+ 			this.remoteBORef =  remoteRef;
+ 			this.remoteTask = remoteTask;
+ 			this.remoteTrade =  remoteTrade;
+ 			this.remoteBo = remoteBO;
+ 			filterValues = new FilterValues(remoteBORef, remoteTrade,remoteTask, remoteBo);
+ 		
+    	 
+     }
      
      
      public MultiSelectListExComboBox getMultiSelectListExComboBox(String val [],final FilterBean filler ) {
@@ -284,6 +294,23 @@ public abstract class SearchCriteriaType extends JPanel
  			bean.setAnd_or("And");
     	 return bean;
      }
+     public FilterBean getProductSubType(MultiSelectListExComboBox values, String colName)  {
+    	 FilterBean  bean = new FilterBean();
+    	 String ss = "";
+    	 String idSelected ="";
+    	 int ids [] = values.getSelectedIndices();
+			Object obj[] = values.getSelectedObjects();
+			for (int i = 0; i < values.getSelectedObjects().length; i++) {
+				    ss = ss + (String) obj[i] + ",";
+				    idSelected = idSelected + ids[i] +",";
+			}
+			bean.setColumnName(colName);
+			bean.setColumnValues(ss.substring(0, ss.length()-1));
+			bean.setIdSelected(idSelected.substring(0, idSelected.length()-1));
+			bean.setSearchCriteria("in");
+ 			bean.setAnd_or("And");
+    	 return bean;
+     }
      public FilterBean getprimaryCurrency(String values, String colName)  {
     	 FilterBean  bean = new FilterBean();
     	 String ss = "";
@@ -367,7 +394,7 @@ public abstract class SearchCriteriaType extends JPanel
                         bean.setColumnName("Book");
                         bean.setSearchCriteria("in");
                         
-                        bean.setColumnValues(new Integer(getBookID(bookID)).toString());
+                        bean.setIdSelected(new Integer(getBookID(bookID)).toString());
                         bean.setAnd_or("And");
                 
                         
