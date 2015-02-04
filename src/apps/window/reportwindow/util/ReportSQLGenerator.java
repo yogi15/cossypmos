@@ -23,6 +23,7 @@ public class ReportSQLGenerator {
 	 tableNames.put("Cashposition", "Cashposition");
 	 tableNames.put("PNL", "Liquidpos");
 	 tableNames.put("Fees", "Fees");
+	 tableNames.put("TradeAttribute", "TradeAttribute");
 	 }
 	public String createBookProductSQL(String productType,
 			String productSubType, String bookid, String le, String traderID,
