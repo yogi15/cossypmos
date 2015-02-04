@@ -18,7 +18,7 @@ FTD SQL ****************************************************************
 				 	  
 				 	   
     from  trade  where 
-       trunc(tradedate) = to_date('26/01/2015','dd/mm/yyyy')    
+       trunc(tradedate) = to_date('26/01/2015','dd/mm/yyyy')    and parentid = 0 
     group by 
     (case  when substr(type,0,3) = 'BUY' then 'SALE'   else 'PURCHASE'    end ),
     (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ), 
