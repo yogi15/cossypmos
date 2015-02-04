@@ -778,13 +778,15 @@ import dsServices.ServerConnectionUtil;
 			public void actionPerformed(ActionEvent arg0) {
 				
 								setRoutingDataCal();
+								populateRountingData();
 			}
     	});
-	  functionality.FarRate1.addActionListener(new ActionListener() {		
+	  functionality.FarRate2.addActionListener(new ActionListener() {		
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
 				setRoutingDataCal();
+				populateRountingData();
 			}
 	  });
   
@@ -792,6 +794,7 @@ import dsServices.ServerConnectionUtil;
 	  		@Override		        
 		  	public void keyTyped(KeyEvent e) {
 		  		if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+		  			populateRountingData();
 		  		}
 		  	}
 	  });
@@ -804,6 +807,8 @@ import dsServices.ServerConnectionUtil;
 			
 			
 			setRoutingDataCal();
+			populateRountingData();
+			
 		/*	try {
 				double rate1 = 0.0 ;
 				double rate2 = 0.0 ;	
@@ -861,6 +866,7 @@ import dsServices.ServerConnectionUtil;
 		public void actionPerformed(ActionEvent arg0) {
 			
 		setRoutingDataCal();
+		populateRountingData();
 		/*try {
 			double rate1 = 0.0 ;
 			double rate2 = 0.0 ;	
@@ -1387,6 +1393,7 @@ import dsServices.ServerConnectionUtil;
 							populateRountingData();
 						
 						functionality.jLabel3.setText(sconfig.getSecondCurrencySPlit());
+						 functionality. jTabbedPane2.setVisible(true);
 						
 						 } else {
 							 
@@ -1394,6 +1401,7 @@ import dsServices.ServerConnectionUtil;
 							 showAlertMessage("Currency split config for selected Currency Pair and Book not found.");
 							 out.jCheckBox2.setSelected(false);
 							 functionality.jPanel2.setVisible(false);
+							
 						 }
 					} catch (RemoteException e1) {
 						
@@ -2207,6 +2215,33 @@ import dsServices.ServerConnectionUtil;
 									swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot).toString());
 					    		 
 					    	 }
+		                    	String type = basicData.buysell.getText();
+		                    	if(type.equalsIgnoreCase("SELL/BUY")) {
+		                    		type = "SELL";
+		                    	}
+		                    	if(type.equalsIgnoreCase("BUY/SELL")) {
+		                    		type = "BUY";
+		                    	}
+		                    	if(type.equalsIgnoreCase("SELL")) {
+									
+									double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+									amt1 = Math.abs(amt1) * -1;
+									double spot = (new Double(out.jTextField4.getText()).doubleValue());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+									double amt2 = Math.abs(amt1);								
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot).toString());
+									
+					    	 } else {
+					    		 
+					    		 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+									amt1 = Math.abs(amt1) ;
+									double spot = (new Double(out.jTextField4.getText()).doubleValue());
+									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
+									double amt2 = Math.abs(amt1) * -1;								
+									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot));
+					    		 
+					    	 }
+		                    	populateRountingData();
 		                    	 }catch(NumberFormatException e1) {
 			                    		commonUTIL.showAlertMessage("Enter Number ");
 			                    	}
@@ -2247,6 +2282,7 @@ import dsServices.ServerConnectionUtil;
 									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot));
 					    		 
 					    	 }
+		                    	populateRountingData();
 		                    }catch(NumberFormatException e1) {
 	                    		commonUTIL.showAlertMessage("Enter Number ");
 	                    	}
@@ -3518,7 +3554,7 @@ import dsServices.ServerConnectionUtil;
 		  //  functionality.jTabbedPane1.setVisible(true);
 		    fwdOp.startDate.setDate(commonUTIL.getCurrentDate());
 		    fwdOp.startDate.setEnabled(false);	
-		 // mpankaj 02/02
+		 // mpankaj 02/02functionality.jPanel2.jTextField2
 			 functionality.jPanel2.setVisible(false);
 			 out.jCheckBox2.setSelected(false);
 			 
