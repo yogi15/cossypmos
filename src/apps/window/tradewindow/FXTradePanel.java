@@ -866,7 +866,6 @@ import dsServices.ServerConnectionUtil;
 		public void actionPerformed(ActionEvent arg0) {
 			
 		setRoutingDataCal();
-		populateRountingData();
 		/*try {
 			double rate1 = 0.0 ;
 			double rate2 = 0.0 ;	
@@ -1139,6 +1138,82 @@ import dsServices.ServerConnectionUtil;
 			}				
 		}
 	 });
+	 
+	 takeupW.jButton0.addMouseListener(new java.awt.event.MouseAdapter() {
+		 
+		 @Override
+		public void mouseClicked(MouseEvent e) {
+			 
+			 double amt1;
+			 double amt2;
+			 
+			try {
+				
+				amt1 = takeupW.jTextField1.getDoubleValue();
+				amt2 = takeupW.jTextField3.getDoubleValue();
+								
+				if(amt1 == 0 || amt2 ==0 ) {
+					commonUTIL.showAlertMessage("Takeup Quoting/Primary Amount is Zero");
+					return;
+				}
+				
+				if (null == takeupW.jTextField5.getDate()) {
+					commonUTIL.showAlertMessage("Please select TakeUp Trade Date");
+					return;
+				}
+				
+				if (null == takeupW.jTextField6.getDate()) {
+					commonUTIL.showAlertMessage("Please select TakeUp Settle Date");
+					return;
+				}
+				
+				int selectRow = takeupW.jTable0.getSelectedRow();
+				
+				Trade tradeTakeUpSelected =takeupW.tableData.get(selectRow);
+				tradeTakeUpSelected.setQuantity(amt1);
+				tradeTakeUpSelected.setNominal(amt2);
+				tradeTakeUpSelected.setTradeDate(commonUTIL.convertDateTOString(takeupW.jTextField5.getDate()));
+				tradeTakeUpSelected.setDelivertyDate(commonUTIL.convertDateTOString(takeupW.jTextField6.getDate()));
+				
+				Vector<String> message = new Vector<String>();
+                
+				Vector tradestatus = null;
+	                
+				tradestatus	 = 	remoteTrade.saveTrade(tradeTakeUpSelected, message);
+				
+				try {
+			       	
+					if(commonUTIL.isEmpty(tradestatus)) {
+			       		commonUTIL.showAlertMessage("Error in ServerSide in saving Trade");
+			       		return;
+			       	 }
+			       	 String statusT = (String) tradestatus.elementAt(0);
+			       	 int i = ((Integer) tradestatus.elementAt(1)).intValue();
+			       	 if(i == -10) {
+			       		commonUTIL.showAlertMessage((statusT));
+						return;
+					 
+			       	 }
+			       	 if(i == -4) {
+			 			commonUTIL.showAlertMessage((statusT));
+			    			return;
+			    		 }
+			       	 if(i == -3) {
+			    			commonUTIL.showAlertMessage((statusT));
+			    			return;
+			    		 }
+			       	 if(i > 0) 
+			       		commonUTIL.showAlertMessage((statusT));
+							
+				} catch (Exception e2) {				
+					e2.printStackTrace();
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		 }
+		 
+	 });
        // }
 	// functionality.j
 	 
@@ -1206,13 +1281,26 @@ import dsServices.ServerConnectionUtil;
 		    	}
 			}
 			
+			 //@yogesh 04/02/2014
+			  // check if split rates are filled if split rate checkbox is checked
+			if(!checkRates()){
+				return;
+			}
+			
 		    if(validdateALLFields("NEW")) {
 		    	trade = new Trade();
 		    	mirrorBook.setBookno(0);
 		    	
 		    	removeAttributeFromTrade(trade);
 	            fillTrade(trade,"NEW");
-	             
+	            
+	            //@yogesh 04/02/2014
+	            // check if instrumentType is selected for every Trade
+	  		  	// checks if tradeDate is less then delivery date
+	            if (!checktradeDetails(trade)){
+	            	return;
+	            }
+	            
 		    	int isHoliday = 0;
 				try {					
 					isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(0, 3), 
@@ -2572,13 +2660,27 @@ import dsServices.ServerConnectionUtil;
 							    		commonUTIL.showAlertMessage("Option End date cannot be after Trade end date");
 							    		return;	
 							    	}
+							    								    	
 								}
 								
-								fillTrade(trade,"NEW");
+								 //@yogesh 04/02/2014
+								  // check if split rates are filled if split rate checkbox is checked
+								if(!checkRates()){
+									return;
+								}
+								
+								fillTrade(trade,"NEW");												
 								
 								int isHoliday = 0;
 								try {
 									
+									//@yogesh 04/02/2014
+						            // check if instrumentType is selected for every Trade
+						  		  	// checks if tradeDate is less then delivery date
+						            if (!checktradeDetails(trade)){
+						            	return;
+						            }
+						            
 									isHoliday = remoteReference.checkHolidayOrWeekend((String)trade.getTradedesc().substring(0, 3), 
 											trade.getDelivertyDate());
 									
@@ -3497,7 +3599,7 @@ import dsServices.ServerConnectionUtil;
 	        basicData.jRadioButton0.setEnabled(false);
 	        basicData.jRadioButton1.setSelected(true);
 	        if(productSubType.equalsIgnoreCase(FXFORWARD)) {
-				basicData.jRadioButton1.setSelected(true);
+				//basicData.jRadioButton1.setSelected(true);
 				basicData.jRadioButton2.setSelected(false);
 				basicData.jRadioButton5.setSelected(false);
 				basicData.jRadioButton0.setSelected(false);
@@ -3506,9 +3608,9 @@ import dsServices.ServerConnectionUtil;
 				basicData.buysell.setText("BUY");
 			}
 			if(productSubType.equalsIgnoreCase(FXSWAP)) {
-				basicData.jRadioButton2.setSelected(true);
+				basicData.jRadioButton2.setSelected(false);
 				basicData.jRadioButton5.setSelected(false);
-				basicData.jRadioButton1.setSelected(false);
+				//basicData.jRadioButton1.setSelected(false);
 				basicData.jRadioButton0.setSelected(false);
 				functionality.jButton2.setEnabled(true);
 				functionality.jButton3.setEnabled(true);
@@ -3516,9 +3618,9 @@ import dsServices.ServerConnectionUtil;
 				
 			}
 			if(productSubType.equalsIgnoreCase(FXFORWARDOPTION)) {
-				basicData.jRadioButton5.setSelected(true);
+				basicData.jRadioButton5.setSelected(false);
 				basicData.jRadioButton2.setSelected(false);
-				basicData.jRadioButton1.setSelected(false);
+				//basicData.jRadioButton1.setSelected(false);
 				basicData.jRadioButton0.setSelected(false);
 				functionality.jButton2.setEnabled(false);
 				functionality.jButton3.setEnabled(false);
@@ -3527,10 +3629,10 @@ import dsServices.ServerConnectionUtil;
 				fwdOp.quotingC.setText("0");
 			}
 			if(productSubType.equalsIgnoreCase(FXTAKEUP)) {
-				basicData.jRadioButton0.setSelected(true);
+				//basicData.jRadioButton0.setSelected(true);
 				basicData.jRadioButton5.setSelected(false);
 				basicData.jRadioButton2.setSelected(false);
-				basicData.jRadioButton1.setSelected(false);
+				//basicData.jRadioButton1.setSelected(false);
 				functionality.jButton2.setEnabled(false);
 				functionality.jButton3.setEnabled(false);
 				//basicData.buysell.setText("BUY");
@@ -4115,7 +4217,20 @@ import dsServices.ServerConnectionUtil;
 			//@yogesh 01/02/2015
 			// this has to be before setAttribute(trade.getAttributes());
 			if(trade.getTradedesc1().equalsIgnoreCase(FXFORWARDOPTION) && trade.getVersion() > 1) {
-				attributes.isfwOpTrade = true;
+				
+				//@yogesh 04/02/2015
+				// checks if trade has take ups. if yes then disable InstrumentType attribute
+				Collection<Attribute> list = new Vector<Attribute>();
+				try {
+					list = remoteReference.selectWhereAttribute("attributename like 'ParentID' and attributevalue =" + trade.getId());
+				} catch (RemoteException e) {				
+					e.printStackTrace();
+				}
+				//disable InstrumentType attribute
+				if (list.size() > 0) {
+					attributes.isfwOpTrade = true;
+				}
+				
 			}
 			getDataFromTrade(trade.getBookId(),"Book");
 
@@ -4202,7 +4317,9 @@ import dsServices.ServerConnectionUtil;
 		    	fwdOp.setVisible(true);
 		    	basicData.jRadioButton2.setEnabled(false);
 		    	basicData.jRadioButton5.setSelected(true);
+		    	basicData.jRadioButton5.setEnabled(true);
 		    	basicData.jRadioButton1.setEnabled(false);
+		    	basicData.jRadioButton1.setSelected(false);
 		    	basicData.jRadioButton0.setEnabled(false);
 		    	basicData.jRadioButton0.setSelected(false);
 		    	basicData.jRadioButton6.setSelected(false);
@@ -4210,22 +4327,26 @@ import dsServices.ServerConnectionUtil;
 		    	functionality.jButton2.setSelected(false);
 		    	functionality.jButton3.setSelected(false);
 		    	String currP = trade.getTradedesc();
-		    	 fwdOp.jLabel2.setText(currP.substring(0, 3));
-				 fwdOp.jLabel3.setText(currP.substring(4, 7));
-				 fwdOp.startDate.setEnabled(false);	
+		    	fwdOp.jLabel2.setText(currP.substring(0, 3));
+				fwdOp.jLabel3.setText(currP.substring(4, 7));
+				fwdOp.startDate.setEnabled(false);	
 				 // attributeDataValue is set in setAttributes method
 				 String instrumentType = trade.getAttributeValue("InstrumentType");
 				 
-				 //@ yogesh
+				 //@ yogesh 01/02/2015
 				 // fwdoption date shown
-				 if (instrumenTypeVal.contains(instrumentType)) {
+				 /*if (instrumenTypeVal.contains(instrumentType)) {
 					 fwdOp.startDate.setEnabled(true);
 					 fwdOp.startDate.setEditable(false);
 					 fwdOp.startDate.setDate(commonUTIL.convertStringtoSQLDate(trade.getEffectiveDate()));									 				 
 				 } else {					 
 					 fwdOp.startDate.setDate(commonUTIL.convertStringtoSQLDate(attributeDataValue.get("Trade Date")));					 
-				 }
-								 
+				 }*/
+				 
+				//@ yogesh 01/02/2015
+				 // fwdoption date shown
+				 fwdOp.startDate.setDate(commonUTIL.convertStringtoSQLDate(trade.getEffectiveDate()));	
+				 
 				 functionality.jButton0.setEnabled(true);
 				 fwdOp.primaryC.setValue(trade.getQuantity());
 				 fwdOp.quotingC.setValue(trade.getNominal());
@@ -4252,10 +4373,11 @@ import dsServices.ServerConnectionUtil;
 				swap.jTextField2.setText("0.0");
 				swap.jTextField4.setText("0.0");
 				swap.setVisible(false);
+				
 		    	basicData.jRadioButton5.setEnabled(false);
 		    	basicData.jRadioButton2.setEnabled(false);
 		    	basicData.jRadioButton2.setSelected(false);
-		    	basicData.jRadioButton5.setEnabled(false);
+		    	basicData.jRadioButton5.setSelected(false);
 		    	basicData.jRadioButton0.setEnabled(false);
 		    	basicData.jRadioButton0.setSelected(false);
 		    	basicData.jRadioButton6.setSelected(false);
@@ -4626,21 +4748,27 @@ import dsServices.ServerConnectionUtil;
 							//out.jCheckBox2.setSelected(true);
 							out.jCheckBox2.setEnabled(true);
 							if(trade == null || trade.getId() == 0) 
-							     functionality.clearRounting();
-								sconfig =  (CurrencySplitConfig)vector.elementAt(0);
-								functionality.jLabel2.setText(sconfig.getFirstCurrencySplit());
-								populateRountingData();
-								functionality.jLabel3.setText(sconfig.getSecondCurrencySPlit());
-							} else {
-								out.jCheckBox2.setSelected(false);
-								out.jCheckBox2.setEnabled(false);
-								 functionality.clearRounting();
-								 functionality.jPanel2.setVisible(false);
-							}
+							    functionality.clearRounting();
+							sconfig =  (CurrencySplitConfig)vector.elementAt(0);
+							functionality.jLabel2.setText(sconfig.getFirstCurrencySplit());
+							populateRountingData();
+							functionality.jLabel3.setText(sconfig.getSecondCurrencySPlit());
+							// functionality.jButton8.setEnabled(true);
+							 // mpankaj 02/02
+							
+							// @ yogesh 04/02/2105
+							// split currency panel is made visible if split currency chechbox is set selected above
+							// and if a split currency config is found for book and currency 
+							functionality.jPanel2.setVisible(true);
+						} else {
+							out.jCheckBox2.setSelected(false);
+							out.jCheckBox2.setEnabled(false);
+							functionality.clearRounting();
+							functionality.jPanel2.setVisible(false);
+						}
 						  
-						} catch (NumberFormatException | RemoteException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						} catch (NumberFormatException | RemoteException e1) {							
+							e1.printStackTrace();
 						}
 				  	}
 					
@@ -4841,4 +4969,62 @@ import dsServices.ServerConnectionUtil;
         		instrumenTypeVal.add(data.getName());
         	}
         }
+	 
+	 	   //@yogesh 04/02/2014
+		  // check if split rates are filled if split rate checkbox is checked
+		  private boolean checkRates() {		  
+				boolean ratesOk = true;
+						 
+				if (out.jCheckBox2.isSelected()) {
+					String splitBaseNearRate = functionality.jTextField2.getText().toString();
+					String splitQuoteNearRate = functionality.jTextField3.getText().toString();
+					
+					if (splitBaseNearRate.equals("") || splitBaseNearRate.equals("0.0") ) {
+						commonUTIL.showAlertMessage("Please enter Split Base Near Rate");
+						ratesOk =false;	
+					} else if (splitQuoteNearRate.equals("") || splitQuoteNearRate.equals("0.0") ) {
+						commonUTIL.showAlertMessage("Please enter Split Quote Near Rate");
+						ratesOk =false;	
+					} 
+					
+					if (basicData.jRadioButton2.isSelected()) {					
+						String splitBaseFarRate = functionality.FarRate1.getText().toString();
+						String splitQuoteFarRate = functionality.FarRate2.getText().toString();					
+						
+						if (splitBaseFarRate.equals("") || splitBaseFarRate.equals("0.0") ) {
+							commonUTIL.showAlertMessage("Please enter Split Base Far Rate");
+							ratesOk =false;	
+						} else if (splitQuoteFarRate.equals("") || splitQuoteFarRate.equals("0.0") ) {
+							commonUTIL.showAlertMessage("Please enter Split Quote Far Rate");
+							ratesOk =false;	
+						}
+					}
+				}
+				
+				
+	           
+	            
+				return ratesOk;
+		  }
+		  
+		//@yogesh 04/02/2014
+          // check if instrumentType is selected for every Trade
+		  // checks if tradeDate is less then delivery date
+		  private boolean checktradeDetails(Trade trade) {
+			  boolean isTradeOk = true;
+			  
+			  if (trade.getAttributeValue("InstrumentType").equals("")) {
+	            	commonUTIL.showAlertMessage("PleaseSelect Instrument Type");
+	            	isTradeOk = false;	
+	            }
+	            
+	            
+	            if ( (commonUTIL.stringToDate(trade.getAttributeValue("Trade Date"), true)).after( 
+	            		 commonUTIL.stringToDate(trade.getDelivertyDate(), true)) ) {	            	 	
+	            	 commonUTIL.showAlertMessage("Trade Date cannot be greater than Delivery Date");
+	            	 isTradeOk = false;		            	 
+	             }
+	            
+	            return isTradeOk;
+		  }
 	}
