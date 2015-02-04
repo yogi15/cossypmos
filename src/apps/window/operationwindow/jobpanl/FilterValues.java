@@ -1369,6 +1369,7 @@ public class FilterValues {
 			}
 		}	
 		String sqlS = "select";
+		//if()
 		String columns = sql.substring(sql.indexOf("select")+6,sql.indexOf("from"));
 		String where = sql.substring(sql.indexOf("from"),sql.length());
 		String col [] = columns.split(",");
