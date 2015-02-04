@@ -476,18 +476,24 @@ public abstract class SearchCriteriaType extends JPanel
  	}
      public int getCPid(int idSelected) {
  		LegalEntity le = (LegalEntity)  counterPartyID.get(idSelected);
+ 		if(le == null)
+ 			return 0;
  		return le.getId();
  		
  	}
  	
      public int getPOid(int idSelected) {
   		LegalEntity le = (LegalEntity)  poID.get(idSelected);
+  		if (le == null)
+  			return 0;
   		return le.getId();
   		
   	}
      
      public int getAgentid(int idSelected) {
   		LegalEntity le = (LegalEntity)  agentID.get(idSelected);
+  		if (le == null)
+  			return 0;
   		return le.getId();
   		
   	}
