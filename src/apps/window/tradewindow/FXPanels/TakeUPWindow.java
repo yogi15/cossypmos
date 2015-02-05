@@ -3,12 +3,10 @@ package apps.window.tradewindow.FXPanels;
 import java.rmi.RemoteException;
 import java.text.DecimalFormat;
 import java.util.Collection;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -27,12 +25,10 @@ import org.dyno.visual.swing.layouts.Leading;
 import util.NumericTextField;
 import util.RemoteServiceUtil;
 import util.commonUTIL;
-import beans.LegalEntity;
 import beans.StartUPData;
 import beans.Trade;
 
 import com.jidesoft.combobox.DateComboBox;
-import com.standbysoft.component.date.swing.JDatePicker;
 
 import dsServices.RemoteReferenceData;
 
@@ -306,8 +302,6 @@ public TakeUPWindow() {
 			jPanel0.add(getJLabel11(), new Constraints(new Leading(317, 12, 12), new Leading(69, 23, 12, 12)));
 			jPanel0.add(getJTextField2(), new Constraints(new Leading(374, 154, 10, 10), new Leading(14, 30, 12, 12)));
 			jPanel0.add(getJTextField3(), new Constraints(new Leading(374, 154, 12, 12), new Leading(62, 30, 12, 12)));
-			jPanel0.add(getJButton0(), new Constraints(new Leading(285, 10, 10), new Leading(146, 12, 12)));
-			jPanel0.add(getJButton1(), new Constraints(new Leading(367, 62, 10, 10), new Leading(146, 12, 12)));
 			jPanel0.add(getJScrollPane0(), new Constraints(new Leading(6, 955, 10, 10), new Leading(183, 229, 10, 10)));
 			jPanel0.add(getJLabel13(), new Constraints(new Leading(12, 12, 12), new Leading(107, 23, 12, 12)));
 			jPanel0.add(getJLabel14(), new Constraints(new Leading(311, 62, 10, 10), new Leading(107, 23, 12, 12)));
@@ -317,8 +311,9 @@ public TakeUPWindow() {
 			jPanel0.add(getJTextField7(), new Constraints(new Leading(681, 156, 12, 12), new Leading(62, 30, 12, 12)));
 			jPanel0.add(getJLabel3(), new Constraints(new Leading(540, 68, 10, 10), new Leading(116, 12, 12)));
 			jPanel0.add(getJTextField5(), new Constraints(new Leading(155, 150, 12, 12), new Leading(106, 24, 12, 12)));
-			jPanel0.add(getJTextField6(), new Constraints(new Leading(377, 148, 12, 12), new Leading(107, 23, 12, 12)));
+			jPanel0.add(getJTextField6(), new Constraints(new Leading(377, 148, 12, 12), new Leading(107, 12, 12)));
 			jPanel0.add(getTypeComboBox(), new Constraints(new Leading(685, 119, 10, 10), new Leading(110, 24, 12, 12)));
+			jPanel0.add(getJButton0(), new Constraints(new Leading(379, 95, 10, 10), new Leading(144, 10, 10)));
 		}
 		return jPanel0;
 	}
