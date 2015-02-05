@@ -3,13 +3,15 @@
 
 FTD SQL ****************************************************************
 
- select 
+
+
+select 
  (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'    else 'FCY/FCY'    end )  FCY_NONFCY, 
  (case  when currency = 'INR' then 'INR'    else 'USD'    end )  Currency, 
  (case  when substr(type,0,3) = 'BUY' then 'SALE'   else 'PURCHASE'    end ) BUYSELL,
-  nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id),'MerchantReady',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantReady,
- nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id),'MerchantForward',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantForward,
- nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id),'MerchantCancellationA',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantCancellationA,
+  nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id,'InstrumentType'),'MerchantReady',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantReady,
+ nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id,'InstrumentType'),'MerchantForward',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantForward,
+ nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id,'InstrumentType'),'MerchantCancellationA',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantCancellationA,
 
  nvl(sum(decode(tradedesc1,'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),1,decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) FXSPOT,
  nvl(sum(decode(tradedesc1,'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),2,decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) FORWARD,
@@ -28,9 +30,13 @@ FTD SQL ****************************************************************
    (case  when currency = 'INR' then 'INR'  else 'USD'  end )
 
 
+
+
+
+
 **********************************************************************************************
 CREATE OR REPLACE Function getFXForwardOptionType
-   ( tradeid IN number) 
+   ( tradeid IN number,attributename in varchar2) 
 
    RETURN varchar2
 IS
@@ -39,7 +45,7 @@ IS
    CURSOR c1
    IS
      SELECT attributeValue
-     FROM  attribute where id = tradeID and attributename =  'InstrumentType' and type = 'Trade';
+     FROM  attribute where id = tradeID and attributename = attributename and type = 'Trade';
 
 BEGIN
 
