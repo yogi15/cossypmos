@@ -722,6 +722,8 @@ import dsServices.ServerConnectionUtil;
 			     }
 			 
 		});
+			     
+			    
 	    
 	    // takeup button        
         functionality.jButton0.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1280,7 +1282,8 @@ import dsServices.ServerConnectionUtil;
 		    		return;	
 		    	}
 			}
-			
+			//@mpankaj 06/02/2014
+			getDataBeforeSave();
 			 //@yogesh 04/02/2014
 			  // check if split rates are filled if split rate checkbox is checked
 			if(!checkRates()){
@@ -1469,7 +1472,7 @@ import dsServices.ServerConnectionUtil;
 							 functionality.jLabel4.setVisible(false);
 							 functionality.jLabel5.setVisible(false);
 						 }
-						System.out.println();
+						//System.out.println();
 						Vector vector = (Vector) remoteReference.getCurrencySplitConfig(Integer.parseInt(basicData.book.getName()), basicData.currencyPair.getText());
 						 
 						if(!commonUTIL.isEmpty(vector)) {
@@ -1901,6 +1904,8 @@ import dsServices.ServerConnectionUtil;
 	    }
     });
 			        
+    
+    
     basicData.jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
 		 public void mouseClicked(MouseEvent e) {
 			 
@@ -2396,8 +2401,11 @@ import dsServices.ServerConnectionUtil;
 								functionality.jTabbedPane1.removeAll();
 							functionality.jTabbedPane1.add("CurrencyPair",__table);
 							__rows = getRows("Tenor");
-							__table = fillFavourites(__rows,swap.swapDate,null,true,"Date");
-							__table = fillFavourites(__rows,out.outRightDate,null,true,"Date");
+						//	if(productSubType.equalsIgnoreCase(FXSWAP)) {
+							__table = fillFavourites(__rows,out.outRightDate,swap.swapDate,null,true,"Date");
+						//	} else {
+							//__table = fillFavourites(__rows,out.outRightDate,null,true,"Date");
+							//}
 							functionality.jTabbedPane1.add("Tenor",__table);
 							__rows = getRows("CounterParty");
 							
@@ -3118,6 +3126,55 @@ import dsServices.ServerConnectionUtil;
 			
 		}
 	
+		public void getDataBeforeSave() {
+    		if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL") || basicData.buysell.getText().equalsIgnoreCase("BUY")) {
+					
+					double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+					amt1 = Math.abs(amt1);
+					double spot = (new Double(out.jTextField4.getText()).doubleValue());
+					out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
+					double amt2 = amt1* spot;								
+					out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2));
+					
+					 double farAmt1 = amt1 * -1;
+			    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1));
+			    	// System.out.println("farAmt1 " + farAmt1);
+			    	// System.out.println("out.jTextField2"+ out.jTextField2.getText());
+			    	 //System.out.println("out.jTextField1"+ out.jTextField1.getText());
+			    	 //System.out.println("swap.jTextField2"+ swap.jTextField1.getText());
+			    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText()) && (!swap.jTextField4.getText().equalsIgnoreCase("0"))) {
+			    		 
+			    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
+			    		 double farAmt2 = Math.abs(farAmt1);								
+			    		 if(farRate !=0)
+			    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2*farRate));
+			    	 }
+					
+	    	 } else {
+	    		 
+	    		 	double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+					double spot = (new Double(out.jTextField4.getText()).doubleValue());
+					out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
+					double amt2 = Math.abs(amt1) * -1;		
+				//	System.out.println("------------- "+commonUTIL.getStringFromDoubleExp(amt2*spot));
+					out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot));
+					
+					 double farAmt1 = amt1 * -1;
+			    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1));
+			    	 
+			    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText())) {
+			    		 
+			    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
+			    		 double farAmt2 = Math.abs(farAmt1) * -1;	
+			    		 if(farRate != 0)
+			    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2*farRate).toString());
+			    	 }	    		 																
+	    	 }	    	
+	          populateRountingData();		
+	    
+    }
+		
+		
 		@Override
 		public void setTaskPanel(BackOfficePanel panel) {
 			
@@ -3470,6 +3527,8 @@ import dsServices.ServerConnectionUtil;
 		public void setSDIPanel(BackOfficePanel panel) {
 	sdiPanel = (SDIPanel) panel;
 		}
+		
+		// mpank jthis method is called when you clicked on SDIPanel
 		public void setSDIPanelInstruction() {
 			if(trade != null) {
 				sdiPanel.clearALL();
@@ -4284,12 +4343,7 @@ import dsServices.ServerConnectionUtil;
 		    	swap.swapDate.setSelectedDate(commonUTIL.stringToDate(trade.getEffectiveDate().toString(),true));
 		    	swap.jTextField4.setValue(trade.getSecondPrice());
 		    	
-		    	try {
-					System.out.println(swap.jTextField4.getDoubleValue());
-				} catch (ParseException e) {
-					
-					e.printStackTrace();
-				}
+		    	
 		    	swap.setVisible(true);
 		    	fwdOp.setVisible(false);
 		    	basicData.jRadioButton2.setSelected(true);
@@ -4566,7 +4620,34 @@ import dsServices.ServerConnectionUtil;
 			    __table.setDefaultRenderer(JButton.class,
 						       new JTableButtonRenderer(defaultRenderer));
 			    __table.setPreferredScrollableViewportSize(new Dimension(400, 200));
+			   if( productSubType.equalsIgnoreCase(FXSWAP) )
+					   __table.addMouseListener(new JTableButtonMouseListener(__table,textField2,label,dateField,type));
 			    __table.addMouseListener(new JTableButtonMouseListener(__table,textField2,label,dateField,type));
+			    if(label  != null) {
+			    //	currencyPair = textField.getText();
+			    	//functionality.refreshPositionTable(currencyPair,new Integer(basicData.book.getName()).intValue());
+			    }
+			    
+			    return __table;
+			
+		}
+private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDatePicker textField3,JLabel label,boolean dateField,String type) {
+			
+			Color colr = new Color(239,239,242);
+			 __table = new JTable(new JTableButtonModel(__rows12));
+			 __table.setRowHeight(30);
+			 __table.setColumnSelectionAllowed(false);
+			 __table.setRowSelectionAllowed(true);
+			 __table.setIntercellSpacing(new Dimension(0, 0));
+			 __table.setShowGrid(false);
+			// __table.setBackground(colr);
+			    defaultRenderer = __table.getDefaultRenderer(JButton.class);
+			    __table.setDefaultRenderer(JButton.class,
+						       new JTableButtonRenderer(defaultRenderer));
+			    __table.setPreferredScrollableViewportSize(new Dimension(400, 200));
+		//	   if( productSubType.equalsIgnoreCase(FXSWAP) )
+					   __table.addMouseListener(new JTableButtonMouseListener(__table,textField2,textField3,label,dateField,type));
+			 //   __table.addMouseListener(new JTableButtonMouseListener(__table,textField2,label,dateField,type));
 			    if(label  != null) {
 			    //	currencyPair = textField.getText();
 			    	//functionality.refreshPositionTable(currencyPair,new Integer(basicData.book.getName()).intValue());
@@ -4649,11 +4730,12 @@ import dsServices.ServerConnectionUtil;
 						//String strTradeDate = "TradeModifiedDateTime";
 						//String tradeDateVal="";
 						//boolean tradeDateFilled = false;
+				// this need to be cache
 						Vector<Attribute> attributesData = attributes.getData();
 						for(int i=0;i<attributesData.size();i++) {
 							Attribute att = attributesData.get(i);
 							String value = att.getValue();
-							System.out.println(att.getName());
+						//	System.out.println(att.getName());
 							/*if (att.getName().equals(strTradeDate)) {
 								
 								tradeDateRowno = i;
@@ -4732,7 +4814,7 @@ import dsServices.ServerConnectionUtil;
 			   //commented below  far date is currentdate + tenor
 			   /*int t = (new Integer(swapTenor.substring(0, swapTenor.length()-1)).intValue() * 2);
 			   swapTenor = t + swapTenor.substring(swapTenor.length()-1, swapTenor.length());*/
-			   generateDeliveryDate(swapField,swapTenor);
+			   generateDeliveryDate(swapField,swapTenor,datefield);
 			   
 			   
 		   } else {
@@ -4841,12 +4923,13 @@ import dsServices.ServerConnectionUtil;
 			    swapField = textField2;
 			    this.type = type;
 			  }
-		  public JTableButtonMouseListener(JTable table, JDatePicker textField,JDatePicker  textField2,JLabel labeln,boolean dateField) {
+		  public JTableButtonMouseListener(JTable table, JDatePicker textField,JDatePicker  textField2,JLabel labeln,boolean dateField,String type) {
 			    __table = table;
 			    datefield = textField;
 			    label = labeln;
 			    dateF = dateField;
 			    swapField = textField2;
+			    this.type = type;
 			  }
 	   
 		  public void mouseClicked(MouseEvent e) {
@@ -4868,12 +4951,19 @@ import dsServices.ServerConnectionUtil;
 		  public void mouseReleased(MouseEvent e) {
 		//    __forwardEventToButton(e);
 		  }
-		  public void generateDeliveryDate(JDatePicker dateField,String tenor) {
+		  public void generateDeliveryDate(JDatePicker dateField,String tenor,JDatePicker outRight1) {
 			//  System.out.println(commonUTIL.getCurrentDate());
 				DateU dateissueDate = DateU.valueOf(commonUTIL.getCurrentDate());
 				dateissueDate.convertToCode(tenor);
+				///if(dateField != null)
+				//dateField.setSelectedDate(dateissueDate.getDate());
+				if(outRight1 != null)
+				outRight1.setSelectedDate(dateissueDate.getDate());
+				dateissueDate.convertToCode(tenor);
+				if(dateField != null)
+					dateField.setSelectedDate(dateissueDate.getDate());
 				
-				dateField.setSelectedDate(dateissueDate.getDate());
+				
 			}
 		 
 		}
