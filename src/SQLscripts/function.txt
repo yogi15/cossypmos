@@ -20,7 +20,7 @@ select
 				 	  
 				 	   
     from  trade  where 
-       trunc(tradedate) = to_date('26/01/2015','dd/mm/yyyy')    and parentid = 0 
+       trunc(tradedate) = to_date('26/01/2015','dd/mm/yyyy')      and autotype = 'Original'  or autotype  is null
     group by 
     (case  when substr(type,0,3) = 'BUY' then 'SALE'   else 'PURCHASE'    end ),
     (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ), 
@@ -36,7 +36,7 @@ select
 
 **********************************************************************************************
 CREATE OR REPLACE Function getFXForwardOptionType
-   ( tradeid IN number,tradeattributename in varchar2,bookno in number,dateDiff in number,productType in varchar2) 
+   ( tradeid IN number,tradeattributename in varchar2) 
 
    RETURN varchar2
 IS
@@ -44,7 +44,7 @@ IS
 
    CURSOR c1
    IS
-     SELECT getFTDReportColumnIdentifier(attributeValue,getValueOnLEAttribute(bookno,'Sector'),dateDiff,productType) 
+     SELECT attributeValue 
      FROM  attribute where id = tradeID and attributename = tradeattributename and type = 'Trade';
 
 BEGIN
@@ -63,6 +63,39 @@ RETURN cnumber;
 END;
 
 ************************************************************************
+CREATE OR REPLACE Function getFXForwardOptionType
+   ( tradeid IN number,tradeattributename in varchar2,leid in number,dateDiff in number,productType in varchar2) 
+
+   RETURN varchar2
+IS
+   cnumber varchar2(20);
+
+   CURSOR c1
+   IS
+     SELECT getFTDReportColumnIdentifier(attributeValue,getValueOnLEAttribute(leid,'Sector'),dateDiff,productType) 
+     FROM  attribute where id = tradeID and attributename = tradeattributename and type = 'Trade';
+
+BEGIN
+
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+
+   if c1%notfound then
+      cnumber := 1;
+   end if;
+
+   CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+
+
+
+
+
+
 
 **********************************************************************************************
 CREATE OR REPLACE Function getFTDReportColumnIdentifier
