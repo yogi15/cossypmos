@@ -9,13 +9,13 @@ select
  (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'    else 'FCY/FCY'    end )  FCY_NONFCY, 
  (case  when currency = 'INR' then 'INR'    else 'USD'    end )  Currency, 
  (case  when substr(type,0,3) = 'BUY' then 'SALE'   else 'PURCHASE'    end ) BUYSELL,
-  nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id,'InstrumentType'),'MerchantReady',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantReady,
- nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id,'InstrumentType'),'MerchantForward',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantForward,
- nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id,'InstrumentType'),'MerchantCancellationA',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantCancellationA,
+  nvl(sum( decode(getFXForwardOptionType(id,'InstrumentType',cpid,getSPOTTtypeDeals(TRADEDATE,deliverydate,tradedesc1 ),tradedesc1),'MerchantReady',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantReady,
+ nvl(sum( decode(getFXForwardOptionType(id,'InstrumentType',cpid,getSPOTTtypeDeals(TRADEDATE,deliverydate,tradedesc1 ),tradedesc1),'MerchantForward',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantForward,
+ nvl(sum( decode(getFXForwardOptionType(id,'InstrumentType',cpid,getSPOTTtypeDeals(TRADEDATE,deliverydate,tradedesc1 ),tradedesc1),'MerchantCancellationA',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) MerchantCancellationA,
 
- nvl(sum(decode(tradedesc1,'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),1,decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) FXSPOT,
- nvl(sum(decode(tradedesc1,'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),2,decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) FORWARD,
- nvl(sum(DECODE(tradedesc1, 'FXSWAP',  decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) FXSWAP
+ nvl(sum( decode(getFXForwardOptionType(id,'InstrumentType',cpid,getSPOTTtypeDeals(TRADEDATE,deliverydate,tradedesc1 ),tradedesc1),'FXSPOT',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) FXSPOT,
+ nvl(sum( decode(getFXForwardOptionType(id,'InstrumentType',cpid,getSPOTTtypeDeals(TRADEDATE,deliverydate,tradedesc1 ),tradedesc1),'FXFORWARD',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) FORWARD,
+ nvl(sum(decode(getFXForwardOptionType(id,'InstrumentType',cpid,getSPOTTtypeDeals(TRADEDATE,deliverydate,tradedesc1 ),tradedesc1),'FXSWAP',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','26/01/2015'))),0) FXSWAP
 				
 				 	  
 				 	   
@@ -36,7 +36,85 @@ select
 
 **********************************************************************************************
 CREATE OR REPLACE Function getFXForwardOptionType
-   ( tradeid IN number,attributename in varchar2) 
+   ( tradeid IN number,tradeattributename in varchar2,bookno in number,dateDiff in number,productType in varchar2) 
+
+   RETURN varchar2
+IS
+   cnumber varchar2(20);
+
+   CURSOR c1
+   IS
+     SELECT getFTDReportColumnIdentifier(attributeValue,getValueOnLEAttribute(bookno,'Sector'),dateDiff,productType) 
+     FROM  attribute where id = tradeID and attributename = tradeattributename and type = 'Trade';
+
+BEGIN
+
+   OPEN c1;
+   FETCH c1 INTO cnumber;
+
+   if c1%notfound then
+      cnumber := 1;
+   end if;
+
+   CLOSE c1;
+
+RETURN cnumber;
+
+END;
+
+************************************************************************
+
+**********************************************************************************************
+CREATE OR REPLACE Function getFTDReportColumnIdentifier
+   (instrumentType in varchar2,bookattributename in varchar2,dateDif in number,productType in varchar2) 
+
+   RETURN varchar2
+IS
+   cnumber varchar2(50);
+
+   
+
+BEGIN
+    IF  instrumentType = 'Interbank_Purchase' and bookattributename = 'BANK' and dateDif = 1 and productType = 'FXFORWARD' then 
+	cnumber := 'FXSPOT';
+     end if;
+    IF  instrumentType = 'Interbank_Sale' and bookattributename = 'BANK' and dateDif = 1 and productType = 'FXFORWARD' then 
+	cnumber := 'FXSPOT';
+     end if;
+     IF  instrumentType = 'Interbank_Sale' and bookattributename = 'BANK' and dateDif = 2 and productType = 'FXFORWARD' then 
+	cnumber := 'FXFORWARD';
+     end if;
+      IF  instrumentType = 'Interbank_Purchase' and bookattributename = 'BANK' and dateDif = 2 and productType = 'FXFORWARD' then 
+	cnumber := 'FXSPOT';
+	end if;
+      IF  instrumentType = 'Buy_Sell' and bookattributename = 'BANK' and dateDif = 2 and productType = 'FXSWAP' then 
+	cnumber := 'FXSWAP';
+      end if;
+     IF  instrumentType = 'Sell_Buy' and bookattributename = 'BANK' and dateDif = 2 and productType = 'FXSWAP' then 
+	cnumber := 'FXSWAP';
+      end if;
+      IF  instrumentType = 'Merchant_Ready' and bookattributename = 'CORP' and dateDif = 1 and productType = 'FXFORWARD' then 
+	cnumber := 'MERCHANTREADY';
+      end if;
+      IF  instrumentType = 'FORWARD_PURCHASE' and bookattributename = 'CORP' and dateDif = 2 and productType = 'FXFORWARDOPTION' then 
+	cnumber := 'MERCHANTFORWARD';
+      end if;
+       IF  instrumentType = 'Cancelled' and bookattributename = 'CORP' and dateDif = 2 and productType = 'FXTAKEUP' then 
+	cnumber := 'MERCHANTCANCELLED';
+      end if;
+      
+RETURN cnumber;
+
+END;
+
+************************************************************************
+
+
+
+
+**********************************************************************************************
+CREATE OR REPLACE Function getValueOnLEAttribute
+   ( leid IN number,leattributename in varchar2) 
 
    RETURN varchar2
 IS
@@ -45,7 +123,7 @@ IS
    CURSOR c1
    IS
      SELECT attributeValue
-     FROM  attribute where id = tradeID and attributename = attributename and type = 'Trade';
+     FROM  leattribute where le_ID = leid and attributename = leattributename;
 
 BEGIN
 
@@ -396,7 +474,8 @@ END;
 
 *********************************************************************
 
-function getSPOTTtypeDeals(tradedate in timestamp,deliverdate in timestamp) return number
+create or replace function getSPOTTtypeDeals(tradedate in timestamp,deliverdate in timestamp,
+producttype in varchar2) return number
 is
 cnumber number(10);
 begin
@@ -406,6 +485,11 @@ cnumber := trunc(deliverdate) - trunc(tradedate);
    else
       cnumber := 1;
 end if;
+
+if(producttype <> 'FXFORWARD') Then
+cnumber := 2;
+end if ;
+
   RETURN cnumber;
 
 
