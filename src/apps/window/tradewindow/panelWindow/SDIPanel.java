@@ -97,7 +97,14 @@ public class SDIPanel extends BackOfficePanel {
 		init();
 	}
 	public void clearALL() {
+		
+		//@ yogesh 07/02/2015
+		// components are cleared
 		jCheckBox0.setSelected(false);
+		payerSDI.setText("");
+		receiverSDI.setText("");
+		payerRolemodel.removeAllElements();
+		receiverRolemodel.removeAllElements();
 		payerInstr.removeAllItems();
 		payerModel.removeAllElements();
 		receiverInstr.removeAllItems();
@@ -107,6 +114,7 @@ public class SDIPanel extends BackOfficePanel {
 		payerPreferredSDIs = null;
 		receiverPreferredSDIs = null;
 		originalRules = null;
+		tmodel.removeALL();
 		rules = null;
 		
 	}
@@ -157,16 +165,21 @@ public class SDIPanel extends BackOfficePanel {
 					int r = receiverRole.getSelectedIndex() ;
 					if(r!= -1) {
 						String role = (String) payerRole.getSelectedItem();
-						int leid = trade.getCpID();
-					    if(role.equalsIgnoreCase(SDIConstants.PO)) {
-					    	Book book =  getBook(trade.getBookId());
-					    	leid = book.getLe_id();
-					    }
-						String payerKey =  role+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(leid);
-						payerPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(payerKey);
-						payerInstr.removeAllItems();
-						payerModel.removeAllElements();
-						processComboxData(payerPreferredSDIs,payerModel);
+						// yogesh 07/02/2015
+						// role != null is added because payerRole is null when payermode is emptied in clearwindow()
+						if (role != null) {
+							int leid = trade.getCpID();
+						    if(role.equalsIgnoreCase(SDIConstants.PO)) {
+						    	Book book =  getBook(trade.getBookId());
+						    	leid = book.getLe_id();
+						    }
+							String payerKey =  role+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(leid);
+							payerPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(payerKey);
+							payerInstr.removeAllItems();
+							payerModel.removeAllElements();
+							processComboxData(payerPreferredSDIs,payerModel);
+						}
+						
 					}
 					
 				}
