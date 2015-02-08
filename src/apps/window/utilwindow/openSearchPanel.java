@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -38,20 +37,20 @@ public class openSearchPanel extends SearchCriteriaType {
 	public JButton jButton0;
 	private JPanel jPanel1;
 	private JLabel jLabel0;
-	private JComboBox productType;
+	private JComboBox<String> productType;
 	private MultiSelectListExComboBox productSubType;
 	private JLabel jLabel1;
 
-	private MultiSelectListExComboBox Currency;
+	private MultiSelectListExComboBox CurrencyPair;
 	private JLabel jLabel2;
 	private JLabel jLabel3;
 	private DateComboBox TradeDateFrom;
 	private DateComboBox TradeDateTo;
 	private JLabel jLabel4;
 	private static final long serialVersionUID = 1L;
-	javax.swing.DefaultComboBoxModel currencyAttributeData = new javax.swing.DefaultComboBoxModel();
-	javax.swing.DefaultComboBoxModel productTypeAttributeData = new javax.swing.DefaultComboBoxModel();
-	javax.swing.DefaultComboBoxModel productSubTypeAttributeData = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel<String> currencyPairAttributeData = new javax.swing.DefaultComboBoxModel<String>();
+	javax.swing.DefaultComboBoxModel<String> productTypeAttributeData = new javax.swing.DefaultComboBoxModel<String>();
+	javax.swing.DefaultComboBoxModel<String> productSubTypeAttributeData = new javax.swing.DefaultComboBoxModel<String>();
 	
     JPanel searchC = null;
 	public openSearchPanel(RemoteTrade remoteTrade,RemoteReferenceData remoteR, RemoteBOProcess remoteBO,RemoteTask remoteTask) {
@@ -59,7 +58,7 @@ public class openSearchPanel extends SearchCriteriaType {
 		initComponents();
 		
 		processDomainData(productTypeAttributeData,  getFilterValues().getDomainValues("ProductType"));
-		processDomainData(currencyAttributeData, getFilterValues().getDomainValues("Currency"));
+		processCurrenyPairData(currencyPairAttributeData);
 		
 	}
 
@@ -76,19 +75,20 @@ public class openSearchPanel extends SearchCriteriaType {
 	public Vector<FilterBean> searchCriteria() {
 		Vector<FilterBean> filterBeans = new Vector<FilterBean>();
 		FilterBean bean = null;
-if((productType.getSelectedIndex() > 0)  ) {
-			
+		
+		if((productType.getSelectedIndex() > 0)  ) {			
 			filterBeans.add(getProductType(productType.getSelectedItem().toString()));
 		} 
-		if( (productSubType.getSelectedIndex() > 0) ) {
-			
+		
+		if( (productSubType.getSelectedIndex() > 0) ) {			
 			filterBeans.add(getProductSubType(productSubType,"ProductSubType"));
 		} 
-		if( (Currency.getSelectedIndex() > 0) ) {
-			//	int i [] = Currency.getSelectedIndices();
-				filterBeans.add(getCurrency(Currency, "Currency"));
 		
-			} 
+		if( (CurrencyPair.getSelectedIndex() > 0) ) {
+			//	int i [] = Currency.getSelectedIndices();
+				filterBeans.add(getCurrency(CurrencyPair, "CurrencyPair"));
+		} 
+		
 		if( TradeDateFrom.getDate() != null ) {
 			
 			Date tradeDt = TradeDateFrom.getDate();
@@ -101,10 +101,10 @@ if((productType.getSelectedIndex() > 0)  ) {
 
 			}
 			
-		}
-		// TODO Auto-generated method stub
+		}		
 		return filterBeans;
 	}
+	
 	private JPanel getJPanel1() {
 		if (jPanel1 == null) {
 			jPanel1 = new JPanel();
@@ -124,6 +124,7 @@ if((productType.getSelectedIndex() > 0)  ) {
 		}
 		return jPanel1;
 	}
+	
 	private JLabel getJLabel4() {
 		if (jLabel4 == null) {
 			jLabel4 = new JLabel();
@@ -140,24 +141,22 @@ if((productType.getSelectedIndex() > 0)  ) {
 		}
 		return TradeDateTo;
 	}
+	
 	private DateComboBox getTradeDateFrom() {
-		if (TradeDateFrom == null) {
-			
+		if (TradeDateFrom == null) {			
 			TradeDateFrom = new  com.jidesoft.combobox.DateComboBox();
 			//TradeDateFrom.setTimeDisplayed(true);
 			TradeDateFrom.setFormat(commonUTIL.getDateFormat());
-			TradeDateFrom.setDate(null);
-			
+			TradeDateFrom.setDate(null);			
 		}
 		
 		return TradeDateFrom;
 	}
 
-
 	private JLabel getJLabel3() {
 		if (jLabel3 == null) {
 			jLabel3 = new JLabel();
-			jLabel3.setText("Date From");
+			jLabel3.setText("Trade Date");
 		}
 		return jLabel3;
 	}
@@ -170,12 +169,12 @@ if((productType.getSelectedIndex() > 0)  ) {
 		return jLabel2;
 	}
 
-	private JComboBox getJComboBox2() {
-		if (Currency == null) {
-			Currency = new MultiSelectListExComboBox();
-			Currency.setModel(currencyAttributeData);
+	private MultiSelectListExComboBox getJComboBox2() {
+		if (CurrencyPair == null) {
+			CurrencyPair = new MultiSelectListExComboBox();
+			CurrencyPair.setModel(currencyPairAttributeData);
 		}
-		return Currency;
+		return CurrencyPair;
 	}
 
 	private JLabel getJLabel1() {
@@ -186,17 +185,16 @@ if((productType.getSelectedIndex() > 0)  ) {
 		return jLabel1;
 	}
 
-	private JComboBox getJComboBox1() {
+	private MultiSelectListExComboBox getJComboBox1() {
 		if (productSubType == null) {
-			productSubType = new MultiSelectListExComboBox();
-		//	productSubType.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+			productSubType = new MultiSelectListExComboBox();		
 		}
 		return productSubType;
 	}
 
-	private JComboBox getProductType() {
+	private JComboBox<String> getProductType() {
 		if (productType == null) {
-			productType = new JComboBox();
+			productType = new JComboBox<String>();
 			productType.setModel(productTypeAttributeData);
 			productType.addItemListener( new ItemListener() {
 
@@ -207,7 +205,7 @@ if((productType.getSelectedIndex() > 0)  ) {
 	        		String productType1 = productType.getSelectedItem().toString();
 	        		productSubTypeAttributeData.removeAllElements();
 	        		productSubTypeAttributeData = null;
-	        		productSubTypeAttributeData = new  javax.swing.DefaultComboBoxModel();
+	        		productSubTypeAttributeData = new  javax.swing.DefaultComboBoxModel<String>();
 	        		productSubType.removeAll();
 	        		processDomainData(productSubTypeAttributeData,getFilterValues().getDomainValues(productType1+".subType"));
 	        		productSubType.setModel(productSubTypeAttributeData);
@@ -234,19 +232,15 @@ if((productType.getSelectedIndex() > 0)  ) {
 	}
 
 	@Override
-	public void clearllCriterial() {
-		// TODO Auto-generated method stub
+	public void clearllCriterial() {		
 		TradeDateFrom.setDate(null);
-	TradeDateTo.setDate(null);
-	productType.setSelectedIndex(-1);
-	productSubType.setSelectedIndex(-1);
-		
+		TradeDateTo.setDate(null);
+		productType.setSelectedIndex(-1);
+		productSubType.setSelectedIndex(-1);		
 	}
 
 	@Override
-	public void loadFilters(Vector<UserJobsDetails> jobdetails) {
-		// TODO Auto-generated method stub
-		
+	public void loadFilters(Vector<UserJobsDetails> jobdetails) {	
 	}
 
 }
