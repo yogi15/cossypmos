@@ -20,6 +20,34 @@ public  class TransferRule implements Serializable,Cloneable {
 
 	}
     
+    /**
+	 * @return the payerMethodType
+	 */
+	public String getPayerMethodType() {
+		return payerMethodType;
+	}
+	/**
+	 * @param payerMethodType the payerMethodType to set
+	 */
+	public void setPayerMethodType(String payerMethodType) {
+		this.payerMethodType = payerMethodType;
+	}
+	/**
+	 * @return the receiverMethodType
+	 */
+	public String getReceiverMethodType() {
+		return receiverMethodType;
+	}
+	/**
+	 * @param receiverMethodType the receiverMethodType to set
+	 */
+	public void setReceiverMethodType(String receiverMethodType) {
+		this.receiverMethodType = receiverMethodType;
+	}
+
+	String payerMethodType;
+    String receiverMethodType;
+    
 	public String getFxSwapType() {
 		return fxSwapType;
 	}
