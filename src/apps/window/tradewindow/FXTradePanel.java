@@ -372,9 +372,6 @@ import dsServices.ServerConnectionUtil;
 			this.defaultRenderer = defaultRenderer;
 		}
 	
-		
-	
-		
 		public RemoteTrade getRemoteTrade() {
 			return remoteTrade;
 		}
@@ -1035,77 +1032,84 @@ import dsServices.ServerConnectionUtil;
 			}
 			
 			 try {
+				 
 				 if(takeUPproduct == null)
 				 takeUPproduct	 = (Product) remoteProduct.selectProductOnType(productType, FXTAKEUP);
 				   
-				DateU tradedate = DateU.valueOf(commonUTIL.stringToDate(trade.getTradeDate(),true));
-				DateU tradeEffectiveDate= DateU.valueOf(commonUTIL.stringToDate(trade.getEffectiveDate(),true));
-				DateU tradeDeliverydate = DateU.valueOf(commonUTIL.stringToDate(trade.getDelivertyDate(),true));
-				DateU takeUPTradeDate = DateU.valueOf(takeupW.jTextField5.getDate());
-				DateU takeUPSettleDate = DateU.valueOf(takeupW.jTextField6.getDate());
+				 DateU tradedate = DateU.valueOf(commonUTIL.stringToDate(trade.getTradeDate(),true));
+				 DateU tradeEffectiveDate= DateU.valueOf(commonUTIL.stringToDate(trade.getEffectiveDate(),true));
+				 DateU tradeDeliverydate = DateU.valueOf(commonUTIL.stringToDate(trade.getDelivertyDate(),true));
+				 DateU takeUPTradeDate = DateU.valueOf(takeupW.jTextField5.getDate());
+				 DateU takeUPSettleDate = DateU.valueOf(takeupW.jTextField6.getDate());
 				
-				if(!commonUTIL.between2dates(tradedate.getDate(), tradeEffectiveDate.getDate(), takeUPTradeDate.getDate())) {
+				 if(!commonUTIL.between2dates(tradedate.getDate(), tradeEffectiveDate.getDate(), takeUPTradeDate.getDate())) {
 					commonUTIL.showAlertMessage("Take-up Trade date(s) has to be within the Start and End dates of the FX Time Option");
 					return;
-				}
-				if(!commonUTIL.between2dates(tradedate.getDate(), tradeEffectiveDate.getDate(), takeUPSettleDate.getDate())) {
+				 }
+				 
+				 if(!commonUTIL.between2dates(tradedate.getDate(), tradeEffectiveDate.getDate(), takeUPSettleDate.getDate())) {
 					commonUTIL.showAlertMessage("Take-up Settle date(s) has to be within the FwdOption Start date and FwdOption End date");
 					return;
-				}
-				tradeTakeUp.setId(0);
-				tradeTakeUp.setTradedesc1(FXTAKEUP);
-				tradeTakeUp.setAction("NEW");
-				tradeTakeUp.setStatus("NONE");
-				tradeTakeUp.setParentID(trade.getId());
-				tradeTakeUp.setBookId(trade.getBookId());
-				tradeTakeUp.setCpID(trade.getCpID());
-				tradeTakeUp.setType(trade.getType());
-				tradeTakeUp.setProductType(trade.getProductType());
-				tradeTakeUp.setCurrency(trade.getCurrency());
-				tradeTakeUp.setTradedesc(trade.getTradedesc());
-				tradeTakeUp.setPrice(trade.getPrice());
-				tradeTakeUp.setTraderID(trade.getTraderID());
-				tradeTakeUp.setAttribute("ParentID",Integer.toString(trade.getId()));
+				 }
+				 
+				 tradeTakeUp.setId(0);
+				 tradeTakeUp.setTradedesc1(FXTAKEUP);
+				 tradeTakeUp.setAction("NEW");
+				 tradeTakeUp.setStatus("NONE");
+				 tradeTakeUp.setParentID(trade.getId());
+				 tradeTakeUp.setBookId(trade.getBookId());
+				 tradeTakeUp.setCpID(trade.getCpID());
+				 tradeTakeUp.setType(trade.getType());
+				 tradeTakeUp.setProductType(trade.getProductType());
+				 tradeTakeUp.setCurrency(trade.getCurrency());
+				 tradeTakeUp.setTradedesc(trade.getTradedesc());
+				 tradeTakeUp.setPrice(trade.getPrice());
+				 tradeTakeUp.setTraderID(trade.getTraderID());
+				 tradeTakeUp.setAttribute("ParentID",Integer.toString(trade.getId()));
 				
-				if ( takeupW.typeComboBox.getSelectedItem() == null) {
+				 if ( takeupW.typeComboBox.getSelectedItem() == null) {
 					commonUTIL.showAlertMessage("Please select Takeup Type");
-				} else{
+				 } else{
 					tradeTakeUp.setAttribute("TakeUpType", takeupW.typeComboBox.getSelectedItem().toString());	
-				}
-			
-			
-				tradeTakeUp.setUserID(user.getId());
-				double amt1 = takeupW.jTextField1.getDoubleValue();
-				double amt2 = takeupW.jTextField3.getDoubleValue();
-				if(amt1 > 0.) {
+				 }
+						
+				 tradeTakeUp.setUserID(user.getId());
+				 double amt1 = takeupW.jTextField1.getDoubleValue();
+				 double amt2 = takeupW.jTextField3.getDoubleValue();
+				 if(amt1 > 0.) {
 				    if(  amt1 > takeupW.jTextField0.getDoubleValue()) {
 				    	commonUTIL.showAlertMessage("Take-up amount greater then Outstanding FX Time Option");
 				    	return;
 				    }
-				}
-				if(amt1 < 0.) {
+				 }
+				 
+				 if(amt1 < 0.) {
 				    if( amt1 < takeupW.jTextField0.getDoubleValue() ) {
 				    	commonUTIL.showAlertMessage("Take-up amount greater then Outstanding FX Time Option");
 				    	return;
 				    }
-				}
-				tradeTakeUp.setQuantity(amt1);
-				tradeTakeUp.setNominal(amt2);
-				tradeTakeUp.setTradeDate(commonUTIL.convertDateTOString(takeUPTradeDate.getDate()));
-				tradeTakeUp.setDelivertyDate(commonUTIL.convertDateTOString(takeUPSettleDate.getDate()));
-				tradeTakeUp.setEffectiveDate(commonUTIL.convertDateTOString(takeUPSettleDate.getDate()));
-				tradeTakeUp.setAttribute("Trade Date",tradeTakeUp.getTradeDate());
-				tradeTakeUp.setProductId(takeUPproduct.getId());
-				Vector tradestatus = new Vector();
-				tradestatus = remoteTrade.saveTrade(tradeTakeUp,tradestatus);
+				 }
+				 
+				 tradeTakeUp.setQuantity(amt1);
+				 tradeTakeUp.setNominal(amt2);
+				 tradeTakeUp.setTradeDate(commonUTIL.convertDateTimeTOString(takeUPTradeDate.getDate()));
+				 tradeTakeUp.setDelivertyDate(commonUTIL.convertDateTOString(takeUPSettleDate.getDate()));
+				 tradeTakeUp.setEffectiveDate(commonUTIL.convertDateTOString(takeUPSettleDate.getDate()));
+				 tradeTakeUp.setAttribute("Trade Date",commonUTIL.convertDateTimeTOString(takeUPTradeDate.getDate()));
+				 tradeTakeUp.setAttribute("InstrumentType",trade.getAttributeValue("InstrumentType"));
+				 tradeTakeUp.setProductId(takeUPproduct.getId());
+				 
+				 Vector tradestatus = new Vector();
+				 tradestatus = remoteTrade.saveTrade(tradeTakeUp,tradestatus);
 				
                	 String statusT = (String) tradestatus.elementAt(0);
                	 
                	 int i = ((Integer) tradestatus.elementAt(1)).intValue();
-               	if(i <= -10) {
+               	 if(i <= -10) {
                		commonUTIL.showAlertMessage((statusT));
         			return;
                	 }
+               	 
                	 if(i == -4) {
          			commonUTIL.showAlertMessage((statusT));
             			return;
@@ -1116,22 +1120,25 @@ import dsServices.ServerConnectionUtil;
             		 }
                	 if(i > 0) 
                		commonUTIL.showAlertMessage((statusT));
-               	tradeTakeUp.setId(i);
-               	takeupW.model.addRow(tradeTakeUp);
-               	if(tradeTakeUp.getQuantity() > 0.) {
+               	 
+               	 tradeTakeUp.setId(i);
+               	 takeupW.model.addRow(tradeTakeUp);
+               	 
+               	 if(tradeTakeUp.getQuantity() > 0.) {
                		fwdOp.primaryC.setValue(fwdOp.primaryC.getDoubleValue() - tradeTakeUp.getQuantity() );
                		fwdOp.quotingC.setValue(fwdOp.quotingC.getDoubleValue() + (tradeTakeUp.getNominal() * -1));
                		takeupW.jTextField0.setValue(takeupW.jTextField0.getDoubleValue() -tradeTakeUp.getQuantity() );
                		takeupW.jTextField2.setValue(takeupW.jTextField2.getDoubleValue()+ (tradeTakeUp.getNominal() * -1));
                		
-               	}
-               	if(tradeTakeUp.getQuantity() < 0.) {
+               	 }
+               	 
+               	 if(tradeTakeUp.getQuantity() < 0.) {
                		fwdOp.primaryC.setValue(fwdOp.primaryC.getDoubleValue() + (tradeTakeUp.getQuantity() * -1) );
                		fwdOp.quotingC.setValue(fwdOp.quotingC.getDoubleValue() -tradeTakeUp.getNominal());
                		takeupW.jTextField0.setValue(takeupW.jTextField0.getDoubleValue() +(tradeTakeUp.getQuantity() *-1));
                		takeupW.jTextField2.setValue(takeupW.jTextField2.getDoubleValue() - tradeTakeUp.getNominal() );
                		
-               	}					
+               	 }					
 				              
 			} catch (ParseException e1) {				
 				e1.printStackTrace();
@@ -1141,7 +1148,10 @@ import dsServices.ServerConnectionUtil;
 		}
 	 });
 	 
-	 takeupW.jButton0.addMouseListener(new java.awt.event.MouseAdapter() {
+	 //@yogesh 05/02/2014
+	 // below action listener commented as edit button is not required	 
+	 //takeUp edit button
+	/* takeupW.jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
 		 
 		 @Override
 		public void mouseClicked(MouseEvent e) {
@@ -1215,14 +1225,20 @@ import dsServices.ServerConnectionUtil;
 			}
 		 }
 		 
-	 });
-       // }
+	 });*/
+       
+	 // }
 	// functionality.j
 	 
 	 // B2B config button
 	  functionality.jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				
+				if (!functionality.jButton2.isEnabled()) {
+					return;
+				}
+				
 				String BookID =basicData.book.getName();
 				if(BookID == null || commonUTIL.isEmpty(BookID.trim())) {
 					commonUTIL.showAlertMessage("Select Book & Currency Pair");
@@ -1259,6 +1275,9 @@ import dsServices.ServerConnectionUtil;
 	  functionality.jButton5.addMouseListener(new java.awt.event.MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			if (!functionality.jButton5.isEnabled()) {
+				return;
+			}
 			if(trade != null) {
 				String autoType = trade.getAutoType();
 				if(!commonUTIL.isEmpty(autoType)) {
@@ -1282,13 +1301,15 @@ import dsServices.ServerConnectionUtil;
 		    		return;	
 		    	}
 			}
-			//@mpankaj 06/02/2014
-			getDataBeforeSave();
+			
 			 //@yogesh 04/02/2014
 			  // check if split rates are filled if split rate checkbox is checked
 			if(!checkRates()){
 				return;
 			}
+			
+			//@mpankaj 06/02/2014
+			getDataBeforeSave();			
 			
 		    if(validdateALLFields("NEW")) {
 		    	trade = new Trade();
@@ -1431,7 +1452,9 @@ import dsServices.ServerConnectionUtil;
             			 e1.printStackTrace();
             		 } 	             
 	             } 
-	             functionality.jButton5.setText("SAVEASNEW");
+	             //@yogesh 07/02/2015
+	             // jbuttuon% should always be DEAL
+	             //functionality.jButton5.setText("SAVEASNEW");
 	             functionality.jButton6.setEnabled(true);            	
 		    }
 		}	
@@ -2390,7 +2413,12 @@ import dsServices.ServerConnectionUtil;
 	
 						@Override
 						public void mouseClicked(MouseEvent e) {
-						if(!favEnableFlag) {
+							
+							if (!functionality.jButton1.isEnabled()) {
+								return;
+							}
+							
+							if(!favEnableFlag) {
 							int i = functionality.jTabbedPane1.getSelectedIndex();
 							//functionality.jTabbedPane1.addt
 							String name = functionality.jTabbedPane1.getTitleAt(i);
@@ -2436,15 +2464,16 @@ import dsServices.ServerConnectionUtil;
 	
 						@Override
 						public void mouseClicked(MouseEvent e) {
-							newTradeView();
-						functionality.jButton5.setText("DEAL");
-						functionality.jButton6.setEnabled(false);
+							
+							if (!functionality.jButton4.isEnabled()) {
+								return;
 							}
 							
+							newTradeView();
 						
-						
-			    
-			    	
+							functionality.jButton5.setText("DEAL");
+							functionality.jButton6.setEnabled(false);
+						}
 			    });
 			        // ROLLOVER & ROLLBACK Functionality 
 			        functionality.jButton7.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -2595,6 +2624,11 @@ import dsServices.ServerConnectionUtil;
 			        	  
 			        	@Override
 						public void mouseClicked(MouseEvent e) {
+			        		
+			        		if (!functionality.jButton3.isEnabled()) {
+								return;
+							}
+			        		
 			        		if(trade == null) {
 			        			commonUTIL.showAlertMessage("Select Trade");
 			        			return;
@@ -2676,6 +2710,10 @@ import dsServices.ServerConnectionUtil;
 								if(!checkRates()){
 									return;
 								}
+								
+								//@yogesh 07/02/2015
+								//pankaj forgot to add in save
+								getDataBeforeSave();
 								
 								fillTrade(trade,"NEW");												
 								
@@ -3348,7 +3386,7 @@ import dsServices.ServerConnectionUtil;
 				}
 				
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 			return flag;
@@ -3366,22 +3404,17 @@ import dsServices.ServerConnectionUtil;
 				flag = true;
 			
 			return flag;
-		}
+		}		
 		
-		
-		public boolean validateField(JTextField jtext,String name) {
-			
-			
+		public boolean validateField(JTextField jtext,String name) {			
 			if(!validateFieldValue(jtext.getName())) {
 				commonUTIL.showAlertMessage(" Select  "+ name);
 				return false;
 			}
 			return true;
 		}
-		
-		
-		// this is method is used to RountingData Calculation
-		
+				
+		// this is method is used to RountingData Calculation		
 		public void setRoutingDataCal() {
 			try {
 				double rate1 = 0.0 ;
@@ -3442,40 +3475,28 @@ import dsServices.ServerConnectionUtil;
 			}catch(NullPointerException n) {
 				return flag;
 			}
-			return flag;
-				
+			return flag;				
 		}
-		
-	
+			
 		@Override
-		public void setPanelValue(CommonPanel tradeValue) {
-			
-			
+		public void setPanelValue(CommonPanel tradeValue) {					
 		}
 	
 		@Override
-		public void setTradePanelValue(CommonPanel tradeValue) {
-			
-			
+		public void setTradePanelValue(CommonPanel tradeValue) {			
 		}
 	
 		@Override
-		public Collection getCashFlows() {
-			
+		public Collection getCashFlows() {			
 			return null;
 		}
 	
 		@Override
-		public Pricer getPricer() {
-			
+		public Pricer getPricer() {			
 			return null;
-		}
-		
-		
-		
-		
-		private void processTableData(Hashtable<String,String> attributes,DefaultTableModel model) {
-			
+		}		
+
+		private void processTableData(Hashtable<String,String> attributes,DefaultTableModel model) {			
 	    	Vector vector;
 			try {
 				this.attributes.clearllCriteriaModel();
@@ -3489,20 +3510,28 @@ import dsServices.ServerConnectionUtil;
 		    		int rowCount = this.attributes.getTableRowCount();
 		    		attru.setName(tradeAttributes.getName().toString());
 		    	//	attru.setName(tradeAttributes.getName().toString());
-		    		if(tradeAttributes.getName().equalsIgnoreCase("Trade Date") || tradeAttributes.getName().equalsIgnoreCase("TradeModifiedDateTime")) {
+		    		if(tradeAttributes.getName().equalsIgnoreCase("Trade Date") 
+		    				|| tradeAttributes.getName().equalsIgnoreCase("TradeModifiedDateTime")) {
 		    	    	
 		    			attru.setValue(commonUTIL.getCurrentDateTime());
+		    			
+		    			//@yogesh 08/02/2015
+	                    // we are using DateCellEditor to show Jide calender in TradeDate and TradeModifiedDateTime	               
+		    			this.attributes.addRowEditor(rowCount, "Values");
+		    			
+		    	    } else {
+		    	    	Vector attributeValues = (Vector) remoteReference.getStartUPData(attru.getName());
+			    		if(!commonUTIL.isEmpty(attributeValues)) {
+				    		 String values [] = this.attributes.convertVectortoSringArray(attributeValues,tradeAttributes.getName().toString());
+				    		 this.attributes.addRowEditor(rowCount, 1, this.attributes.getJComboxBox(values),"Values");
+			    		 	 values = null;
+			    		} else {
+			    			this.attributes.addRowEditor(rowCount, 1,this.attributes.getJTextFieldBox(), "Values");
+			    		}
 		    	    }
-		    		this.attributes.addNewRow(attru);
-		    		Vector attributeValues = (Vector) remoteReference.getStartUPData(attru.getName());
-		    		 if(!commonUTIL.isEmpty(attributeValues)) {
-		    		 String values [] = this.attributes.convertVectortoSringArray(attributeValues,tradeAttributes.getName().toString());
-		    		 this.attributes.addRowEditor(rowCount, 1, this.attributes.getJComboxBox(values),"Values");
-		    		 		     values = null;
-		    	} else {
 		    		
-		    		this.attributes.addRowEditor(rowCount, 1,this.attributes.getJTextFieldBox(), "Values");
-		    	}
+		    		this.attributes.addNewRow(attru);
+		    		
 		    			
 		    	}
 		    	
@@ -3517,82 +3546,73 @@ import dsServices.ServerConnectionUtil;
 		    		i++;
 		    		} */
 		    		
-			} catch (RemoteException e) {
-				
+			} catch (RemoteException e) {				
 				e.printStackTrace();
 			}
 	    }
 	
 		@Override
 		public void setSDIPanel(BackOfficePanel panel) {
-	sdiPanel = (SDIPanel) panel;
+			sdiPanel = (SDIPanel) panel;
 		}
 		
 		// mpank jthis method is called when you clicked on SDIPanel
 		public void setSDIPanelInstruction() {
 			if(trade != null) {
 				sdiPanel.clearALL();
-				sdiPanel.setTrade(trade);
-				 
+				sdiPanel.setTrade(trade);				 
 			} else {
 				Trade dummy = new Trade();
 				dummy.setId(0);
 				fillTrade(dummy,"NEW");
 				if(isTradeProper)  {
 					sdiPanel.clearALL();
-					sdiPanel.setTrade(dummy);
+					//@yogesh 07/02/2015
+					// below is commented as dummy trade cause null pointer in setTrade which calls generate transfer rule.
+					//sdiPanel.setTrade(dummy);
 				}
-				isTradeProper = false;
-				
+				isTradeProper = false;				
 			}
 			
 		}
-		 public void getTradeSDI(BackOfficePanel panel) {
-				
-					//System.out.println(panel);
-					//sdiPanel.setTrade(trade);
-					//panel.fillJTabel((Vector) SDISelectorUtil.selectSdiOntrade(trade, remoteReference));
-			 setSDIPanelInstruction();
-				
-			}
+		 public void getTradeSDI(BackOfficePanel panel) {				
+			//System.out.println(panel);
+			//sdiPanel.setTrade(trade);
+			//panel.fillJTabel((Vector) SDISelectorUtil.selectSdiOntrade(trade, remoteReference));
+			 setSDIPanelInstruction();				
+		}
 	
 		@Override
-		public void setFEESPanel(BackOfficePanel panel) {
-			
-			feesPanel = (FeesPanel) panel;
-			
+		public void setFEESPanel(BackOfficePanel panel) {			
+			feesPanel = (FeesPanel) panel;			
 		}
 	
 		
 	
 		 public void getTradeTask(BackOfficePanel panel) {
-				try {
-					//sdiPanel.setTrade(trade);
+			try {
+				//sdiPanel.setTrade(trade);
+				panel.fillJTabel((Vector)remoteTask.selectTaskWhere("tradeId = " + trade.getId()));
+			} catch (RemoteException e) {
 				
-					panel.fillJTabel((Vector)remoteTask.selectTaskWhere("tradeId = " + trade.getId()));
-				} catch (RemoteException e) {
-					
-					e.printStackTrace();
-				}
+				e.printStackTrace();
 			}
+		}
 		 
 	
 		@Override
-		public void setTradePostings(BackOfficePanel panel) {
-			
-			
+		public void setTradePostings(BackOfficePanel panel) {					
 		}
 	
 		@Override
-		public void processTask(TaskEventProcessor taskEvent, Users WindowUser) {
-			
-			
+		public void processTask(TaskEventProcessor taskEvent, Users WindowUser) {				
 		}
+		
 		@Override
-		public void setTradeTransfers(BackOfficePanel panel) {
-			
+		public void setTradeTransfers(BackOfficePanel panel) {			
 			transferPanel = (TransferPanel) panel;
 		} 
+		
 		public void getTradeTransfers(BackOfficePanel panel) {
 			try {
 				transferPanel.setTrade(trade);
@@ -3602,7 +3622,14 @@ import dsServices.ServerConnectionUtil;
 				e.printStackTrace();
 			}
 		}
+		// new button
 		public void newTradeView() {
+			
+			//@yogesh 07/02/2015
+			// if called after takeUpWindow is opened then funtionality buttons disable while opening 
+			//takeup trade should be enabled
+			enableTakeUpDisabledFunctionalityButton();
+			
 			app.trade = null;
 		//	out.jCheckBox2.setEnabled(true);
 			//out.jCheckBox0.setEnabled(false);
@@ -3613,8 +3640,6 @@ import dsServices.ServerConnectionUtil;
 			basicData.counterPary.setText("");
 			basicData.counterPary.setName("0");
 			basicData.buysell.setText("BUY");
-			basicData.jRadioButton1.setSelected(true);
-			basicData.jRadioButton2.setSelected(false);
 		//	basicData.jRadioButton3.setSelected(true);
 		//	basicData.jRadioButton4.setSelected(false);
 			out.jLabel2.setText("");
@@ -3632,32 +3657,40 @@ import dsServices.ServerConnectionUtil;
 			actionstatus.removeAllElements();
 			actionstatus.insertElementAt("NEW", 0); 
 			out.jComboBox1.setModel(actionstatus);
-			swap.jTextField1.setText("0");
+			
+			//@yogesh 07/02/2015
+		    // swap.setVisible(false); set its field to zero
+			/*swap.jTextField1.setText("0");
 			swap.jTextField2.setText("0");
 			swap.swapDate.setText("0");
-			swap.jTextField4.setText("0");
+			swap.jTextField4.setText("0");*/
+			swap.setVisible(false); 
 			String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
 	        
 	      //  attributeModel = new DefaultTableModel(attributeColumnName,0);
 	        processTableData(attributeDataValue,attributeModel);
 	        attributes.jTable1.removeAll();
 	     //   attributes.jTable1.setModel(attributeModel);
-	        basicData.jRadioButton6.setEnabled(false);
-	        basicData.jRadioButton7.setEnabled(false);
-	        basicData.jRadioButton6.setSelected(false);
-	        basicData.jRadioButton7.setSelected(false);
+	       
 	        rollpanel.getJPanel0().setVisible(false);
 	        functionality.jButton7.setEnabled(false);
 	        trade = null;
 	      
 	     //   productSubType = "";
-	        basicData.jRadioButton5.setEnabled(true);
-	        basicData.jRadioButton1.setEnabled(true);
-	        basicData.jRadioButton2.setEnabled(true);
 	        basicData.jRadioButton0.setSelected(false);
 	        basicData.jRadioButton0.setEnabled(false);
-	        basicData.jRadioButton1.setSelected(true);
-	        if(productSubType.equalsIgnoreCase(FXFORWARD)) {
+			basicData.jRadioButton1.setSelected(true);
+	        basicData.jRadioButton1.setEnabled(true);
+			basicData.jRadioButton2.setSelected(false);
+			basicData.jRadioButton2.setEnabled(true);
+			basicData.jRadioButton5.setSelected(false);
+			basicData.jRadioButton5.setEnabled(true);			
+			basicData.jRadioButton6.setSelected(false);
+	        basicData.jRadioButton6.setEnabled(false);
+	        basicData.jRadioButton7.setSelected(false);
+	        basicData.jRadioButton7.setEnabled(false);
+	        
+	        /*if(productSubType.equalsIgnoreCase(FXFORWARD)) {
 				//basicData.jRadioButton1.setSelected(true);
 				basicData.jRadioButton2.setSelected(false);
 				basicData.jRadioButton5.setSelected(false);
@@ -3695,30 +3728,39 @@ import dsServices.ServerConnectionUtil;
 				functionality.jButton2.setEnabled(false);
 				functionality.jButton3.setEnabled(false);
 				//basicData.buysell.setText("BUY");
-			}
+			}*/
 	        functionality.setRoutingData(null);
 	        b2bconfig = null;
 	     //   functionality.jPanel2.setVisible(true);
-			functionality.jPanel6.setVisible(true);
+			//functionality.jPanel6.setVisible(true);
 		   functionality.b2bCurrencyPair.setText("");
 		  //  functionality.b2bBook.setText("");
 		    functionality.b2bTransferTo.setText("");
 		    functionality.clearRounting();
-		    functionality.jLabel2.setText("");
+
+		  //@yogesh 07/02/2015
+		    // functionality.jPanel6.setVisible(false); set its field to zero	
+		    
+/*		    functionality.jLabel2.setText("");
 		    functionality.jLabel3.setText("");
 		    functionality.jTextField2.setText("0.0");
 		    functionality.jTextField3.setText("0.0");
 		    functionality.FarRate1.setText("0.0");
-		    functionality.FarRate2.setText("0.0");
+		    functionality.FarRate2.setText("0.0");*/
 		    functionality.jPanel6.setVisible(false);
 		  //  functionality.jTabbedPane2.setVisible(false);
 		  //  functionality.jTabbedPane1.setVisible(true);
+		    
+		    fwdOp.setEnabled(false);
 		    fwdOp.startDate.setDate(commonUTIL.getCurrentDate());
 		    fwdOp.startDate.setEnabled(false);	
 		 // mpankaj 02/02functionality.jPanel2.jTextField2
 			 functionality.jPanel2.setVisible(false);
 			 out.jCheckBox2.setSelected(false);
-			 
+			 out.jCheckBox2.setEnabled(false);
+			// getTradeTransfers(transferPanel);
+				//getTradeTask(taskPanel);
+				getTradeSDI(sdiPanel);
 		}
 		public int fillRollParitialOutRightTrade(Trade rolltrade,String type,int rollFROMID,boolean isParital,double rollAmt)  {
 			Trade newrolltrade = new Trade();
@@ -4337,7 +4379,13 @@ import dsServices.ServerConnectionUtil;
 		    actionController = true;
 		    processActionData(actionstatus,productType,trade.getTradedesc1(),out.jTextField6.getText(),remoteTrade);
 		    actionController = false;
-		    if(trade.getTradedesc1().equalsIgnoreCase(FXSWAP)) {
+		    if(trade.getTradedesc1().equalsIgnoreCase(FXSWAP)) {		    	
+
+				//@yogesh 07/02/2015
+				// if called after takeUpWindow is opened then funtionality buttons disable while opening 
+				//takeup trade should be enabled
+		    	enableTakeUpDisabledFunctionalityButton();
+		    	
 		    	swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(trade.getTradeAmount()).toString());
 		    	swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(trade.getYield()).toString());
 		    	swap.swapDate.setSelectedDate(commonUTIL.stringToDate(trade.getEffectiveDate().toString(),true));
@@ -4363,21 +4411,31 @@ import dsServices.ServerConnectionUtil;
 		    
 		    if(trade.getTradedesc1().equalsIgnoreCase(FXFORWARDOPTION)) {
 		    	
+		    	//@yogesh 07/02/2015
+				// if called after takeUpWindow is opened then funtionality buttons disable while opening 
+				//takeup trade should be enabled
+		    	enableTakeUpDisabledFunctionalityButton();
+		    	
+		    	swap.setVisible(false);
+		    	rollpanel.setVisible(false);
+		    	fwdOp.setVisible(true);
+		    	
 		    	swap.jTextField1.setText("0.0");
 				swap.jTextField2.setText("0.0");
 				swap.jTextField4.setText("0.0");
-				swap.setVisible(false);
-		    	rollpanel.setVisible(false);
-		    	fwdOp.setVisible(true);
-		    	basicData.jRadioButton2.setEnabled(false);
-		    	basicData.jRadioButton5.setSelected(true);
-		    	basicData.jRadioButton5.setEnabled(true);
-		    	basicData.jRadioButton1.setEnabled(false);
-		    	basicData.jRadioButton1.setSelected(false);
+						    	
 		    	basicData.jRadioButton0.setEnabled(false);
 		    	basicData.jRadioButton0.setSelected(false);
+		    	basicData.jRadioButton1.setEnabled(false);
+		    	basicData.jRadioButton1.setSelected(false);
+		    	basicData.jRadioButton2.setEnabled(false);
+		    	basicData.jRadioButton2.setSelected(false);
+		    	basicData.jRadioButton5.setSelected(true);
+		    	basicData.jRadioButton5.setEnabled(true);    	
+		    	
 		    	basicData.jRadioButton6.setSelected(false);
 		    	basicData.jRadioButton7.setSelected(false);
+		    	
 		    	functionality.jButton2.setSelected(false);
 		    	functionality.jButton3.setSelected(false);
 		    	String currP = trade.getTradedesc();
@@ -4420,20 +4478,27 @@ import dsServices.ServerConnectionUtil;
 		    
 		    if(trade.getTradedesc1().equalsIgnoreCase(FXFORWARD))  {
 		    	
-		    	basicData.jRadioButton1.setSelected(true);
-		    	basicData.jRadioButton1.setEnabled(true);
+		    	//@yogesh 07/02/2015
+				// if called after takeUpWindow is opened then funtionality buttons disable while opening 
+				//takeup trade should be enabled
+		    	enableTakeUpDisabledFunctionalityButton();
+		    	
+		    	swap.setVisible(false);
+		    	rollpanel.setVisible(false);
+		    	fwdOp.setVisible(false);
 		    	
 		    	swap.jTextField1.setText("0.0");
 				swap.jTextField2.setText("0.0");
 				swap.jTextField4.setText("0.0");
-				swap.setVisible(false);
-				
-		    	basicData.jRadioButton5.setEnabled(false);
+										    	
+				basicData.jRadioButton0.setEnabled(false);
+		    	basicData.jRadioButton0.setSelected(false);
+		    	basicData.jRadioButton1.setSelected(true);
+		    	basicData.jRadioButton1.setEnabled(true);
 		    	basicData.jRadioButton2.setEnabled(false);
 		    	basicData.jRadioButton2.setSelected(false);
-		    	basicData.jRadioButton5.setSelected(false);
-		    	basicData.jRadioButton0.setEnabled(false);
-		    	basicData.jRadioButton0.setSelected(false);
+		    	basicData.jRadioButton5.setEnabled(false);
+		    	basicData.jRadioButton5.setSelected(false);		    	
 		    	basicData.jRadioButton6.setSelected(false);
 		    	basicData.jRadioButton7.setSelected(false);
 		    	fwdOp.setVisible(false);
@@ -4441,24 +4506,41 @@ import dsServices.ServerConnectionUtil;
 		    	//productSubType = "FXSWAP";
 		    }
 		    if(trade.getTradedesc1().equalsIgnoreCase(FXTAKEUP))  {
+		    	
 		    	productSubType = FXTAKEUP;
-		    	basicData.jRadioButton1.setSelected(false);
-		    	basicData.jRadioButton1.setEnabled(false);
+		    	
+		    	out.jTextField4.setEditable(false);
+		    	
 		    	swap.setVisible(false);
+		    	rollpanel.setVisible(false);
+		    	fwdOp.setVisible(false);
+		
 		    	swap.jTextField1.setText("0.0");
 				swap.jTextField2.setText("0.0");
 				swap.jTextField4.setText("0.0");
-		    	basicData.jRadioButton5.setEnabled(false);
-		    	basicData.jRadioButton2.setEnabled(false);
-		    	basicData.jRadioButton2.setSelected(false);
-		    	basicData.jRadioButton5.setSelected(false);
-		    	basicData.jRadioButton5.setEnabled(false);
-		    	basicData.jRadioButton0.setEnabled(true);
+				
+				basicData.currencyPair.setEditable(false);
+				basicData.jRadioButton0.setEnabled(true);
 		    	basicData.jRadioButton0.setSelected(true);
+				basicData.jRadioButton1.setSelected(false);
+		    	basicData.jRadioButton1.setEnabled(false);
+		    	basicData.jRadioButton2.setEnabled(false);
+		    	basicData.jRadioButton2.setSelected(false);		    	
+		    	basicData.jRadioButton5.setEnabled(false);    	
+		    	basicData.jRadioButton5.setSelected(false);
+		    	
+		    	functionality.jButton1.setEnabled(false);
+		    	functionality.jButton2.setEnabled(false);
+		    	functionality.jButton3.setEnabled(false);
+		    	functionality.jButton4.setEnabled(false);
+		    	functionality.jButton5.setEnabled(false);
+		    	
+		    	functionality.jButton1.setSelected(false);
 		    	functionality.jButton2.setSelected(false);
 		    	functionality.jButton3.setSelected(false);
-		    	fwdOp.setVisible(false);
-		    	  rollpanel.setVisible(false);
+		    	functionality.jButton4.setSelected(false);
+		    	functionality.jButton5.setSelected(false);
+
 		    }
 		    basicData.jRadioButton6.setEnabled(true);
 		    basicData.jRadioButton7.setEnabled(true);
@@ -4803,9 +4885,9 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 		      (MouseEvent)SwingUtilities.convertMouseEvent(__table, e, button);
 		    button.dispatchEvent(buttonEvent);
 		
-		    	mirrorBook.setBookno(0);
-		  //  buttonEvent.
-		 //  System.out.println( button.getText() + " " + button.getName());
+		    mirrorBook.setBookno(0);
+		    //  buttonEvent.
+		    //  System.out.println( button.getText() + " " + button.getName());
 		   if(dateF) {
 			  //As we dont need to calculate near date based on tenor we have commented below method
 			   // generateDeliveryDate(datefield,button.getName());
@@ -4814,8 +4896,7 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 			   //commented below  far date is currentdate + tenor
 			   /*int t = (new Integer(swapTenor.substring(0, swapTenor.length()-1)).intValue() * 2);
 			   swapTenor = t + swapTenor.substring(swapTenor.length()-1, swapTenor.length());*/
-			   generateDeliveryDate(swapField,swapTenor,datefield);
-			   
+			   generateDeliveryDate(swapField,swapTenor,datefield);		   
 			   
 		   } else {
 			  comp.setText(button.getText());
@@ -4827,8 +4908,12 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 					try {
 						vector = (Vector) remoteReference.getCurrencySplitConfig(Integer.parseInt(button.getName()), currencyPair);
 						if(!commonUTIL.isEmpty(vector)) {
-							//out.jCheckBox2.setSelected(true);
+							// @yogesh 07/02/2015
+							//split checkbox should also be selected when combination of
+							// book and currencypair is found in currncySplitConfig
+							out.jCheckBox2.setSelected(true);
 							out.jCheckBox2.setEnabled(true);
+																				
 							if(trade == null || trade.getId() == 0) 
 							    functionality.clearRounting();
 							sconfig =  (CurrencySplitConfig)vector.elementAt(0);
@@ -4842,18 +4927,17 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 							// split currency panel is made visible if split currency chechbox is set selected above
 							// and if a split currency config is found for book and currency 
 							functionality.jPanel2.setVisible(true);
-						} else {
+						 } else {
 							out.jCheckBox2.setSelected(false);
 							out.jCheckBox2.setEnabled(false);
 							functionality.clearRounting();
 							functionality.jPanel2.setVisible(false);
 						}
 						  
-						} catch (NumberFormatException | RemoteException e1) {							
-							e1.printStackTrace();
-						}
-				  	}
-					
+					} catch (NumberFormatException | RemoteException e1) {							
+						e1.printStackTrace();
+					}
+				  }					
 			  }
 			  if(type.equalsIgnoreCase("CurrencyPair")) {
 				  String book = basicData.book.getName();
@@ -4875,18 +4959,16 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 								 functionality.clearRounting();
 								 functionality.jPanel2.setVisible(false);
 							}
-						} catch (NumberFormatException | RemoteException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						
+						} catch (NumberFormatException | RemoteException e1) {						
+							e1.printStackTrace();
 						}
-				  	}
-				  
+				  	}				  
 			  }
 		   }
+		   
 		  if(label != null){
-			  label.setText(comp.getText().substring(0, 3)); // negiotated currency
-			  
-			  
+			  label.setText(comp.getText().substring(0, 3)); // negiotated currency			  
 		  }
 		  
 		 //  comp.
@@ -4913,8 +4995,9 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 			    dateF = dateField;
 			    this.type = type;
 			   // swapField = textField2;
-			   // mirrorBook = mirrorBook;
-			  }
+			   // mirrorBook = mirrorBook;  
+		  }
+		  
 		  public JTableButtonMouseListener(JTable table,JDatePicker  textField2,JLabel labeln,boolean dateField,String type) {
 			    __table = table;
 			    //datefield = textField;
@@ -4922,7 +5005,8 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 			    dateF = dateField;
 			    swapField = textField2;
 			    this.type = type;
-			  }
+		  }
+		  
 		  public JTableButtonMouseListener(JTable table, JDatePicker textField,JDatePicker  textField2,JLabel labeln,boolean dateField,String type) {
 			    __table = table;
 			    datefield = textField;
@@ -4930,7 +5014,7 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 			    dateF = dateField;
 			    swapField = textField2;
 			    this.type = type;
-			  }
+		  }
 	   
 		  public void mouseClicked(MouseEvent e) {
 		    __forwardEventToButton(e);
@@ -4952,18 +5036,14 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 		//    __forwardEventToButton(e);
 		  }
 		  public void generateDeliveryDate(JDatePicker dateField,String tenor,JDatePicker outRight1) {
-			//  System.out.println(commonUTIL.getCurrentDate());
-				DateU dateissueDate = DateU.valueOf(commonUTIL.getCurrentDate());
-				dateissueDate.convertToCode(tenor);
-				///if(dateField != null)
-				//dateField.setSelectedDate(dateissueDate.getDate());
-				if(outRight1 != null)
-				outRight1.setSelectedDate(dateissueDate.getDate());
-				dateissueDate.convertToCode(tenor);
-				if(dateField != null)
-					dateField.setSelectedDate(dateissueDate.getDate());
-				
-				
+
+			  	DateU dateissueDate = DateU.valueOf(out.outRightDate.getSelectedDate());
+			  	dateissueDate.convertToCode(tenor);
+				if(basicData.jRadioButton2.isSelected()) {					
+					swap.swapDate.setSelectedDate(dateissueDate.getDate());
+				} else {
+					out.outRightDate.setSelectedDate(dateissueDate.getDate());
+				}
 			}
 		 
 		}
@@ -5063,18 +5143,18 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 	 	   //@yogesh 04/02/2014
 		  // check if split rates are filled if split rate checkbox is checked
 		  private boolean checkRates() {		  
-				boolean ratesOk = true;
-						 
+				boolean ratesOk = true;								
+				
 				if (out.jCheckBox2.isSelected()) {
 					String splitBaseNearRate = functionality.jTextField2.getText().toString();
 					String splitQuoteNearRate = functionality.jTextField3.getText().toString();
 					
 					if (splitBaseNearRate.equals("") || splitBaseNearRate.equals("0.0") ) {
 						commonUTIL.showAlertMessage("Please enter Split Base Near Rate");
-						ratesOk =false;	
+						return false;	
 					} else if (splitQuoteNearRate.equals("") || splitQuoteNearRate.equals("0.0") ) {
 						commonUTIL.showAlertMessage("Please enter Split Quote Near Rate");
-						ratesOk =false;	
+						return false;	
 					} 
 					
 					if (basicData.jRadioButton2.isSelected()) {					
@@ -5083,16 +5163,13 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 						
 						if (splitBaseFarRate.equals("") || splitBaseFarRate.equals("0.0") ) {
 							commonUTIL.showAlertMessage("Please enter Split Base Far Rate");
-							ratesOk =false;	
+							return false;	
 						} else if (splitQuoteFarRate.equals("") || splitQuoteFarRate.equals("0.0") ) {
 							commonUTIL.showAlertMessage("Please enter Split Quote Far Rate");
-							ratesOk =false;	
+							return false;	
 						}
 					}
-				}
-				
-				
-	           
+				}           
 	            
 				return ratesOk;
 		  }
@@ -5105,16 +5182,27 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 			  
 			  if (trade.getAttributeValue("InstrumentType").equals("")) {
 	            	commonUTIL.showAlertMessage("PleaseSelect Instrument Type");
-	            	isTradeOk = false;	
-	            }
+	            	return false;	
+	          }	            
 	            
-	            
-	            if ( (commonUTIL.stringToDate(trade.getAttributeValue("Trade Date"), true)).after( 
+			  if ( (commonUTIL.stringToDate(trade.getAttributeValue("Trade Date"), true)).after( 
 	            		 commonUTIL.stringToDate(trade.getDelivertyDate(), true)) ) {	            	 	
 	            	 commonUTIL.showAlertMessage("Trade Date cannot be greater than Delivery Date");
-	            	 isTradeOk = false;		            	 
-	             }
+	            	 return false;		            	 
+	          }
 	            
-	            return isTradeOk;
+	          return isTradeOk;
+		  }
+		  
+		//@yogesh 07/02/2015
+			// enables all functionality buttons disable while opening 
+			//takeup trade
+		  private void enableTakeUpDisabledFunctionalityButton() {
+			  out.jTextField4.setEditable(true);
+			  functionality.jButton1.setEnabled(true);
+			  functionality.jButton2.setEnabled(true);
+			  functionality.jButton3.setEnabled(true);
+			  functionality.jButton4.setEnabled(true);
+			  functionality.jButton5.setEnabled(true);
 		  }
 	}
