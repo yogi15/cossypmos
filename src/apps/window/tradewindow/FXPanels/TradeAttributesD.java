@@ -28,6 +28,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
@@ -43,7 +44,7 @@ import com.jidesoft.combobox.MultiSelectListExComboBox;
 import com.jidesoft.grid.DateCellEditor;
 
 import dsServices.RemoteReferenceData;
-
+import apps.window.referencewindow.DateCellEditor12;
 import beans.Attribute;
 import beans.StartUPData;
 
@@ -208,6 +209,7 @@ public class TradeAttributesD extends JPanel {
             rowEditor.setEditorAt(row,ed);
             jTable1.getColumn(columnName).setCellEditor(rowEditor);
         }
+      
         public void addRowEditor(int row,int col,MultiSelectListExComboBox multiCombox,String columnName) {
             final MultiSelectionRenderer ed = new MultiSelectionRenderer(multiCombox,null);
             rowEditor.setEditorForRowCol(row,col,ed);
@@ -231,6 +233,14 @@ public class TradeAttributesD extends JPanel {
         public void addRowEditor(int row,int col,JComboBox combox,String columnName) {
             DefaultCellEditor ed = new DefaultCellEditor(combox);
             rowEditor.setEditorForRowCol(row,col,ed);
+            jTable1.getColumn(columnName).setCellEditor(rowEditor);
+        }
+        
+        //@yogesh 08/02/2015
+        // this will add dateCellEditior in jtable cell
+        public void addRowEditor(int row, String columnName) {
+            final DateCellEditor12 ed = new DateCellEditor12();
+            rowEditor.setEditorAt(row,ed);
             jTable1.getColumn(columnName).setCellEditor(rowEditor);
         }
         private EachRowEditor getRowEditor() {
@@ -422,7 +432,10 @@ public class TradeAttributesD extends JPanel {
                 protected Hashtable editors;
 
                 protected TableCellEditor editor, defaultEditor;
-
+                
+                protected DateCellEditor12 dateCellEditor12; 
+                
+                
                 JTable table;
 
                 /**
@@ -528,29 +541,65 @@ public class TradeAttributesD extends JPanel {
                 protected void selectEditor(MouseEvent e) {
                     int row =0;
                     int col =0;
-                    
+                    String value = "";
                     if (e == null) {
                         row = table.getSelectionModel().getAnchorSelectionIndex();
                         col = table.getSelectedColumn();
+                        
                     } else {
                         row = table.rowAtPoint(e.getPoint());
                         col = table.columnAtPoint(e.getPoint());
                     }
                     //System.out.println("From selectEditor row == " + row + " col == " + col);
-                    if(col == -1) {
-                        editor = defaultEditor;
-                    } else if(col == 0) {
-                        editor = defaultEditor;
-                    } else {                    
-		                Vector cols = (Vector) editors.get(new Integer(row));
-		                
-		                if(!commonUTIL.isEmpty(cols)) 
-		                	editor = (TableCellEditor) cols.get(col-1);
-		                }
                     
-		                if (editor == null) {
-		                	editor = defaultEditor;
-		                }
+                    //@yogesh 08/02/2015
+                    // if column is trade date and trademodifiedTime then we need to return DateCellEditor12
+                    // else other editor
+                    value =table.getModel().getValueAt(row, 0).toString();
+                    
+                    if (value.equalsIgnoreCase("Trade Date") || value.equalsIgnoreCase("TradeModifiedDateTime")) {
+                    	dateCellEditor12 = new DateCellEditor12();
+                    	//dateCellEditor12.datetimeFormat = true;
+                    	dateCellEditor12.setTimeDisplayed(true);
+                    	dateCellEditor12.addCellEditorListener(new CellEditorListener() {
+
+                			@Override
+                			public void editingCanceled(ChangeEvent e) {
+                				// TODO Auto-generated method stub
+                				// Systemout.println(e.getSource());
+                				// Systemout.println(e.toString());
+                				
+                			}
+
+                			@Override
+                			public void editingStopped(ChangeEvent e) {                				
+                				DateCellEditor12 dd =  (DateCellEditor12)e.getSource();
+                				// to avoid null pointer when a date window is opened by esc is used to not select value
+                				//we have used if condition below
+                				if (dd.getCellEditorValue()!=null) {
+                					table.getModel().setValueAt((dd.getCellEditorValue().toString()),table.getSelectionModel().getAnchorSelectionIndex(), 0); 
+                				}
+                				               		                				
+                			}                        	
+                        });
+                    	editor = dateCellEditor12;
+                    	
+                    } else {
+                    	 if(col == -1) {
+                             editor = defaultEditor;
+                         } else if(col == 0) {
+                             editor = defaultEditor;
+                         } else {                    
+     		                Vector cols = (Vector) editors.get(new Integer(row));
+     		                
+     		                if(!commonUTIL.isEmpty(cols)) 
+     		                	editor = (TableCellEditor) cols.get(col-1);
+     		            }
+                    }
+   
+	                if (editor == null) {
+	                	editor = defaultEditor;
+	                }
                 }
                 protected void selectEditor(KeyEvent e) {
 	                int row =0;
