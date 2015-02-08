@@ -13,15 +13,17 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
+import org.dyno.visual.swing.layouts.Bilateral;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
-import com.jidesoft.combobox.DateComboBox;
-
 import util.commonUTIL;
 import beans.FilterBean;
 import beans.UserJobsDetails;
+
+import com.jidesoft.combobox.DateComboBox;
+import com.jidesoft.combobox.MultiSelectListExComboBox;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class CashPositionSearchPanel extends SearchCriteriaType {
@@ -33,12 +35,12 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 	private JLabel jLabel3;
 	private JLabel jLabel4;
 	private JLabel jLabel5;
-	private JComboBox currency;
-	private JComboBox book;
-	private JComboBox counterParty;
-	private JComboBox primaryCurr;
-	private JComboBox quotingCurr;
-	private JComboBox BUYSELL;
+	private JComboBox<String> currency;
+	private JComboBox<String> book;
+	private JComboBox<String> counterParty;
+	private JComboBox<String> primaryCurr;
+	private JComboBox<String> quotingCurr;
+	private JComboBox<String> BUYSELL;
 	Hashtable<String,String> haslegalEntityattributes = new Hashtable<String,String>();
 	
 	/**
@@ -88,31 +90,31 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 
 	Hashtable<String,String> hasbookEntityattributes = new Hashtable<String,String>();
 	Hashtable<String,String> hastradeEntityattributes = new Hashtable<String,String>();
-	javax.swing.DefaultComboBoxModel bookData = new javax.swing.DefaultComboBoxModel();
-	javax.swing.DefaultComboBoxModel legalEntityData = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel<String> bookData = new javax.swing.DefaultComboBoxModel<String>();
+	javax.swing.DefaultComboBoxModel<String> legalEntityData = new javax.swing.DefaultComboBoxModel<String>();
 
-	javax.swing.DefaultComboBoxModel currencyAttributeData = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel<String> currencyAttributeData = new javax.swing.DefaultComboBoxModel<String>();
 
-	javax.swing.DefaultComboBoxModel productTypeAttributeData = new javax.swing.DefaultComboBoxModel();
-	javax.swing.DefaultComboBoxModel productSubTypeAttributeData = new javax.swing.DefaultComboBoxModel();
-	javax.swing.DefaultComboBoxModel primarryCurrAttributeData = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel<String> productTypeAttributeData = new javax.swing.DefaultComboBoxModel<String>();
+	javax.swing.DefaultComboBoxModel<String> productSubTypeAttributeData = new javax.swing.DefaultComboBoxModel<String>();
+	javax.swing.DefaultComboBoxModel<String> primarryCurrAttributeData = new javax.swing.DefaultComboBoxModel<String>();
 
-	javax.swing.DefaultComboBoxModel quotingCurrAttributeData = new javax.swing.DefaultComboBoxModel();
-	javax.swing.DefaultComboBoxModel bookAttributesData = new javax.swing.DefaultComboBoxModel();
-	javax.swing.DefaultComboBoxModel legalEntityAttributeData = new javax.swing.DefaultComboBoxModel();
-	javax.swing.DefaultComboBoxModel tradeAttributeData = new javax.swing.DefaultComboBoxModel();
+	javax.swing.DefaultComboBoxModel<String> quotingCurrAttributeData = new javax.swing.DefaultComboBoxModel<String>();
+	javax.swing.DefaultComboBoxModel<String> bookAttributesData = new javax.swing.DefaultComboBoxModel<String>();
+	javax.swing.DefaultComboBoxModel<String> legalEntityAttributeData = new javax.swing.DefaultComboBoxModel<String>();
+	javax.swing.DefaultComboBoxModel<String> tradeAttributeData = new javax.swing.DefaultComboBoxModel<String>();
 	
 	
-	Hashtable<Integer,beans.Book> books = new Hashtable<Integer,beans.Book> ();
-	Hashtable<Integer,beans.LegalEntity> counterPartyID = new Hashtable();
-	private JComboBox leattributesData;
+	/*Hashtable<Integer,beans.Book> books = new Hashtable<Integer,beans.Book>();
+	Hashtable<Integer,beans.LegalEntity> counterPartyID = new Hashtable<Integer,beans.LegalEntity>();*/
+	private JComboBox<String> leattributesData;
 	private JTextField leAttribute;
 	private JLabel jLabel6;
 	private JLabel jLabel7;
-	private JComboBox bookAttributessData;
+	private JComboBox<String> bookAttributessData;
 	private JTextField bookAttribute;
 	private JLabel jLabel8;
-	private JComboBox tradeAttributesData;
+	private JComboBox<String> tradeAttributesData;
 	private JTextField tradeAttribute;
 	private JLabel jLabel9;
 	private DateComboBox fromDate;
@@ -120,8 +122,8 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 	private DateComboBox toDate;
 	private JLabel jLabel11;
 	private JLabel jLabel12;
-	private JComboBox producttype;
-	private JComboBox productSubType;
+	private JComboBox<String> producttype;
+	private MultiSelectListExComboBox productSubType;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	public CashPositionSearchPanel() {
 		processBookDataCombo1(bookData, books);
@@ -132,9 +134,8 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 		processDomainData(bookAttributesData,  getFilterValues().getDomainValues("BookAttributes"));
 		processDomainData(legalEntityAttributeData,  getFilterValues().getDomainValues("LEAttributes"));
 		processDomainData(tradeAttributeData,  getFilterValues().getDomainValues("TradeAttribute"));
-		processDomainData(productTypeAttributeData,  getFilterValues().getDomainValues("ProductType"));
-		
-		
+		processDomainData(productTypeAttributeData,  getFilterValues().getDomainValues("ProductType"));		
+		processDomainData(productSubTypeAttributeData,getFilterValues().getDomainValues("FX"+".subType"));
 		initComponents();
 	}
 
@@ -150,48 +151,47 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 		setOpaque(true);
 		setLayout(new GroupLayout());
 		add(getJLabel0(), new Constraints(new Leading(18, 10, 10), new Leading(22, 10, 10)));
-		add(getCurrency(), new Constraints(new Leading(145, 100, 12, 12), new Leading(20, 28, 10, 10)));
-		add(getJLabel1(), new Constraints(new Leading(22, 10, 10), new Leading(62, 12, 12)));
-		add(getJLabel2(), new Constraints(new Leading(13, 12, 12), new Leading(152, 10, 10)));
-		add(getBook(), new Constraints(new Leading(145, 184, 10, 10), new Leading(146, 28, 10, 10)));
-		add(getLeattributesData(), new Constraints(new Leading(145, 140, 10, 10), new Leading(188, 28, 10, 10)));
-		add(getJLabel6(), new Constraints(new Leading(12, 12, 12), new Leading(195, 15, 10, 10)));
-		add(getJLabel7(), new Constraints(new Leading(18, 12, 12), new Leading(101, 12, 12)));
-		add(getBookAttributessData(), new Constraints(new Leading(145, 176, 12, 12), new Leading(98, 28, 12, 12)));
-		add(getBookAttribute(), new Constraints(new Leading(339, 119, 10, 10), new Leading(101, 28, 12, 12)));
-		add(getLeAttribute(), new Constraints(new Leading(339, 126, 10, 10), new Leading(188, 28, 10, 10)));
-		add(getJLabel3(), new Constraints(new Leading(12, 103, 12, 12), new Leading(359, 10, 10)));
-		add(getJLabel4(), new Constraints(new Leading(12, 12, 12), new Leading(391, 10, 10)));
-		add(getPrimaryCurr(), new Constraints(new Leading(145, 79, 12, 12), new Leading(361, 26, 10, 10)));
-		add(getQuotingCurr(), new Constraints(new Leading(145, 82, 12, 12), new Leading(393, 26, 10, 10)));
-		add(getCounterPary(), new Constraints(new Leading(145, 184, 12, 12), new Leading(54, 28, 12, 12)));
-		add(getJLabel8(), new Constraints(new Leading(15, 12, 12), new Leading(246, 10, 10)));
-		add(getTradeAttributesData(), new Constraints(new Leading(145, 176, 12, 12), new Leading(240, 28, 12, 12)));
-		add(getTradeAttribute(), new Constraints(new Leading(339, 126, 12, 12), new Leading(240, 28, 12, 12)));
-		add(getJLabel9(), new Constraints(new Leading(15, 12, 12), new Leading(300, 10, 10)));
-		add(getFromDate(), new Constraints(new Leading(145, 154, 10, 10), new Leading(294, 28, 12, 12)));
-		add(getJLabel10(), new Constraints(new Leading(305, 12, 12), new Leading(297, 12, 12)));
-		add(getToDate(), new Constraints(new Leading(338, 154, 12, 12), new Leading(294, 28, 12, 12)));
-		add(getJLabel11(), new Constraints(new Leading(251, 12, 12), new Leading(363, 12, 12)));
-		add(getJLabel12(), new Constraints(new Leading(248, 10, 10), new Leading(403, 10, 10)));
-		add(getProducttype(), new Constraints(new Leading(342, 146, 12, 12), new Leading(359, 30, 10, 10)));
-		add(getproductSubType(), new Constraints(new Leading(344, 142, 12, 12), new Leading(403, 27, 10, 10)));
-		add(getJLabel5(), new Constraints(new Leading(12, 12, 12), new Leading(430, 12, 12)));
-		add(getBUYSELL(), new Constraints(new Leading(145, 82, 12, 12), new Leading(427, 26, 10, 10)));
-		setSize(501, 490);
+		add(getJLabel1(), new Constraints(new Leading(18, 10, 10), new Leading(68, 12, 12)));
+		add(getJLabel6(), new Constraints(new Leading(18, 12, 12), new Leading(201, 15, 10, 10)));
+		add(getJLabel7(), new Constraints(new Leading(18, 12, 12), new Leading(112, 12, 12)));
+		add(getBookAttributessData(), new Constraints(new Leading(145, 162, 12, 12), new Leading(98, 28, 12, 12)));
+		add(getCurrency(), new Constraints(new Leading(145, 100, 12, 12), new Leading(12, 24, 12, 12)));
+		add(getJLabel2(), new Constraints(new Leading(18, 12, 12), new Leading(158, 10, 10)));
+		add(getLeattributesData(), new Constraints(new Leading(145, 162, 12, 12), new Leading(188, 28, 10, 10)));
+		add(getJLabel8(), new Constraints(new Leading(18, 12, 12), new Leading(246, 10, 10)));
+		add(getTradeAttributesData(), new Constraints(new Leading(147, 162, 10, 10), new Leading(232, 28, 10, 10)));
+		add(getJLabel9(), new Constraints(new Leading(18, 12, 12), new Leading(291, 10, 10)));
+		add(getFromDate(), new Constraints(new Leading(145, 154, 12, 12), new Leading(278, 28, 12, 12)));
+		add(getToDate(), new Constraints(new Bilateral(339, 13, 9), new Leading(278, 28, 12, 12)));
+		add(getTradeAttribute(), new Constraints(new Bilateral(339, 11, 6), new Leading(232, 28, 12, 12)));
+		add(getJLabel10(), new Constraints(new Leading(312, 28, 104), new Leading(291, 12, 12)));
+		add(getJLabel3(), new Constraints(new Leading(18, 103, 12, 12), new Leading(339, 12, 12)));
+		add(getJLabel4(), new Constraints(new Leading(18, 10, 10), new Leading(383, 12, 12)));
+		add(getBUYSELL(), new Constraints(new Leading(145, 82, 12, 12), new Leading(417, 26, 12, 12)));
+		add(getJLabel5(), new Constraints(new Leading(18, 12, 12), new Leading(429, 12, 12)));
+		add(getJLabel11(), new Constraints(new Leading(18, 12, 12), new Leading(473, 12, 12)));
+		add(getProducttype(), new Constraints(new Leading(143, 174, 10, 10), new Leading(461, 26, 10, 10)));
+		add(getproductSubType(), new Constraints(new Leading(143, 174, 12, 12), new Leading(503, 27, 12, 12)));
+		add(getJLabel12(), new Constraints(new Leading(18, 10, 10), new Leading(516, 10, 10)));
+		add(getLeAttribute(), new Constraints(new Bilateral(339, 14, 6), new Leading(188, 28, 10, 10)));
+		add(getBookAttribute(), new Constraints(new Bilateral(339, 14, 6), new Leading(100, 26, 12, 12)));
+		add(getPrimaryCurr(), new Constraints(new Leading(145, 106, 10, 10), new Leading(329, 24, 10, 10)));
+		add(getQuotingCurr(), new Constraints(new Leading(145, 106, 12, 12), new Leading(373, 24, 10, 10)));
+		add(getCounterPary(), new Constraints(new Leading(145, 162, 12, 12), new Leading(146, 26, 12, 12)));
+		add(getBook(), new Constraints(new Leading(145, 162, 12, 12), new Leading(54, 28, 12, 12)));
+		setSize(497, 565);
 	}
 
-	private JComboBox getproductSubType() {
+	private MultiSelectListExComboBox getproductSubType() {
 		if (productSubType == null) {
-			productSubType = new JComboBox();
-			productSubType.setModel(new DefaultComboBoxModel(new Object[] { "productsubtype" }));
+			productSubType = new MultiSelectListExComboBox();
 		}
 		return productSubType;
 	}
 
-	private JComboBox getProducttype() {
+	private JComboBox<String> getProducttype() {
 		if (producttype == null) {
-			producttype = new JComboBox();
+			producttype = new JComboBox<String>();
 			producttype.setModel(productTypeAttributeData);
 			producttype.addItemListener( new ItemListener() {
 
@@ -202,7 +202,7 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 	        		String productType = producttype.getSelectedItem().toString();
 	        		productSubTypeAttributeData.removeAllElements();
 	        		productSubTypeAttributeData = null;
-	        		productSubTypeAttributeData = new  javax.swing.DefaultComboBoxModel();
+	        		productSubTypeAttributeData = new  javax.swing.DefaultComboBoxModel<String>();
 	        		productSubType.removeAll();
 	        		processDomainData(productSubTypeAttributeData,  getFilterValues().getDomainValues(productType+".subType"));
 	        		productSubType.setModel(productSubTypeAttributeData);
@@ -212,9 +212,7 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 	        			quotingCurr.setEditable(true);
 	        			quotingCurr.setEnabled(true);
 	        			
-	        		}
-	        		else {
-	        			
+	        		} else {	        			
 	        			primaryCurr.setEditable(false);
 	        			primaryCurr.setEnabled(false);
 	        			quotingCurr.setEditable(false);
@@ -287,9 +285,9 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 		return tradeAttribute;
 	}
 
-	private JComboBox getTradeAttributesData() {
+	private JComboBox<String> getTradeAttributesData() {
 		if (tradeAttributesData == null) {
-			tradeAttributesData = new JComboBox();
+			tradeAttributesData = new JComboBox<String>();
 			tradeAttributesData.setModel(tradeAttributeData);
 		}
 		return tradeAttributesData;
@@ -310,9 +308,9 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 		return bookAttribute;
 	}
 
-	private JComboBox getBookAttributessData() {
+	private JComboBox<String> getBookAttributessData() {
 		if (bookAttributessData == null) {
-			bookAttributessData = new JComboBox();
+			bookAttributessData = new JComboBox<String>();
 			bookAttributessData.setModel(bookAttributesData);
 		}
 		return bookAttributessData;
@@ -341,17 +339,17 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 		return leAttribute;
 	}
 
-	private JComboBox getLeattributesData() {
+	private JComboBox<String> getLeattributesData() {
 		if (leattributesData == null) {
-			leattributesData = new JComboBox();
+			leattributesData = new JComboBox<String>();
 			leattributesData.setModel(legalEntityAttributeData);
 		}
 		return leattributesData;
 	}
 
-	private JComboBox getBUYSELL() {
+	private JComboBox<String> getBUYSELL() {
 		if (BUYSELL == null) {
-			BUYSELL = new JComboBox();
+			BUYSELL = new JComboBox<String>();
 			BUYSELL.addItem("");
 			BUYSELL.setSelectedIndex(0);
 			BUYSELL.addItem("BUY");
@@ -361,41 +359,41 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 	}
 
 
-	private JComboBox getQuotingCurr() {
+	private JComboBox<String> getQuotingCurr() {
 		if (quotingCurr == null) {
-			quotingCurr = new JComboBox();
+			quotingCurr = new JComboBox<String>();
 			quotingCurr.setModel(quotingCurrAttributeData);
 		}
 		return quotingCurr;
 	}
 
-	private JComboBox getPrimaryCurr() {
+	private JComboBox<String> getPrimaryCurr() {
 		if (primaryCurr == null) {
-			primaryCurr = new JComboBox();
+			primaryCurr = new JComboBox<String>();
 			primaryCurr.setModel(primarryCurrAttributeData);
 		}
 		return primaryCurr;
 	}
 
-	private JComboBox getBook() {
+	private JComboBox<String> getBook() {
 		if (book == null) {
-			book = new JComboBox();
+			book = new JComboBox<String>();
 			book.setModel(bookData);
 		}
 		return book;
 	}
 
-	private JComboBox getCounterPary() {
+	private JComboBox<String> getCounterPary() {
 		if (counterParty == null) {
-			counterParty = new JComboBox();
+			counterParty = new JComboBox<String>();
 			counterParty.setModel(legalEntityData);
 		}
 		return counterParty;
 	}
 
-	private JComboBox getCurrency() {
+	private JComboBox<String> getCurrency() {
 		if (currency == null) {
-			currency = new JComboBox();
+			currency = new JComboBox<String>();
 			currency.setModel(currencyAttributeData);
 		}
 		return currency;
@@ -451,100 +449,95 @@ public class CashPositionSearchPanel extends SearchCriteriaType {
 
 	@Override
 	public Vector<FilterBean> searchCriteria() {
-		// TODO Auto-generated method stub
+		
 		Vector<FilterBean> filterBeans = new Vector<FilterBean>();
 		FilterBean bean = null;
-		if(currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(currency.getSelectedItem().toString()))) {
-			
-			filterBeans.add(getCurrency(currency.getSelectedItem().toString(), "Currency"));
-	
+		if(currency.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(currency.getSelectedItem().toString()))) {			
+			filterBeans.add(getCurrency(currency.getSelectedItem().toString(), "Currency"));	
 		}
+		
 		if(book.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(book.getSelectedItem().toString()))) {
-			filterBeans.add(getBookName(book.getSelectedIndex()));
-			
+			filterBeans.add(getBookName(book.getSelectedIndex()));	
 		}
-if(primaryCurr.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(primaryCurr.getSelectedItem().toString()))) {
-			
+		
+		if(primaryCurr.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(primaryCurr.getSelectedItem().toString()))) {					
 			filterBeans.add(getCurrency(primaryCurr.getSelectedItem().toString(), "primaryCurr"));
-	
 		}
-if(quotingCurr.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(quotingCurr.getSelectedItem().toString()))) {
-	
-	filterBeans.add(getCurrency(quotingCurr.getSelectedItem().toString(), "quotingCurr"));
-
-}
-if(counterParty.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(counterParty.getSelectedItem().toString()))) {
-	
-	filterBeans.add(getLegalEntity(counterParty.getSelectedIndex(), "cpid"));
-	
-} 
-if(BUYSELL.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BUYSELL.getSelectedItem().toString()))) {
-	filterBeans.add(getBUYSELL(BUYSELL.getSelectedItem().toString()));
-
-	
-} 
-if((producttype.getSelectedIndex() > 0)  ) {
-	
-	filterBeans.add(getProductType(producttype.getSelectedItem().toString()));
-} 
-if( (productSubType.getSelectedIndex() > 0) ) {
-	
-	filterBeans.add(getProductSubType(productSubType.getSelectedItem().toString()));
-} 
-if((counterParty.getSelectedIndex() > 0)) {
-	
-	filterBeans.add(getLegalEntity(counterParty.getSelectedIndex(), "cpid"));
-	
-} 
-if(!commonUTIL.isEmpty(tradeAttribute.getText())) {
-	bean = new FilterBean();
-	if(tradeAttributesData.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(tradeAttributesData.getSelectedItem().toString()))) {
-	bean.setColumnName("TradeKeyword");
-	bean.setColumnValues("tradeattribute.attributename = '"+tradeAttributesData.getSelectedItem().toString()+"' and tradeattribute.attributevalue = '"+tradeAttribute.getText() +"'");
-	bean.setAnd_or("And");
-	bean.setSearchCriteria("in");
-	filterBeans.add(bean);
-	}
-}		
-if(!commonUTIL.isEmpty(leAttribute.getText())) {
-	bean = new FilterBean();
-	if(leattributesData.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(leattributesData.getSelectedItem().toString()))) {
-	bean.setColumnName("LeKeyword");
-	bean.setColumnValues("legalentityattribute.attributename = '"+leattributesData.getSelectedItem().toString()+"' and legalentityattribute.attributevalue = '"+leAttribute.getText() +"'");
-	bean.setAnd_or("And");
-	bean.setSearchCriteria("in");
-	filterBeans.add(bean);
-	}
-} 
-if(!commonUTIL.isEmpty(bookAttribute.getText())) {
-	bean = new FilterBean();
-	if(bookAttributessData.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(bookAttributessData.getSelectedItem().toString()))) {
-	bean.setColumnName("BookKeyword");
-	bean.setColumnValues("bookattribute.attributename = '"+bookAttributessData.getSelectedItem().toString()+"' and bookattribute.attributevalue = '"+bookAttribute.getText() +"'");
-	bean.setAnd_or("And");
-	bean.setSearchCriteria("in");
-	filterBeans.add(bean);
-	}
-} 
-if( fromDate.getDate() != null ) {
-	
-	Date tradeDt = fromDate.getDate();
-	if(toDate.getDate() != null) {
-	filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(tradeDt),		
-											commonUTIL.convertDateTOString(toDate.getDate()), "TradeDate"));
-	} else {
-		filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(tradeDt),		
-				commonUTIL.convertDateTOString(fromDate.getDate()), "TradeDate"));
-
-	}
-	
-}
+		
+		if(quotingCurr.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(quotingCurr.getSelectedItem().toString()))) {		
+			filterBeans.add(getCurrency(quotingCurr.getSelectedItem().toString(), "quotingCurr"));		
+		}
+		
+		if(counterParty.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(counterParty.getSelectedItem().toString()))) {	
+			filterBeans.add(getLegalEntity(counterParty.getSelectedIndex(), "cpid"));			
+		} 
+		
+		if(BUYSELL.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(BUYSELL.getSelectedItem().toString()))) {
+			filterBeans.add(getBUYSELL(BUYSELL.getSelectedItem().toString()));			
+		} 
+		
+		if((producttype.getSelectedIndex() > 0)  ) {	
+			filterBeans.add(getProductType(producttype.getSelectedItem().toString()));		
+		}
+		
+		if( (productSubType.getSelectedIndex() > 0) ) {			
+			filterBeans.add(getProductSubType(productSubType,"ProductSubType"));
+		} 
+		
+		if((counterParty.getSelectedIndex() > 0)) {		
+			filterBeans.add(getLegalEntity(counterParty.getSelectedIndex(), "cpid"));			
+		} 
+		
+		if(!commonUTIL.isEmpty(tradeAttribute.getText())) {
+			bean = new FilterBean();
+			if(tradeAttributesData.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(tradeAttributesData.getSelectedItem().toString()))) {
+				bean.setColumnName("TradeKeyword");
+				bean.setColumnValues("tradeattribute.attributename = '"+tradeAttributesData.getSelectedItem().toString()+"' and tradeattribute.attributevalue = '"+tradeAttribute.getText() +"'");
+				bean.setAnd_or("And");
+				bean.setSearchCriteria("in");
+				filterBeans.add(bean);
+			}
+		}
+		
+		if(!commonUTIL.isEmpty(leAttribute.getText())) {
+			bean = new FilterBean();
+			if(leattributesData.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(leattributesData.getSelectedItem().toString()))) {
+				bean.setColumnName("LeKeyword");
+				bean.setColumnValues("legalentityattribute.attributename = '"+leattributesData.getSelectedItem().toString()+"' and legalentityattribute.attributevalue = '"+leAttribute.getText() +"'");
+				bean.setAnd_or("And");
+				bean.setSearchCriteria("in");
+				filterBeans.add(bean);
+			}
+		} 
+		
+		if(!commonUTIL.isEmpty(bookAttribute.getText())) {
+			bean = new FilterBean();
+			if(bookAttributessData.getSelectedIndex() != -1 && (!commonUTIL.isEmpty(bookAttributessData.getSelectedItem().toString()))) {
+				bean.setColumnName("BookKeyword");
+				bean.setColumnValues("bookattribute.attributename = '"+bookAttributessData.getSelectedItem().toString()+"' and bookattribute.attributevalue = '"+bookAttribute.getText() +"'");
+				bean.setAnd_or("And");
+				bean.setSearchCriteria("in");
+				filterBeans.add(bean);
+			}
+		} 
+		
+		if( fromDate.getDate() != null ) {			
+			Date tradeDt = fromDate.getDate();
+			if(toDate.getDate() != null) {
+				filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(tradeDt),		
+													commonUTIL.convertDateTOString(toDate.getDate()), "TradeDate"));
+			} else {
+				filterBeans.add(getCriteriaDate(commonUTIL.convertDateTOString(tradeDt),		
+						commonUTIL.convertDateTOString(fromDate.getDate()), "TradeDate"));		
+			}			
+		}
+		
 		return filterBeans;
 	}
 
 	@Override
 	public void clearllCriterial() {
-		// TODO Auto-generated method stub
+		
 		currency.setSelectedIndex(-1);
 		BUYSELL.setSelectedIndex(-1);
 		primaryCurr.setSelectedIndex(-1);
@@ -561,28 +554,33 @@ if( fromDate.getDate() != null ) {
 		leAttribute.setText("");
 		tradeAttribute.setText("");
 		
-			}
+	}
 
 	@Override
 	public void loadFilters(Vector<UserJobsDetails> jobdetails) {
-		// TODO Auto-generated method stub
+		
 		for(int i=0;i<jobdetails.size();i++) {
 			UserJobsDetails bean = jobdetails.get(i);
 			if(bean.getColumnName().equalsIgnoreCase("Type")) {
 				BUYSELL.setSelectedItem(bean.getValues());
 			}
+			
 			if(bean.getColumnName().equalsIgnoreCase("Currency")) {
 				currency.setSelectedItem(bean.getValues());
 			}
+			
 			if(bean.getColumnName().equalsIgnoreCase("BookID")) {
 				book.setSelectedIndex(getBooktoSelected(Integer.parseInt(bean.getValues())));
 			}
+			
 			if(bean.getColumnName().equalsIgnoreCase("cpid")) {
 				counterParty.setSelectedIndex(getCPtoSelected(Integer.parseInt(bean.getValues())));
 			}
+			
 			if(bean.getColumnName().equalsIgnoreCase("primaryCurr")) {
 				primaryCurr.setSelectedItem(bean.getValues());
 			}
+			
 			if(bean.getColumnName().equalsIgnoreCase("quotingCurr")) {
 				quotingCurr.setSelectedItem(bean.getValues());
 			}
@@ -596,9 +594,11 @@ if( fromDate.getDate() != null ) {
 				toDate.setDate(commonUTIL
 						.convertStringtoSQLDate(bean.getValues()));
 			} 
+			
 			if(bean.getColumnName().equalsIgnoreCase("ProductType")) {
 				producttype.setSelectedItem(bean.getValues());
 			}
+			
 			if(bean.getColumnName().equalsIgnoreCase("ProductSubType")) {
 				productSubType.setSelectedItem(bean.getValues());
 			}
@@ -612,6 +612,7 @@ if( fromDate.getDate() != null ) {
 				tradeAttributesData.setSelectedItem(tradeAttributeNames);
 				tradeAttribute.setText(tradeAttributeValue);
 			}
+			
 			if(bean.getColumnName().equalsIgnoreCase("LeKeyword")) {
 				String leAttName = "legalentityattribute.attributename = '";
 				String leAttValue = "' and legalentityattribute.attributevalue = '";
@@ -620,6 +621,7 @@ if( fromDate.getDate() != null ) {
 				leattributesData.setSelectedItem(leAttributeNames);
 				leAttribute.setText(leAttributeValue);
 			}
+			
 			if(bean.getColumnName().equalsIgnoreCase("BookKeyword")) {
 				String leAttName = "bookattribute.attributename = '";
 				String leAttValue = "' and bookattribute.attributevalue = '";
