@@ -313,7 +313,10 @@ public class TradeApplication extends DefaultDockableHolder {
 		JMenu fileMenu = new JMenu("File");
 		cashFlow = new JMenu("CashFlow");
 		cashFlow.setEnabled(false);
-		menuBar.add(fileMenu);
+		
+		//@yogesh 07/02/2015
+		// hide file menu to avoid save, saveasnew code from there
+		//menuBar.add(fileMenu);
 		menuBar.add(cashFlow);
 		commonUTIL.setBackGroundColor(menuBar);
 		// Create and add simple menu item to one of the drop down menu
@@ -945,10 +948,10 @@ public class TradeApplication extends DefaultDockableHolder {
 			// jToolBar0.setBorder(new LineBorder(Color.black, 1, false));
 			//jToolBarB.setLayout(new BorderLayout());
 			//jToolBar0.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
-			jToolBarB.add(getJButton1());
+			//jToolBarB.add(getJButton1());
 			jToolBarB.add(getJButton5());
-			jToolBarB.add(getJButton2());
-			jToolBarB.add(getJButton6());
+			//jToolBarB.add(getJButton2());
+			//jToolBarB.add(getJButton6());
 			//jToolBar0.add(getJButton7());
 			jToolBarB.add(getJButton0());
 			jToolBarB.add(getJButton3());
