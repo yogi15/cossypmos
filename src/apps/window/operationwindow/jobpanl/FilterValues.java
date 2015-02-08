@@ -201,6 +201,7 @@ public class FilterValues {
 		columnNames.put("TransferDate", "ValueDate");
 		columnNames.put("TransferMethodType", "Method");
 		columnNames.put("OpenpositionDate", "OpenpositionDate");
+		columnNames.put("CurrencyPair", "tradedesc");
 		
 		numberDataTypes.put("Book", "Bookid");
 		numberDataTypes.put("LegalEntity", "id");
