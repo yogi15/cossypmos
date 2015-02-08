@@ -46,6 +46,15 @@ public class DateCellEditor12 extends com.jidesoft.grid.DateCellEditor {
 	        else {
 	            cal = Calendar.getInstance();
 	            cal.setTime((Date) value);
+	        }	                	        
+	        
+	        if (isTimeDisplayed()) {
+	        	
+	        	//@yogesh 08/02/2015
+	        	// the commented return gives date in gregorain calender.
+	        	// we need date in dd/MM/yyyy HH:mm:ss format
+	        	return  commonUTIL.convertDateTimeTOString(cal.getTime());
+	            //return new Date(timeInMillis);
 	        }
 	        
 	        long timeInMillis = cal.getTimeInMillis();
@@ -63,13 +72,7 @@ public class DateCellEditor12 extends com.jidesoft.grid.DateCellEditor {
 
 	        // now get universal time
 	        Date ret = adjustedCalendar.getTime();
-
-
 	        
-	        if (isTimeDisplayed()) {
-	            return new Date(timeInMillis);
-	        }
-
 	        return commonUTIL.dateToString(ret);
 	    }
    public DateCellEditor12() {
