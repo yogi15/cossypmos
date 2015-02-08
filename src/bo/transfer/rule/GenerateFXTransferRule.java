@@ -132,13 +132,13 @@ public class GenerateFXTransferRule extends ProductTransferRule {
 				 ruleB.set_transferType(transerTYPEPRINCIPAL);
 			     
 				 Book book = (Book) getBook(trade.getBookId());
-				 po = (LegalEntity) getLegalEntity(book.getLe_id());
-					 if(trade.isMirrorTrade()) {
-				    
-				    	 ruleB.set__tradeCptyId(po.getId());
-				     } else {
-				    	 ruleB.set__tradeCptyId(trade.getCpID());
-				     }
+				 po= (LegalEntity) getLegalEntity(book.getLe_id());
+				 
+				 if(trade.isMirrorTrade()) {			    
+			    	 ruleB.set__tradeCptyId(po.getId());
+			     } else {
+			    	 ruleB.set__tradeCptyId(trade.getCpID());
+			     }
 					 
 				 ruleB.set_payerLegalEntityId(book.getLe_id()); // po role 
 				 Sdi paySdi = getSdiOnEntity(po.getId(),productType,trade.getCurrency(),SDIConstants.PO);
