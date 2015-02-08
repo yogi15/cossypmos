@@ -206,9 +206,9 @@ public class ReportSQLGenerator {
 		if ((tablename.contains("trade"))
 				&& (!reportType.equalsIgnoreCase("Trade"))) {
 			attachWhere = true;
-			if (sqlJoins.length() > 0)
+			if (sqlJoins.length() > 0) {
 				sqlJoins = sqlJoins + " and " + reportType + ".id = trade.id ";
-			else if (!reportType.equalsIgnoreCase("Trade")) {
+			} else if (!reportType.equalsIgnoreCase("Trade")) {
 				sqlJoins = reportType + ".tradeid = trade.id ";
 			} else {
 				sqlJoins = reportType + ".id = trade.id ";
