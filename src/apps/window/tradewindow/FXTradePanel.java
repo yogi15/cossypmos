@@ -739,35 +739,41 @@ import dsServices.ServerConnectionUtil;
 				takeupW.setIconImage(Toolkit.getDefaultToolkit()
 		      		   .getImage(imgURL));
 				takeupW.setTitle("Cosmos TakeUP Window : " + user.getUser_name()    );
-				try {
-					takeupW.jTextField0.setValue(fwdOp.primaryC.getDoubleValue());
-					takeupW.jTextField2.setValue(fwdOp.quotingC.getDoubleValue());
-					takeupW.jLabel10.setText(trade.getCurrency());
-					takeupW.jLabel11.setText(trade.getCurrency());
-					takeupW.jLabel5.setText(basicData.currencyPair.getText().substring(0, 3));
-					takeupW.jLabel4.setText(basicData.currencyPair.getText().substring(0, 3));
-				//	takeupW.jTextField4.setDateFormat(commonUTIL.getDateTimeFormat());
-                  //   takeupW.jTextField7.setDateFormat(commonUTIL.getDateTimeFormat());
-                     //takeupW.jTextField5.setText(commonUTIL.getCurrentDateInString());
-                     //takeupW.jTextField5.setEditable(false);
-					//takeupW.jTextField5.setDate(commonUTIL.getDateTimeFormat());
-                     //takeupW.jTextField6.setFormat(commonUTIL.getDateTimeFormat());
-                     
-                     /*if (!commonUTIL.stringToDate(trade.getDelivertyDate(), true).equals(
-                    		 commonUTIL.stringToDate(trade.getEffectiveDate(), true))) {                    	 
-                    	 takeupW.jTextField7.setText(trade.getEffectiveDate());                    	 
-                     } else {                    	 
-                    	 takeupW.jTextField7.setText(trade.getTradeDate());                    	 
-                     }*/
-                     
-                     takeupW.jTextField7.setText(trade.getEffectiveDate());
-                     takeupW.jTextField4.setText(trade.getTradeDate());                  
-                     takeupW.jTextField1.setValue(0);
-                     takeupW.jTextField3.setValue(0);
-                     takeupW.model.setData((Vector) childTrades);
-				} catch (ParseException e1) {
-					
-					e1.printStackTrace();
+				
+				//@yogesh 10/02/2015
+				// when new is pressed trade is null and if its merchant trade and takeUp Button is pressed it 
+				//throws null pointer. To avoid that we check if trade is null below
+				if (trade != null) {
+					try {
+						takeupW.jTextField0.setValue(fwdOp.primaryC.getDoubleValue());
+						takeupW.jTextField2.setValue(fwdOp.quotingC.getDoubleValue());
+						takeupW.jLabel10.setText(trade.getCurrency());
+						takeupW.jLabel11.setText(trade.getCurrency());
+						takeupW.jLabel5.setText(basicData.currencyPair.getText().substring(0, 3));
+						takeupW.jLabel4.setText(basicData.currencyPair.getText().substring(0, 3));
+					//	takeupW.jTextField4.setDateFormat(commonUTIL.getDateTimeFormat());
+	                  //   takeupW.jTextField7.setDateFormat(commonUTIL.getDateTimeFormat());
+	                     //takeupW.jTextField5.setText(commonUTIL.getCurrentDateInString());
+	                     //takeupW.jTextField5.setEditable(false);
+						//takeupW.jTextField5.setDate(commonUTIL.getDateTimeFormat());
+	                     //takeupW.jTextField6.setFormat(commonUTIL.getDateTimeFormat());
+	                     
+	                     /*if (!commonUTIL.stringToDate(trade.getDelivertyDate(), true).equals(
+	                    		 commonUTIL.stringToDate(trade.getEffectiveDate(), true))) {                    	 
+	                    	 takeupW.jTextField7.setText(trade.getEffectiveDate());                    	 
+	                     } else {                    	 
+	                    	 takeupW.jTextField7.setText(trade.getTradeDate());                    	 
+	                     }*/
+	                     
+	                     takeupW.jTextField7.setText(trade.getEffectiveDate());
+	                     takeupW.jTextField4.setText(trade.getTradeDate());                  
+	                     takeupW.jTextField1.setValue(0);
+	                     takeupW.jTextField3.setValue(0);
+	                     takeupW.model.setData((Vector) childTrades);
+
+					} catch (ParseException e1) {
+						e1.printStackTrace();
+					}
 				}
 				//takeupW.setUser(user);				
 			}
@@ -3630,8 +3636,19 @@ import dsServices.ServerConnectionUtil;
 			//takeup trade should be enabled
 			enableTakeUpDisabledFunctionalityButton();
 			
+			//@yogesh 10/02/2015
+			//enable the instrument type and 
+			attributes.tradeAction = "New";
+			
+			//@yogesh 10/02/2015
+			// make a new takeUpwindow and set its type to utilize
+			if (trade != null && trade.getTradedesc1().equals(FXFORWARDOPTION)) {
+				takeupW = new TakeUPWindow();
+				takeupW.typeComboBox.setSelectedItem("Utilize");
+			}			
+			
 			app.trade = null;
-		//	out.jCheckBox2.setEnabled(true);
+			//out.jCheckBox2.setEnabled(true);
 			//out.jCheckBox0.setEnabled(false);
 			functionality.jButton2.setEnabled(true);
 			basicData.currencyPair.setText("");
@@ -3664,15 +3681,19 @@ import dsServices.ServerConnectionUtil;
 			swap.jTextField2.setText("0");
 			swap.swapDate.setText("0");
 			swap.jTextField4.setText("0");*/
-			swap.setVisible(false); 
+	
 			String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
 	        
 	      //  attributeModel = new DefaultTableModel(attributeColumnName,0);
 	        processTableData(attributeDataValue,attributeModel);
 	        attributes.jTable1.removeAll();
 	     //   attributes.jTable1.setModel(attributeModel);
-	       
+	        swap.setVisible(false);
+			fwdOp.setVisible(false);
+			fwdOp.setEnabled(false);
 	        rollpanel.getJPanel0().setVisible(false);
+	        functionality.jPanel2.setVisible(false);
+	        functionality.jPanel6.setVisible(false);
 	        functionality.jButton7.setEnabled(false);
 	        trade = null;
 	      
@@ -3747,13 +3768,10 @@ import dsServices.ServerConnectionUtil;
 		    functionality.jTextField3.setText("0.0");
 		    functionality.FarRate1.setText("0.0");
 		    functionality.FarRate2.setText("0.0");*/
-		    functionality.jPanel6.setVisible(false);
+		   
 		  //  functionality.jTabbedPane2.setVisible(false);
 		  //  functionality.jTabbedPane1.setVisible(true);
-		    
-		    fwdOp.setEnabled(false);
-		    fwdOp.startDate.setDate(commonUTIL.getCurrentDate());
-		    fwdOp.startDate.setEnabled(false);	
+		    		    		 
 		 // mpankaj 02/02functionality.jPanel2.jTextField2
 			 functionality.jPanel2.setVisible(false);
 			 out.jCheckBox2.setSelected(false);
@@ -4157,8 +4175,9 @@ import dsServices.ServerConnectionUtil;
 		    
 		    //@yogesh 01/02/2015
 		    // for merchant float trade effective date is fwdOp.start da
-		    String instrumentType = trade.getAttributeValue("InstrumentType");			 
-			 if (instrumenTypeVal.contains(instrumentType)) {				 
+		    String instrumentType = trade.getAttributeValue("InstrumentType");	
+		    
+			if (instrumenTypeVal.contains(instrumentType) && trade.getTradedesc1().equalsIgnoreCase(FXFORWARDOPTION)) {				 
 				 trade.setEffectiveDate(commonUTIL.convertDateTOString(fwdOp.startDate.getDate()));				 
 			 } 
 		    
@@ -4505,6 +4524,11 @@ import dsServices.ServerConnectionUtil;
 		    	  rollpanel.setVisible(false);
 		    	//productSubType = "FXSWAP";
 		    }
+		    
+		    basicData.jRadioButton6.setEnabled(true);
+		    basicData.jRadioButton7.setEnabled(true);
+		    
+		    
 		    if(trade.getTradedesc1().equalsIgnoreCase(FXTAKEUP))  {
 		    	
 		    	productSubType = FXTAKEUP;
@@ -4528,11 +4552,15 @@ import dsServices.ServerConnectionUtil;
 		    	basicData.jRadioButton2.setSelected(false);		    	
 		    	basicData.jRadioButton5.setEnabled(false);    	
 		    	basicData.jRadioButton5.setSelected(false);
+		    	basicData.jRadioButton6.setEnabled(false);    	
+		    	basicData.jRadioButton6.setSelected(false);
+		    	basicData.jRadioButton7.setEnabled(false);    	
+		    	basicData.jRadioButton7.setSelected(false);
 		    	
 		    	functionality.jButton1.setEnabled(false);
 		    	functionality.jButton2.setEnabled(false);
 		    	functionality.jButton3.setEnabled(false);
-		    	functionality.jButton4.setEnabled(false);
+		    	//functionality.jButton4.setEnabled(false);
 		    	functionality.jButton5.setEnabled(false);
 		    	
 		    	functionality.jButton1.setSelected(false);
@@ -4542,8 +4570,7 @@ import dsServices.ServerConnectionUtil;
 		    	functionality.jButton5.setSelected(false);
 
 		    }
-		    basicData.jRadioButton6.setEnabled(true);
-		    basicData.jRadioButton7.setEnabled(true);
+		    
 		    rollpanel.setVisible(false);
 		    setTrade(trade);
 		}
