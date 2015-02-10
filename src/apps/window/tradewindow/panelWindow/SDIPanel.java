@@ -573,16 +573,21 @@ public class SDIPanel extends BackOfficePanel {
 						 boolean sdiISzero = false;
 						 boolean sdiMethod = false;
 						 if(rule.get_payerSDId() == 0 || rule.get_receiverSDId() == 0) {
-							commonUTIL.showAlertMessage("Missing SDI on "+rule.get_settlementCurrency() + " "+getLEName(rule.get_payerLegalEntityId()) + " " + getLEName(rule.get_receiverLegalEntityId())); 
+							//@ yogesh 10/02/2105
+							 // pankaj asked to comment
+							//commonUTIL.showAlertMessage("Missing SDI on "+rule.get_settlementCurrency() + " "+getLEName(rule.get_payerLegalEntityId()) + " " + getLEName(rule.get_receiverLegalEntityId())); 
 							 sdiISzero = true;
 						 }
 						 if(!sdiISzero) {
-						 String payMethod = rule.getPayerMethodType();
-						 String recMehtod = rule.getReceiverMethodType();
-						 if(payMethod.equalsIgnoreCase(recMehtod)) {
-								
-							 sdiMethod= true;
-						 }
+							 String payMethod = rule.getPayerMethodType();
+							 String recMehtod = rule.getReceiverMethodType();
+							 //@ yogesh 10/02/2105
+							 // checking for null
+							 if (commonUTIL.isEmpty(payMethod) && commonUTIL.isEmpty(recMehtod)) {
+								 if(payMethod.equalsIgnoreCase(recMehtod)) {										
+									 sdiMethod= true;
+								 } 
+							 }							 
 						 }
 						 if(!rowSelectionAllowed) {
 							 c.setBackground(Color.gray);
