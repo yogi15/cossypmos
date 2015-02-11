@@ -1,0 +1,26 @@
+select 
+	 (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'    else 'FCY/FCY'    end )  FCY_NONFCY, 
+	 (case  when currency = 'INR' then 'INR'    else 'USD'    end )  Currency, 
+	 (case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ) BUYSELL,
+     (nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'MERCHANTREADY',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0)
+	  ) AS "MERCHANT READY",
+     (nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'MERCHANTFORWARD',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
+	  ) AS "MERCHANT FORWARD",
+	  nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'TakeUpType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'MERCHANTCANCELLED',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
+	  AS "MERCHANT CANCELLATION",
+     (nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'FXSPOT',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
+	  ) AS "FX SPOT",
+     (nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'FXFORWARD',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
+	  ) AS "FX FORWARD",
+     (nvl(sum(decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'FXSWAP',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
+	 ) AS "FX SWAP"
+FROM  
+		trade  where    trunc(tradedate) = to_date('15/01/2015','dd/mm/yyyy')      and autotype in ('Original','null')
+GROUP BY 
+		(case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ),
+	    (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ), 
+	    (case  when currency = 'INR' then 'INR'   else 'USD'    end ) ,
+	    getValueOnLEAttribute(cpid,'Sector')
+ORDER BY
+	   (case when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY'   end ), 
+	   (case  when currency = 'INR' then 'INR'  else 'USD'  end )
