@@ -55,55 +55,67 @@ public class TradeSQL {
 	 "select id,producttype,tradedesc1  from trade  " ;
   
   final static private String SELECTFTDSQL = 
-			 "select decode( t.currency,'INR','FCY/INR','FCY/FCY')currencyPair, "+
-			 " t.currency Currency, "+
-			 " decode(substr(t.type,0,3),'BUY','PURCHASE','SALE') as BUYSELL , "+
-			 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARDOPTION', decode(a.ATTRIBUTENAME,'InstrumentType',decode(a.ATTRIBUTEVALUE,'MerchantReady',t.quantity , 0))))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0)  as  MerchantReady  , "+
-		  " nvl(( SUM(DECODE(t.tradedesc1, 'FXFORWARDOPTION', decode(a.ATTRIBUTENAME,'InstrumentType',decode(a.ATTRIBUTEVALUE,'MerchantForward',t.quantity , 0))))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0)   MerchantForward   ," +
-			 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARDOPTION', decode(a.ATTRIBUTENAME,'InstrumentType',decode(a.ATTRIBUTEVALUE,'MerchantCancellationA',t.quantity , 0))))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))) ,0) MerchantCancellationA, " +
-			 " nvl((SUM(DECODE(t.tradedesc1, 'FXSWAP', quantity/2  ))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0) AS  FXSWAP , " +
-			 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),  1,quantity/2 ) ))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0) AS  SPOT, " +
-			 " nvl((SUM(DECODE(t.tradedesc1, 'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),  2,quantity/2 ) ))  *  decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','24/01/2015'))),0) AS  FORWARD " +
-			 " from trade t,attribute  a where t.id = a.ID  " +
-			 " and trunc(t.tradedate) = to_date('24/01/2015','dd/mm/yyyy') and a.type = 'Trade'" +
-			 " and a.type = 'Trade'" +
-			 " group by t.currency,substr(t.type,0,3), t.tradedesc " +
-			 " order by t.currency" ;
+		  " select " +
+			" (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'    else 'FCY/FCY'    end )  FCY_NONFCY, "+ 
+			" (case  when currency = 'INR' then 'INR'    else 'USD'    end )  Currency, "+ 
+			" (case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ) BUYSELL, "+ 
+		    " (nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'MERCHANTREADY',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) "+ 
+			"  ) AS "+ "MERCHANT READY"+ "," +  
+		    " (nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'MERCHANTFORWARD',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) "+ 
+			"  ) AS "+ "MERCHANT FORWARD"+ "," + 
+			" nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'TakeUpType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'MERCHANTCANCELLED',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) "+ 
+			" AS "+ "MERCHANT CANCELLATION"+ "," + 
+		    " (nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'FXSPOT',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) "+ 
+			"  ) AS "+ "FX SPOT"+ "," + 
+		    " (nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'FXFORWARD',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) "+ 
+			"  ) AS"+ "FX FORWARD"+ "," + 
+		    " (nvl(sum(decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'FXSWAP',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) "+ 
+			" ) AS" + "FX SWAP"  + 
+		" FROM " +
+			" trade  where    trunc(tradedate) = to_date('15/01/2015','dd/mm/yyyy')      and autotype in ('Original','null') "+ 
+	"	GROUP BY "+ 
+			   "(case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ), "+ 
+			   "(case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ), "+ 
+			   " (case  when currency = 'INR' then 'INR'   else 'USD'    end ) , "+ 
+			   " getValueOnLEAttribute(cpid,'Sector') "+ 
+		"ORDER BY "+ 
+			  " (case when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY'   end ), "+ 
+			  " (case  when currency = 'INR' then 'INR'  else 'USD'  end )";
+
 
 		
   public static String getFTDSQL(String currentDate) {
 	  String ftdSQL = 
-			  "select "+
-			  " (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'    else 'FCY/FCY'    end )  FCY_NONFCY, " +
-			  "  (case  when currency = 'INR' then 'INR'    else 'USD'    end )  Currency, "+
-			  "  (case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ) BUYSELL,"+
-			  "   nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id),'MerchantReady',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0) MerchantReady,"+
-			  " nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id),'MerchantForward',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0) MerchantForward,"+
-			  "  nvl(sum(decode(tradedesc1,'FXFORWARDOPTION', decode(getFXForwardOptionType(id),'MerchantCancellationA',decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0) MerchantCancellationA,"+
-			 
- 			"  nvl(sum(decode(tradedesc1,'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),1,decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0) FXSPOT,"+
- 			 "   nvl(sum(decode(tradedesc1,'FXFORWARD', decode(getSPOTTtypeDeals(TRADEDATE,deliverydate ),2,decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2))) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0) FORWARD,"+
- 			 "   nvl(sum(DECODE(tradedesc1, 'FXSWAP',  decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"'))),0) FXSWAP"+
-			 				
-			 				 	  
-			 				 	   
- "     from  trade  where "+
- "       trunc(tradedate) = to_date('"+currentDate+"','dd/mm/yyyy')    and  parentid = 0 "+
- "     group by "+
- "    (case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ), "+
- "     (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ), "+
- "     (case  when currency = 'INR' then 'INR'   else 'USD'    end ) "+
- "     order by "+
- "    (case when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY'   end ), "+
-			    "    (case  when currency = 'INR' then 'INR'  else 'USD'  end )";
+			  " select " +
+						" (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'    else 'FCY/FCY'    end )  FCY_NONFCY, "+ 
+						" (case  when currency = 'INR' then 'INR'    else 'USD'    end )  Currency, "+ 
+						" (case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ) BUYSELL, "+ 
+					    " (nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'MERCHANTREADY',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"')))),0) "+ 
+						"  ) AS \"MERCHANT READY\"," +  
+					    " (nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'MERCHANTFORWARD',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"')))),0) "+ 
+						"  ) AS \"MERCHANT FORWARD\"," + 
+						" nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'TakeUpType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'MERCHANTCANCELLED',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"')))),0) "+ 
+						" AS  \"MERCHANT CANCELLATION\"," +  
+					    " (nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'FXSPOT',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"')))),0) "+ 
+						"  ) AS \"FX SPOT\"," + 
+					    " (nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'FXFORWARD',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"')))),0) "+ 
+						"  ) AS \"FX FORWARD\"," + 
+					    " (nvl(sum(decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'FXSWAP',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','"+currentDate+"')))),0) "+ 
+						" ) AS \"FX SWAP\" "+ 
+					" FROM " +
+						" trade  where    trunc(tradedate) = to_date('"+currentDate+"','dd/mm/yyyy')      and autotype in ('Original','null') "+ 
+				"	GROUP BY "+ 
+						   "(case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ), "+ 
+						   "(case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ), "+ 
+						   " (case  when currency = 'INR' then 'INR'   else 'USD'    end ) , "+ 
+						   " getValueOnLEAttribute(cpid,'Sector') "+ 
+					"ORDER BY "+ 
+						  " (case when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY'   end ), "+ 
+						  " (case  when currency = 'INR' then 'INR'  else 'USD'  end )";
 
 	  return ftdSQL;
   }
-  
-  
-  
-  
-  
+    
   
   private static String getUpdateSQL(Trade trade) {
       String updateSQL = "UPDATE  trade set  productId=" +trade.getProductId()+ ",type='"+ trade.getType().trim() +
