@@ -117,6 +117,7 @@ static ConcurrentHashMap<String, String> engineSignals = new ConcurrentHashMap<S
        }
        catch(RemoteException e){
     	   commonUTIL.displayError("Server","Error in Starting Server  <<<<<<<<<<<<<  " , e);
+    	   System.exit(0);
        } finally {
     	   executor.shutdownNow();
        }
@@ -211,7 +212,7 @@ static ConcurrentHashMap<String, String> engineSignals = new ConcurrentHashMap<S
 
           e.printStackTrace();
        //   s.stop();
-         // System.exit(1);
+         System.exit(1);
 
    } finally {
    	//s.stop();
