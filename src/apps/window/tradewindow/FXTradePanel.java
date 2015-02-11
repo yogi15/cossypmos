@@ -3206,8 +3206,7 @@ import dsServices.ServerConnectionUtil;
 					 double farAmt1 = amt1 * -1;
 			    	 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(farAmt1));
 			    	 
-			    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText())) {
-			    		 
+			    	 if (! commonUTIL.isEmpty(swap.jTextField4.getText())) {			    		 
 			    		 double farRate = (new Double(swap.jTextField4.getText()).doubleValue());
 			    		 double farAmt2 = Math.abs(farAmt1) * -1;	
 			    		 if(farRate != 0)
@@ -4936,10 +4935,10 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 						vector = (Vector) remoteReference.getCurrencySplitConfig(Integer.parseInt(button.getName()), currencyPair);
 						if(!commonUTIL.isEmpty(vector)) {
 							// @yogesh 07/02/2015
-							//split checkbox should also be selected when combination of
+							//split checkbox should also be selected but disable when combination of
 							// book and currencypair is found in currncySplitConfig
 							out.jCheckBox2.setSelected(true);
-							out.jCheckBox2.setEnabled(true);
+							out.jCheckBox2.setEnabled(false);
 																				
 							if(trade == null || trade.getId() == 0) 
 							    functionality.clearRounting();
@@ -5176,27 +5175,55 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 					String splitBaseNearRate = functionality.jTextField2.getText().toString();
 					String splitQuoteNearRate = functionality.jTextField3.getText().toString();
 					
-					if (splitBaseNearRate.equals("") || splitBaseNearRate.equals("0.0") ) {
+					if (splitBaseNearRate.equals("") || Double.parseDouble(splitBaseNearRate) == 0)  {
 						commonUTIL.showAlertMessage("Please enter Split Base Near Rate");
 						return false;	
-					} else if (splitQuoteNearRate.equals("") || splitQuoteNearRate.equals("0.0") ) {
+					} else if (splitQuoteNearRate.equals("") || Double.parseDouble(splitQuoteNearRate) == 0) {
 						commonUTIL.showAlertMessage("Please enter Split Quote Near Rate");
 						return false;	
 					} 
 					
-					if (basicData.jRadioButton2.isSelected()) {					
-						String splitBaseFarRate = functionality.FarRate1.getText().toString();
-						String splitQuoteFarRate = functionality.FarRate2.getText().toString();					
-						
-						if (splitBaseFarRate.equals("") || splitBaseFarRate.equals("0.0") ) {
-							commonUTIL.showAlertMessage("Please enter Split Base Far Rate");
-							return false;	
-						} else if (splitQuoteFarRate.equals("") || splitQuoteFarRate.equals("0.0") ) {
-							commonUTIL.showAlertMessage("Please enter Split Quote Far Rate");
-							return false;	
-						}
+					String farRate1 = functionality.FarRate1.getText().toString();
+					String farRate2 = functionality.FarRate2.getText().toString();
+					
+					if (farRate1.equals("") || Double.parseDouble(farRate1) == 0)  {
+						commonUTIL.showAlertMessage("Please enter FarRate1");
+						return false;	
+					} else if (farRate2.equals("") || Double.parseDouble(farRate2) == 0) {
+						commonUTIL.showAlertMessage("Please enter FarRate2");
+						return false;	
 					}
-				}           
+					
+					// swap radio button
+					if (basicData.jRadioButton2.isSelected()) {					
+						String swapFarAmt1 = swap.jTextField1.getText().toString();
+						String swapFarAmt2 = swap.jTextField2.getText().toString();	
+						String swapRate = swap.jTextField4.getText().toString();
+						
+						if (swapFarAmt1.equals("") ||  Double.parseDouble(swapFarAmt1) == 0 ) {
+							commonUTIL.showAlertMessage("Please enter FarAmt1");
+							return false;	
+						} else if (swapFarAmt2.equals("") ||  Double.parseDouble(swapFarAmt2) == 0 ) {
+							commonUTIL.showAlertMessage("Please enter FarAmt2");
+							return false;	
+						} else if (swapRate.equals("") ||  Double.parseDouble(swapRate) == 0 ) {
+							commonUTIL.showAlertMessage("Please SwapRate");
+							return false;	
+						} 
+					}
+				} else {
+					String amt1 = out.jTextField1.getText().toString();
+					//String amt2 = out.jTextField2.getText().toString();
+					String rate = out.jTextField4.getText().toString();
+					
+					if (amt1.equals("") ||  Double.parseDouble(amt1) == 0 ) {
+						commonUTIL.showAlertMessage("Please enter Amt1");
+						return false;	
+					} else if (rate.equals("") ||  Double.parseDouble(rate) == 0 ) {
+						commonUTIL.showAlertMessage("Please enter Rate");
+						return false;	
+					}
+				}
 	            
 				return ratesOk;
 		  }
