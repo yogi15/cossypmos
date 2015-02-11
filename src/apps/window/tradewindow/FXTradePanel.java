@@ -5170,7 +5170,7 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 		  // check if split rates are filled if split rate checkbox is checked
 		  private boolean checkRates() {		  
 				boolean ratesOk = true;								
-				
+				//split checkbox is selected
 				if (out.jCheckBox2.isSelected()) {
 					String splitBaseNearRate = functionality.jTextField2.getText().toString();
 					String splitQuoteNearRate = functionality.jTextField3.getText().toString();
