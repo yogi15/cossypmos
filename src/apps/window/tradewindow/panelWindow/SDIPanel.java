@@ -186,7 +186,7 @@ public class SDIPanel extends BackOfficePanel {
 							payerPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(payerKey);
 							payerInstr.removeAllItems();
 							payerModel.removeAllElements();
-							processComboxData(payerPreferredSDIs,payerModel);
+							processComboxData(payerPreferredSDIs,payerModel,rule.get_payerSDId());
 						}
 						
 					}
@@ -222,7 +222,7 @@ public class SDIPanel extends BackOfficePanel {
 								receiverPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(receiverKey);
 								receiverInstr.removeAllItems();
 								receiverModel.removeAllElements();
-								processComboxData(receiverPreferredSDIs,receiverModel);
+								processComboxData(receiverPreferredSDIs,receiverModel,rule.get_receiverSDId());
 					}
 					
 				}
@@ -283,6 +283,8 @@ public class SDIPanel extends BackOfficePanel {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if(!jCheckBox0.isEnabled() || !jCheckBox0.isSelected())
+						return;
 					customChangeApply = true;
 					TransferRule rule1 = null;
 					// TODO Auto-generated method stub
@@ -348,7 +350,8 @@ public class SDIPanel extends BackOfficePanel {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					// TODO Auto-generated method stub
-
+                    if(!jCheckBox0.isEnabled())
+                    	return;
 					if(jCheckBox0.isSelected()) {
 						int selectRow = jTable0.getSelectedRow();
 						if(selectRow == -1) {
@@ -359,28 +362,14 @@ public class SDIPanel extends BackOfficePanel {
 						
 					}
 					if(customChangeApply) {
-				 	rules.clear();
+				 //	rules.clear();
+						
 				 	commonUTIL.showAlertMessage(" Setting to Default ");
-					
-						tmodel = new TableModelUtil(originalRules, col);
-						rules = originalRules;
+				 	rules = (Vector<TransferRule>) originalRules.clone();
+						tmodel = new TableModelUtil(rules, col);
+						
 						jTable0.setModel(tmodel);
-						/*jTable0.getColumnModel().getColumn(0).setPreferredWidth(150); 
-						 jTable0.getColumnModel().getColumn(1).setPreferredWidth(150); 
-						 jTable0.getColumnModel().getColumn(2).setPreferredWidth(250); 
-						 jTable0.getColumnModel().getColumn(3).setPreferredWidth(250); 
-						 jTable0.getColumnModel().getColumn(4).setPreferredWidth(250); 
-						 jTable0.getColumnModel().getColumn(5).setPreferredWidth(280); 
-						 jTable0.getColumnModel().getColumn(6).setPreferredWidth(230); 
-						 jTable0.getColumnModel().getColumn(7).setPreferredWidth(230); 
-						 jTable0.getColumnModel().getColumn(8).setPreferredWidth(230); 
-						 jTable0.getColumnModel().getColumn(9).setPreferredWidth(200); 
-						 jTable0.getColumnModel().getColumn(10).setPreferredWidth(240); 
-						 jTable0.getColumnModel().getColumn(11).setPreferredWidth(200); 
-						 jTable0.getColumnModel().getColumn(12).setPreferredWidth(200); 
-						 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); */
-						 
-						 tca.adjustColumns();
+						tca.adjustColumns();
 						 customChangeApply = false;
 						
 						
@@ -573,21 +562,19 @@ public class SDIPanel extends BackOfficePanel {
 						 boolean sdiISzero = false;
 						 boolean sdiMethod = false;
 						 if(rule.get_payerSDId() == 0 || rule.get_receiverSDId() == 0) {
-							//@ yogesh 10/02/2105
-							 // pankaj asked to comment
-							//commonUTIL.showAlertMessage("Missing SDI on "+rule.get_settlementCurrency() + " "+getLEName(rule.get_payerLegalEntityId()) + " " + getLEName(rule.get_receiverLegalEntityId())); 
+						//	commonUTIL.showAlertMessage("Missing SDI on "+rule.get_settlementCurrency() + " "+getLEName(rule.get_payerLegalEntityId()) + " " + getLEName(rule.get_receiverLegalEntityId())); 
 							 sdiISzero = true;
 						 }
+						 
 						 if(!sdiISzero) {
-							 String payMethod = rule.getPayerMethodType();
-							 String recMehtod = rule.getReceiverMethodType();
-							 //@ yogesh 10/02/2105
-							 // checking for null
-							 if (commonUTIL.isEmpty(payMethod) && commonUTIL.isEmpty(recMehtod)) {
-								 if(payMethod.equalsIgnoreCase(recMehtod)) {										
-									 sdiMethod= true;
-								 } 
-							 }							 
+						 String payMethod = rule.getPayerMethodType();
+						 String recMethod = rule.getReceiverMethodType();
+						 if(!commonUTIL.isEmpty(payMethod) && !commonUTIL.isEmpty(recMethod))  {
+						 if(payMethod.equalsIgnoreCase(recMethod)) {
+								
+							 sdiMethod= true;
+						 }
+						 }
 						 }
 						 if(!rowSelectionAllowed) {
 							 c.setBackground(Color.gray);
@@ -600,7 +587,7 @@ public class SDIPanel extends BackOfficePanel {
 							 c.setBackground(c1);
 						 }
 						 if(!sdiMethod  && !sdiISzero ) { // when method are not matching and sdi are not zero 
-							 Color c1 = new Color(128,128,128);
+							 Color c1 = new Color(205,205,193);
 							 c.setBackground(c1);
 						 }
 						 if(sdiISzero && !sdiMethod) { 
@@ -668,8 +655,10 @@ public class SDIPanel extends BackOfficePanel {
 				if(selectRow == -1)
 					return;
 				TransferRule rule = rules.get(selectRow);
+				
 				receiverSDI.setText(getLEName(rule.get_receiverLegalEntityId()));
 				payerSDI.setText(getLEName(rule.get_payerLegalEntityId()));
+				
 				String payKey = rule.get_payerLegalEntityRole()+"|"+rule.get_settlementCurrency()+"|"+rule.get_productType()+"|"+String.valueOf(rule.get_payerLegalEntityId());
 				String recKey = rule.get_receiverLegalEntityRole()+"|"+rule.get_settlementCurrency()+"|"+rule.get_productType()+"|"+String.valueOf(rule.get_receiverLegalEntityId());
 				payerPreferredSDIs	 = SDISelectorUtil.getPreferredSdisOnKey(payKey);
@@ -679,8 +668,8 @@ public class SDIPanel extends BackOfficePanel {
 			     payerModel.removeAllElements();
 			     receiverModel.removeAllElements();
 			     
-			     processComboxData(payerPreferredSDIs,payerModel);
-			     processComboxData(receiverPreferredSDIs,receiverModel);
+			     processComboxData(payerPreferredSDIs,payerModel,rule.get_payerSDId());
+			     processComboxData(receiverPreferredSDIs,receiverModel,rule.get_receiverSDId());
 			     payerInstr.setModel(payerModel);
 			     receiverInstr.setModel(receiverModel);
 			     payerRole.setSelectedItem(rule.get_payerLegalEntityRole());
@@ -947,6 +936,13 @@ public class SDIPanel extends BackOfficePanel {
 
 	@Override
 	public void fillJTabel(Vector data) {
+		if(data == null) {
+			jCheckBox0.setEnabled(false);
+			jButton3.setEnabled(false);
+			return;
+		}
+		jCheckBox0.setEnabled(true);
+		jButton3.setEnabled(true);
 		if (data != null && (!data.isEmpty())) {
 			jCheckBox0.setSelected(false);
 			customChangeApply = false;
@@ -999,12 +995,13 @@ public class SDIPanel extends BackOfficePanel {
 		
 	}
 
-	private DefaultComboBoxModel processComboxData(Vector<Sdi> preferredSDis,DefaultComboBoxModel model) {
+	private DefaultComboBoxModel processComboxData(Vector<Sdi> preferredSDis,DefaultComboBoxModel model,int idSdi) {
       //  model.removeAllElements();
 		
 		if(preferredSDis != null) {
 			for(int i=0;i<preferredSDis.size();i++) {
 				Sdi sdi = preferredSDis.get(i);
+				
 				String key = "";
 				/*
 				if(commonUTIL.isEmpty(sdi.getGlName()))
@@ -1015,6 +1012,8 @@ public class SDIPanel extends BackOfficePanel {
 				key = getLEName(sdi.getAgentId()) + "/"+sdi.getGlName().trim() +"/"+sdi.getMessageType().trim()+"/"+sdi.getPayrec();
 				
 				model.addElement(key);
+				if(sdi.getId() == idSdi)
+				model.setSelectedItem(key);
 				/*if (!sdi.getkey().equals("")) {
 					model.setSelectedItem(key);
 				}*/
@@ -1084,8 +1083,13 @@ public class SDIPanel extends BackOfficePanel {
 		this.trade = trade;
 		rules = rule.generateRules(trade);
 		
-		if(rules == null)
+		if(rules == null) {
+			jCheckBox0.setEnabled(false);
+			jButton3.setEnabled(false);
 			return;
+		}
+		jCheckBox0.setEnabled(true);
+		jButton3.setEnabled(true);
 		tmodel = new TableModelUtil(rules,col);
 		originalRules = new Vector(rules);
 		// System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"+originalRules.get(1).get_payerAgentID());
@@ -1118,8 +1122,8 @@ public class SDIPanel extends BackOfficePanel {
 		      payerModel.removeAllElements();
 		      receiverInstr.removeAllItems();
 		      receiverModel.removeAllElements();
-		     processComboxData(payerPreferredSDIs,payerModel);
-		     processComboxData(receiverPreferredSDIs,receiverModel);
+		     processComboxData(payerPreferredSDIs,payerModel,rule.get_payerSDId());
+		     processComboxData(receiverPreferredSDIs,receiverModel,rule.get_receiverSDId());
 		     payerInstr.setModel(payerModel);
 		     receiverInstr.setModel(receiverModel);
 		     processStartUpData(receiverRolemodel);
