@@ -1074,7 +1074,8 @@ import dsServices.ServerConnectionUtil;
 				 tradeTakeUp.setAttribute("ParentID",Integer.toString(trade.getId()));
 				
 				 if ( takeupW.typeComboBox.getSelectedItem() == null) {
-					commonUTIL.showAlertMessage("Please select Takeup Type");
+					commonUTIL.showAlertMessage("Select Takeup Type");
+					return;
 				 } else{
 					tradeTakeUp.setAttribute("TakeUpType", takeupW.typeComboBox.getSelectedItem().toString());	
 				 }
