@@ -76,8 +76,7 @@ public class TradeSQL {
 	"	GROUP BY "+ 
 			   "(case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ), "+ 
 			   "(case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ), "+ 
-			   " (case  when currency = 'INR' then 'INR'   else 'USD'    end ) , "+ 
-			   " getValueOnLEAttribute(cpid,'Sector') "+ 
+			   " (case  when currency = 'INR' then 'INR'   else 'USD'    end ) "+
 		"ORDER BY "+ 
 			  " (case when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY'   end ), "+ 
 			  " (case  when currency = 'INR' then 'INR'  else 'USD'  end )";
@@ -107,8 +106,7 @@ public class TradeSQL {
 				"	GROUP BY "+ 
 						   "(case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ), "+ 
 						   "(case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ), "+ 
-						   " (case  when currency = 'INR' then 'INR'   else 'USD'    end ) , "+ 
-						   " getValueOnLEAttribute(cpid,'Sector') "+ 
+						   " (case  when currency = 'INR' then 'INR'   else 'USD'    end )  "+ 						 
 					"ORDER BY "+ 
 						  " (case when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY'   end ), "+ 
 						  " (case  when currency = 'INR' then 'INR'  else 'USD'  end )";
