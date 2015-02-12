@@ -3638,6 +3638,7 @@ import dsServices.ServerConnectionUtil;
 			//@yogesh 10/02/2015
 			//enable the instrument type and 
 			attributes.tradeAction = "New";
+			attributes.isfwOpTrade = false;
 			
 			//@yogesh 10/02/2015
 			// make a new takeUpwindow and set its type to utilize
@@ -4532,6 +4533,10 @@ import dsServices.ServerConnectionUtil;
 		    	
 		    	productSubType = FXTAKEUP;
 		    	
+		    	// @yogesh 12/02/2014
+		    	//Instrument type is not editable for takeUp trade
+		    	attributes.isfwOpTrade = true;
+		    	
 		    	out.jTextField4.setEditable(false);
 		    	
 		    	swap.setVisible(false);
@@ -4953,6 +4958,12 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 							// split currency panel is made visible if split currency chechbox is set selected above
 							// and if a split currency config is found for book and currency 
 							functionality.jPanel2.setVisible(true);
+							if (basicData.jRadioButton1.isSelected() || basicData.jRadioButton5.isSelected()) {
+								functionality.FarRate1.setVisible(false);
+								functionality.FarRate2.setVisible(false);
+								functionality.jLabel4.setVisible(false);
+								functionality.jLabel5.setVisible(false);
+							}
 						 } else {
 							out.jCheckBox2.setSelected(false);
 							out.jCheckBox2.setEnabled(false);
@@ -5183,14 +5194,44 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 						return false;	
 					} 
 					
-					String farRate1 = functionality.FarRate1.getText().toString();
-					String farRate2 = functionality.FarRate2.getText().toString();
+					// swap radio button
+					if (basicData.jRadioButton2.isSelected()) {					
+						String swapFarAmt1 = swap.jTextField1.getText().toString();
+						String swapFarAmt2 = swap.jTextField2.getText().toString();	
+						String swapRate = swap.jTextField4.getText().toString();
+						
+						if (swapFarAmt1.equals("") ||  Double.parseDouble(swapFarAmt1) == 0 ) {
+							commonUTIL.showAlertMessage("Please enter FarAmt1");
+							return false;	
+						} else if (swapFarAmt2.equals("") ||  Double.parseDouble(swapFarAmt2) == 0 ) {
+							commonUTIL.showAlertMessage("Please enter FarAmt2");
+							return false;	
+						} else if (swapRate.equals("") ||  Double.parseDouble(swapRate) == 0 ) {
+							commonUTIL.showAlertMessage("Please SwapRate");
+							return false;	
+						} 
+						
+						String farRate1 = functionality.FarRate1.getText().toString();
+						String farRate2 = functionality.FarRate2.getText().toString();
+						
+						if (farRate1.equals("") || Double.parseDouble(farRate1) == 0)  {
+							commonUTIL.showAlertMessage("Please enter Split FarRate1");
+							return false;	
+						} else if (farRate2.equals("") || Double.parseDouble(farRate2) == 0) {
+							commonUTIL.showAlertMessage("Please enter Split FarRate2");
+							return false;	
+						}
+					}
+				} else {
+					String amt1 = out.jTextField1.getText().toString();
+					//String amt2 = out.jTextField2.getText().toString();
+					String rate = out.jTextField4.getText().toString();
 					
-					if (farRate1.equals("") || Double.parseDouble(farRate1) == 0)  {
-						commonUTIL.showAlertMessage("Please enter FarRate1");
+					if (amt1.equals("") ||  Double.parseDouble(amt1) == 0 ) {
+						commonUTIL.showAlertMessage("Please enter Amt1");
 						return false;	
-					} else if (farRate2.equals("") || Double.parseDouble(farRate2) == 0) {
-						commonUTIL.showAlertMessage("Please enter FarRate2");
+					} else if (rate.equals("") ||  Double.parseDouble(rate) == 0 ) {
+						commonUTIL.showAlertMessage("Please enter Rate");
 						return false;	
 					}
 					
@@ -5210,18 +5251,6 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 							commonUTIL.showAlertMessage("Please SwapRate");
 							return false;	
 						} 
-					}
-				} else {
-					String amt1 = out.jTextField1.getText().toString();
-					//String amt2 = out.jTextField2.getText().toString();
-					String rate = out.jTextField4.getText().toString();
-					
-					if (amt1.equals("") ||  Double.parseDouble(amt1) == 0 ) {
-						commonUTIL.showAlertMessage("Please enter Amt1");
-						return false;	
-					} else if (rate.equals("") ||  Double.parseDouble(rate) == 0 ) {
-						commonUTIL.showAlertMessage("Please enter Rate");
-						return false;	
 					}
 				}
 	            
