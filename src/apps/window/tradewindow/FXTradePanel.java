@@ -2696,19 +2696,17 @@ import dsServices.ServerConnectionUtil;
 								return;
 							}	else {
 								
-								if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {
-									
+								if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {				
 							    	if (commonUTIL.addSubtractDate(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true), 31).before(
-											 fwdOp.startDate.getDate())) {							    		
+											 fwdOp.startDate.getDate())) {		    		
 							    		commonUTIL.showAlertMessage("Option End date falls beyond 31 days after Trade end date");
-							    		 return;							    		
+							    		return;		    		
 							    	}
 							    	
 							    	if (fwdOp.startDate.getDate().before(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true))){
-							    		commonUTIL.showAlertMessage("Option End date cannot be after Trade end date");
+							    		commonUTIL.showAlertMessage("Option End date cannot be before Trade end date");
 							    		return;	
 							    	}
-							    								    	
 								}
 								
 								 //@yogesh 04/02/2014
@@ -4465,14 +4463,14 @@ import dsServices.ServerConnectionUtil;
 				 String instrumentType = trade.getAttributeValue("InstrumentType");
 				 
 				 //@ yogesh 01/02/2015
-				 // fwdoption date shown
-				 /*if (instrumenTypeVal.contains(instrumentType)) {
+				 // fwdoptionEnd date is shown
+				 if (instrumenTypeVal.contains(instrumentType)) {
 					 fwdOp.startDate.setEnabled(true);
-					 fwdOp.startDate.setEditable(false);
+					 fwdOp.startDate.setEditable(true);
 					 fwdOp.startDate.setDate(commonUTIL.convertStringtoSQLDate(trade.getEffectiveDate()));									 				 
 				 } else {					 
 					 fwdOp.startDate.setDate(commonUTIL.convertStringtoSQLDate(attributeDataValue.get("Trade Date")));					 
-				 }*/
+				 }
 				 
 				//@ yogesh 01/02/2015
 				 // fwdoption date shown
