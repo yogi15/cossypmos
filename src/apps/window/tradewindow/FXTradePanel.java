@@ -1125,8 +1125,10 @@ import dsServices.ServerConnectionUtil;
             			commonUTIL.showAlertMessage((statusT));
             			return;
             		 }
-               	 if(i > 0) 
+               	if(i > 0)  {
                		commonUTIL.showAlertMessage((statusT));
+               		attributes.isfwOpTrade = true;
+               	 }
                	 
                	 tradeTakeUp.setId(i);
                	 takeupW.model.addRow(tradeTakeUp);
@@ -4335,7 +4337,7 @@ import dsServices.ServerConnectionUtil;
 			
 			//@yogesh 01/02/2015
 			// this has to be before setAttribute(trade.getAttributes());
-			if(trade.getTradedesc1().equalsIgnoreCase(FXFORWARDOPTION) && trade.getVersion() > 1) {
+			/*if(trade.getTradedesc1().equalsIgnoreCase(FXFORWARDOPTION) && trade.getVersion() > 1) {
 				
 				//@yogesh 04/02/2015
 				// checks if trade has take ups. if yes then disable InstrumentType attribute
@@ -4350,7 +4352,7 @@ import dsServices.ServerConnectionUtil;
 					attributes.isfwOpTrade = true;
 				}
 				
-			}
+			}*/
 			getDataFromTrade(trade.getBookId(),"Book");
 
 			//@yogesh
@@ -4485,8 +4487,13 @@ import dsServices.ServerConnectionUtil;
 		    	 try {		    		
 		    		childTrades 	= remoteTrade.getChildTrades(trade.getId());
 		    		Vector childes = (Vector) childTrades;
-		    		if(!childes.isEmpty())  {		    			
+		    		if(!childes.isEmpty())  {	
+		    			//@yogesh 13/02/2015
+		    			// if fwdopt trade has take up then disable instrumentType
+		    			attributes.isfwOpTrade = true;
 		    			setOutStandingBalONFwdOption(childes,trade);		    		
+		    		} else {
+		    			attributes.isfwOpTrade = false;
 		    		}		    		
 				} catch (RemoteException e) {					
 					e.printStackTrace();
