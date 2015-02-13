@@ -3276,8 +3276,8 @@ import dsServices.ServerConnectionUtil;
 			getTradeSDI(sdiPanel);
 			functionality.refreshTables(trade.getTradedesc(),basicData.book.getText(),new Integer(basicData.book.getName()).intValue());
 			functionality.jButton7.setEnabled(false);
-			basicData.jRadioButton6.setEnabled(true);
-	        basicData.jRadioButton7.setEnabled(true);
+			//basicData.jRadioButton6.setEnabled(false);
+	      //  basicData.jRadioButton7.setEnabled(false);
 		}
 			
 		}
@@ -4524,8 +4524,8 @@ import dsServices.ServerConnectionUtil;
 		    	//productSubType = "FXSWAP";
 		    }
 		    
-		    basicData.jRadioButton6.setEnabled(true);
-		    basicData.jRadioButton7.setEnabled(true);
+		 //   basicData.jRadioButton6.setEnabled(true);
+		//    basicData.jRadioButton7.setEnabled(true);
 		    
 		    
 		    if(trade.getTradedesc1().equalsIgnoreCase(FXTAKEUP))  {
