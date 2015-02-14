@@ -477,7 +477,7 @@ RETURN cnumber;
 END;
 
 
-create or replace Function getAttributeValueOnTrade
+create or replace Function getAttributeValueOnTrade123
    ( tradeID IN number , attributen in varchar2)
    RETURN varchar2
 IS
@@ -559,4 +559,81 @@ WHEN OTHERS THEN
 END;
 
 
-*******************************************************************************
+*******************************************************************************************************
+
+create or replace Function getTPlusDiff
+   ( dayofWeek IN number , curr in varchar2,tradedate in timestamp,deliveryDate in timestamp,noofHoliday in number)
+  RETURN number
+IS
+   holidaydays number(20);
+   cnumber number(20);
+   cdate timestamp;
+   dnumber number(20);
+   fwday number(20);
+   swday number(20);
+   holidays varchar2(2000);
+ 
+   CURSOR c1
+   IS
+     SELECT fweekday,sweekday,hdate
+     FROM  HOLIDAY where currency = curr and (fweekday =  dayofWeek or  sweekday = dayofWeek);
+
+BEGIN
+holidaydays := noofHoliday;
+cnumber := 0;
+--DBMS_OUTPUT.PUT_LINE('tradedate ' ||tradedate);
+   open c1;
+   fetch c1 into fwday, swday,holidays;
+close c1;
+  dnumber := (trunc(deliveryDate) - trunc(tradedate));
+     holidaydays := getholidays(dayofWeek,fwday,swday,holidays,0,tradedate,deliveryDate);
+
+     cnumber := dnumber - holidaydays;
+  
+
+return cnumber;
+END;
+************************************************************************************************************
+
+create or replace Function getholidays(dayofWeek in number,fweekD in number,SweekD in number,
+ holidaylist in varchar2,countHoliday in number,tradedate in timestamp,deliverdate in timestamp)
+ return number 
+ is 
+ holidayC number(20);
+ cnumber number(20);
+  dnumber number(20);
+  tdate timestamp;
+ begin 
+cnumber := 0;
+holidayC := countHoliday;
+   if fweekD = dayofWeek then
+     cnumber := 2;
+     end if;
+   if SweekD = dayofWeek then
+     cnumber := 1;
+     end if;
+   if cnumber = 0 then 
+     dnumber := instr(holidaylist,to_char(tradedate,'MM/dd/yyyy'));
+     if dnumber > 0 then 
+       cnumber := 1;
+     else 
+       cnumber := 0;
+     end if;
+   end if;
+   if cnumber > 0 then 
+     holidayC := holidayC + cnumber;
+      tdate := tradedate+cnumber;
+      if (trunc(deliverdate) - trunc(tdate)) > 0 then
+		holidayC := getholidays(to_char(to_timestamp(tdate),'d'),fweekD,SweekD,holidaylist,holidayC,tdate,deliverdate);
+      end if;
+    end if;
+if cnumber = 0 then 
+    -- holidayC := holidayC + cnumber;
+      tdate := tradedate+1;
+      if (trunc(deliverdate) - trunc(tdate)) > 0 then
+		holidayC := getholidays(to_char(to_timestamp(tdate),'d'),fweekD,SweekD,holidaylist,holidayC,tdate,deliverdate);
+      end if;
+    end if;
+return holidayC;
+ end;
+
