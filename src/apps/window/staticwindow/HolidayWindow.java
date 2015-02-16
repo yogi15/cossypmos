@@ -246,7 +246,7 @@ public class HolidayWindow extends javax.swing.JPanel {
             		 String dates [] =   holi.getHdate().split(",");
             		 cmodList2.removeAllElements();
             		 for(int i=0;i<dates.length;i++) {
-            			    cmodList2.add(i, dates[i]);
+            			 cmodList2.add(i, commonUTIL.dateToString((commonUTIL.stringToDate(dates[i], CommonConstants.MONTH_DATE_YEAR_FORMAT))));
             		 }
             		 jList1.removeAll();
             		 jList1.setModel(cmodList2);
@@ -254,7 +254,7 @@ public class HolidayWindow extends javax.swing.JPanel {
             	   if(holi.getFweekday() == 2 || holi.getSweekdday() == 2) 
             		   jCheckBox1.setSelected(true);
             	   if(holi.getFweekday() == 3 || holi.getSweekdday() == 3) 
-            		   jCheckBox2.setSelected(true);
+            		   jCheckBox2.setSelected(true);		
             	   if(holi.getFweekday() == 4 || holi.getSweekdday() == 4) 
             		   jCheckBox3.setSelected(true);
             	   if(holi.getFweekday() == 5 || holi.getSweekdday() == 5) 
