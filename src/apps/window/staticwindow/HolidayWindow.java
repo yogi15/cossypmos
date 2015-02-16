@@ -15,11 +15,12 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
 import com.standbysoft.component.date.swing.JDatePicker;
+
+import constants.CommonConstants;
 import beans.Holiday;
-
 import util.commonUTIL;
-
 import dsServices.RemoteReferenceData;
 import dsServices.ServerConnectionUtil;
 
@@ -310,13 +311,19 @@ public class HolidayWindow extends javax.swing.JPanel {
     	      				JOptionPane.INFORMATION_MESSAGE);
             		return;
 				}
+				if (jTable1.getSelectedRow() == -1) {
+					JOptionPane.showMessageDialog(null,"Select Currency",null,
+    	      				JOptionPane.INFORMATION_MESSAGE);
+            		return;
+				}
 				Holiday holi = new Holiday();
 				holi.setCountry(jComboBox1.getSelectedItem().toString());
 				holi.setCurrency(tmodel.getValueAt(jTable1.getSelectedRow(), 0).toString());
 				String dates = "";
 				if(cmodList2.getSize() > 0) {
 					for(int i=0;i<cmodList2.getSize();i++) {
-						dates = dates + (String) cmodList2.get(i) + ",";
+						dates = dates + commonUTIL.convertStringDateInFormat(commonUTIL.stringToDate((String) cmodList2.get(i), true), 
+								CommonConstants.MONTH_DATE_YEAR_FORMAT) + ",";
 					}
 					holi.setHdate(dates.substring(0, dates.length()-1));
 				}
@@ -342,6 +349,13 @@ public class HolidayWindow extends javax.swing.JPanel {
 		            }
 		         
 				}
+				
+				if (holi.getFweekday() == 0 && holi.getHdate() == null) {
+					JOptionPane.showMessageDialog(null,"Please select either Weekends or Dates",null,
+    	      				JOptionPane.INFORMATION_MESSAGE);
+            		return;
+				}
+				
       try {
 		remoteBORef.saveHoliday(holi);
 	} catch (RemoteException e1) {
