@@ -1384,7 +1384,7 @@ public class commonUTIL {
 	
 	/**
 	 * Returns date as a string in a required format
-	 * @param quantity
+	 * @param String 
 	 * @return String date converted in a given format
 	 */
 	
@@ -1397,8 +1397,28 @@ public class commonUTIL {
 		return formatter.format(date);
 						  
 	}
-
-
+	
+	/**
+	 * Returns date converted from a  string in a required format no isLeneint use
+	 * @param Date date
+	 * @return String date converted in a given format
+	 */
+	
+	 static public java.util.Date stringToDate(String dateStr,String format) {
+		   if(dateStr.contains("-")) 
+			   dateStr = dateStr.replace("-", "/");
+	       
+		   SimpleDateFormat formatter = new SimpleDateFormat(format);
+	       Date returnDate = null; 
+	       
+		   try {
+			   returnDate= formatter.parse(dateStr);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			return returnDate;
+	 }
+	 
 	public static Object convertToFinanceFormate(double quantity) {
 		// TODO Auto-generated method stub
 		String value = getStringFromDoubleExp(quantity);
