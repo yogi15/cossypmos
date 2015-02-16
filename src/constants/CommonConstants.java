@@ -15,6 +15,7 @@ public class CommonConstants {
 	final public static String SDF_DATE_FORMAT = "dd/MM/yyyy";
 	final public static String SDF_CCIL_HEADER_FORMAT = "YYYYMMDDHHMM";
 	final public static String SDF_DATE_TIME_FORMAT = "dd/MM/yyyy hh:mm:ss";
+	final public static String MONTH_DATE_YEAR_FORMAT = "MM/dd/yyyy";
 	
 	final public static String CURRENCY = "Currency";
 	final public static String DATE_ROLL = "DateRoll";
