@@ -1381,8 +1381,22 @@ public class commonUTIL {
 		
 		return dateTime.substring(0, 10);
 	}
-
-
+	
+	/**
+	 * Returns date as a string in a required format
+	 * @param quantity
+	 * @return String date converted in a given format
+	 */
+	
+	static public String convertStringDateInFormat(Date date, String format) {
+		
+		SimpleDateFormat formatter= null;
+				
+		formatter = new SimpleDateFormat(format);
+			
+		return formatter.format(date);
+						  
+	}
 
 
 	public static Object convertToFinanceFormate(double quantity) {
