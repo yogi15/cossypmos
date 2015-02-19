@@ -6,21 +6,21 @@ select
 	 (case  when currency = 'INR' then 'INR'    else 'USD'    end )  Currency, 
 	(case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ) BUYSELL,
  (
-	  nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'MERCHANTREADY',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0)
+	  nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1,tradedesc),tradedesc1),'MERCHANTREADY',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0)
  ) AS "MERCHANT READY",
  (
- nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'MERCHANTFORWARD',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
+ nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1,tradedesc),tradedesc1),'MERCHANTFORWARD',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
  ) AS "MERCHANT FORWARD",
- nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'TakeUpType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'MERCHANTCANCELLED',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
+ nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'TakeUpType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1,tradedesc),tradedesc1),'MERCHANTCANCELLED',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
    AS "MERCHANT CANCELLATION",
  (
-	 nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'FXSPOT',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
+	 nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1,tradedesc),tradedesc1),'FXSPOT',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
  ) AS "FX SPOT",
  (
- 	nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'FXFORWARD',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
+ 	nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1,tradedesc),tradedesc1),'FXFORWARD',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
  ) AS "FX FORWARD",
  ( 
-nvl(sum(decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1),'FXSWAP',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
+nvl(sum(decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1,tradedesc),'FXSWAP',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
  ) AS "FX SWAP"
 FROM  
 		trade  where    trunc(tradedate) = to_date('15/01/2015','dd/mm/yyyy')      and autotype in ('Original','null')
@@ -535,11 +535,12 @@ END;
 *********************************************************************
 
 create or replace function getSPOTTtypeDeals(tradedate in timestamp,deliverdate in timestamp,
-producttype in varchar2) return number
+producttype in varchar2,curruncyPair in varchar2) return number
 is
 cnumber number(10);
 begin
-cnumber := trunc(deliverdate) - trunc(tradedate);
+--cnumber := trunc(deliverdate) - trunc(tradedate);
+cnumber := getTPlusDays(to_char(to_timestamp(tradedate),'d'),curruncyPair,tradedate,deliverdate);
  if(cnumber >= 2) Then
      cnumber := 2;
    else
@@ -561,6 +562,37 @@ END;
 
 *******************************************************************************************************
 
+create or replace Function getTPlusDays
+   ( dayofWeek IN number , currpair in varchar2,tradedate in timestamp,deliveryDate in timestamp)
+  RETURN number
+IS
+   firstCdays number(20);
+   secondCdays number(20);
+   f1C varchar2(10);
+   s1C varchar2(10);
+  cnumber number(20);
+ 
+  
+BEGIN
+f1C := SUBSTR(currpair , 1,3);
+s1C := SUBSTR(currpair , 5,7);
+cnumber := 1;
+--DBMS_OUTPUT.PUT_LINE('tradedate ' ||tradedate);
+  firstCdays := cnumber * getTPlusDiff(to_char(to_timestamp(tradedate),'d'),f1C,tradedate,deliverydate,0); 
+  
+  secondCdays := cnumber *  getTPlusDiff(to_char(to_timestamp(tradedate),'d'),s1C,tradedate,deliverydate,0); 
+
+  cnumber := secondCdays;
+  if (firstCdays > cnumber) then 
+   cnumber := firstCdays;
+   end if;
+
+
+return cnumber;
+END;
+
+*******************************************************************************************************
+
 create or replace Function getTPlusDiff
    ( dayofWeek IN number , curr in varchar2,tradedate in timestamp,deliveryDate in timestamp,noofHoliday in number)
   RETURN number
@@ -576,7 +608,7 @@ IS
    CURSOR c1
    IS
      SELECT fweekday,sweekday,hdate
-     FROM  HOLIDAY where currency = curr and (fweekday =  dayofWeek or  sweekday = dayofWeek);
+     FROM  HOLIDAY where currency = curr ;
 
 BEGIN
 holidaydays := noofHoliday;
@@ -585,10 +617,10 @@ cnumber := 0;
    open c1;
    fetch c1 into fwday, swday,holidays;
 close c1;
-  dnumber := (trunc(deliveryDate) - trunc(tradedate));
+  cnumber := (trunc(deliveryDate) - trunc(tradedate));
      holidaydays := getholidays(dayofWeek,fwday,swday,holidays,0,tradedate,deliveryDate);
 
-     cnumber := dnumber - holidaydays;
+     cnumber := cnumber - holidaydays;
   
 
 return cnumber;
@@ -607,13 +639,13 @@ create or replace Function getholidays(dayofWeek in number,fweekD in number,Swee
 cnumber := 0;
 holidayC := countHoliday;
    if fweekD = dayofWeek then
-     cnumber := 2;
-     end if;
-   if SweekD = dayofWeek then
      cnumber := 1;
      end if;
+   if SweekD = dayofWeek then
+     cnumber := 2;
+     end if;
    if cnumber = 0 then 
-     dnumber := instr(holidaylist,to_char(tradedate,'MM/dd/yyyy'));
+     dnumber := instr(holidaylist,to_char(tradedate,'dd/mm/yyyy'));
      if dnumber > 0 then 
        cnumber := 1;
      else 
