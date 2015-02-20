@@ -86,6 +86,7 @@ public class TradeSQL {
   public static String getFTDSQL(String currentDate) {
 	  String ftdSQL = 
 	  " select  " + 
+	  " id, "+
 	  "   (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'    else 'FCY/FCY'    end )  FCY_NONFCY,  " + 
 	  "   (case  when currency = 'INR' then 'INR'    else 'USD'    end )  Currency,  " + 
 	  "   (case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ) BUYSELL, " + 
@@ -101,10 +102,11 @@ public class TradeSQL {
 	  "   (case  when substr(type,0,3) = 'BUY' then 'PURCHASE'   else 'SALE'    end ), " + 
 	  "      (case  when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY' end ),  " + 
 	  "      (case  when currency = 'INR' then 'INR'   else 'USD'    end ) , " + 
-	  "      getValueOnLEAttribute(cpid,'Sector') " + 
+	  " id" +
 	  " ORDER BY  " + 
 	  "     (case when substr(tradedesc,5,7) = 'INR' then 'FCY/INR'  else 'FCY/FCY'   end ),  " + 
-	  "     (case  when currency = 'INR' then 'INR'  else 'USD'  end ) " ;
+	  "     (case  when currency = 'INR' then 'INR'  else 'USD'  end ), " +
+	  "id";
 	 
 	  return ftdSQL;
   }
