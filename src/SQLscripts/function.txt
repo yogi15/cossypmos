@@ -20,7 +20,7 @@ select
  	nvl(sum( decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1,tradedesc),tradedesc1),'FXFORWARD',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
  ) AS "FX FORWARD",
  ( 
-nvl(sum(decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1),tradedesc1,tradedesc),'FXSWAP',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
+nvl(sum(decode(getFTDReportColumnIdentifier(getFXForwardOptionType(id,'InstrumentType'),getValueOnLEAttribute(cpid,'Sector'),getSPOTTtypeDeals(tradedate,deliverydate,tradedesc1,tradedesc),'FXSWAP',abs(decode(checkOnBaseAndQuotingCurr(tradedesc),0,amount1,amount2)) * decode(checkCurrencyPairWithoutUSD(tradedesc),1,1,getQuoteData(substr(tradedesc,1,3) || '/USD','15/01/2015')))),0) 
  ) AS "FX SWAP"
 FROM  
 		trade  where    trunc(tradedate) = to_date('15/01/2015','dd/mm/yyyy')      and autotype in ('Original','null')
