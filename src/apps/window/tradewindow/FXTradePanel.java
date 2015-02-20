@@ -1342,7 +1342,8 @@ import dsServices.ServerConnectionUtil;
 					if (isHoliday == 1) {				
 						commonUTIL.showAlertMessage("Near Date selected is a Holiday or a weekend. " +
 								"Please select another date");
-						out.outRightDate.setBackground(Color.red);
+						return;
+						//out.outRightDate.setBackground(Color.red);
 					}
 					
 					if (isHoliday != 1) {						
@@ -1352,7 +1353,8 @@ import dsServices.ServerConnectionUtil;
 						if (isHoliday == 1) {							
 							commonUTIL.showAlertMessage("Far Date selected is a Holiday or a weekend. " +
 									"Please select another date");
-							out.outRightDate.setBackground(Color.red);
+							return;
+							//out.outRightDate.setBackground(Color.red);
 						}
 						
 					} else if (isHoliday == -1) {
@@ -2741,7 +2743,8 @@ import dsServices.ServerConnectionUtil;
 										
 										commonUTIL.showAlertMessage("Near Date selected is a Holiday or a weekend. " +
 												"Please select another date");
-										out.outRightDate.setBackground(Color.red);
+										return;
+										//out.outRightDate.setBackground(Color.red);
 									}
 									
 									if (isHoliday != 1) {
@@ -2753,7 +2756,8 @@ import dsServices.ServerConnectionUtil;
 											
 											commonUTIL.showAlertMessage("Far Date selected is a Holiday or a weekend. " +
 													"Please select another date");
-											out.outRightDate.setBackground(Color.red);
+											return;
+											//out.outRightDate.setBackground(Color.red);
 										}
 										
 									} else if (isHoliday == -1) {
