@@ -1,22 +1,22 @@
 package util;
 
+import java.awt.TextField;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.FocusListener;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
+import java.util.Locale;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
-import javax.swing.text.AbstractDocument.Content;
+
+import util.common.NumberFormatUtil;
+
 
 public class NumericTextField extends JTextField implements
     NumericPlainDocument.InsertErrorListener {
@@ -33,12 +33,88 @@ public class NumericTextField extends JTextField implements
     }
 
     numericDoc.addInsertErrorListener(this);
+   
   }
 
+  public String getText() {
+	  String text = super.getText();
+	  text = checkAmount(text);
+	 double dd =  NumberFormatUtil.stringToNumber(text, Locale.getDefault());
+	  return text.valueOf(dd);
+  }
   public NumericTextField(int columns, DecimalFormat format) {
     this(null, columns, format);
-  }
+    this.addFocusListener(new FocusListener() {
+        public void focusLost(java.awt.event.FocusEvent event) {
+        	NumericTextField t = (NumericTextField) event.getSource();
+            t.setText(checkAmount(t.getText()));
+        }
 
+        public void focusGained(java.awt.event.FocusEvent event) {
+        	NumericTextField t = (NumericTextField) event.getSource();
+            t.selectAll();
+        }
+
+
+    }
+    );
+  }
+  static public String checkAmount(String s) {
+      return checkAmount(s, 2,false);
+  }
+  static public String checkAmount(String s,int dig, boolean absoluteValue) {
+      int idx = s.indexOf("k");
+      if (idx == -1)
+          idx = s.indexOf("K");
+      if (idx > 0) {
+          double m = commonUTIL.converStringToDouble(s.substring(0, idx));
+          if (absoluteValue)
+              m = Math.abs(m);
+              //return Util.numberToString(m*1000.);
+          return NumberFormatUtil.numberToString(m * 1000., dig);
+      }
+       idx = s.indexOf("l");
+      if (idx == -1)
+          idx = s.indexOf("L");
+      if (idx > 0) {
+          double m = commonUTIL.converStringToDouble(s.substring(0, idx));
+          if (absoluteValue)
+              m = Math.abs(m);
+              //return Util.numberToString(m*1000.);
+          return NumberFormatUtil.numberToString(m * 100000., dig);
+      }
+      idx = s.indexOf("m");
+      if (idx == -1)
+          idx = s.indexOf("M");
+      if (idx > 0) {
+          double m = commonUTIL.converStringToDouble(s.substring(0, idx));
+          if (absoluteValue)
+              m = Math.abs(m);
+          return NumberFormatUtil.numberToString(m * 1000000., dig);
+      }
+      idx = s.indexOf("b");
+      if (idx == -1)
+          idx = s.indexOf("B");
+      if (idx > 0) {
+          double m = commonUTIL.converStringToDouble(s.substring(0, idx));
+          if (absoluteValue)
+              m = Math.abs(m);
+          return NumberFormatUtil.numberToString(m * 1000000000., dig);
+      }
+      idx = s.indexOf("t");
+      if (idx == -1)
+          idx = s.indexOf("T");
+      if (idx > 0) {
+          double m = commonUTIL.converStringToDouble(s.substring(0, idx));
+          if (absoluteValue)
+              m = Math.abs(m);
+          return NumberFormatUtil.numberToString(m * 1000000000000., dig);
+      }
+      double m = commonUTIL.converStringToDouble(s);
+      if (absoluteValue)
+          m = Math.abs(m);
+      return NumberFormatUtil.numberToString(m, dig);
+  }
   public NumericTextField(String text) {
     this(text, 0, null);
   }
@@ -107,6 +183,7 @@ public class NumericTextField extends JTextField implements
 }
 
 class NumericPlainDocument extends PlainDocument {
+	String amountConv = "False";
          public NumericPlainDocument() {
            setFormat(null);
          }
@@ -196,6 +273,7 @@ class NumericPlainDocument extends PlainDocument {
 
          public void insertString(int offset, String str, AttributeSet a)
              throws BadLocationException {
+        	 
            if (str == null || str.length() == 0) {
              return;
            }
@@ -208,9 +286,13 @@ class NumericPlainDocument extends PlainDocument {
 
            // Create the result of inserting the new data,
            // but ignore the trailing newline
-           String targetString = content.getString(0, offset) + str
+           String targetString = content.getString(0, offset) + (String) str
                + content.getString(offset, length - offset - 1);
-
+           
+          targetString = (String) fromString(targetString,amountConv );
+           ///str = (String)fromString(str);
+       
+         
            // Parse the input string and check for errors
            do {
              boolean gotPositive = targetString.startsWith(positivePrefix);
@@ -223,7 +305,7 @@ class NumericPlainDocument extends PlainDocument {
              // at index 0. So, we need to add the appropriate
              // suffix if it is not present at this point.
              if (gotPositive == true || gotNegative == true) {
-               String suffix;
+               String suffix  = "k";
                int suffixLength;
                int prefixLength;
 
@@ -329,6 +411,8 @@ class NumericPlainDocument extends PlainDocument {
 
            // Finally, add to the model
            super.insertString(offset, str, a);
+           
+           amountConv = "False";
          }
 
          public void addInsertErrorListener(InsertErrorListener l) {
@@ -378,5 +462,93 @@ class NumericPlainDocument extends PlainDocument {
          protected ParsePosition parsePos = new ParsePosition(0);
 
          protected static DecimalFormat defaultFormat = new DecimalFormat();
+         
+         public Object fromString(String string,String amountConvert) {
+
+             if (!commonUTIL.isEmpty(string)) {
+                 
+            	 try {
+                     String str = string.toUpperCase();
+                     if (str.indexOf("K") > 0) {
+                         int idx = str.indexOf("K");
+                         double m = commonUTIL.converStringToDouble(str.substring(0, idx));
+                         amountConvert = "True";
+                         return commonUTIL.converDoubleToString(m * 1000.);
+                     }
+                     else if (str.indexOf("L") > 0) {
+                         int idx = str.indexOf("L");
+                         double m = commonUTIL.converStringToDouble(str.substring(0, idx));
+                         amountConvert = "True";
+                         return commonUTIL.converDoubleToString(m * 100000.);
+                     }
+                     else if (str.indexOf("M") > 0) {
+                         int idx = str.indexOf("M");
+                         double m = commonUTIL.converStringToDouble(str.substring(0, idx));
+                         amountConvert = "True";
+                         return commonUTIL.converDoubleToString(m * 1000000.);
+                     }
+                     else if (str.indexOf("B") > 0) {
+                         int idx = str.indexOf("B");
+                         double m = commonUTIL.converStringToDouble(str.substring(0, idx));
+                         amountConvert = "True";
+                         return commonUTIL.converDoubleToString(m * 1000000000.);
+                     }
+                     else if (str.indexOf("T") > 0) {
+                         int idx = str.indexOf("T");
+                         double m = commonUTIL.converStringToDouble(str.substring(0, idx));
+                         amountConvert = "True";
+                         return commonUTIL.converDoubleToString(m * 1000000000000.);
+                     }
+                 
+                 }
+                 catch (Exception e) {
+                     return null;
+                 }
+            
+                 
+             }
+             return string;
+         }
+         public Object fromString(String string) {
+
+             if (!commonUTIL.isEmpty(string)) {
+                 
+            	 try {
+                     String str = string.toUpperCase();
+                     if (str.equalsIgnoreCase("K") ) {
+                         int idx = str.indexOf("K");
+                      //   double m = commonUTIL.converStringToDouble(str.substring(0, idx));
+                        
+                         return "000";//commonUTIL.converDoubleToString(m * 1000.);
+                     }
+                     else  if (str.equalsIgnoreCase("M") ) {
+                         int idx = str.indexOf("M");
+                      //   double m = commonUTIL.converStringToDouble(str.substring(0, idx));
+                       //  amountConvert = true;
+                         return "000000";//commonUTIL.converDoubleToString(m * 1000000.);
+                     }
+                     else if (str.equalsIgnoreCase("B")) {
+                         int idx = str.indexOf("B");
+                      //   double m = commonUTIL.converStringToDouble(str.substring(0, idx));
+                         //amountConvert = true;
+                         return "000000000";//commonUTIL.converDoubleToString(m * 1000000000.);
+                     }
+                     else if (str.equalsIgnoreCase("T")) {
+                         int idx = str.indexOf("T");
+                       //  double m = commonUTIL.converStringToDouble(str.substring(0, idx));
+                       //  amountConvert = true;
+                         return "000000000000";//commonUTIL.converDoubleToString(m * 1000000000000.);
+                     }
+                 
+                 }
+                 catch (Exception e) {
+                     return null;
+                 }
+            
+                 
+             }
+             return string;
+         }
+         
        }
 
