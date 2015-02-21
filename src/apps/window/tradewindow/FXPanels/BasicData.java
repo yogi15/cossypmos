@@ -1,36 +1,56 @@
 package apps.window.tradewindow.FXPanels;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.rmi.RemoteException;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
 
+import beans.Book;
+import beans.LegalEntity;
+
+import com.jidesoft.combobox.TableExComboBox;
+import com.jidesoft.combobox.TableExComboBoxSearchable;
+import com.jidesoft.grid.SortableTable;
+
+import dsServices.RemoteReferenceData;
+
+
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class BasicData extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+	Vector<LegalEntity>_vectorLEs = null;
 	public JLabel jLabel1;
 	public JTextField currencyPair;
 	public JLabel jLabel2;
 	public JRadioButton jRadioButton1;
+	RemoteReferenceData remoteRef = null;
 	public JLabel jLabel3;
 	public JTextField book;
 	public JTextField buysell;
 	public JRadioButton jRadioButton2;
 	public JRadioButton jRadioButton3;
 	public JLabel jLabel4;
-	public JTextField counterPary;
+	//public JTextField counterPary;
 	public JRadioButton jRadioButton4;
 	public JRadioButton jRadioButton5;
 	public JRadioButton jRadioButton6;
@@ -38,8 +58,22 @@ public class BasicData extends JPanel {
 	public JRadioButton jRadioButton0;
 	public JTextField jTextField7;
 	private JLabel jLabel0;
+	TableModelUtil leModel = null;
+	public TableExComboBox counterPary = null;
+	
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	public BasicData() {
+		initComponents();
+	}
+
+	public BasicData(RemoteReferenceData remoteReference) {
+		// TODO Auto-generated constructor stub
+		this.remoteRef = remoteReference;
+		
+			String col[] = { "CpId", "Name ", "Role", "COntactType" };
+			//remoteRef.getLegalEntityDataOnRole("CounterParty");
+			leModel = new TableModelUtil(getAllLegalEntity(),col);
+		
 		initComponents();
 	}
 
@@ -57,7 +91,7 @@ public class BasicData extends JPanel {
 		add(getJTextField7(), new Constraints(new Leading(523, 152, 10, 10), new Leading(40, 23, 12, 12)));
 		add(getJLabel0(), new Constraints(new Leading(523, 121, 89, 96), new Leading(12, 12, 12)));
 		add(getJRadioButton7(), new Constraints(new Leading(756, 12, 12), new Leading(32, 12, 12)));
-		add(getJRadioButton6(), new Constraints(new Leading(758, 64, 12, 12), new Leading(5, 12, 12)));
+	add(getJRadioButton6(), new Constraints(new Leading(758, 64, 12, 12), new Leading(5, 12, 12)));
 		add(getJRadioButton1(), new Constraints(new Leading(677, 10, 10), new Leading(3, 17, 12, 12)));
 		add(getJRadioButton2(), new Constraints(new Leading(677, 10, 10), new Leading(24, 16, 10, 10)));
 		add(getJRadioButton0(), new Constraints(new Leading(677, 12, 12), new Leading(44, 19, 12, 12)));
@@ -129,11 +163,41 @@ public class BasicData extends JPanel {
 		return jRadioButton5;
 	}
 
-	private JTextField getCounterPary() {
-		if (counterPary == null) {
-			counterPary = new JTextField();
+	private TableExComboBox getCounterPary() {
+		//if (counterPary == null) {
+		//	counterPary = new JTextField();
 		//	counterPary.setText("Counterparty");
-		}
+		//}
+	
+		counterPary = new TableExComboBox(
+				leModel) {
+			@Override
+			protected JTable createTable(TableModel model) {
+				return new SortableTable(model);
+			}
+			
+			
+		};
+		counterPary.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				int leid = counterPary.getSelectedIndex();
+				if(leid == 0)
+					return;
+				LegalEntity le = _vectorLEs.get(leid);
+				counterPary.setName(String.valueOf(((le)).getId()));
+				//System.out.println(counterPary.getName());
+				
+			}
+		});
+		counterPary.setValueColumnIndex(1);
+//		
+		//counterPary.setSelectedItem("ALCOA INC");
+		
+		counterPary.setEditable(false);
+		new TableExComboBoxSearchable(counterPary);
 		return counterPary;
 	}
 
@@ -264,5 +328,109 @@ public class BasicData extends JPanel {
 		}
 		return jLabel1;
 	}
+	
+	
+	protected Vector<LegalEntity> getAllLegalEntity(){ 
+		try {
+			_vectorLEs = (Vector) remoteRef.getLegalEntityDataOnRole("CounterParty");
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return _vectorLEs;
+		
+	}
+
+	   class TableModelUtil extends AbstractTableModel {
+
+			final String[] columnNames;
+
+			Vector<LegalEntity> data;
+			RemoteReferenceData remoteRef;
+			Hashtable<Integer, Book> books;
+
+			public TableModelUtil(Vector<LegalEntity> myData, String col[]) {
+				this.columnNames = col;
+				this.data = myData;
+				this.books = books;
+			}
+
+			public int getColumnCount() {
+				return columnNames.length;
+			}
+
+			public int getRowCount() {
+				if (data != null)
+					return data.size();
+				return 0;
+			}
+
+			public String getColumnName(int col) {
+				return columnNames[col];
+			}
+
+			public Object getValueAt(int row, int col) {
+				Object value = null;
+
+				LegalEntity currSplit = (LegalEntity) data.get(row);
+
+				switch (col) {
+				case 0:
+					value = currSplit.getId();
+					break;
+				case 1:
+					value = currSplit.getName();
+					break;
+				
+
+				}
+				return value;
+			}
+
+			public boolean isCellEditable(int row, int col) {
+				return false;
+			}
+
+			public void setValueAt(Object value, int row, int col) {
+				
+					data.set(row, (LegalEntity) value);
+					this.fireTableDataChanged();
+				
+				
+
+			}
+
+			public void addRow(Object value) {
+
+				data.add((LegalEntity) value);
+				this.fireTableDataChanged();
+
+			}
+
+			public void delRow(int row) {
+				if (row != -1) {
+					data.remove(row);
+					this.fireTableDataChanged();
+				}
+
+			}
+
+			public void udpateValueAt(Object value, int row, int col) {
+
+				data.set(row, (LegalEntity) value);
+				for (int i = 0; i < columnNames.length; i++)
+					fireTableCellUpdated(row, i);
+
+			}
+
+			public void removeALL() {
+				if (data != null) {
+					data.removeAllElements();
+				}
+				data = null;
+				this.fireTableDataChanged();
+			}
+		}
+	
 
 }
