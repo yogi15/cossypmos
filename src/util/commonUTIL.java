@@ -19,6 +19,7 @@ import java.util.Date;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -45,6 +46,8 @@ import apps.newDealInvoker;
 import beans.StartUPData;
 import beans.TransferRule;
 import util.common.DateU;
+import util.common.NumberFormatUtil;
+import util.common.NumberRoundingMethod;
 
 
 
@@ -52,6 +55,7 @@ import util.common.DateU;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+
 
 import constants.CommonConstants;
 import dsEventProcessor.DebugEventProcessor;
@@ -63,9 +67,15 @@ import dsEventProcessor.EventProcessor;
 
 public class commonUTIL {
 	   public final static String ENCODING="UTF-8";
-	
+	   static final String NULL_NUMBER_STRING = "";
 	static protected String USER_HOME=null;
     static protected String USER_NAME=null;
+	static Map<Locale, NumberFormat> _numberFormat            = new HashMap<Locale, NumberFormat>();
+	static Map<Locale, NumberFormat> _numberFormatNoGrouping  = new HashMap<Locale, NumberFormat>();
+	static Map<String, DecimalFormat> _decimalFormat           = new HashMap<String, DecimalFormat>();
+	static Map<String, DecimalFormat> _decimalFormatNoGrouping = new HashMap<String, DecimalFormat>();
+	static Map<String, DecimalFormat> _patternDecimalFormat    = new HashMap<String, DecimalFormat>();
+
 	static public void displayError(String name,String methodName, Exception e) {
       System.err.println("Classname : " + name + " : MethodName : " +methodName + " :: "+ e);
        
@@ -179,7 +189,16 @@ public class commonUTIL {
 	  }
 	
 	static public double converStringToDouble(String doubleValue) {
-		Double doub = new Double(doubleValue);
+		if(commonUTIL.isEmpty(doubleValue))
+			return 0.0;
+		String dValue = doubleValue ;
+		Double doub = null;
+		
+		if(doubleValue.contains(",")) {
+			doub = NumberFormatUtil.stringToNumber(doubleValue,Locale.getDefault());
+		} else {
+			doub = new Double(doubleValue);
+		}
 		return doub.doubleValue();
 	}
 	static public int converStringToInteger(String intValue) {
@@ -236,8 +255,18 @@ public class commonUTIL {
     	} 
     	return value;
     }
-	
-	
+	// this is requred for Rate columns only. 
+    static public String getStringFromDoubleExpRates(double amount) {
+    	String value = BigDecimal.valueOf(amount).toPlainString();
+    	int len = value.length() -  value.indexOf(".") ;
+    	if(value.contains(".")) {
+    		if(len == 2)
+    		value = value.substring(0, value.indexOf(".")+2);
+    		if(len >= 3)
+    			value = value.substring(0, value.indexOf(".")+3);
+    	} 
+    	return value;
+    }
 	static public void setLabelFont(JComponent label) {
 		label.setFont(new Font("Arial", Font.BOLD, 13));
 	
@@ -1118,6 +1147,8 @@ public class commonUTIL {
 	    
 	public static String getOnlyDate(String settleDate) {
 		// TODO Auto-generated method stub
+		if(settleDate == null || settleDate.length() < 10)
+			return null;
 		return settleDate.substring(0, 10).trim();
 	}
 	
@@ -1175,6 +1206,26 @@ public class commonUTIL {
 	  public static boolean isEmpty(Collection<?> collection) {
 		  return (collection == null || collection.isEmpty());
 	  }
+		static public final int DECIMALS = NumberRoundingMethod.MAX_DEC_PLACES-2;
+	  synchronized static NumberFormat getNumberFormat(Locale loc,
+				boolean useGrouping) {
+			NumberFormat f =
+				useGrouping ? (NumberFormat)_numberFormat.get(loc) :
+					(NumberFormat)_numberFormatNoGrouping.get(loc);
+				if (f == null) {
+					f = NumberFormat.getInstance(loc);
+					f.setMaximumFractionDigits(DECIMALS);
+					if (useGrouping) {
+						_numberFormat.put(loc, f);
+					}
+					else {
+						f.setGroupingUsed(false);
+						_numberFormatNoGrouping.put(loc, f);
+					}
+				}
+				return f;
+		}
+	  
 /*
 	 * Replaces a common from a string format number
 	 * 
