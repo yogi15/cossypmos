@@ -73,6 +73,7 @@ import beans.StartUPData;
 import beans.Trade;
 import beans.Users;
 
+import com.jidesoft.combobox.TableExComboBox;
 import com.jidesoft.converter.BooleanConverter;
 import com.jidesoft.converter.DateConverter;
 import com.jidesoft.converter.DoubleConverter;
@@ -165,12 +166,12 @@ import dsServices.ServerConnectionUtil;
 				    };
 		 public BasicData getBasicData() {
 			if (basicData == null) {
-				basicData = new BasicData();
+				basicData = new BasicData(remoteReference);
 				//basicData.setBorder(new LineBorder(Color.black, 1, false));
 			}
 			return basicData;
 		}
-	
+		 
 		public void setBasicData(BasicData basicData) {
 			this.basicData = basicData;
 		}
@@ -472,6 +473,7 @@ import dsServices.ServerConnectionUtil;
 			//initJide();
 			//@ yogesh 01/02/2015
 			// takeup type default is set to utilize 
+			initRemote();
 			takeupW.typeComboBox.setSelectedItem("Utilize");
 			
 			setBorder(new LineBorder(Color.black, 1, false));
@@ -648,7 +650,7 @@ import dsServices.ServerConnectionUtil;
 			}
 			   
 		}
-		public void init() {
+		public void initRemote() {
 			de =ServerConnectionUtil.connect("localhost", 1099,commonUTIL.getServerIP());
 		   	 try {
 		   		remoteTrade = (RemoteTrade) de.getRMIService("Trade");
@@ -658,6 +660,21 @@ import dsServices.ServerConnectionUtil;
 		   		remoteProduct = (RemoteProduct) de.getRMIService("Product");
 		   		product = (Product) remoteProduct.selectProductOnType(productType, productSubType);     
 		   		remoteBO = (RemoteBOProcess) de.getRMIService("BOProcess");
+		   	 }catch(RemoteException r) {
+		   		 commonUTIL.displayError("FXTradePanel", "initRemote", r);
+		   	 }
+		   		
+		}
+		public void init() {
+			//de =ServerConnectionUtil.connect("localhost", 1099,commonUTIL.getServerIP());
+		   	 try {
+		   	/*	remoteTrade = (RemoteTrade) de.getRMIService("Trade");
+		   		boremote = (RemoteBOProcess) de.getRMIService("BOProcess");
+		   		remoteTask = (RemoteTask) de.getRMIService("Task");
+		   		remoteReference = (RemoteReferenceData) de.getRMIService("ReferenceData");
+		   		remoteProduct = (RemoteProduct) de.getRMIService("Product");
+		   		product = (Product) remoteProduct.selectProductOnType(productType, productSubType);     
+		   		remoteBO = (RemoteBOProcess) de.getRMIService("BOProcess"); */
 		   		Vector startupDataInstrumentType = (Vector) remoteReference.getStartUPData("InstrumentType");
 		   		JComboBox startupDataInstrumentTypecomboBox = new JComboBox( convertVectortoSringArray(startupDataInstrumentType) );
 		   		startupDataInstrumentTypeDC = new DefaultCellEditor(startupDataInstrumentTypecomboBox);
@@ -669,7 +686,7 @@ import dsServices.ServerConnectionUtil;
 		   		 actionstatus.insertElementAt("NEW", 0);
 		   		 actionstatus.setSelectedItem("NEW");
 		   		 basicData.buysell.setEditable(false);
-		   		 basicData.counterPary.setEditable(false);
+		   		// basicData.counterPary.setEditable(false);
 		   		out.jCheckBox2.setEnabled(false);
 		   		out.jCheckBox2.setSelected(false);
 		   		 basicData.book.setEditable(false);
@@ -2666,7 +2683,7 @@ import dsServices.ServerConnectionUtil;
 								
 									 mirrorBook = getBook(id);
 									 if(mirrorBook.getBookno() > 0 )
-									basicData.counterPary.setText(mirrorBook.getBook_name());
+									basicData.counterPary.setSelectedItem(mirrorBook.getBook_name());
 									 counterPartyID = trade.getCpID();
 									 showbook.dispose();
 								}
@@ -3423,7 +3440,13 @@ import dsServices.ServerConnectionUtil;
 			}
 			return true;
 		}
-				
+		public boolean validateField(TableExComboBox jtext,String name) {			
+			if(!validateFieldValue(jtext.getName())) {
+				commonUTIL.showAlertMessage(" Select  "+ name);
+				return false;
+			}
+			return true;
+		}
 		// this is method is used to RountingData Calculation		
 		public void setRoutingDataCal() {
 			try {
@@ -3659,7 +3682,7 @@ import dsServices.ServerConnectionUtil;
 			basicData.currencyPair.setText("");
 			basicData.book.setText("");
 			basicData.book.setName("0");
-			basicData.counterPary.setText("");
+			basicData.counterPary.setSelectedItem("");
 			basicData.counterPary.setName("0");
 			basicData.buysell.setText("BUY");
 		//	basicData.jRadioButton3.setSelected(true);
@@ -4319,7 +4342,7 @@ import dsServices.ServerConnectionUtil;
 					basicData.jTextField7.setText(le.getName());
 					basicData.jTextField7.setName(new Integer(id).toString());
 				} else {
-				   basicData.counterPary.setText(le.getName());
+				   basicData.counterPary.setSelectedItem(le.getName());
 				   basicData.counterPary.setName(new Integer(id).toString());
 				}
 			}
@@ -4368,7 +4391,7 @@ import dsServices.ServerConnectionUtil;
 			if(trade.isMirrorTrade()) {
 				mirrorBook = getBook(trade.getMirrorBookid());
 				Book book = getBook(trade.getCpID());
-				basicData.counterPary.setText(book.getBook_name());
+				basicData.counterPary.setSelectedItem(book.getBook_name());
 				basicData.counterPary.setName(new Integer(book.getBookno()).toString());
 			} else {
 				getDataFromTrade(trade.getCpID(),"CounterParty");
@@ -4729,6 +4752,30 @@ import dsServices.ServerConnectionUtil;
 			    return __table;
 			
 		}
+		private JTable fillFavourites(Object __rows12 [][],TableExComboBox textField,JTextField textField2,JLabel label,boolean dateField,Book mirrorBook,String type) {
+			Color colr = new Color(239,239,242);
+			
+			 __table = new JTable(new JTableButtonModel(__rows12));
+			 __table.setRowHeight(30);
+			 __table.setColumnSelectionAllowed(false);
+			 __table.setRowSelectionAllowed(true);
+			 __table.setIntercellSpacing(new Dimension(0, 0));
+			 __table.setShowGrid(false);
+		//	 __table.setBackground(colr);
+			
+			    defaultRenderer = __table.getDefaultRenderer(JButton.class);
+			    __table.setDefaultRenderer(JButton.class,
+						       new JTableButtonRenderer(defaultRenderer));
+			    __table.setPreferredScrollableViewportSize(new Dimension(400, 200));
+			    __table.addMouseListener(new JTableButtonMouseListener(__table,textField,textField2,label,dateField,mirrorBook,type));
+			    if(label  != null) {
+			    //	currencyPair = textField.getText();
+			    	//functionality.refreshPositionTable(currencyPair,new Integer(basicData.book.getName()).intValue());
+			    }
+			    
+			    return __table;
+			
+		}
 		private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JLabel label,boolean dateField,String type) {
 			
 			Color colr = new Color(239,239,242);
@@ -4896,6 +4943,7 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 		
 		  private JTable __table;
 		  JTextField comp = null;
+		  TableExComboBox comp1 = null;
 		  JDatePicker swapField = null;
 		  JLabel label = null;
 		  JDatePicker datefield = null;
@@ -4940,8 +4988,14 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 			   generateDeliveryDate(swapField,swapTenor,datefield);		   
 			   
 		   } else {
+			   if(comp != null) {
 			  comp.setText(button.getText());
 			  comp.setName(button.getName());
+			   } 
+			   if(comp1 != null) {
+				   comp1.setSelectedItem(button.getText());
+					  comp1.setName(button.getName());
+			   }
 			  if(type.equalsIgnoreCase("Book")) {
 				  String currencyPair = basicData.currencyPair.getText();
 				  if(!commonUTIL.isEmpty(currencyPair)) {
@@ -5032,6 +5086,7 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 		    label = labeln;
 		    dateF = dateField;
 		    this.type = type;
+		    
 		  
 		   // swapField = textField2;
 		  }
@@ -5044,7 +5099,15 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 			   // swapField = textField2;
 			   // mirrorBook = mirrorBook;  
 		  }
-		  
+		  public JTableButtonMouseListener(JTable table,TableExComboBox textField,JTextField textField2,JLabel labeln,boolean dateField,Book mirrorBook,String type) {
+			    __table = table;
+			    comp1 = textField;
+			    label = labeln;
+			    dateF = dateField;
+			    this.type = type;
+			   // swapField = textField2;
+			   // mirrorBook = mirrorBook;  
+		  }
 		  public JTableButtonMouseListener(JTable table,JDatePicker  textField2,JLabel labeln,boolean dateField,String type) {
 			    __table = table;
 			    //datefield = textField;
