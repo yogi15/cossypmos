@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import util.commonUTIL;
+
 
 
 public class NumberFormatUtil {
@@ -122,6 +124,55 @@ public class NumberFormatUtil {
 		 static public String numberToString(double rate) {
 			 return numberToString(rate, Locale.getDefault());
 		 }
+		 static public double stringToNumber(String s,Locale loc) {
+			  return stringToNumber(s, loc, true);
+		  }
+
+		  static public double stringToNumber(String s, Locale loc, boolean useGrouping) {
+			  try {
+				  return stringToNumberThrowException(s, loc, useGrouping);
+			  } catch(Throwable x) { commonUTIL.displayError("NumberFormatUtil", "stringToNumber", new Exception(x)); }
+			  return 0.0;
+		  }
+
+		  static public double stringToNumberThrowException(String s,Locale loc)
+		  throws Exception {
+			  return stringToNumberThrowException(s, loc, true);
+		  }
+		 static public double stringToNumberThrowException(String s,
+				  Locale loc,
+				  boolean useGrouping)
+		  throws Exception {
+			  try {
+				  if ((s == null) || (s.length() == 0)) return 0.0;
+				  s = s.trim();
+				  if (s.length() == 0) return 0.0;
+				  int sign=1;
+				  if(s.charAt(0)=='(') {
+					  int l=s.length();
+					  if(s.charAt(l-1)==')') l=l-1;
+				  if(l<1) return 0.0;
+				  s = s.substring(1,l);
+				  sign=-1;
+				  } else if (s.charAt(0) == '+') {
+					  // if the string begins with a plus sign, strip it off and parse
+					  // again.
+					  return stringToNumber(s.substring(1),loc);
+				  }
+				  NumberFormat f=getNumberFormat(loc, useGrouping);
+				  double v=0.0;
+				  synchronized(f) {
+					  f.setMaximumFractionDigits(DECIMALS);
+					  try { v=f.parse(s).doubleValue();}
+					  catch(Exception e) { commonUTIL.displayError("NumberFormatUtil", "stringToNumber", e);
+					  }
+				  }
+				  return v*sign;
+			  } catch(Exception  x) {
+				  
+				  throw x;
+			  }
+		  }
 		 /**
 		  * Returns the String representation (with a given
 		  * number of decimals) of a given double.
