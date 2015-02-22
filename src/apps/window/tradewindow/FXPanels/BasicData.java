@@ -178,6 +178,8 @@ public class BasicData extends JPanel {
 			
 			
 		};
+		counterPary.setEditable(true);
+		counterPary.setBorder(null);
 		counterPary.addActionListener(new ActionListener() {
 			
 			@Override
