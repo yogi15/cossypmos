@@ -16,6 +16,7 @@ import java.rmi.RemoteException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
@@ -699,10 +700,10 @@ import dsServices.ServerConnectionUtil;
 				 out.jTextField1.setText("0"); // amt1
 				 out.jTextField2.setText("0"); // amt2
 					
-				 out.outRightDate.setDateFormat(commonUTIL.getDateFormat()); // date
-				 out.outRightDate.setSelectedDate(commonUTIL.getCurrentDate());
-				 swap.swapDate.setDateFormat(commonUTIL.getDateFormat());
-				 swap.swapDate.setSelectedDate(commonUTIL.getCurrentDate());
+				// out.outRightDate.setDateFormat(commonUTIL.getDateFormat()); // date
+				 out.outRightDate.setDate(commonUTIL.getCurrentDate());
+				// swap.swapDate.setDate(commonUTIL.getDateFormat());
+				 swap.swapDate.setDate(commonUTIL.getCurrentDate());
 				 rollpanel.jTextField0.setDateFormat(commonUTIL.getDateFormat());
 				 out.jTextField4.setText("0"); // spot 
 				 basicData.jTextField7.setText("0");  
@@ -1316,13 +1317,13 @@ import dsServices.ServerConnectionUtil;
 			}
 			
 			if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {				
-		    	if (commonUTIL.addSubtractDate(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true), 31).before(
+		    	if (commonUTIL.addSubtractDate( ((Calendar) out.outRightDate.getSelectedItem()).getTime(), 31).before(
 						 fwdOp.startDate.getDate())) {		    		
 		    		commonUTIL.showAlertMessage("Option End date falls beyond 31 days after Trade end date");
 		    		return;		    		
 		    	}
 		    	
-		    	if (fwdOp.startDate.getDate().before(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true))){
+		    	if (fwdOp.startDate.getDate().before(((Calendar) out.outRightDate.getSelectedItem()).getTime())){
 		    		commonUTIL.showAlertMessage("Option End date cannot be before Trade end date");
 		    		return;	
 		    	}
@@ -1951,7 +1952,7 @@ import dsServices.ServerConnectionUtil;
 			    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2*farRate).toString());
 			    	 }	    		 																
 	    	 }	    	
-	          populateRountingData();		
+	         // populateRountingData();		
 	    }
     });
 			        
@@ -2245,7 +2246,7 @@ import dsServices.ServerConnectionUtil;
 									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp((amt1 * -1) * spot).toString());
 					    		 
 					    	 }
-		                    	populateRountingData();
+		                    	//populateRountingData();
 		                    }catch(NumberFormatException e1) {
 	                    		commonUTIL.showAlertMessage("Enter Number ");
 	                    	}
@@ -2290,7 +2291,7 @@ import dsServices.ServerConnectionUtil;
 									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp((amt2 *-1)/ spot).toString());
 					    		 
 					    	 }
-		                    	populateRountingData();
+		                    	//populateRountingData();
 		                    	}catch(NumberFormatException e1) {
 		                    		commonUTIL.showAlertMessage("Enter Number ");
 		                    	}
@@ -2323,7 +2324,7 @@ import dsServices.ServerConnectionUtil;
 									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt1 * spot).toString());
 					    		 
 					    	 }
-		                    	populateRountingData();
+		                    //	populateRountingData();
 		                    	}catch(NumberFormatException e1) {
 		                    		commonUTIL.showAlertMessage("Enter Number ");
 		                    	}
@@ -2385,7 +2386,7 @@ import dsServices.ServerConnectionUtil;
 									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot));
 					    		 
 					    	 }
-		                    	populateRountingData();
+		                    	//populateRountingData();
 		                    	 }catch(NumberFormatException e1) {
 			                    		commonUTIL.showAlertMessage("Enter Number ");
 			                    	}
@@ -2426,7 +2427,7 @@ import dsServices.ServerConnectionUtil;
 									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot));
 					    		 
 					    	 }
-		                    	populateRountingData();
+		                    //	populateRountingData();
 		                    }catch(NumberFormatException e1) {
 	                    		commonUTIL.showAlertMessage("Enter Number ");
 	                    	}
@@ -2551,14 +2552,14 @@ import dsServices.ServerConnectionUtil;
 										String roll = functionality.jButton7.getText();
 										DateU dateRolldate = DateU.valueOf(rollpanel.jTextField0.getSelectedDate());
 										if(roll.equalsIgnoreCase("ROLLOVER")) {
-												DateU dateFWDDate = DateU.valueOf(out.outRightDate.getSelectedDate());
+												DateU dateFWDDate = DateU.valueOf(out.outRightDate.getDate());
 												if(dateRolldate.lte(dateFWDDate)) {
 													commonUTIL.showAlertMessage("ROLLOVER Date before OutRight Date");
 													return;
 												}
 										}
 										if(roll.equalsIgnoreCase("ROLLBACK")) {
-											DateU dateFWDDate = DateU.valueOf(out.outRightDate.getSelectedDate());
+											DateU dateFWDDate = DateU.valueOf(out.outRightDate.getDate());
 											if(dateFWDDate.lte(dateRolldate)) {
 												commonUTIL.showAlertMessage("OutRight  Date before ROLLBack Date");
 												return;
@@ -2719,13 +2720,13 @@ import dsServices.ServerConnectionUtil;
 							}	else {
 								
 								if(basicData.jRadioButton5.isSelected() && fwdOp.startDate.isEnabled()) {				
-							    	if (commonUTIL.addSubtractDate(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true), 31).before(
+							    	if (commonUTIL.addSubtractDate(out.outRightDate.getDate(), 31).before(
 											 fwdOp.startDate.getDate())) {		    		
 							    		commonUTIL.showAlertMessage("Option End date falls beyond 31 days after Trade end date");
 							    		return;		    		
 							    	}
 							    	
-							    	if (fwdOp.startDate.getDate().before(commonUTIL.stringToDate(out.outRightDate.getSelectedDateAsText(), true))){
+							    	if (fwdOp.startDate.getDate().before(out.outRightDate.getDate())){
 							    		commonUTIL.showAlertMessage("Option End date cannot be before Trade end date");
 							    		return;	
 							    	}
@@ -2953,7 +2954,7 @@ import dsServices.ServerConnectionUtil;
 							swap.jTextField1.setText("0.0");
 							swap.jTextField2.setText("0.0");
 							swap.jTextField4.setText("0.0");
-							out.outRightDate.setSelectedDate(commonUTIL.addSubtractDate(commonUTIL.getCurrentDate(), 2));
+							out.outRightDate.setDate(commonUTIL.addSubtractDate(commonUTIL.getCurrentDate(), 2));
 									
 							//if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
 							//	basicData.buysell.setText("SELL/BUY");
@@ -3199,7 +3200,7 @@ import dsServices.ServerConnectionUtil;
 					amt1 = Math.abs(amt1);
 					double spot = (new Double(out.jTextField4.getText()).doubleValue());
 					out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
-					double amt2 = (amt1 * spot * -1);								
+					double amt2 = (amt1* spot) *-1;								
 					out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2));
 					
 					 double farAmt1 = amt1 * -1;
@@ -3221,7 +3222,7 @@ import dsServices.ServerConnectionUtil;
 	    		 	double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 					double spot = (new Double(out.jTextField4.getText()).doubleValue());
 					out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
-					double amt2 = Math.abs(amt1) * 1;		
+					double amt2 = Math.abs(amt1) * -1;		
 				//	System.out.println("------------- "+commonUTIL.getStringFromDoubleExp(amt2*spot));
 					out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot));
 					
@@ -3692,7 +3693,7 @@ import dsServices.ServerConnectionUtil;
 			out.jTextField1.setText("0"); // amt1
 			out.jTextField2.setText("0"); // amt2
 		//	out.outRightDate.setDateFormat(commonUTIL.getDateFormat()); // date
-			out.outRightDate.setSelectedDate(commonUTIL.getCurrentDate());// date
+			out.outRightDate.setDate(commonUTIL.getCurrentDate());// date
 			out.jTextField4.setText("0"); // spot 
 			basicData.jTextField7.setText("0"); // trader
 			basicData.jTextField7.setName("0");
@@ -3821,7 +3822,7 @@ import dsServices.ServerConnectionUtil;
 				  newrolltrade.setCpID(new Integer(basicData.counterPary.getName()).intValue());
 				  newrolltrade.setTraderID(new Integer(basicData.jTextField7.getName()).intValue());
 				  newrolltrade.setTradeDate(commonUTIL.getCurrentDateTime());
-				  newrolltrade.setDelivertyDate(out.outRightDate.getSelectedDateAsText());
+				  newrolltrade.setDelivertyDate(commonUTIL.convertDateTimeTOString(out.outRightDate.getDate()));
 				  newrolltrade.setStatus("NONE");
 				  newrolltrade.setProductType(productType);
 		   
@@ -3948,7 +3949,7 @@ import dsServices.ServerConnectionUtil;
 					  newrolltrade.setCpID(new Integer(basicData.counterPary.getName()).intValue());
 					  newrolltrade.setTraderID(new Integer(basicData.jTextField7.getName()).intValue());
 					  newrolltrade.setTradeDate(commonUTIL.getCurrentDateTime());
-					  newrolltrade.setDelivertyDate(out.outRightDate.getSelectedDateAsText());
+					  newrolltrade.setDelivertyDate(commonUTIL.convertDateTimeTOString(out.outRightDate.getDate()));
 					  newrolltrade.setStatus("NONE");
 					  newrolltrade.setProductType(productType);
 			   
@@ -4152,7 +4153,7 @@ import dsServices.ServerConnectionUtil;
 				return;
 			trade.setTraderID(new Integer(basicData.jTextField7.getName()).intValue());
 			trade.setTradeDate(commonUTIL.getCurrentDateTime());
-		    trade.setDelivertyDate(out.outRightDate.getSelectedDateAsText());
+		    trade.setDelivertyDate(commonUTIL.convertDateTimeTOString(out.outRightDate.getDate()));
 			trade.setStatus(out.jTextField6.getText());
 		    trade.setProductType(productType);
 		   
@@ -4188,7 +4189,7 @@ import dsServices.ServerConnectionUtil;
 				}
 			    
 				// used as fwd amt for FXSWAP in FX
-			    trade.setEffectiveDate(swap.swapDate.getSelectedDateAsText());
+			    trade.setEffectiveDate(commonUTIL.convertDateTimeTOString(swap.swapDate.getDate()));
 			    try {
 					trade.setSecondPrice(swap.jTextField4.getDoubleValue());  // used as forward rate 
 				} catch (ParseException e) {						
@@ -4401,7 +4402,7 @@ import dsServices.ServerConnectionUtil;
 			out.jLabel2.setText(trade.getTradedesc().substring(0, 3));
 			
 			basicData.buysell.setText(trade.getType());
-			out.outRightDate.setSelectedDate(commonUTIL.stringToDate(trade.getDelivertyDate(),true));
+			out.outRightDate.setDate(commonUTIL.stringToDate(trade.getDelivertyDate(),true));
 			out.jTextField6.setText(trade.getStatus());
 			productType = trade.getProductType();
 			productSubType = trade.getTradedesc1();
@@ -4435,7 +4436,7 @@ import dsServices.ServerConnectionUtil;
 		    	
 		    	swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(trade.getTradeAmount()).toString());
 		    	swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(trade.getYield()).toString());
-		    	swap.swapDate.setSelectedDate(commonUTIL.stringToDate(trade.getEffectiveDate().toString(),true));
+		    	swap.swapDate.setDate(commonUTIL.stringToDate(trade.getEffectiveDate().toString(),true));
 		    	swap.jTextField4.setValue(trade.getSecondPrice());
 		    	
 		    	
@@ -4826,6 +4827,31 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 			    return __table;
 			
 		}
+private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateComboBox  textField2,com.jidesoft.combobox.DateComboBox  textField3,JLabel label,boolean dateField,String type) {
+	
+	Color colr = new Color(239,239,242);
+	 __table = new JTable(new JTableButtonModel(__rows12));
+	 __table.setRowHeight(30);
+	 __table.setColumnSelectionAllowed(false);
+	 __table.setRowSelectionAllowed(true);
+	 __table.setIntercellSpacing(new Dimension(0, 0));
+	 __table.setShowGrid(false);
+	// __table.setBackground(colr);
+	    defaultRenderer = __table.getDefaultRenderer(JButton.class);
+	    __table.setDefaultRenderer(JButton.class,
+				       new JTableButtonRenderer(defaultRenderer));
+	    __table.setPreferredScrollableViewportSize(new Dimension(400, 200));
+//	   if( productSubType.equalsIgnoreCase(FXSWAP) )
+			   __table.addMouseListener(new JTableButtonMouseListener(__table,textField2,textField3,label,dateField,type));
+	 //   __table.addMouseListener(new JTableButtonMouseListener(__table,textField2,label,dateField,type));
+	    if(label  != null) {
+	    //	currencyPair = textField.getText();
+	    	//functionality.refreshPositionTable(currencyPair,new Integer(basicData.book.getName()).intValue());
+	    }
+	    
+	    return __table;
+	
+}
 		private Object [][] getRows(String name) {
 			Object rows [][] = null;
 		
@@ -4947,6 +4973,8 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 		  JDatePicker swapField = null;
 		  JLabel label = null;
 		  JDatePicker datefield = null;
+		  com.jidesoft.combobox.DateComboBox   swapFieldJ = null;
+		  com.jidesoft.combobox.DateComboBox   datefieldJ  = null;
 		  boolean dateF = false;
 		  String type = "";
 		 // Book mirrorBook = null;
@@ -5125,7 +5153,14 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 			    swapField = textField2;
 			    this.type = type;
 		  }
-	   
+		  public JTableButtonMouseListener(JTable table, com.jidesoft.combobox.DateComboBox textField,com.jidesoft.combobox.DateComboBox  textField2,JLabel labeln,boolean dateField,String type) {
+			    __table = table;
+			    datefieldJ = textField;
+			    label = labeln;
+			    dateF = dateField;
+			    swapFieldJ = textField2;
+			    this.type = type;
+		  }
 		  public void mouseClicked(MouseEvent e) {
 		    __forwardEventToButton(e);
 		  }
@@ -5147,12 +5182,12 @@ private JTable fillFavourites(Object __rows12 [][],JDatePicker textField2,JDateP
 		  }
 		  public void generateDeliveryDate(JDatePicker dateField,String tenor,JDatePicker outRight1) {
 
-			  	DateU dateissueDate = DateU.valueOf(out.outRightDate.getSelectedDate());
+			  	DateU dateissueDate = DateU.valueOf(out.outRightDate.getDate());
 			  	dateissueDate.convertToCode(tenor);
 				if(basicData.jRadioButton2.isSelected()) {					
-					swap.swapDate.setSelectedDate(dateissueDate.getDate());
+					swap.swapDate.setDate(dateissueDate.getDate());
 				} else {
-					out.outRightDate.setSelectedDate(dateissueDate.getDate());
+					out.outRightDate.setDate(dateissueDate.getDate());
 				}
 			}
 		 
