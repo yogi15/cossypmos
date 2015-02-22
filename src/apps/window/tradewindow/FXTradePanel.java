@@ -3199,7 +3199,7 @@ import dsServices.ServerConnectionUtil;
 					amt1 = Math.abs(amt1);
 					double spot = (new Double(out.jTextField4.getText()).doubleValue());
 					out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
-					double amt2 = amt1* spot;								
+					double amt2 = (amt1 * spot * -1);								
 					out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2));
 					
 					 double farAmt1 = amt1 * -1;
@@ -3221,7 +3221,7 @@ import dsServices.ServerConnectionUtil;
 	    		 	double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 					double spot = (new Double(out.jTextField4.getText()).doubleValue());
 					out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
-					double amt2 = Math.abs(amt1) * -1;		
+					double amt2 = Math.abs(amt1) * 1;		
 				//	System.out.println("------------- "+commonUTIL.getStringFromDoubleExp(amt2*spot));
 					out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot));
 					
