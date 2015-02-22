@@ -1,6 +1,11 @@
 package apps.window.tradewindow.FXPanels;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -13,6 +18,8 @@ import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
 import util.NumericTextField;
+import util.commonUTIL;
+import util.common.DateU;
 
 import com.standbysoft.component.date.swing.JDatePicker;
 
@@ -28,7 +35,8 @@ public class Swap extends JPanel {
 	private JLabel jLabel2;
 	public NumericTextField jTextField2;
 	private JLabel jLabel3;
-	public JDatePicker swapDate;
+	//public JDatePicker swapDate;
+	public com.jidesoft.combobox.DateComboBox  swapDate;
 	public NumericTextField jTextField4;
 	DecimalFormat format = new DecimalFormat("##,###,#######.####");
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
@@ -50,14 +58,86 @@ public class Swap extends JPanel {
 		return jTextField4;
 	}
 
-	private JDatePicker getJTextField3() {
+	private com.jidesoft.combobox.DateComboBox getJTextField3() {
 		if (swapDate == null) {
-			swapDate = new JDatePicker();
+			swapDate = new com.jidesoft.combobox.DateComboBox();
+			swapDate.setFormat(new SimpleDateFormat("dd/MM/yyyy"));
+			Calendar currentDate = Calendar.getInstance();
+			swapDate.setDate(currentDate.getTime());
+			swapDate.setName("SwapRight");
+			swapDate.addKeyListener(new KeyListener() {
+					
+					@Override
+					public void keyTyped(KeyEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void keyReleased(KeyEvent arg0) {
+						// TODO Auto-generated method stub
+						if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+							String dateTxt = getDateText();
+							setDateTextEmpty();
+							Date date = swapDate.getDate();
+							if(date == null)
+								date = commonUTIL.getCurrentDate();
+							if(!commonUTIL.isEmpty(dateTxt))
+								swapDate.setDate(checkDate(dateTxt.trim(),date));
+							
+						/*	if(dateTxt.equalsIgnoreCase("1m")) {
+				   			 Date date = dateSpinner.getDate();
+				   			DateU dated  = 	DateU.valueOf(date);
+				   			dated.addMonths(1);
+				   			 dateSpinner.setDate(dated.getDate()); */
+				   			 
+				   		// }
+							
+							
+						}
+					}
+					
+					@Override
+					public void keyPressed(KeyEvent arg0) {
+						// TODO Auto-generated method stub
+						if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+							String dateT = getDateText();
+							setDateTextEmpty();
+						} else {
+							setDateText(arg0.getKeyChar());
+						}
+					//	System.out.println(arg0.getKeyChar());
+						
+					//	dateSpinner.setName(dateSpinner.getName()+arg0.getKeyChar());
+					//	System.out.println(dateSpinner.getName());
+						//setDateText(arg0.getKeyChar());
+					}
+				    	
+				    });
+		    
+		   
 			//jTextField3.setText("jTextField2");
 		}
 		return swapDate;
 	}
-
+	 public String getDateText() {
+			
+		   return dateText;
+		  
+	   }
+	String dateText = "";
+	public String setDateText(Character kk) {
+		  if(kk.isSpaceChar(kk))
+			  return dateText;
+		  if(commonUTIL.isEmpty(dateText))
+		   dateText = dateText.trim()  + String.valueOf(kk);
+		  else 
+			  dateText = dateText.trim() + String.valueOf(kk);
+		   return dateText;
+	  }
+	  public void setDateTextEmpty() {
+		   dateText = "";
+	  }
 	private JLabel getJLabel3() {
 		if (jLabel3 == null) {
 			jLabel3 = new JLabel();
@@ -122,5 +202,62 @@ public class Swap extends JPanel {
 		}
 		return jLabel0;
 	}
+	
+	static public Date checkDate(String s1,Date date) {
+		  String s = s1.trim();
+		  try {
+			  int idx = s.indexOf("d");
+			  if (idx == -1)
+				  idx = s.indexOf("D");
+			  if (idx > 0) {
+				  int days = commonUTIL.converStringToInteger(s.substring(0, idx));
+	             			DateU dated  = 	DateU.valueOf(date);
+	             			dated.addDays(days);
+	   			             //return Util.numberToString(m*1000.);
+	             			return dated.getDate();
+			  }
+			  idx = s.indexOf("w");
+			  if (idx == -1)
+				  idx = s.indexOf("W");
+			  if (idx > 0) {
+				  	int days = commonUTIL.converStringToInteger(s.substring(0, idx));
+	          			DateU dated  = 	DateU.valueOf(date);
+	          			dated.addDays(days * 7);
+	   			
+	              //return Util.numberToString(m*1000.);
+	          			return dated.getDate();
+			  }
+	      idx = s.indexOf("m");
+	      if (idx == -1)
+	          idx = s.indexOf("M");
+	      if (idx > 0) {
+	    	  int days = commonUTIL.converStringToInteger(s.substring(0, idx));
+	          
+	        	 
+	   			DateU dated  = 	DateU.valueOf(date);
+	   			dated.addMonths(days);
+	   			
+	              //return Util.numberToString(m*1000.);
+	          return dated.getDate();
+	      }
+	      idx = s.indexOf("y");
+	      if (idx == -1)
+	          idx = s.indexOf("Y");
+	      if (idx > 0) {
+	    	  int days = commonUTIL.converStringToInteger(s.substring(0, idx));
+	          
+	        	 
+	   			DateU dated  = 	DateU.valueOf(date);
+	   			dated.addYears(days);
+	   			
+	              //return Util.numberToString(m*1000.);
+	          return dated.getDate();
+	      }
+	      
+		  } catch(NumberFormatException m) {
+			  return date;
+	     }
+	      return date;
+	  }
 
 }
