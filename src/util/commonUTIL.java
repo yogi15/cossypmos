@@ -202,7 +202,7 @@ public class commonUTIL {
 		return doub.doubleValue();
 	}
 	static public int converStringToInteger(String intValue) {
-		Integer doub = new Integer(intValue);
+		Integer doub = new Integer(intValue.trim());
 		return doub.intValue();
 	}
 	static public String converDoubleToString(double doubleValue) {
