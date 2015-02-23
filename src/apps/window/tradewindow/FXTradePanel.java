@@ -532,7 +532,7 @@ import dsServices.ServerConnectionUtil;
 			functionality.jButton5.setText("SAVEASNEW");
 			functionality.jButton6.setEnabled(true);
 			
-			functionality.refreshTables(trade.getTradedesc(),basicData.book.getText(),new Integer(basicData.book.getName()).intValue());
+			functionality.refreshTables(trade.getTradedesc(),"",new Integer(basicData.book.getName()).intValue());
 			try {
 				String autoType = trade.getAutoType();
 				if(!commonUTIL.isEmpty(autoType)) {
@@ -541,27 +541,13 @@ import dsServices.ServerConnectionUtil;
 			        	routingTrades  = remoteTrade.getSplitTrades(trade);  // i know only 5 records are going to come. 
 			        	if(routingTrades.size() == 5) {
 				        	out.jCheckBox2.setSelected(true);
-				        	//@yogesh 23/02/2015
-							// show jpanel of split rates
-				        	//however trade is not FXSWAP then dont show FARRate1 and FArRate2
-				        	// and thier labels
-				        	functionality.jPanel2.setVisible(true);
 				        	functionality.jLabel2.setText(routingTrades.get(1).getTradedesc());
 				        	functionality.jLabel3.setText(routingTrades.get(3).getTradedesc()); 
 				        	functionality.jTextField2.setText(String.valueOf(routingTrades.get(1).getPrice())); // bad programming.
 				        	functionality.jTextField3.setText(String.valueOf(routingTrades.get(3).getPrice())); // bad programming.
 				        	if(trade.getTradedesc1().equalsIgnoreCase(FXSWAP)) {
-				        		functionality.FarRate1.setVisible(true);
-				        		functionality.FarRate2.setVisible(true);
-				        		functionality.jLabel4.setVisible(true);
-				        		functionality.jLabel5.setVisible(true);
 				        		functionality.FarRate1.setText(String.valueOf(routingTrades.get(1).getSecondPrice())); // bad programming.
 				        		functionality.FarRate2.setText(String.valueOf(routingTrades.get(3).getSecondPrice())); // bad programming.
-				        	} else {
-				        		functionality.jLabel4.setVisible(false);
-				        		functionality.jLabel5.setVisible(false);
-				        		functionality.FarRate1.setVisible(false);
-				        		functionality.FarRate2.setVisible(false);
 				        	}
 			        	}
 			        	functionality.setRoutingData(routingTrades);
@@ -700,14 +686,14 @@ import dsServices.ServerConnectionUtil;
 		   		 functionality.jButton8.setEnabled(false);
 		   		 actionstatus.insertElementAt("NEW", 0);
 		   		 actionstatus.setSelectedItem("NEW");
-		   		 basicData.buysell.setEditable(false);
+		   		 //basicData.buysell.setEditable(false);
 		   		// basicData.counterPary.setEditable(false);
 		   		out.jCheckBox2.setEnabled(false);
 		   		out.jCheckBox2.setSelected(false);
-		   		 basicData.book.setEditable(false);
+		   		// basicData.book.setEditable(false);
 		   		 out.jComboBox1.removeAll();
 		   		 out.jComboBox1.setModel(actionstatus);
-		   		 basicData.jTextField7.setEditable(false);
+		   		// basicData.jTextField7.setEditable(false);
 				 out.jTextField6.setEditable(false);
 				 out.jLabel2.setText("");
 				 out.jTextField5.setText("0"); // id
@@ -720,7 +706,7 @@ import dsServices.ServerConnectionUtil;
 				 swap.swapDate.setDate(commonUTIL.getCurrentDate());
 				 rollpanel.jTextField0.setDateFormat(commonUTIL.getDateFormat());
 				 out.jTextField4.setText("0"); // spot 
-				 basicData.jTextField7.setText("0");  
+				// basicData.jTextField7.setText("0");  
 				//String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
 	             
 				 //   attributeModel = new DefaultTableModel(attributeColumnName,0);
@@ -753,7 +739,24 @@ import dsServices.ServerConnectionUtil;
 		});
 			     
 			    
-	    
+			    basicData.currencyPair.addActionListener(new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							// TODO Auto-generated method stub
+							int leid = basicData.currencyPair.getSelectedIndex();
+							if(leid == 0)
+								return;
+							//String le = _vectorCp.get(leid);
+							String currenyP = (String) basicData.currencyPair.getSelectedItem();
+							basicData.currencyPair.setName((String) basicData.currencyPair.getSelectedItem());
+							
+							out.jLabel2.setText(currenyP.substring(0, 3));
+							
+							//System.out.println(counterPary.getName());
+							
+						}
+					});
 	    // takeup button        
         functionality.jButton0.addMouseListener(new java.awt.event.MouseAdapter() {
 			@Override
@@ -781,8 +784,8 @@ import dsServices.ServerConnectionUtil;
 						takeupW.jTextField2.setValue(fwdOp.quotingC.getDoubleValue());
 						takeupW.jLabel10.setText(trade.getCurrency());
 						takeupW.jLabel11.setText(trade.getCurrency());
-						takeupW.jLabel5.setText(basicData.currencyPair.getText().substring(0, 3));
-						takeupW.jLabel4.setText(basicData.currencyPair.getText().substring(0, 3));
+						takeupW.jLabel5.setText(((String)basicData.currencyPair.getSelectedItem()).substring(0, 3));
+						takeupW.jLabel4.setText(((String)basicData.currencyPair.getSelectedItem()).substring(0, 3));
 					//	takeupW.jTextField4.setDateFormat(commonUTIL.getDateTimeFormat());
 	                  //   takeupW.jTextField7.setDateFormat(commonUTIL.getDateTimeFormat());
 	                     //takeupW.jTextField5.setText(commonUTIL.getCurrentDateInString());
@@ -810,14 +813,14 @@ import dsServices.ServerConnectionUtil;
 				//takeupW.setUser(user);				
 			}
         });
-    	/*functionality.FarRate2.addActionListener(new ActionListener() {
+    	functionality.FarRate2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
 								setRoutingDataCal();
 								populateRountingData();
 			}
-    	});*/
+    	});
 	  functionality.FarRate2.addActionListener(new ActionListener() {		
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -1286,7 +1289,7 @@ import dsServices.ServerConnectionUtil;
 					return;
 				}
 				int bookID = Integer.parseInt(basicData.book.getName());
-				String currencyPair = basicData.currencyPair.getText();
+				String currencyPair = ((String)basicData.currencyPair.getSelectedItem());
 				
 				/*	try {
 						Vector b2b = (Vector) remoteReference.getB2BConfig(bookID, currencyPair);
@@ -1297,7 +1300,7 @@ import dsServices.ServerConnectionUtil;
 						 b2bconfig = new B2BConfig();
 						 functionality.jPanel2.setVisible(false);
 						functionality.jPanel6.setVisible(true);
-					   functionality.b2bCurrencyPair.setText(basicData.currencyPair.getText());
+					   functionality.b2bCurrencyPair.setText(((String)basicData.currencyPair.getSelectedItem()));
 					   getDataForB2bCps();
 					   // functionality.b2bBook.setText(getBook(b2bconfig.getBookid()).getBook_name());
 					    functionality.b2bTransferTo.setText("0");
@@ -1517,7 +1520,7 @@ import dsServices.ServerConnectionUtil;
 					
 					 try {
 					//	 basicData.book.getName() 
-						 if(commonUTIL.isEmpty(basicData.book.getName()) && commonUTIL.isEmpty(basicData.currencyPair.getText())) {
+						 if(commonUTIL.isEmpty(basicData.book.getName()) && commonUTIL.isEmpty(((String)basicData.currencyPair.getSelectedItem()))) {
 							 commonUTIL.showAlertMessage("Select Book & CurrencyPair");
 							 out.jCheckBox2.setSelected(false);
 							 return;
@@ -1539,7 +1542,7 @@ import dsServices.ServerConnectionUtil;
 							 functionality.jLabel5.setVisible(false);
 						 }
 						//System.out.println();
-						Vector vector = (Vector) remoteReference.getCurrencySplitConfig(Integer.parseInt(basicData.book.getName()), basicData.currencyPair.getText());
+						Vector vector = (Vector) remoteReference.getCurrencySplitConfig(Integer.parseInt(basicData.book.getName()), ((String)basicData.currencyPair.getSelectedItem()));
 						 
 						if(!commonUTIL.isEmpty(vector)) {
 							
@@ -2467,7 +2470,7 @@ import dsServices.ServerConnectionUtil;
 							String name = functionality.jTabbedPane1.getTitleAt(i);
 							
 								__rows = getRows("CurrencyPair");
-								basicData.currencyPair.setText(((JButton) __rows[0][0]).getName());
+								basicData.currencyPair.setSelectedItem(((JButton) __rows[0][0]).getName());
 								__table = fillFavourites(__rows,basicData.currencyPair,null,out.jLabel2,false,"CurrencyPair");
 								functionality.jTabbedPane1.removeAll();
 							functionality.jTabbedPane1.add("CurrencyPair",__table);
@@ -2490,7 +2493,7 @@ import dsServices.ServerConnectionUtil;
 							functionality.jTabbedPane1.add("Trader",__table);
 							favEnableFlag = true;
 							if(productSubType.equalsIgnoreCase(FXFORWARDOPTION)) {
-							String currP = basicData.currencyPair.getText();
+							String currP = ((String)basicData.currencyPair.getSelectedItem());
 							fwdOp.jLabel2.setText(currP.substring(0, 3));
 							 fwdOp.jLabel3.setText(currP.substring(4, 7));
 							}
@@ -2873,7 +2876,7 @@ import dsServices.ServerConnectionUtil;
 			                   		 		setTrade(trade);
 			                   		 		//saveASNew(trade);
 			                   		 	openTrade(trade);
-						        		functionality.refreshTables(trade.getTradedesc(),basicData.book.getText(),new Integer(basicData.book.getName()).intValue());
+						        		functionality.refreshTables(trade.getTradedesc(),"",new Integer(basicData.book.getName()).intValue());
 						        	
 			       		} catch (RemoteException e1) {
 			       			
@@ -3044,7 +3047,7 @@ import dsServices.ServerConnectionUtil;
 							basicData.jRadioButton1.setSelected(false);
 							basicData.jRadioButton5.setSelected(true);
 							
-							String currP = basicData.currencyPair.getText();
+							String currP = ((String)basicData.currencyPair.getSelectedItem());
 							
 							//@ yogesh 01/02/2015
 							//@ no action id currency pair is not selected
@@ -3312,7 +3315,7 @@ import dsServices.ServerConnectionUtil;
 			getTradeTransfers(transferPanel);
 			getTradeTask(taskPanel);
 			getTradeSDI(sdiPanel);
-			functionality.refreshTables(trade.getTradedesc(),basicData.book.getText(),new Integer(basicData.book.getName()).intValue());
+			functionality.refreshTables(trade.getTradedesc(),"",new Integer(basicData.book.getName()).intValue());
 			functionality.jButton7.setEnabled(false);
 			//basicData.jRadioButton6.setEnabled(false);
 	      //  basicData.jRadioButton7.setEnabled(false);
@@ -3384,7 +3387,7 @@ import dsServices.ServerConnectionUtil;
 					return flag;
 				}
 			}
-			if(commonUTIL.isEmpty(basicData.currencyPair.getText()))  {
+			if(commonUTIL.isEmpty(((String)basicData.currencyPair.getSelectedItem())))  {
 				    commonUTIL.showAlertMessage("Select CurrencyPair");
 					return flag;
 			}
@@ -3694,8 +3697,8 @@ import dsServices.ServerConnectionUtil;
 			//out.jCheckBox2.setEnabled(true);
 			//out.jCheckBox0.setEnabled(false);
 			functionality.jButton2.setEnabled(true);
-			basicData.currencyPair.setText("");
-			basicData.book.setText("");
+			//basicData.currencyPair.setText("");
+			//basicData.book.setText("");
 			basicData.book.setName("0");
 			basicData.counterPary.setSelectedItem("");
 			basicData.counterPary.setName("0");
@@ -3709,7 +3712,7 @@ import dsServices.ServerConnectionUtil;
 		//	out.outRightDate.setDateFormat(commonUTIL.getDateFormat()); // date
 			out.outRightDate.setDate(commonUTIL.getCurrentDate());// date
 			out.jTextField4.setText("0"); // spot 
-			basicData.jTextField7.setText("0"); // trader
+			//basicData.jTextField7.setText("0"); // trader
 			basicData.jTextField7.setName("0");
 			out.jTextField6.setText("NONE"); // status
 			
@@ -3735,7 +3738,7 @@ import dsServices.ServerConnectionUtil;
 			fwdOp.setVisible(false);
 			fwdOp.setEnabled(false);
 	        rollpanel.getJPanel0().setVisible(false);
-	        //functionality.jPanel2.setVisible(false);
+	        functionality.jPanel2.setVisible(false);
 	        functionality.jPanel6.setVisible(false);
 	        functionality.jButton7.setEnabled(false);
 	        trade = null;
@@ -3842,7 +3845,7 @@ import dsServices.ServerConnectionUtil;
 		   
 		  
 				  newrolltrade.setAction("NEW");
-				  newrolltrade.setCurrency((String)basicData.currencyPair.getText().substring(4, 7));  // negotiable curr ie. quote currency ie. settlementCurrency
+				  newrolltrade.setCurrency(((String)basicData.currencyPair.getSelectedItem()).substring(4, 7));  // negotiable curr ie. quote currency ie. settlementCurrency
 		    if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
 		    	newrolltrade.setType("SELL/BUY");
 		    	newrolltrade.setQuantity(rollAmt * -1); 
@@ -3852,7 +3855,7 @@ import dsServices.ServerConnectionUtil;
 		    	newrolltrade.setQuantity(rollAmt * -1); 
 		    	newrolltrade.setNominal(( newrolltrade.getQuantity() * -1) * trade.getPrice());
 		    }
-		    newrolltrade.setTradedesc(basicData.currencyPair.getText()); 
+		    newrolltrade.setTradedesc(((String)basicData.currencyPair.getSelectedItem())); 
 		    newrolltrade.setUserID(user.getId());
 		    newrolltrade.setAttributes(rolltrade.getAttributes());
 		    if(type.equalsIgnoreCase("ROLLOVER"))  {
@@ -3969,7 +3972,7 @@ import dsServices.ServerConnectionUtil;
 			   
 			  
 					  newrolltrade.setAction("NEW");
-					  newrolltrade.setCurrency((String)basicData.currencyPair.getText().substring(4, 7));  // negotiable curr ie. quote currency ie. settlementCurrency
+					  newrolltrade.setCurrency(((String)basicData.currencyPair.getSelectedItem()).substring(4, 7));  // negotiable curr ie. quote currency ie. settlementCurrency
 			    if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
 			    	newrolltrade.setType("SELL/BUY");
 			    	newrolltrade.setQuantity(new Double(out.jTextField1.getText()).doubleValue() * -1); 
@@ -3979,7 +3982,7 @@ import dsServices.ServerConnectionUtil;
 			    	newrolltrade.setQuantity(new Double(out.jTextField1.getText()).doubleValue() * -1); 
 			    	newrolltrade.setNominal(new Double(out.jTextField2.getText()).doubleValue() * -1);
 			    }
-			    newrolltrade.setTradedesc(basicData.currencyPair.getText()); 
+			    newrolltrade.setTradedesc(((String)basicData.currencyPair.getSelectedItem())); 
 			    newrolltrade.setUserID(user.getId());
 			    newrolltrade.setAttributes(rolltrade.getAttributes());
 			    if(type.equalsIgnoreCase("ROLLOVER"))  {
@@ -4173,10 +4176,10 @@ import dsServices.ServerConnectionUtil;
 		   
 		    if(!(out.jComboBox1.getSelectedIndex() == -1))
 		        trade.setAction(out.jComboBox1.getSelectedItem().toString());
-		    if(!commonUTIL.isEmpty(basicData.currencyPair.getText()))
-		    trade.setCurrency((String)basicData.currencyPair.getText().substring(4, 7));  // negotiable curr ie. quote currency ie. settlementCurrency
+		    if(!commonUTIL.isEmpty(((String)basicData.currencyPair.getSelectedItem())))
+		    trade.setCurrency((String)((String)basicData.currencyPair.getSelectedItem()).substring(4, 7));  // negotiable curr ie. quote currency ie. settlementCurrency
 		    trade.setType(basicData.buysell.getText());
-		    trade.setTradedesc(basicData.currencyPair.getText()); 
+		    trade.setTradedesc(((String)basicData.currencyPair.getSelectedItem())); 
 		    trade.setUserID(user.getId());
 		    trade.setAttributes(getAttributeValue());
 		    trade.setPrice(new Double(out.jTextField4.getText()).doubleValue());
@@ -4260,7 +4263,7 @@ import dsServices.ServerConnectionUtil;
 			Trade  originaltrade  = null;
 			if(trade == null) {
 				originaltrade = new Trade();
-				if(commonUTIL.isEmpty(basicData.book.getName()) || commonUTIL.isEmpty(basicData.currencyPair.getText()))
+				if(commonUTIL.isEmpty(basicData.book.getName()) || commonUTIL.isEmpty(((String)basicData.currencyPair.getSelectedItem())))
 				   return;		
 				
 			    fillTrade(originaltrade,"NEW");
@@ -4347,14 +4350,14 @@ import dsServices.ServerConnectionUtil;
 				Book book = new Book();
 				book.setBookno(id);
 				book = (Book) remoteReference.selectBook(book);
-				basicData.book.setText(book.getBook_name());
+				basicData.book.setSelectedItem(book.getBook_name());
 				basicData.book.setName(new Integer(id).toString());
 			} else if(name.equalsIgnoreCase("CounterParty") || name.equalsIgnoreCase("Trader")) {
 				LegalEntity le = new LegalEntity();
 				
 				le = (LegalEntity) remoteReference.selectLE(id);
 				if(name.equalsIgnoreCase("Trader")) {
-					basicData.jTextField7.setText(le.getName());
+					basicData.jTextField7.setSelectedItem(le.getName());
 					basicData.jTextField7.setName(new Integer(id).toString());
 				} else {
 				   basicData.counterPary.setSelectedItem(le.getName());
@@ -4372,11 +4375,6 @@ import dsServices.ServerConnectionUtil;
 			if(trade == null)
 				return;
 			
-			//@yogesh 23/02/2015
-			// clear all previous trade before opening new trade.
-			// also you can remove all code that disable different fields mentiond in if of 
-			// different types of trade below.
-			newTradeView();
 			int atRows = attributes.jTable1.getRowCount();
 			for(int t=0;t <atRows; t++) {
 				attributes.jTable1.setValueAt("", t, 1);
@@ -4417,7 +4415,7 @@ import dsServices.ServerConnectionUtil;
 				getDataFromTrade(trade.getCpID(),"CounterParty");
 			}
 			getDataFromTrade(trade.getTraderID(),"Trader");
-			basicData.currencyPair.setText(trade.getTradedesc());
+			basicData.currencyPair.setSelectedItem(trade.getTradedesc());
 			out.jLabel2.setText(trade.getTradedesc().substring(0, 3));
 			
 			basicData.buysell.setText(trade.getType());
@@ -4724,7 +4722,7 @@ import dsServices.ServerConnectionUtil;
 	        
 			
 		}
-		private JTable fillFavourites(Object __rows12 [][],JTextField textField,JTextField textField2,JLabel label,boolean dateField,String type) {
+		private JTable fillFavourites(Object __rows12 [][],TableExComboBox textField,JTextField textField2,JLabel label,boolean dateField,String type) {
 			Color colr = new Color(239,239,242);
 			
 			 __table = new JTable(new JTableButtonModel(__rows12));
@@ -4987,8 +4985,9 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 	class JTableButtonMouseListener implements MouseListener {		
 		
 		  private JTable __table;
-		  JTextField comp = null;
-		  TableExComboBox comp1 = null;
+		  JTextField comp = null; // for normal
+		  TableExComboBox comp2 = null; // for book
+		  TableExComboBox comp1 = null; // for cp 
 		  JDatePicker swapField = null;
 		  JLabel label = null;
 		  JDatePicker datefield = null;
@@ -5043,8 +5042,12 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 				   comp1.setSelectedItem(button.getText());
 					  comp1.setName(button.getName());
 			   }
+			   if(comp2 != null) {
+				   comp2.setSelectedItem(button.getText());
+					  comp2.setName(button.getName());
+			   }
 			  if(type.equalsIgnoreCase("Book")) {
-				  String currencyPair = basicData.currencyPair.getText();
+				  String currencyPair = ((String)basicData.currencyPair.getSelectedItem());
 				  if(!commonUTIL.isEmpty(currencyPair)) {
 					  Vector vector;
 					try {
@@ -5116,7 +5119,7 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 		   }
 		   
 		  if(label != null){
-			  label.setText(comp.getText().substring(0, 3)); // negiotated currency			  
+			  label.setText(((String)comp2.getSelectedItem()).substring(0, 3)); // negiotated currency			  
 		  }
 		  
 		 //  comp.
@@ -5127,9 +5130,9 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 		    __table.repaint();
 		  }
 	
-		  public JTableButtonMouseListener(JTable table,JTextField textField,JTextField textField2,JLabel labeln,boolean dateField,String type) {
+		  public JTableButtonMouseListener(JTable table,TableExComboBox textField,JTextField textField2,JLabel labeln,boolean dateField,String type) {
 		    __table = table;
-		    comp = textField;
+		    comp2 = textField;
 		    label = labeln;
 		    dateF = dateField;
 		    this.type = type;
