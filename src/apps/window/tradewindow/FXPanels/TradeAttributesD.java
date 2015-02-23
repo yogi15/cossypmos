@@ -1,6 +1,7 @@
 package apps.window.tradewindow.FXPanels;
 
 import java.awt.Component;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
@@ -253,7 +254,17 @@ public class TradeAttributesD extends JPanel {
             this.rowEditor = rowEditor;
         }
 	     public JComboBox getJComboxBox(final String [] criteria) {
-	        final JComboBox criteriaC = new JComboBox(criteria);
+	        final JComboBox criteriaC = new JComboBox(criteria){ 
+	            public void processFocusEvent(FocusEvent fe) { 
+	                super.processFocusEvent(fe); 
+	                Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(); 
+	      
+	               if (isDisplayable() && fe.getID()==FocusEvent.FOCUS_GAINED 
+	                        && focusOwner==this && !isPopupVisible()) { 
+	                            showPopup(); 
+	                } 
+	          } 
+	     }; 
 	        criteriaC.addItemListener(new ItemListener() {
 	        	@Override
             	public void itemStateChanged(ItemEvent e) {
@@ -374,14 +385,16 @@ public class TradeAttributesD extends JPanel {
                 public boolean isCellEditable(int row, int col) {                        
                     String attrName = getValueAt(row, 0).toString();
                         
-                    if ((attrName.equals("Trade Date")|| attrName.equals("TradeModifiedDateTime")) 
+                    if ((attrName.equals("Trade Date") || attrName.equals("TradeModifiedDateTime"))  
                     		&& !tradeAction.equals("New")) {                                
                     	return false;
                     } 
                     
                     //@yogesh 01/02/2015
-                    // if it is fwdOption then it cant change the Instrumenttype
+                    // if it is fwdOption and takeupTrade then it cant change the Instrumenttype
                     else if (isfwOpTrade && attrName.equals("InstrumentType")) {
+                    	return false;
+                    } else if (isfwOpTrade && attrName.equals("ParentID")) {
                     	return false;
                     }
                     return true;            
