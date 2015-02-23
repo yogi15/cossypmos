@@ -541,13 +541,27 @@ import dsServices.ServerConnectionUtil;
 			        	routingTrades  = remoteTrade.getSplitTrades(trade);  // i know only 5 records are going to come. 
 			        	if(routingTrades.size() == 5) {
 				        	out.jCheckBox2.setSelected(true);
+				        	//@yogesh 23/02/2015
+							// show jpanel of split rates
+				        	//however trade is not FXSWAP then dont show FARRate1 and FArRate2
+				        	// and thier labels
+				        	functionality.jPanel2.setVisible(true);
 				        	functionality.jLabel2.setText(routingTrades.get(1).getTradedesc());
 				        	functionality.jLabel3.setText(routingTrades.get(3).getTradedesc()); 
 				        	functionality.jTextField2.setText(String.valueOf(routingTrades.get(1).getPrice())); // bad programming.
 				        	functionality.jTextField3.setText(String.valueOf(routingTrades.get(3).getPrice())); // bad programming.
 				        	if(trade.getTradedesc1().equalsIgnoreCase(FXSWAP)) {
+				        		functionality.FarRate1.setVisible(true);
+				        		functionality.FarRate2.setVisible(true);
+				        		functionality.jLabel4.setVisible(true);
+				        		functionality.jLabel5.setVisible(true);
 				        		functionality.FarRate1.setText(String.valueOf(routingTrades.get(1).getSecondPrice())); // bad programming.
 				        		functionality.FarRate2.setText(String.valueOf(routingTrades.get(3).getSecondPrice())); // bad programming.
+				        	} else {
+				        		functionality.jLabel4.setVisible(false);
+				        		functionality.jLabel5.setVisible(false);
+				        		functionality.FarRate1.setVisible(false);
+				        		functionality.FarRate2.setVisible(false);
 				        	}
 			        	}
 			        	functionality.setRoutingData(routingTrades);
@@ -4375,6 +4389,11 @@ import dsServices.ServerConnectionUtil;
 			if(trade == null)
 				return;
 			
+			//@yogesh 23/02/2015
+			// clear all previous trade before opening new trade.
+			// also you can remove all code that disable different fields mentiond in if of 
+			// different types of trade below.
+			newTradeView();
 			int atRows = attributes.jTable1.getRowCount();
 			for(int t=0;t <atRows; t++) {
 				attributes.jTable1.setValueAt("", t, 1);
