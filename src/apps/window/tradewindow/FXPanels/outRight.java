@@ -157,8 +157,10 @@ public class outRight extends JPanel {
 						Date date = outRightDate.getDate();
 						if(date == null)
 							date = commonUTIL.getCurrentDate();
-						if(!commonUTIL.isEmpty(dateTxt))
+						if(!commonUTIL.isEmpty(dateTxt)) {
+					//	date =	checkDate(dateTxt.trim(),date);
 						outRightDate.setDate(checkDate(dateTxt.trim(),date));
+						}
 						
 					/*	if(dateTxt.equalsIgnoreCase("1m")) {
 			   			 Date date = dateSpinner.getDate();
