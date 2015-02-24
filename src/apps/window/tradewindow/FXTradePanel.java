@@ -3101,9 +3101,12 @@ import dsServices.ServerConnectionUtil;
 							//@ date should be displayes even though currency pair is not selected
 							fwdOp.startDate.setDate(commonUTIL.getCurrentDate());
 							
-							if(!currP.isEmpty()) {
-								fwdOp.jLabel2.setText(currP.substring(0, 3));
-							 	fwdOp.jLabel3.setText(currP.substring(4, 7));
+							if(currP != null ) {
+								if (!currP.isEmpty()) {
+									fwdOp.jLabel2.setText(currP.substring(0, 3));
+								 	fwdOp.jLabel3.setText(currP.substring(4, 7));
+								}
+								
 							}								
 							 	//fwdOp.startDate.setText(commonUTIL.convertDateTOString(commonUTIL.getCurrentDate()));
 							} 
@@ -3836,6 +3839,12 @@ import dsServices.ServerConnectionUtil;
 		    		    		 
 		 // mpankaj 02/02functionality.jPanel2.jTextField2
 			 functionality.jPanel2.setVisible(false);
+			//@yogesh 24/02/2015
+			 // split rates are set to zero. other wise previous trade split rates are shown
+			 functionality.jTextField2.setText("0");
+			 functionality.jTextField3.setText("0");
+			 functionality.FarRate1.setText("0");
+			 functionality.FarRate2.setText("0");
 			 out.jCheckBox2.setSelected(false);
 			 out.jCheckBox2.setEnabled(false);
 			// getTradeTransfers(transferPanel);
