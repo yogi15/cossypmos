@@ -147,7 +147,9 @@ public class BasicData extends JPanel {
 				public void actionPerformed(ActionEvent arg0) {
 					// TODO Auto-generated method stub
 					int leid = jTextField7.getSelectedIndex();
-					if(leid == 0)
+					// @ yogesh 24/02/2015
+					// returns if -1
+					if(leid == 0 || leid == -1)
 						return;
 					LegalEntity le = _vectorTraders.get(leid);
 					jTextField7.setName(String.valueOf(((le)).getId()));
@@ -237,7 +239,9 @@ public class BasicData extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				int leid = counterPary.getSelectedIndex();
-				if(leid == 0)
+				// @ yogesh 24/02/2015
+				// returns if -1
+				if(leid == 0 || leid == -1)
 					return;
 				LegalEntity le = _vectorLEs.get(leid);
 				counterPary.setName(String.valueOf(((le)).getId()));
@@ -395,7 +399,9 @@ public void setKeyPress(boolean keyPress) {
 				public void actionPerformed(ActionEvent arg0) {
 					// TODO Auto-generated method stub
 					int leid = book.getSelectedIndex();
-					if(leid == 0)
+					// @ yogesh 24/02/2015
+					// returns if -1
+					if(leid == 0 || leid == -1)
 						return;
 					Book le = _vectorBooks.get(leid);
 					book.setName(String.valueOf(((le)).getBookno()));
