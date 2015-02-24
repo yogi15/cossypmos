@@ -3,8 +3,6 @@ package apps.window.tradewindow.FXPanels;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.rmi.RemoteException;
@@ -26,7 +24,6 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
-import apps.window.tradewindow.FXTradePanel;
 import beans.Book;
 import beans.CurrencyPair;
 import beans.LegalEntity;
@@ -42,7 +39,7 @@ import dsServices.RemoteReferenceData;
 public class BasicData extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	Vector<LegalEntity>_vectorLEs = null;
+	public Vector<LegalEntity>_vectorLEs = null;
 	public JLabel jLabel1;
 	//public JTextField currencyPair;
 	public JLabel jLabel2;
@@ -69,13 +66,11 @@ public class BasicData extends JPanel {
 	public TableExComboBox counterPary = null;
 	public TableExComboBox book = null;
 	public TableExComboBox currencyPair = null;
-	Vector<Book> _vectorBooks= null;
+	public Vector<Book> _vectorBooks= null;
 	//Vector<Fa> _vectorBooks= null;
 	public TableExComboBox jTextField7 = null;
 	Vector<LegalEntity> _vectorTraders= null;
 	Vector<String> _vectorCp = null;
-	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-	
 	public BasicData() {
 		initComponents();
 	}
@@ -233,7 +228,7 @@ public class BasicData extends JPanel {
 		};
 		counterPary.setEditable(false);
 		counterPary.setBorder(null);
-		counterPary.addActionListener(new ActionListener() {
+		/*counterPary.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -248,7 +243,7 @@ public class BasicData extends JPanel {
 				//System.out.println(counterPary.getName());
 				
 			}
-		});
+		});*/
 		counterPary.setValueColumnIndex(1);
 //		
 		//counterPary.setSelectedItem("ALCOA INC");
@@ -275,6 +270,7 @@ public class BasicData extends JPanel {
 		return jRadioButton3;
 	}
 boolean keyPress = true;
+private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 
 	/**
  * @return the keyPress
@@ -291,20 +287,22 @@ public void setKeyPress(boolean keyPress) {
 }
 
 	private JRadioButton getJRadioButton2() {
-		if (jRadioButton2 == null) {
-			jRadioButton2 = new JRadioButton();
-			//jRadioButton2.setSelected(true);
-			jRadioButton2.setText("Swap");
-		}
-		return jRadioButton2;
+	if (jRadioButton2 == null) {
+		jRadioButton2 = new JRadioButton();
+		jRadioButton2.setSelected(true);
+		jRadioButton2.setText("Swap");
 	}
+	return jRadioButton2;
+}
 
 	private JTextField getBuysell() {
 		if (buysell == null) {
 			buysell = new JTextField();
 			buysell.setText("BUY");
 			buysell.setBackground(Color.green);
-			buysell.addKeyListener(new KeyListener() {
+			buysell.setEditable(false);
+			
+	/*		buysell.addKeyListener(new KeyListener() {
 				
 				@Override
 				public void keyTyped(KeyEvent arg0) {
@@ -373,7 +371,7 @@ public void setKeyPress(boolean keyPress) {
 					}
 				}
 			});
-			
+			*/
 		}
 		return buysell;
 	}
@@ -393,7 +391,7 @@ public void setKeyPress(boolean keyPress) {
 			};
 			book.setEditable(false);
 			book.setBorder(null);
-			book.addActionListener(new ActionListener() {
+			/*book.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -408,7 +406,7 @@ public void setKeyPress(boolean keyPress) {
 					//System.out.println(counterPary.getName());
 					
 				}
-			});
+			});*/
 			book.setValueColumnIndex(1);
 //			
 			//counterPary.setSelectedItem("ALCOA INC");
@@ -504,7 +502,7 @@ public void setKeyPress(boolean keyPress) {
 			};
 			currencyPair.setEditable(false);
 			currencyPair.setBorder(null);
-			currencyPair.addActionListener(new ActionListener() {
+			/*currencyPair.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -518,7 +516,7 @@ public void setKeyPress(boolean keyPress) {
 					//System.out.println(counterPary.getName());
 					
 				}
-			});
+			});*/
 			currencyPair.setValueColumnIndex(0);
 //			
 			//counterPary.setSelectedItem("ALCOA INC");
@@ -953,5 +951,15 @@ public void setKeyPress(boolean keyPress) {
 			}
 		}
 	
+	   public int getBookId(String bookName) {
+		   int bookNo = 0;
+		   for (Book book: _vectorBooks) {			   
+			   if (bookName.equals(book.getBook_name())) {
+				   bookNo = book.getBookno();
+				   break;
+			   }
+		   }		   
+		   return bookNo;
+	   }
 
 }
