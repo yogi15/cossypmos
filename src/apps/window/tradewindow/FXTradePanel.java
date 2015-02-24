@@ -759,7 +759,7 @@ import dsServices.ServerConnectionUtil;
 						public void actionPerformed(ActionEvent arg0) {
 							// TODO Auto-generated method stub
 							int leid = basicData.currencyPair.getSelectedIndex();
-							if(leid == 0)
+							if(leid == 0 || leid == -1)
 								return;
 							//String le = _vectorCp.get(leid);
 							String currenyP = (String) basicData.currencyPair.getSelectedItem();
@@ -3713,9 +3713,12 @@ import dsServices.ServerConnectionUtil;
 			functionality.jButton2.setEnabled(true);
 			//basicData.currencyPair.setText("");
 			//basicData.book.setText("");
-			basicData.book.setName("0");
-			basicData.counterPary.setSelectedItem("");
-			basicData.counterPary.setName("0");
+			// @ yogesh 24/02/2015
+			// selected index to -1
+			basicData.currencyPair.setSelectedIndex(-1);
+			basicData.book.setSelectedIndex(-1);
+			basicData.counterPary.setSelectedIndex(-1);
+			basicData.jTextField7.setSelectedIndex(-1);
 			basicData.buysell.setText("BUY");
 		//	basicData.jRadioButton3.setSelected(true);
 		//	basicData.jRadioButton4.setSelected(false);
@@ -3726,8 +3729,7 @@ import dsServices.ServerConnectionUtil;
 		//	out.outRightDate.setDateFormat(commonUTIL.getDateFormat()); // date
 			out.outRightDate.setDate(commonUTIL.getCurrentDate());// date
 			out.jTextField4.setText("0"); // spot 
-			//basicData.jTextField7.setText("0"); // trader
-			basicData.jTextField7.setName("0");
+						
 			out.jTextField6.setText("NONE"); // status
 			
 			out.jComboBox1.removeAll();
@@ -5413,7 +5415,7 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 			  boolean isTradeOk = true;
 			  
 			  if (trade.getAttributeValue("InstrumentType").equals("")) {
-	            	commonUTIL.showAlertMessage("PleaseSelect Instrument Type");
+	            	commonUTIL.showAlertMessage("Please Select Instrument Type");
 	            	return false;	
 	          }	            
 	            
