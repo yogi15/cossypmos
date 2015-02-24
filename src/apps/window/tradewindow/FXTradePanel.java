@@ -2036,11 +2036,11 @@ import dsServices.ServerConnectionUtil;
 					 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
 					 
 					 double samt2 =  (new Double(swap.jTextField1.getText()).doubleValue());
-					 samt2 = Math.abs(samt2) * -1;
-					 double samt1= Math.abs( (new Double(swap.jTextField2.getText()).doubleValue()));
-					 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2));
+					 samt2 = Math.abs(samt2);
+					 double samt1= Math.abs( (new Double(swap.jTextField2.getText()).doubleValue())) * -1;
+					 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(samt1));
 					
-					 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(samt1).toString());
+					 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(samt2).toString());
 					
 				 }  else if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL")) {
 					 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
@@ -3256,7 +3256,7 @@ import dsServices.ServerConnectionUtil;
 	    		 	double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 					double spot = (new Double(out.jTextField4.getText()).doubleValue());
 					out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
-					double amt2 = Math.abs(amt1) * -1;		
+					double amt2 = Math.abs(amt1);		
 				//	System.out.println("------------- "+commonUTIL.getStringFromDoubleExp(amt2*spot));
 					out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot));
 					
