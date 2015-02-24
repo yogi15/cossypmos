@@ -2,9 +2,12 @@
 	
 	import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -753,24 +756,50 @@ import dsServices.ServerConnectionUtil;
 		});
 			     
 			    
-			    basicData.currencyPair.addActionListener(new ActionListener() {
-						
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							// TODO Auto-generated method stub
-							int leid = basicData.currencyPair.getSelectedIndex();
-							if(leid == 0 || leid == -1)
-								return;
-							//String le = _vectorCp.get(leid);
-							String currenyP = (String) basicData.currencyPair.getSelectedItem();
-							basicData.currencyPair.setName((String) basicData.currencyPair.getSelectedItem());
-							
-							out.jLabel2.setText(currenyP.substring(0, 3));
-							
-							//System.out.println(counterPary.getName());
-							
-						}
-					});
+	    basicData.currencyPair.addActionListener(new ActionListener() {				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					int leid = basicData.currencyPair.getSelectedIndex();
+					if(leid == -1)
+						return;
+					basicData.currencyPair.setName((String) basicData.currencyPair.getSelectedItem());	
+					
+					checkForSplitTradeCheckBox();
+				}
+		});
+	    
+	    basicData.counterPary.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {				
+				int leid = basicData.counterPary.getSelectedIndex();
+				// @ yogesh 24/02/2015
+				// returns if -1
+				if(leid == -1)
+					return;
+				
+				basicData.counterPary.setName((String) basicData.counterPary.getSelectedItem());	
+				
+				//checkForSplitTrade();
+			}
+		});
+
+	    basicData.book.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int leid = basicData.book.getSelectedIndex();
+				// @ yogesh 24/02/2015
+				// returns if -1
+				if(leid == -1)
+					return;
+				//Book le = basicData._vectorBooks.get(leid);
+				//basicData.book.setName((String) basicData.book.getSelectedItem());		
+				
+				checkForSplitTradeCheckBox();
+			}
+		});
+	    
+	   
+	    
 	    // takeup button        
         functionality.jButton0.addMouseListener(new java.awt.event.MouseAdapter() {
 			@Override
@@ -1986,8 +2015,93 @@ import dsServices.ServerConnectionUtil;
 	         // populateRountingData();		
 	    }
     });
-			        
+	
+    basicData.buysell.addFocusListener(new FocusListener() {
+
+		@Override
+		public void focusGained(FocusEvent arg0) {
+			//basicData.jLabel3.setOpaque(true);
+			basicData.jLabel3.setFont(new Font("Tahoma", Font.BOLD, 11));
+		}
+
+		@Override
+		public void focusLost(FocusEvent arg0) {
+			//basicData.jLabel3.setOpaque(false);		
+			basicData.jLabel3.setFont(new Font("Tahoma", 0, 11) );
+		}
+    	
+    });
     
+    basicData.buysell.addActionListener(new java.awt.event.ActionListener() {
+	    public void actionPerformed(java.awt.event.ActionEvent e) {
+	    	
+	    	String buySell = basicData.buysell.getText();
+	    	
+	    	if (buySell.equalsIgnoreCase("BUY/SELL")) {
+	    		basicData.buysell.setText("SELL/BUY");
+	    		basicData.buysell.setBackground(Color.red);
+	    	} else if (buySell.equalsIgnoreCase("SELL/BUY")) {
+	    		basicData.buysell.setText("BUY/SELL");
+	    		basicData.buysell.setBackground(Color.green);
+	    	} else if (buySell.equalsIgnoreCase("BUY")) {
+	    		basicData.buysell.setText("SELL");
+	    		basicData.buysell.setBackground(Color.red);
+	    	} else if (buySell.equalsIgnoreCase("SELL")) {
+	    		basicData.buysell.setText("BUY");
+	    		basicData.buysell.setBackground(Color.green);
+	    	}
+	    	
+	    	 if(basicData.buysell.getText().equalsIgnoreCase("SELL")) {
+	 			
+	 			double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+	 			amt1 = Math.abs(amt1) * -1;
+	 			out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+	 			 double amt2 = Math.abs( (new Double(out.jTextField2.getText()).doubleValue()));
+	 			 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
+	 			
+	 		 }  else if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
+	 				 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
+	 				 amt2 = Math.abs(amt2) * -1;
+	 				 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
+	 				 double amt1= Math.abs( (new Double(out.jTextField1.getText()).doubleValue()));
+	 				 out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+	 			 }
+	 			 
+	 			 if(basicData.buysell.getText().equalsIgnoreCase("SELL/BUY")) {
+	 					
+	 				 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+	 					amt1 = Math.abs(amt1) * -1;
+	 					out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+	 					 double amt2 = Math.abs( (new Double(out.jTextField2.getText()).doubleValue()));
+	 					 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
+	 					 
+	 					 double samt2 =  (new Double(swap.jTextField1.getText()).doubleValue());
+	 					 samt2 = Math.abs(samt2);
+	 					 double samt1= Math.abs( (new Double(swap.jTextField2.getText()).doubleValue())) * -1;
+	 					 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(samt1));
+	 					
+	 					 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(samt2).toString());
+	 					
+	 				 }  else if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL")) {
+	 					 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
+	 					 amt2 = Math.abs(amt2) * -1;
+	 					 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
+	 					 double amt1= Math.abs( (new Double(out.jTextField1.getText()).doubleValue()));
+	 					 out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+	 					 
+	 					 double samt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
+	 						samt1 = Math.abs(samt1) * -1;
+	 						swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(samt1).toString());
+	 						 double samt2 = Math.abs( (new Double(swap.jTextField2.getText()).doubleValue()));
+	 						 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(samt2).toString());
+	 					
+	 				 }
+	 			 
+	 			 populateRountingData();
+	    	
+	    }
+	    });
+	    
     
     basicData.jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
 		 public void mouseClicked(MouseEvent e) {
@@ -5448,4 +5562,52 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 			  functionality.jButton4.setEnabled(true);
 			  functionality.jButton5.setEnabled(true);
 		  }
+		  
+		  public void checkForSplitTradeCheckBox() {
+		    		    	
+		    	if ( basicData.book.getSelectedIndex() != -1 && basicData.currencyPair.getSelectedIndex() != -1) {
+		    		
+		    		Vector vector = new Vector();
+		    		try {
+		    			vector = (Vector) remoteReference.getCurrencySplitConfig(basicData.getBookId(basicData.book.getSelectedItem().toString()), 
+		    					basicData.currencyPair.getSelectedItem().toString());
+						if(!commonUTIL.isEmpty(vector)) {
+							// @yogesh 07/02/2015
+							//split checkbox should also be selected but disable when combination of
+							// book and currencypair is found in currncySplitConfig
+							out.jCheckBox2.setSelected(true);
+							out.jCheckBox2.setEnabled(false);
+																				
+							if(trade == null || trade.getId() == 0) 
+							    functionality.clearRounting();
+							sconfig =  (CurrencySplitConfig)vector.elementAt(0);
+							functionality.jLabel2.setText(sconfig.getFirstCurrencySplit());
+							populateRountingData();
+							functionality.jLabel3.setText(sconfig.getSecondCurrencySPlit());
+							// functionality.jButton8.setEnabled(true);
+							 // mpankaj 02/02
+							
+							// @ yogesh 04/02/2105
+							// split currency panel is made visible if split currency chechbox is set selected above
+							// and if a split currency config is found for book and currency 
+							functionality.jPanel2.setVisible(true);
+							if (basicData.jRadioButton1.isSelected() || basicData.jRadioButton5.isSelected()) {
+								functionality.FarRate1.setVisible(false);
+								functionality.FarRate2.setVisible(false);
+								functionality.jLabel4.setVisible(false);
+								functionality.jLabel5.setVisible(false);
+							}
+						 } else {
+							out.jCheckBox2.setSelected(false);
+							out.jCheckBox2.setEnabled(false);
+							functionality.clearRounting();
+							functionality.jPanel2.setVisible(false);
+						}
+						  
+					} catch (NumberFormatException | RemoteException e1) {							
+						e1.printStackTrace();
+					}
+		    		
+		    	}
+		    }
 	}
