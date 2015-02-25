@@ -961,5 +961,26 @@ public void setKeyPress(boolean keyPress) {
 		   }		   
 		   return bookNo;
 	   }
-
+	   
+	   public int getLeId(String leName) {
+		   int leId = 0;
+		   for (LegalEntity le: _vectorLEs) {			   
+			   if (leName.equals(le.getAlias())) {
+				   leId = le.getId();
+				   break;
+			   }
+		   }		   
+		   return leId;
+	   }
+	   
+	   public int getTraderId(String traderName) {
+		   int traderId = 0;
+		   for (LegalEntity le: _vectorTraders) {			   
+			   if (traderName.equals(le.getAlias())) {
+				   traderId = le.getId();
+				   break;
+			   }
+		   }		   
+		   return traderId;
+	   }
 }
