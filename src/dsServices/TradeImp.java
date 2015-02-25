@@ -68,7 +68,7 @@ public class TradeImp implements RemoteTrade {
 					if(e1.isSavetoDB()) {
 						e1 = EventSQL.save((EventProcessor) object, dsSQL.getConn());
 					}
-					newMessage.produceNewMessage(messageIndicator,"TRADE",messageType,(Serializable) e1,"true"); 
+					newMessage.produceNewMessage(messageIndicator,"TRADE",messageType,(Serializable) e1,null); 
 			} else {
 				EventProcessor event = (EventProcessor) object;
 				if(event.isSavetoDB()) {
@@ -1296,7 +1296,7 @@ return status;
 				 originalTrade.setAttribute("SXccySplitID", Integer.valueOf(allocateIDForxccy2).toString());
 			//	 xccy1.setAttribute("MirrorFromTradeID", Integer.valueOf(allocateIDForxccy2).toString());
 				 xccy1.setParentID(allocateIDForOriginalTrade);
-				 
+				 xccy1.setAttribute("SplitSequence", "FirstSplit");
 				 xccy1.setAttribute("XCurrSOriginalTradeID", Integer.valueOf(allocateIDForOriginalTrade).toString());
 				 xccy2.setAttribute("XCurrSOriginalTradeID", Integer.valueOf(allocateIDForOriginalTrade).toString());
 				 xccy2.setParentID(allocateIDForOriginalTrade);
@@ -1309,7 +1309,9 @@ return status;
      			mirror1.setAttribute("ParentID",Integer.toString(allocateIDForOriginalTrade));
      			xccy1.setAttribute("ParentID",Integer.toString(allocateIDForOriginalTrade));
      			xccy2.setAttribute("ParentID",Integer.toString(allocateIDForOriginalTrade));
-     			
+     			 xccy2.setAttribute("SplitSequence", "SecondSplit");
+     		 	mirror1.setAttribute("SplitSequence", "FirstMirror");
+     		 	mirror2.setAttribute("SplitSequence", "SecondMirror");
      			 mirror2.setParentID(allocateIDForOriginalTrade);
      			saveSplitTrade(mirror2);
      			saveSplitTrade(mirror1);
