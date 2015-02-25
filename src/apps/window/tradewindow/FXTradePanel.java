@@ -3587,7 +3587,9 @@ import dsServices.ServerConnectionUtil;
 			}			
 			
 			return true;
-			
+			//@yogesh 25/02/2015
+			// below is commented because we can check whether checbox is selected based on selectedIndex
+			//as done ablove
 			/*if(!validateField(basicData.getBookId(basicData.book.getSelectedItem().toString()),"BOOK"))
 				return flag;
 			if(!validateField(basicData.getLeId(basicData.counterPary.getSelectedItem().toString()),"CounterParty"))
@@ -4328,7 +4330,9 @@ import dsServices.ServerConnectionUtil;
 				product = (Product) remoteProduct.selectProductOnType(productType, productSubType);
 			} catch (RemoteException e) {				
 				e.printStackTrace();
-			}    
+			} 
+			//@yogesh 25/02/2015
+			// below is commented as we have acheck for book in validateALLIDField()
 			/*if(basicData.book.getSelectedIndex() ==-1)
 			   return;*/
 			trade.setBookId(basicData.getBookId(basicData.book.getSelectedItem().toString()));
@@ -4337,7 +4341,8 @@ import dsServices.ServerConnectionUtil;
 				trade.setMirrorBookid(mirrorBook.getBookno());				
 			} else {
 				trade.setMirrorID(0);
-				/* 25/02/2015
+				/* //@yogesh 25/02/2015
+				// below is commented as we have a check for cp in validateALLIDField()
 				 * if(commonUTIL.isEmpty(basicData.counterPary.getName())) {
 					commonUTIL.showAlertMessage("Select CounterParty");
 					return;
@@ -4346,6 +4351,8 @@ import dsServices.ServerConnectionUtil;
 					return;*/
 			trade.setCpID(basicData.getLeId(basicData.counterPary.getSelectedItem().toString()));
 			}
+			//@yogesh 25/02/2015
+			// below is commented as we have acheck for trader in validateALLIDField()
 			/*if(basicData.jTextField7.getSelectedIndex() ==-1)
 				return;*/
 			trade.setTraderID(basicData.getTraderId(basicData.jTextField7.getSelectedItem().toString()));
@@ -4356,6 +4363,8 @@ import dsServices.ServerConnectionUtil;
 		   
 		    if(!(out.jComboBox1.getSelectedIndex() == -1))
 		        trade.setAction(out.jComboBox1.getSelectedItem().toString());
+		    //@yogesh 25/02/2015
+		    // below is commented as we have acheck for currencypair in validateALLIDField()
 		    //if(!commonUTIL.isEmpty(((String)basicData.currencyPair.getSelectedItem())))
 		    trade.setCurrency((String)((String)basicData.currencyPair.getSelectedItem()).substring(4, 7));  // negotiable curr ie. quote currency ie. settlementCurrency
 		    trade.setType(basicData.buysell.getText());
