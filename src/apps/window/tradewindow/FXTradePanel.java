@@ -757,15 +757,16 @@ import dsServices.ServerConnectionUtil;
 			     
 			    
 	    basicData.currencyPair.addActionListener(new ActionListener() {				
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					int leid = basicData.currencyPair.getSelectedIndex();
-					if(leid == -1)
-						return;
-					basicData.currencyPair.setName((String) basicData.currencyPair.getSelectedItem());	
-					
-					checkForSplitTradeCheckBox();
-				}
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int leid = basicData.currencyPair.getSelectedIndex();
+				if(leid == -1)
+					return;
+				String currencyPair = (String) basicData.currencyPair.getSelectedItem();
+				basicData.currencyPair.setName(currencyPair);	
+				out.jLabel2.setText(currencyPair.substring(0, currencyPair.indexOf("/")));
+				checkForSplitTradeCheckBox();
+			}
 		});
 	    
 	    basicData.counterPary.addActionListener(new ActionListener() {			
@@ -3570,16 +3571,33 @@ import dsServices.ServerConnectionUtil;
 		public boolean validateALLIDField() {
 			boolean flag = false;
 			
-			if(!validateField(basicData.book,"BOOK"))
+			if (basicData.book.getSelectedIndex() == -1) {
+				commonUTIL.showAlertMessage("Select Book");
 				return flag;
-			if(!validateField(basicData.counterPary,"CounterParty"))
+			}
+			
+			if (basicData.counterPary.getSelectedIndex() == -1) {
+				commonUTIL.showAlertMessage("Select CounterParty");
 				return flag;
-			if(!validateField(basicData.jTextField7,"Trader"))
+			}
+			
+			if (basicData.jTextField7.getSelectedIndex() == -1) {
+				commonUTIL.showAlertMessage("Select Trader");
+				return flag;
+			}			
+			
+			return true;
+			
+			/*if(!validateField(basicData.getBookId(basicData.book.getSelectedItem().toString()),"BOOK"))
+				return flag;
+			if(!validateField(basicData.getLeId(basicData.counterPary.getSelectedItem().toString()),"CounterParty"))
+				return flag;
+			if(!validateField(basicData.getTraderId(basicData.jTextField7.getSelectedItem().toString()),"Trader"))
 				return flag;
 			else 
-				flag = true;
+				flag = true;*/
 			
-			return flag;
+			//return flag;
 		}		
 		
 		public boolean validateField(JTextField jtext,String name) {			
@@ -3591,6 +3609,14 @@ import dsServices.ServerConnectionUtil;
 		}
 		public boolean validateField(TableExComboBox jtext,String name) {			
 			if(!validateFieldValue(jtext.getName())) {
+				commonUTIL.showAlertMessage(" Select  "+ name);
+				return false;
+			}
+			return true;
+		}
+		
+		public boolean validateField(int id,String name) {			
+			if(!validateFieldValue(id)) {
 				commonUTIL.showAlertMessage(" Select  "+ name);
 				return false;
 			}
@@ -3659,7 +3685,21 @@ import dsServices.ServerConnectionUtil;
 			}
 			return flag;				
 		}
-			
+		
+		public boolean validateFieldValue(int id) {
+			boolean flag = false;
+		
+			try {
+			    if(id > 0)
+				   flag = true;
+			}catch(NumberFormatException n) {
+				return flag;
+			}catch(NullPointerException n) {
+				return flag;
+			}
+			return flag;				
+		}
+		
 		@Override
 		public void setPanelValue(CommonPanel tradeValue) {					
 		}
@@ -3963,7 +4003,7 @@ import dsServices.ServerConnectionUtil;
 			 out.jCheckBox2.setEnabled(false);
 			// getTradeTransfers(transferPanel);
 				//getTradeTask(taskPanel);
-				getTradeSDI(sdiPanel);
+				//getTradeSDI(sdiPanel);
 		}
 		public int fillRollParitialOutRightTrade(Trade rolltrade,String type,int rollFROMID,boolean isParital,double rollAmt)  {
 			Trade newrolltrade = new Trade();
@@ -4289,25 +4329,26 @@ import dsServices.ServerConnectionUtil;
 			} catch (RemoteException e) {				
 				e.printStackTrace();
 			}    
-			if(commonUTIL.isEmpty(basicData.book.getName()))
-			   return;
-			trade.setBookId(new Integer(basicData.book.getName()).intValue());
+			/*if(basicData.book.getSelectedIndex() ==-1)
+			   return;*/
+			trade.setBookId(basicData.getBookId(basicData.book.getSelectedItem().toString()));
 			if(mirrorBook.getBookno()> 0) {
 			//	trade.setCpID(counterPartyID);
 				trade.setMirrorBookid(mirrorBook.getBookno());				
 			} else {
 				trade.setMirrorID(0);
-				if(commonUTIL.isEmpty(basicData.counterPary.getName())) {
+				/* 25/02/2015
+				 * if(commonUTIL.isEmpty(basicData.counterPary.getName())) {
 					commonUTIL.showAlertMessage("Select CounterParty");
 					return;
 				}
-				if(commonUTIL.isEmpty(basicData.counterPary.getName()))
-					return;
-			trade.setCpID(new Integer(basicData.counterPary.getName()).intValue());
+				if(basicData.counterPary.getSelectedIndex() ==-1)
+					return;*/
+			trade.setCpID(basicData.getLeId(basicData.counterPary.getSelectedItem().toString()));
 			}
-			if(commonUTIL.isEmpty(basicData.jTextField7.getName()))
-				return;
-			trade.setTraderID(new Integer(basicData.jTextField7.getName()).intValue());
+			/*if(basicData.jTextField7.getSelectedIndex() ==-1)
+				return;*/
+			trade.setTraderID(basicData.getTraderId(basicData.jTextField7.getSelectedItem().toString()));
 			trade.setTradeDate(commonUTIL.getCurrentDateTime());
 		    trade.setDelivertyDate(commonUTIL.convertDateTimeTOString(out.outRightDate.getDate()));
 			trade.setStatus(out.jTextField6.getText());
@@ -4315,7 +4356,7 @@ import dsServices.ServerConnectionUtil;
 		   
 		    if(!(out.jComboBox1.getSelectedIndex() == -1))
 		        trade.setAction(out.jComboBox1.getSelectedItem().toString());
-		    if(!commonUTIL.isEmpty(((String)basicData.currencyPair.getSelectedItem())))
+		    //if(!commonUTIL.isEmpty(((String)basicData.currencyPair.getSelectedItem())))
 		    trade.setCurrency((String)((String)basicData.currencyPair.getSelectedItem()).substring(4, 7));  // negotiable curr ie. quote currency ie. settlementCurrency
 		    trade.setType(basicData.buysell.getText());
 		    trade.setTradedesc(((String)basicData.currencyPair.getSelectedItem())); 
