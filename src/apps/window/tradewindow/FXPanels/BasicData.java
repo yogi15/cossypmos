@@ -965,7 +965,7 @@ public void setKeyPress(boolean keyPress) {
 	   public int getLeId(String leName) {
 		   int leId = 0;
 		   for (LegalEntity le: _vectorLEs) {			   
-			   if (leName.equals(le.getAlias())) {
+			   if (leName.equals(le.getName())) {
 				   leId = le.getId();
 				   break;
 			   }
@@ -976,7 +976,7 @@ public void setKeyPress(boolean keyPress) {
 	   public int getTraderId(String traderName) {
 		   int traderId = 0;
 		   for (LegalEntity le: _vectorTraders) {			   
-			   if (traderName.equals(le.getAlias())) {
+			   if (traderName.equals(le.getName())) {
 				   traderId = le.getId();
 				   break;
 			   }
