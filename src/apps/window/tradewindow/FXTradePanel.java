@@ -5521,16 +5521,16 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 					// swap radio button
 					if (basicData.jRadioButton2.isSelected()) {					
 						String swapFarAmt1 = swap.jTextField1.getText().toString();
-						String swapFarAmt2 = swap.jTextField2.getText().toString();	
+						//String swapFarAmt2 = swap.jTextField2.getText().toString();	
 						String swapRate = swap.jTextField4.getText().toString();
 						
 						if (swapFarAmt1.equals("") ||  Double.parseDouble(swapFarAmt1) == 0 ) {
 							commonUTIL.showAlertMessage("Please enter FarAmt1");
 							return false;	
-						} else if (swapFarAmt2.equals("") ||  Double.parseDouble(swapFarAmt2) == 0 ) {
+						} /*else if (swapFarAmt2.equals("") ||  Double.parseDouble(swapFarAmt2) == 0 ) {
 							commonUTIL.showAlertMessage("Please enter FarAmt2");
 							return false;	
-						} else if (swapRate.equals("") ||  Double.parseDouble(swapRate) == 0 ) {
+						}*/ else if (swapRate.equals("") ||  Double.parseDouble(swapRate) == 0 ) {
 							commonUTIL.showAlertMessage("Please SwapRate");
 							return false;	
 						} 
@@ -5562,16 +5562,21 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 					// swap radio button
 					if (basicData.jRadioButton2.isSelected()) {					
 						String swapFarAmt1 = swap.jTextField1.getText().toString();
-						String swapFarAmt2 = swap.jTextField2.getText().toString();	
+						//String swapFarAmt2 = swap.jTextField2.getText().toString();	
 						String swapRate = swap.jTextField4.getText().toString();
 						
 						if (swapFarAmt1.equals("") ||  Double.parseDouble(swapFarAmt1) == 0 ) {
 							commonUTIL.showAlertMessage("Please enter FarAmt1");
 							return false;	
-						} else if (swapFarAmt2.equals("") ||  Double.parseDouble(swapFarAmt2) == 0 ) {
+						} 
+						
+						// @ yogesh 25/02/2105
+						// below commented because on deal it was throwing below msg
+						//however on deal the faramount is calculated but below check was not allowing
+						/*else if (swapFarAmt2.equals("") ||  Double.parseDouble(swapFarAmt2) == 0 ) {
 							commonUTIL.showAlertMessage("Please enter FarAmt2");
 							return false;	
-						} else if (swapRate.equals("") ||  Double.parseDouble(swapRate) == 0 ) {
+						}*/ else if (swapRate.equals("") ||  Double.parseDouble(swapRate) == 0 ) {
 							commonUTIL.showAlertMessage("Please SwapRate");
 							return false;	
 						} 
