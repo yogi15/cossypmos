@@ -152,6 +152,7 @@ public class outRight extends JPanel {
 				public void keyReleased(KeyEvent arg0) {
 					// TODO Auto-generated method stub
 					if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+						outRightDate.setDate(commonUTIL.getCurrentDate());
 						String dateTxt = getDateText();
 						setDateTextEmpty();
 						Date date = outRightDate.getDate();
@@ -160,6 +161,8 @@ public class outRight extends JPanel {
 						if(!commonUTIL.isEmpty(dateTxt)) {
 					//	date =	checkDate(dateTxt.trim(),date);
 						outRightDate.setDate(checkDate(dateTxt.trim(),date));
+						} else {
+							outRightDate.setDate(commonUTIL.getCurrentDate());
 						}
 						
 					/*	if(dateTxt.equalsIgnoreCase("1m")) {
