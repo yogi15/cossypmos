@@ -792,8 +792,8 @@ import dsServices.ServerConnectionUtil;
 				// returns if -1
 				if(leid == -1)
 					return;
-				//Book le = basicData._vectorBooks.get(leid);
-				//basicData.book.setName((String) basicData.book.getSelectedItem());		
+				Book le = basicData._vectorBooks.get(leid);
+				basicData.book.setName(String.valueOf(le.getBookno()));		
 				
 				checkForSplitTradeCheckBox();
 			}
@@ -2013,7 +2013,7 @@ import dsServices.ServerConnectionUtil;
 			    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(farAmt2*farRate).toString());
 			    	 }	    		 																
 	    	 }	    	
-	         // populateRountingData();		
+	          populateRountingData();		
 	    }
     });
 	
@@ -4335,6 +4335,7 @@ import dsServices.ServerConnectionUtil;
 			// below is commented as we have acheck for book in validateALLIDField()
 			/*if(basicData.book.getSelectedIndex() ==-1)
 			   return;*/
+			if(basicData.book.getSelectedIndex() !=-1)
 			trade.setBookId(basicData.getBookId(basicData.book.getSelectedItem().toString()));
 			if(mirrorBook.getBookno()> 0) {
 			//	trade.setCpID(counterPartyID);
@@ -4343,18 +4344,20 @@ import dsServices.ServerConnectionUtil;
 				trade.setMirrorID(0);
 				/* //@yogesh 25/02/2015
 				// below is commented as we have a check for cp in validateALLIDField()
-				 * if(commonUTIL.isEmpty(basicData.counterPary.getName())) {
-					commonUTIL.showAlertMessage("Select CounterParty");
+				 if(commonUTIL.isEmpty(basicData.counterPary.getName())) {
+					//commonUTIL.showAlertMessage("Select CounterParty");
 					return;
 				}
 				if(basicData.counterPary.getSelectedIndex() ==-1)
 					return;*/
+				if(basicData.counterPary.getSelectedIndex() !=-1)
 			trade.setCpID(basicData.getLeId(basicData.counterPary.getSelectedItem().toString()));
 			}
 			//@yogesh 25/02/2015
 			// below is commented as we have acheck for trader in validateALLIDField()
 			/*if(basicData.jTextField7.getSelectedIndex() ==-1)
 				return;*/
+			if(basicData.jTextField7.getSelectedIndex() !=-1)
 			trade.setTraderID(basicData.getTraderId(basicData.jTextField7.getSelectedItem().toString()));
 			trade.setTradeDate(commonUTIL.getCurrentDateTime());
 		    trade.setDelivertyDate(commonUTIL.convertDateTimeTOString(out.outRightDate.getDate()));
@@ -5630,8 +5633,8 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 							// @yogesh 07/02/2015
 							//split checkbox should also be selected but disable when combination of
 							// book and currencypair is found in currncySplitConfig
-							out.jCheckBox2.setSelected(true);
-							out.jCheckBox2.setEnabled(false);
+							out.jCheckBox2.setSelected(false);
+							out.jCheckBox2.setEnabled(true);
 																				
 							if(trade == null || trade.getId() == 0) 
 							    functionality.clearRounting();
