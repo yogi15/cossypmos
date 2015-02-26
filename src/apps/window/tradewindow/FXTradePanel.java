@@ -4571,7 +4571,7 @@ import dsServices.ServerConnectionUtil;
 			// clear all previous trade before opening new trade.
 			// also you can remove all code that disable different fields mentiond in if of 
 			// different types of trade below.
-			newTradeView();
+			//newTradeView();
 			int atRows = attributes.jTable1.getRowCount();
 			for(int t=0;t <atRows; t++) {
 				attributes.jTable1.setValueAt("", t, 1);
