@@ -311,9 +311,9 @@ public class TradeAttributesD extends JPanel {
 	                return name;
 	        else 
 	        if(v != null ) {
-	                name = new String[v.size()+1]; 
-	                name[i] = "Selected Values";
-	                i = 1;
+	                name = new String[v.size()]; 
+	               /* name[i] = "Select Value";
+	                i = 1;*/
 	                Iterator its = v.iterator();
 	                while(its.hasNext()) {
 	                        
