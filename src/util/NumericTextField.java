@@ -47,7 +47,8 @@ public class NumericTextField extends JTextField implements
     this.addFocusListener(new FocusListener() {
         public void focusLost(java.awt.event.FocusEvent event) {
         	NumericTextField t = (NumericTextField) event.getSource();
-            t.setText(checkAmount(t.getText()));
+        	 double dd =  NumberFormatUtil.stringToNumber(t.getText(), Locale.getDefault());
+            t.setText(String.valueOf(dd));
         }
 
         public void focusGained(java.awt.event.FocusEvent event) {
@@ -259,6 +260,8 @@ class NumericPlainDocument extends PlainDocument {
 
          public Double getDoubleValue() throws ParseException {
            Number result = getNumberValue();
+           if(result == null)
+        	   return 0.0;
            if ((result instanceof Long) == false
                && (result instanceof Double) == false) {
              throw new ParseException("Not a valid double", 0);
