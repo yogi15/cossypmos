@@ -39,6 +39,7 @@ public class Swap extends JPanel {
 	public com.jidesoft.combobox.DateComboBox  swapDate;
 	public NumericTextField jTextField4;
 	DecimalFormat format = new DecimalFormat("##,###,#######.####");
+	//protected Date swapDate;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	public Swap() {
 		initComponents();
@@ -77,13 +78,17 @@ public class Swap extends JPanel {
 					public void keyReleased(KeyEvent arg0) {
 						// TODO Auto-generated method stub
 						if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+							swapDate.setDate(commonUTIL.getCurrentDate());
 							String dateTxt = getDateText();
 							setDateTextEmpty();
 							Date date = swapDate.getDate();
 							if(date == null)
 								date = commonUTIL.getCurrentDate();
-							if(!commonUTIL.isEmpty(dateTxt))
+							if(!commonUTIL.isEmpty(dateTxt)) {
 								swapDate.setDate(checkDate(dateTxt.trim(),date));
+							} else {
+								swapDate.setDate(commonUTIL.getCurrentDate());
+							}
 							
 						/*	if(dateTxt.equalsIgnoreCase("1m")) {
 				   			 Date date = dateSpinner.getDate();
