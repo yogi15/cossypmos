@@ -5633,8 +5633,8 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 							// @yogesh 07/02/2015
 							//split checkbox should also be selected but disable when combination of
 							// book and currencypair is found in currncySplitConfig
-							out.jCheckBox2.setSelected(false);
-							out.jCheckBox2.setEnabled(true);
+							out.jCheckBox2.setSelected(true);
+							out.jCheckBox2.setEnabled(false);
 																				
 							if(trade == null || trade.getId() == 0) 
 							    functionality.clearRounting();
