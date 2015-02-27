@@ -140,7 +140,7 @@ public class outRight extends JPanel {
 			    outRightDate.setName("outRight");
 			    
 			   
-			    outRightDate.addKeyListener(new KeyListener() {
+			/*    outRightDate.addKeyListener(new KeyListener() {
 				
 				@Override
 				public void keyTyped(KeyEvent arg0) {
@@ -165,11 +165,7 @@ public class outRight extends JPanel {
 							outRightDate.setDate(commonUTIL.getCurrentDate());
 						}
 						
-					/*	if(dateTxt.equalsIgnoreCase("1m")) {
-			   			 Date date = dateSpinner.getDate();
-			   			DateU dated  = 	DateU.valueOf(date);
-			   			dated.addMonths(1);
-			   			 dateSpinner.setDate(dated.getDate()); */
+					
 			   			 
 			   		// }
 						
@@ -193,7 +189,7 @@ public class outRight extends JPanel {
 					//setDateText(arg0.getKeyChar());
 				}
 			    	
-			    });
+			    });*/
 		//	jTextField0.setText("jTextField0");
 		} 
 		
@@ -211,7 +207,7 @@ public class outRight extends JPanel {
 		}
 		return jTextField6;
 	}
-	String dateText = "";
+	public String dateText = "";
 	 public String getDateText() {
 		
 		   return dateText;
