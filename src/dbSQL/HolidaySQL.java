@@ -32,7 +32,21 @@ final static private String SELECT =
  static private String SELECTONE =
 	"SELECT currency,country,hdate,fweekday,sweekday FROM HOLIDAY where  " ;
  
+private static String getHolidaysOnCurrencyPair(String cp,String date) {
+	String sql = "			select getHolidaysonCurrencyPair('"+cp+"',to_timestamp('"+date+"','dd/mm/yyyy')+1) Holidays from dual";
+	return sql;
+}
  
+ private static String getupdateSQL(Holiday editHoliday) {
+	 String updateSQL = " update holiday set ";
+	 updateSQL = updateSQL + " currency = '" +editHoliday.getCurrency() + "', ";
+	 updateSQL = updateSQL + " country = '" +editHoliday.getCountry() + "', ";
+	 updateSQL = updateSQL + " hdate = '" +editHoliday.getHdate() + "', ";
+	 updateSQL = updateSQL + " fweekday = " +editHoliday.getFweekday() + ", ";
+	 updateSQL = updateSQL + " sweekday = " +editHoliday.getSweekdday() + " where currency = '"+editHoliday.getCurrency() +"'";
+	 return updateSQL;
+			 
+ }
  
  
  public static boolean save(Holiday insertHoliday, Connection con) {
@@ -89,38 +103,29 @@ final static private String SELECT =
  protected static  boolean edit(Holiday updateHoliday, Connection con ) {
 	 
         PreparedStatement stmt = null;
+        String sql = getupdateSQL(updateHoliday);
 	 try {
-		 con.setAutoCommit(false);
-		 int j = 1;
-		 stmt = dsSQL.newPreparedStatement(con, UPDATE_FROM_HOLIDAY);
-            
 		
-           
-            
-		 stmt.setString(1,updateHoliday.getCurrency());
-         stmt.setString(2, updateHoliday.getCountry());
-         stmt.setString(3, updateHoliday.getHdate());
-         stmt.setInt(4, updateHoliday.getFweekday());
-         stmt.setInt(5, updateHoliday.getSweekdday());
-         stmt.setString(6,updateHoliday.getCurrency());
-         stmt.setString(7, updateHoliday.getCountry());
-         
-            stmt.executeUpdate();
-		 con.commit();
-	 } catch (Exception e) {
-		 commonUTIL.displayError("HolidaySQL","edit  " +UPDATE_FROM_HOLIDAY,e);
-		 return false;
-           
-        }
-        finally {
-           try {
-			stmt.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			commonUTIL.displayError("HolidaySQL","edit",e);
-		}
-        }
-        return true;
+				con.setAutoCommit(false);
+				int j = 1;
+				stmt = dsSQL.newPreparedStatement(con, sql);
+				stmt.executeUpdate(sql);
+				con.commit();
+				commonUTIL.display("HolidaySQL ::  edit", sql);
+				//con.commit();
+			} catch (Exception e) {
+				commonUTIL.displayError("HolidaySQL", "edit", e);
+				return false;
+
+			} finally {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					commonUTIL.displayError("HolidaySQL", sql, e);
+				}
+			}
+			return true;
  }
 
 protected static boolean remove(Holiday deleteHoliday, Connection con ) {
@@ -330,6 +335,35 @@ protected static int selectMax(Connection con ) {
      return Holidays;
  }
 
+ 
+ public static int getHolidaysOnCp(String cp,String date, Connection con) {
+	 String sql = getHolidaysOnCurrencyPair(cp, date);
+	 int h= 0;
+	 PreparedStatement stmt = null;
+	 try {
+		 con.setAutoCommit(false);
+		 stmt = dsSQL.newPreparedStatement(con, sql);
+         
+         ResultSet rs = stmt.executeQuery();
+         while(rs.next())
+         h = rs.getInt("Holidays");
+		 
+	 } catch (Exception e) {
+		 commonUTIL.displayError("HolidaySQL",sql,e);
+		 return h;
+           
+        }
+        finally {
+           try {
+			stmt.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("HolidaySQL",SELECT_MAX,e);
+		}
+        }
+        return h;
+
+ }
  public static int checkHolidayOrWeekend(String currency, String date, Connection con ) {
 	 
 	 int j = 0;
