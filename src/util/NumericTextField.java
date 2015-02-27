@@ -61,7 +61,7 @@ public class NumericTextField extends JTextField implements
     );
   }
   static public String checkAmount(String s) {
-      return checkAmount(s, 2,false);
+      return checkAmount(s, 6,false);
   }
   static public String checkAmount(String s,int dig, boolean absoluteValue) {
       int idx = s.indexOf("k");
