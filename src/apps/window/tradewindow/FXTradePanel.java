@@ -12,6 +12,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.net.URL;
@@ -783,6 +784,98 @@ import dsServices.ServerConnectionUtil;
 				//checkForSplitTrade();
 			}
 		});
+	    
+	    
+	    out.outRightDate.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					String dateT = getTradeDate();
+					if(commonUTIL.isEmpty(dateT)) {
+						dateT = commonUTIL.convertDateTimeTOString(commonUTIL.getCurrentDate());
+					} else {
+					dateT = dateT.substring(0, 10);	
+					}
+					out.outRightDate.setDate(commonUTIL.stringToDate(dateT, false));
+					String dateTxt =out. getDateText();
+					out.setDateTextEmpty();
+					Date date = out.outRightDate.getDate();
+					if(dateTxt.equalsIgnoreCase("Spot")) {
+						String currencyPairS =(String) basicData.currencyPair.getSelectedItem();
+						
+						if(commonUTIL.isEmpty(currencyPair) || commonUTIL.isEmpty(dateT) ) {
+							out.outRightDate.setDate(commonUTIL.getCurrentDate());
+						} else {
+							try {
+									
+								int h = remoteReference.getHolidayonCurrencyPair(currencyPair, dateT);
+								
+								DateU dated  = 	DateU.valueOf(commonUTIL.convertStringtoSQLDate(dateT));
+		             			dated.addDays(h+2);
+		             			
+		             			out.outRightDate.setDate(dated.getDate());
+							} catch (RemoteException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						}
+						
+					} else {
+						if(date == null)
+							date = commonUTIL.getCurrentDate();
+						if(!commonUTIL.isEmpty(dateTxt)) {
+					//	date =	checkDate(dateTxt.trim(),date);
+							try {
+								if(basicData.currencyPair.getSelectedIndex() != -1)
+								 currencyPair =(String) basicData.currencyPair.getSelectedItem();
+								int h = remoteReference.getHolidayonCurrencyPair(currencyPair, dateT);
+								DateU dated = DateU.valueOf(date);
+								dated.addDays(h);
+								out.outRightDate.setDate(out.checkDate(dateTxt.trim(),dated.getDate()));
+							} catch (RemoteException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+						} else {
+							out.outRightDate.setDate(commonUTIL.getCurrentDate());
+						}
+					}
+					
+					
+				
+		   			 
+		   		// }
+					
+					
+				}
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+					String dateT =out.getDateText();
+					out.setDateTextEmpty();
+				} else {
+					out.setDateText(arg0.getKeyChar());
+				}
+			}
+		});
+	    	
+	    
+	    
+	    
+	    
 
 	    basicData.book.addActionListener(new ActionListener() {			
 			@Override
@@ -793,6 +886,7 @@ import dsServices.ServerConnectionUtil;
 				if(leid == -1)
 					return;
 				Book le = basicData._vectorBooks.get(leid);
+				
 				basicData.book.setName(String.valueOf(le.getBookno()));		
 				
 				checkForSplitTradeCheckBox();
@@ -2392,7 +2486,7 @@ import dsServices.ServerConnectionUtil;
 									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp((amt1 * -1) * spot).toString());
 					    		 
 					    	 }
-		                    	//populateRountingData();
+		                    	populateRountingData();
 		                    }catch(NumberFormatException e1) {
 	                    		commonUTIL.showAlertMessage("Enter Number ");
 	                    	}
@@ -3292,6 +3386,12 @@ import dsServices.ServerConnectionUtil;
 				}
 		}
 	
+		protected String getTradeDate() {
+			// TODO Auto-generated method stub
+			String tradedate = attributes.getAttributeValue("Trade Date");
+			return tradedate;
+		}
+
 		private Book getBook(int bookID) {
 			 int b=0;
 			 Book bo = null;
