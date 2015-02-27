@@ -66,7 +66,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 
 	private static final long serialVersionUID = 1L;
 	RemoteMO remotemo = null;
-	DecimalFormat format = new DecimalFormat("##,###,#######.##");
+	DecimalFormat format = new DecimalFormat("##,###,#######.#######");
 	 static private String hostName = "";
 	 ServerConnectionUtil de = null;
 	String positiongcol [] = {"DATE     ","primaryC","quotingC"};
