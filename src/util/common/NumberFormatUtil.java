@@ -95,8 +95,8 @@ public class NumberFormatUtil {
 			 loc = Locale.getDefault();
 		 DecimalFormat f=
 			 useGrouping ?
-					 (DecimalFormat)_decimalFormat.get(loc.toString()+numberOfdec) :
-						 (DecimalFormat)_decimalFormatNoGrouping.get(loc.toString()+numberOfdec);
+					 (DecimalFormat)_decimalFormat.get(loc.toString()+0) :
+						 (DecimalFormat)_decimalFormatNoGrouping.get(loc.toString()+0);
 					 if (f == null) {
 						 NumberFormat numberFormat = getNumberFormat(loc, useGrouping);
 						 if (numberFormat instanceof DecimalFormat)
@@ -104,13 +104,13 @@ public class NumberFormatUtil {
 						 else
 							 f=new DecimalFormat();
 						 f.setGroupingUsed(useGrouping);
-						 f.setMinimumFractionDigits(numberOfdec);
-						 f.setMaximumFractionDigits(numberOfdec);
+						 f.setMinimumFractionDigits(0);
+						 f.setMaximumFractionDigits(0);
 						 if (useGrouping) {
-							 _decimalFormat.put(loc.toString()+numberOfdec, f);
+							 _decimalFormat.put(loc.toString()+0, f);
 						 }
 						 else {
-							 _decimalFormatNoGrouping.put(loc.toString()+numberOfdec, f);
+							 _decimalFormatNoGrouping.put(loc.toString()+0, f);
 						 }
 					 }
 					 return f;
@@ -193,7 +193,8 @@ public class NumberFormatUtil {
 			 }
 
 			 if(numberOfdec < 0) return numberToString(amt);
-			 DecimalFormat df = getDecimalFormat(numberOfdec, locale, useGrouping);
+			 String pattern = "##########.######";
+			 DecimalFormat df = new DecimalFormat(pattern);//getDecimalFormat(numberOfdec, locale, useGrouping);
 			 synchronized(df) {
 				 return df.format(amt);
 			 }
