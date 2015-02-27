@@ -245,7 +245,7 @@ public class commonUTIL {
 	
 	
     static public String getStringFromDoubleExp(double amount) {
-    	double dd = NumberRoundingMethod.round(amount, 2, NumberRoundingMethod.RM_UP);
+    	double dd = NumberRoundingMethod.round(amount, 2, NumberRoundingMethod.RM_NEAREST);
     	String value = BigDecimal.valueOf(dd).toPlainString();
     	int len = value.length() -  value.indexOf(".") ;
     	if(value.contains(".")) {
