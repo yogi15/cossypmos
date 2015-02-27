@@ -106,6 +106,19 @@ public class TradeAttributesD extends JPanel {
         		instrumenTypeVal.add(data.getName());
         	}
         }
+        
+        public String getAttributeValue(String attributeName) {
+        	String value = "";
+        	for(int i=0;i<mod.getRowCount();i++) {
+				String columnName = (String) mod.getValueAt(i, 0);
+				if(columnName.equalsIgnoreCase(attributeName)) {
+				 value = (String) mod.getValueAt(i, 1);
+					break;
+				}
+			}
+        	return value;
+        	
+        }
         private void initComponents() {        	
         	remoteReferenceData = RemoteServiceUtil.getRemoteReferenceDataService();
         	try {
