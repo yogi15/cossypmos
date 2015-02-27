@@ -1392,6 +1392,19 @@ String sql = " quoting_currency = '"+cp.getQuoting_currency() + "'";
 		Vector messConfig = (Vector) MessageConfigSQL.selectMessageConfigOn(sql, dsSQL.getConn());
 		return messConfig;
 	}
+
+	@Override
+	public boolean updateHoliday(Holiday holiday) throws RemoteException {
+		// TODO Auto-generated method stub
+		return HolidaySQL.update(holiday, dsSQL.getConn());
+	}
+
+	@Override
+	public int getHolidayonCurrencyPair(String currencyPair, String date)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return HolidaySQL.getHolidaysOnCp(currencyPair, date, dsSQL.getConn());
+	}
 	
 
 }

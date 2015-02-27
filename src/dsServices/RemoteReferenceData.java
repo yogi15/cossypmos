@@ -36,6 +36,8 @@ public interface RemoteReferenceData extends Remote{
 	public MessageConfig selectMessageConfig(MessageConfig messConfig)throws RemoteException;
 	public boolean deleteMessageConfig(MessageConfig messConfig)throws RemoteException;
 	public boolean updateMessageConfig(MessageConfig messConfig) throws RemoteException;
+	public boolean updateHoliday(Holiday holiday) throws RemoteException;
+	
 	public Collection  selectALLMessageConfigs() throws RemoteException;
 	public Collection  getMessageConfigsonProductype(String productype,String productSubtype) throws RemoteException;
 	public Collection  getMessageConfigsonProductype(String productype,String productSubtype,int poID) throws RemoteException;
@@ -43,7 +45,7 @@ public interface RemoteReferenceData extends Remote{
 	public boolean updateDateRule(DateRule dateRule) throws RemoteException;
 	public DateRule getDateRule(int dateRuleID)  throws RemoteException;
 	
-	
+	public int getHolidayonCurrencyPair(String currencyPair,String date) throws RemoteException;
 	public Country selectCountryOnISO(String isocode) throws RemoteException;
 	public Country selectCountryName(String countryName) throws RemoteException;
 	public Collection selectALLCountry()  throws RemoteException;
