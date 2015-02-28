@@ -53,8 +53,10 @@ import util.common.NumberRoundingMethod;
 
 
 
+
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+
 
 
 import constants.CommonConstants;
@@ -201,6 +203,13 @@ public class commonUTIL {
 		}
 		return doub.doubleValue();
 	}
+	
+	static public String converDoubleToStringWithCommas(String doubleValue) {
+		if( doubleValue.equals("") || Double.parseDouble(doubleValue) == 0)
+			return "0";
+
+		return NumberFormatUtil.numberToString( Double.parseDouble(doubleValue),Locale.getDefault());
+	}
 	static public int converStringToInteger(String intValue) {
 		Integer doub = new Integer(intValue.trim());
 		return doub.intValue();
@@ -242,6 +251,7 @@ public class commonUTIL {
 		String dateF = formats.format(date.getTime());
 		return dateF.toString();
 	} 
+	
 	
 	
     static public String getStringFromDoubleExp(double amount) {
@@ -1470,7 +1480,30 @@ public class commonUTIL {
 			}
 			return returnDate;
 	 }
-	 
+	
+	 /**
+		 * Returns dateString converted from a string of dateTime in a required format no isLeneint use
+		 * @param String dateTime
+		 * @return String
+		 */
+		
+		 static public String stringDateTimeToDate(String dateTime,String format) {
+			   if(dateTime.contains("-")) 
+				   dateTime = dateTime.replace("-", "/");
+		       
+			   SimpleDateFormat formatter = new SimpleDateFormat(format);
+		       Date returnDate = null;
+			try {
+				returnDate = formatter.parse(dateTime);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		       
+			   return convertStringDateInFormat(returnDate, format);
+			
+		 }
+		 
 	public static Object convertToFinanceFormate(double quantity) {
 		// TODO Auto-generated method stub
 		String value = getStringFromDoubleExp(quantity);
