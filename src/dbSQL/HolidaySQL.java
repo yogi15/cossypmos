@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Vector;
 
+import constants.CommonConstants;
 import util.commonUTIL;
 import beans.Holiday;
 
@@ -379,11 +380,11 @@ protected static int selectMax(Connection con ) {
 		  .append("' ")
 		  .append("and")
 		  .append("(hdate like ")
-		  .append("'%" + date +"%' ")
+		  .append("'%" + commonUTIL.stringDateTimeToDate(date, CommonConstants.SDF_DATE_FORMAT) +"%' ")
 		  .append("or ")
-		  .append("to_char(to_date('" + date + "', 'dd/mm/yyyy'), 'd') = fweekday ")
+		  .append("to_char(to_date('" + commonUTIL.stringDateTimeToDate(date, CommonConstants.SDF_DATE_FORMAT) + "', 'dd/mm/yyyy'), 'd') = fweekday ")
 		  .append("or ")
-		  .append("to_char(to_date('" + date + "', 'dd/mm/yyyy'), 'd') = sweekday ")
+		  .append("to_char(to_date('" + commonUTIL.stringDateTimeToDate(date, CommonConstants.SDF_DATE_FORMAT) + "', 'dd/mm/yyyy'), 'd') = sweekday ")
 		  .append(")")
 		  .toString();
 		  
