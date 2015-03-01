@@ -255,22 +255,41 @@ public class JInternalReportFrame extends JInternalFrame {
 				String where = "";
 				if(getReportType().equalsIgnoreCase("FTD")) {
 				Vector<FilterBean> bean = searchPanel.getFilterBeanData();
-				  String currentDate = ((FilterBean) bean.elementAt(0)).getColumnValues();
-				  try {
+				String currentDate = ((FilterBean) bean.elementAt(0)).getColumnValues();
+				try {
 					data = (Vector)	 reportPanel.getRemoteTrade().getFTDReport(currentDate);
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-					if(data != null && data.size() > 0) {
-							reportPanel.getpReport().setHeader((Vector) data.get(0)); 
-							reportPanel.getpReport().setdatatype((Vector) data.get(1));
-							reportPanel.getpReport().setData((Vector) data.get(2));
-							reportPanel.getDemo().setReport(reportPanel.getpReport());
-							reportPanel.getDemo().runNewPanel();
+				if(data != null && data.size() > 0) {
+					reportPanel.getpReport().setHeader((Vector) data.get(0)); 
+					reportPanel.getpReport().setdatatype((Vector) data.get(1));
+					reportPanel.getpReport().setData((Vector) data.get(2));
+					reportPanel.getDemo().setReport(reportPanel.getpReport());
+					reportPanel.getDemo().runNewPanel();
 				}
 					return;
 				}
+				
+				if(getReportType().equalsIgnoreCase("VAR")) {
+					Vector<FilterBean> bean = searchPanel.getFilterBeanData();
+					String currentDate = ((FilterBean) bean.elementAt(0)).getColumnValues();
+					try {
+						data = (Vector)	 reportPanel.getRemoteTrade().getVarReport(currentDate);
+					} catch (RemoteException e) {
+						  e.printStackTrace();
+					}
+					  
+					if(data != null && data.size() > 0) {
+						reportPanel.getpReport().setHeader((Vector) data.get(0)); 
+						reportPanel.getpReport().setdatatype((Vector) data.get(1));
+						reportPanel.getpReport().setData((Vector) data.get(2));
+						reportPanel.getDemo().setReport(reportPanel.getpReport());
+						reportPanel.getDemo().runNewPanel();
+					}
+					return;					
+				}
+				
 				if(getReportType().equalsIgnoreCase("PNL")) {
 					 where =  getFilterValues().createWhere(searchPanel.getFilterBeanData(),"Trade");
 				} else {
