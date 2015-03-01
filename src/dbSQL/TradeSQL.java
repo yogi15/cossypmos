@@ -1492,47 +1492,43 @@ public static Vector getTradesOnB2bTrade(Trade b2bTrade,Connection con) {
 	return (Vector) selectOnWherecClause(sql,con);
 }
 
-public static Collection getFTDReport(String currentDate, Connection con) {
-	
+public static Collection getFTDReport(String currentDate, Connection con) {	
 	
 	 PreparedStatement stmt = null;
      Vector<Object> Trades = new Vector();
      String sql = getFTDSQL(currentDate);
      ResultSet rs = null;
-  try {
+     
+     try {
 	   commonUTIL.display("TradeSQL", "getFTDReport == reports SQL " + sql);
 		 
-   con.setAutoCommit(false);
-  	    stmt = dsSQL.newPreparedStatement(con, sql);
-	  rs = stmt.executeQuery();
-	/*  while(rs.next()) {
-   	    System.out.println(rs.getString(3));
-   	 System.out.println(rs.getDouble(4));
-      
-      }*/
-	  if(rs != null)  {
-	     Trades.add(rs);
-   ReportGenerator generateReport = new ReportGenerator();
-   Trades = (Vector) generateReport.generateReportOnSQL(Trades);
-   }
-  
+	   con.setAutoCommit(false);
+  	   stmt = dsSQL.newPreparedStatement(con, sql);
+  	   rs = stmt.executeQuery();
+		/*  while(rs.next()) {
+	   	    System.out.println(rs.getString(3));
+	   	 System.out.println(rs.getDouble(4));
+	      
+	      }*/
+  	   
+  	   if(rs != null)  {
+  		   Trades.add(rs);
+		   ReportGenerator generateReport = new ReportGenerator();
+		   Trades = (Vector) generateReport.generateReportOnSQL(Trades);
+  	   }
    
-   
- 
   } catch (Exception e) {
-   commonUTIL.displayError("TradeSQL","selectOnWherecClauseReports " + sql,e);
-   return Trades;
-       
-     }
-     finally {
-        try {
+	  commonUTIL.displayError("TradeSQL","getFTDReport " + sql,e);
+	  return Trades;       
+  } finally {
+	  try {
        	 if(stmt != null)
-   stmt.close();
-  } catch (SQLException e) {
+       		 stmt.close();
+	  } catch (SQLException e) {
    
-   commonUTIL.displayError("TradeSQL"," selectOnWherecClauseReports " + sql,e);
+      commonUTIL.displayError("TradeSQL"," getFTDReport " + sql,e);
   }
-     }
+}
      return Trades;
 	
 	/*
@@ -1567,7 +1563,42 @@ public static Collection getFTDReport(String currentDate, Connection con) {
 //	return null;
 }
 
+public static Collection getVarReport(String currentDate, Connection con) {	
+	
+	PreparedStatement stmt = null;
+    Vector<Object> Trades = new Vector();
+    String sql = getFTDSQL(currentDate);
+    ResultSet rs = null;
+    
+    try {
+	   commonUTIL.display("TradeSQL", "getVarReport == reports SQL " + sql);
+		 
+	   con.setAutoCommit(false);
+ 	   stmt = dsSQL.newPreparedStatement(con, sql);
+	  rs = stmt.executeQuery();
+	
+	  if(rs != null)  {
+	     Trades.add(rs);
+	     ReportGenerator generateReport = new ReportGenerator();
+	     Trades = (Vector) generateReport.generateReportOnSQL(Trades);
+	  }  
 
+    } catch (Exception e) {
+    	commonUTIL.displayError("TradeSQL","getVarReport " + sql,e);
+    	return Trades;
+    } finally {
+       try {
+      	 if(stmt != null)
+      		 stmt.close();
+       } catch (SQLException e) {
+    	   commonUTIL.displayError("TradeSQL"," getVarReport " + sql,e);
+       }
+    }
+    
+    return Trades;
+}
+
+ 
     
 
 }

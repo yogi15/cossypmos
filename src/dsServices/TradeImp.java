@@ -90,7 +90,7 @@ public class TradeImp implements RemoteTrade {
 
 	@Override
 	public boolean removeTrade(Trade trade) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		 if(TradeSQL.delete(trade, dsSQL.getConn())) {
 			 
 			publishnewTrade("POS","Object",getTradeEvent(trade));
@@ -102,7 +102,7 @@ public class TradeImp implements RemoteTrade {
 	@Override
 	public Vector saveTrade(Trade trade, Vector<String> message)
 			throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		int i =0;
 		
 		Vector returnStatus = new Vector();
@@ -225,7 +225,7 @@ public class TradeImp implements RemoteTrade {
 
 
 	private boolean isAuthorisedUserAction(Trade trade) {
-		// TODO Auto-generated method stub
+		
 		boolean flag = false;
 		String productsubtype = "";
 	  try {
@@ -262,7 +262,7 @@ public class TradeImp implements RemoteTrade {
 
 
 	private void processAttribues(int tradeId, String attributes,int versionID) {
-		// TODO Auto-generated method stub
+		
 		
 		if (!commonUTIL.isEmpty(attributes)) {
 			Attribute deleteAt = new Attribute();
@@ -332,7 +332,7 @@ public class TradeImp implements RemoteTrade {
 
 	@Override
 	public int saveTrade(Trade trade) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		
 		int i =0;
 		Vector statusTrade = new Vector();
@@ -405,7 +405,7 @@ public class TradeImp implements RemoteTrade {
 
 	
 	private boolean isTradeLock(Trade trade) {
-		// TODO Auto-generated method stub
+		
 		boolean flag = true;
 	   if(!TaskSQL.checkLockOnTrade(trade, dsSQL.getConn())) 
 		   return false;
@@ -431,7 +431,7 @@ public class TradeImp implements RemoteTrade {
 	
 	private boolean isTradeCancel(Trade trade) {
 		boolean  isCancel = true;
-		// TODO Auto-generated method stub
+		
 		String status = trade.getStatus();
 		if(!status.equalsIgnoreCase(cancelStatus))
 		     isCancel = false;
@@ -477,18 +477,18 @@ public class TradeImp implements RemoteTrade {
 			
 		}
 		deleteFeesnotExists(existsingFees,Fees);
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 
 	private void insertFeesOnTrade(Fees nfee) {
-		// TODO Auto-generated method stub
+		
 		FeesSQL.save(nfee, dsSQL.getConn());
 	}
 	
 	private void updateFeesOnTrade(Fees nfee) {
-		// TODO Auto-generated method stub
+		
 		FeesSQL.update(nfee, dsSQL.getConn());
 	}
 
@@ -536,7 +536,7 @@ public class TradeImp implements RemoteTrade {
 	}
 
 	private void deleteFeesOnTrade(Fees efee) {
-		// TODO Auto-generated method stub
+		
 		FeesSQL.delete(efee, dsSQL.getConn());
 	}
 
@@ -612,7 +612,7 @@ public class TradeImp implements RemoteTrade {
 		commonUTIL.displayError("TradeImpl", "ProcessAudit", e);
 		
 	}
-		// TODO Auto-generated method stub
+		
 		
 	}
 
@@ -657,7 +657,7 @@ public class TradeImp implements RemoteTrade {
 	}
 
 	private Task checkTask(Trade newTrade,WFConfig wf,Trade oldTrade) {
-		// TODO Auto-generated method stub
+		
 		Task t = null;
 		{
 			
@@ -693,7 +693,7 @@ public class TradeImp implements RemoteTrade {
 	}
 
 	private Task processTask(Trade trade,int wfcID) {
-		// TODO Auto-generated method stub
+		
 		Task task = new Task();
 		task.setUserid(trade.getUserID());
 		task.setTradeID(trade.getId());
@@ -723,13 +723,13 @@ public class TradeImp implements RemoteTrade {
 
 	@Override
 	public Collection selectALLTrades() throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return TradeSQL.selectALL(dsSQL.getConn());
 	}
 
 	@Override
 	public Trade selectTrade(int tradeID) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		Trade trade = TradeSQL.select(tradeID, dsSQL.getConn());
 		
 		if(trade != null) {
@@ -746,7 +746,7 @@ public class TradeImp implements RemoteTrade {
 
 	@Override
 	public boolean updateTrade(Trade trade) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return TradeSQL.update(trade, dsSQL.getupdateConn());
 	}
 	
@@ -783,7 +783,7 @@ public class TradeImp implements RemoteTrade {
 
 	@Override
 	public Collection getAction(Trade trade) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		
 		Product product = ProductSQL.selectProduct(trade.getProductId(), dsSQL.getConn());
 		String whereClause = "productType ='" + product.getProductType() + "' and productSubType = '"+ product.getProdcutShortName() + "' and currentstatus = '" + trade.getStatus() + "' and action = '" + trade.getAction() + "' and type ='TRADE'";
@@ -793,7 +793,7 @@ public class TradeImp implements RemoteTrade {
 
 	@Override
 	public Collection getAction(String whereClause) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		String sqls = whereClause;
 		System.out.println(sqls);
 		Vector v1 = (Vector)  WFConfigSQL.selectWhere(whereClause, dsSQL.getConn());
@@ -825,7 +825,7 @@ public class TradeImp implements RemoteTrade {
 	
 	@Override
 	public Collection getAllActionsOnStatus(String whereClause) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		
 		return  WFConfigSQL.selectWhere(whereClause, dsSQL.getConn());
 		
@@ -862,7 +862,7 @@ public class TradeImp implements RemoteTrade {
 	}
 	
 	private WFConfig checkSTPExistsonTransition(Trade trade,Product product,WFConfig wf,Vector statusTrade) {
-		// TODO Auto-generated method stub
+		
 		WFConfig cf = wf;
 		if(wf != null) {
 			if(wf.getAuto() == 1 ) {
@@ -938,29 +938,30 @@ return status;
 	public Collection getAuditedTrade(int tradeID) throws RemoteException {
 		String sql = " id = " + tradeID;
 		return AuditSQL.selectwhere(sql, dsSQL.getConn());
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public Collection selectforOpen(String productype) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return TradeSQL.selectforOpen(productype,dsSQL.getConn());
 		
 	}
 
 	@Override
-	public Collection getTradesforReport(String sql) throws RemoteException {
-		// TODO Auto-generated method stub
-		
+	public Collection getTradesforReport(String sql) throws RemoteException {	
 		return  TradeSQL.selectwhereforReports(sql, dsSQL.getConn());
 	}
 	@Override
-	public Collection getFTDReport(String sql) throws RemoteException {
-		// TODO Auto-generated method stub
-		
+	public Collection getFTDReport(String sql) throws RemoteException {		
 		return  TradeSQL.getFTDReport(sql, dsSQL.getConn());
 	}
+	@Override
+	public Collection getVarReport(String sql) throws RemoteException {		
+		return  TradeSQL.getVarReport(sql, dsSQL.getConn());
+	}
+	
    public void startProducingMessage() {
 	   newMessage	 = new CreateNewMessage(commonUTIL.getLocalHostName()+":61616");
 	  
@@ -986,7 +987,7 @@ return status;
 
 			@Override
 			public Trade getTradeOnVersion(int tradeID,int version) throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				Trade trade = new Trade();
 				String sql = " id = " + tradeID + " and version = " + version;
 				Vector v1 = (Vector) AuditSQL.selectwhere(sql,  dsSQL.getConn());
@@ -1164,7 +1165,7 @@ return status;
 
 			@Override
 			public Collection getSDisOnTrade(Trade trade) throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				
 				return populateSDI(trade);
 			}
@@ -1173,7 +1174,7 @@ return status;
 
 			@Override
 			public Vector selectFeesonTrade(int id) throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				return (Vector) FeesSQL.selectFeesOnTrades(id, dsSQL.getConn());
 			}
 
@@ -1182,7 +1183,7 @@ return status;
 			@Override
 			public void updateTradeAndPublish(Trade trade, int userID)
 					throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				
 			}
 
@@ -1190,7 +1191,7 @@ return status;
 
 			@Override
 			public boolean isValidAction(Trade trade) throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				Vector returnStatus = new Vector();
 				WFConfig wfs = getStatusOnTradeAction(trade, trade.getStatus(), returnStatus);
 				if(wfs == null && returnStatus.isEmpty())
@@ -1207,7 +1208,7 @@ return status;
 			@Override
 			public Collection<Vector<Trade>> getChildTrades(int parentID)
 					throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				String sql = " parentID = " +parentID;
 				return  TradeSQL.selectwhere(sql, dsSQL.getConn());
 			}
@@ -1217,7 +1218,7 @@ return status;
 			@Override
 			public Trade getOutStandingBalanceonFWDOption(int FWDOptionID)
 					throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				return TradeSQL.getOutStandingBalanceonFWDOption(FWDOptionID, dsSQL.getConn());
 			}
 
@@ -1226,7 +1227,7 @@ return status;
 			@Override
 			public Trade getOutStandingBalanceonFWDOption(int FWDOptionID,
 					int tradeID) throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				 return TradeSQL.getOutStandingBalanceonFWDOption(FWDOptionID,tradeID, dsSQL.getConn());
 			}
 
@@ -1235,7 +1236,7 @@ return status;
 			@Override
 			public Vector getTradeRollOverHierarchies(int tradeID)
 					throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				return (Vector) TradeSQL.getRollOverHierarchies(tradeID, dsSQL.getConn());
 			}
 
@@ -1244,7 +1245,7 @@ return status;
 			@Override
 			public Vector getTradeRollBackHierarchies(int tradeID)
 					throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 
@@ -1252,7 +1253,7 @@ return status;
 
 			public Vector<String> saveBatchSplitTrades(Vector<Trade> splitTrades,Trade originalTrade, Vector<String> message)
 					throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				if(splitTrades == null || splitTrades.isEmpty())
 					return null;
 				int cout =0;
@@ -1329,7 +1330,7 @@ return status;
 			private Vector<String> saveBatchUpdateSplitTrades(
 					Vector<Trade> splitTrades, Trade originalTrade,
 					Vector<String> message) {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 
@@ -1337,7 +1338,7 @@ return status;
 
 			public Vector<String> saveBatchSplitTrades(Vector<Trade> splitTrades,Vector<String> message)
 					throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				if(splitTrades == null || splitTrades.isEmpty())
 					return null;
 				int cout =0;
@@ -1358,7 +1359,7 @@ return status;
 
 
 			public Vector getSplitTrades(Trade trade) throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				Vector trades = null;
 			String autoType = trade.getAutoType();
 			if(commonUTIL.isEmpty(autoType))
@@ -1425,7 +1426,7 @@ return status;
 			
 			
 			private void generateB2BTrade(Trade trade) {
-				// TODO Auto-generated method stub
+				
 				   try {
 					Trade b2bTrade = (Trade) trade.clone();
 					
@@ -1480,7 +1481,7 @@ return status;
 			
             // to get Mirror Trade if mirror book id is greater then zero this is case when you have internal trade and not B2B trade ;
 			private void generateMirrorTrade(Trade b2btrade,boolean isFromB2B) {
-				// TODO Auto-generated method stub
+				
 				try {
 					Trade mirrorTrade = (Trade) b2btrade.clone();
 					String autoType = mirrorTrade.getAutoType();
@@ -1543,7 +1544,7 @@ return status;
 
 			@Override
 			public Vector getMirrorTrades(int mirrorID) throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				
 				return TradeSQL.getMirrorTrade( mirrorID,dsSQL.getConn());
 			}
@@ -1554,7 +1555,7 @@ return status;
 			public Vector<Trade> getB2Btrades(Trade trade)
 					throws RemoteException {
 				Vector<Trade> b2btrades = null;
-				// TODO Auto-generated method stub
+				
 				String autoType = trade.getAutoType();
 				if(commonUTIL.isEmpty(autoType))
 					return null;
@@ -1591,7 +1592,7 @@ return status;
 			@Override
 			public boolean checkLimitOnTrade(Trade trade,String type)
 					throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				if(remoteLimit == null)  
 					remoteLimit= (RemoteLimit) de.getRMIService("Limit");
 				 
@@ -1615,7 +1616,7 @@ return status;
 			@Override
 			public void isEventExceuted(EventProcessor event)
 					throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				
 				EventSQL.update(event, dsSQL.getConn());
 			}
@@ -1625,7 +1626,7 @@ return status;
 			@Override
 			public Trade getTradeOldVersion(int tradeID, int tradeVersion)
 					throws RemoteException {
-				// TODO Auto-generated method stub
+				
 				/*String sql = " id = " + tradeID + " and version = " + tradeVersion;
 				Vector v1 = (Vector) AuditSQL.selectwhere(sql,  dsSQL.getConn());
 				String oldTradeValues = "";

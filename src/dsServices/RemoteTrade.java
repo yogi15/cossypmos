@@ -6,7 +6,6 @@ import java.util.Vector;
 import java.rmi.Remote;
 
 import dsEventProcessor.EventProcessor;
-
 import beans.EventController;
 import beans.Trade;
 import beans.WFConfig;
@@ -53,5 +52,6 @@ public interface RemoteTrade extends Remote {
 //	public Trade undo(Trade trade, int tradeVersion) throws RemoteException;
 	
 	public String selectTradeAttributesAsString(String tradeId) throws RemoteException;
-	public   Collection getFTDReport(String sql) throws RemoteException;
+	public Collection getFTDReport(String sql) throws RemoteException;
+	public Collection getVarReport(String sql) throws RemoteException;
 }
