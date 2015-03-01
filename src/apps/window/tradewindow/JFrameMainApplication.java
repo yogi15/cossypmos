@@ -57,7 +57,7 @@ public class JFrameMainApplication extends JFrame {
 			new JMenu("Favorities"), new JMenuItem("MessageConfig") };
 	private static JMenuItem[] reports = { new JMenuItem("TradeReport"),
 			new JMenuItem("TransferReport"), new JMenuItem("PostingReport"),new JMenuItem("MessageReport"),new JMenuItem("CashLedgerPositionReport"),new JMenuItem("CashPositionReport"),new JMenuItem("ForwardLadderReport"),
-			new JMenuItem("PNLReport"), new JMenu("Other") };
+			new JMenuItem("PNLReport"), new JMenu("RBIReport") };
 	private static JMenuItem[] favItems = { new JMenuItem("CounterParty"),
 			new JMenuItem("Trader"), new JMenuItem("Tenor"),
 			new JMenuItem("Book"), new JMenuItem("CurrencyPair") };
@@ -104,7 +104,7 @@ public class JFrameMainApplication extends JFrame {
 		subMenu.put("Settlements", settlements);
 		subMenu.put("FXAutoConfig", fxConfigItems);
 		subMenu.put("Listed Derivatives", derivativeItems);
-		subMenu.put("RBI Report", RBIReport);
+		subMenu.put("RBIReport", RBIReport);
 		
 
 		setTitle(" Main Apps " + user.getUser_name());
