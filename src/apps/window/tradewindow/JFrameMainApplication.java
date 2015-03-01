@@ -76,7 +76,7 @@ public class JFrameMainApplication extends JFrame {
 			new JMenu("PositionManagement"), new JMenuItem("LimitDashBoard") };
 	private static JMenuItem[] fixedIncome = { new JMenuItem("Bond"),
 			new JMenuItem("Repo") };
-	private static JMenuItem[] OtherReport = { new JMenuItem("FTDReport"),new JMenuItem("OtherReport")
+	private static JMenuItem[] RBIReport = { new JMenuItem("FTDReport"),new JMenuItem("VARReport"), new JMenuItem("OtherReport"), 
 		 };
 	private static JMenuItem[] positionmenu = {
 			new JMenuItem("PositionManager"),
@@ -104,7 +104,7 @@ public class JFrameMainApplication extends JFrame {
 		subMenu.put("Settlements", settlements);
 		subMenu.put("FXAutoConfig", fxConfigItems);
 		subMenu.put("Listed Derivatives", derivativeItems);
-		subMenu.put("Other", OtherReport);
+		subMenu.put("RBI Report", RBIReport);
 		
 
 		setTitle(" Main Apps " + user.getUser_name());
@@ -502,10 +502,10 @@ public class JFrameMainApplication extends JFrame {
 				}
 			});
 		}
-		for (int r = 0; r < OtherReport.length; r++) {
+		for (int r = 0; r < RBIReport.length; r++) {
 			//derivativeItems[s].setFont(Font.decode("SansSerif-12"));
-			commonUTIL.setBackGroundColor(OtherReport[r]);
-			OtherReport[r].addActionListener(new ActionListener() {
+			commonUTIL.setBackGroundColor(RBIReport[r]);
+			RBIReport[r].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					JFrameNewReport reports = new JFrameNewReport(arg0
 							.getActionCommand(), name);
