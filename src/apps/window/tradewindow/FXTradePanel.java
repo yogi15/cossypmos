@@ -540,7 +540,8 @@ import dsServices.ServerConnectionUtil;
 			try {
 				String autoType = trade.getAutoType();
 				if(!commonUTIL.isEmpty(autoType)) {
-			        if(trade.getTradedesc1().equalsIgnoreCase(FX) || trade.getTradedesc1().equalsIgnoreCase(FXSWAP) || trade.getTradedesc1().equalsIgnoreCase(FXFORWARD) ) {
+			        if(trade.getTradedesc1().equalsIgnoreCase(FX) || trade.getTradedesc1().equalsIgnoreCase(FXSWAP) || trade.getTradedesc1().equalsIgnoreCase(FXFORWARD)
+			        		|| trade.getTradedesc1().equalsIgnoreCase(FXFORWARDOPTION)) {
 			        	
 			        	routingTrades  = remoteTrade.getSplitTrades(trade);  // i know only 5 records are going to come. 
 			        	if(routingTrades.size() == 5) {
@@ -4071,7 +4072,7 @@ import dsServices.ServerConnectionUtil;
 				functionality.jButton3.setEnabled(false);
 				//basicData.buysell.setText("BUY");
 			}*/
-	        functionality.setRoutingData(null);
+	        //functionality.setRoutingData(null);
 	        b2bconfig = null;
 	     //   functionality.jPanel2.setVisible(true);
 			//functionality.jPanel6.setVisible(true);
@@ -4548,8 +4549,10 @@ import dsServices.ServerConnectionUtil;
 		public void populateRountingData() {
 			
 			//FilterValues.isavaliableForSplit(trade.getTradedesc(),trade.getBookId(),)
-			if(productSubType.equalsIgnoreCase(FXFORWARDOPTION))
-				return;
+			//@yogesh 06/03/2015
+			// below is commented as when split merchant trade is opened; the split trades are not shown
+			/*if(productSubType.equalsIgnoreCase(FXFORWARDOPTION))
+				return;*/
 			if(productSubType.equalsIgnoreCase(FXTAKEUP))
 				return;
 			Trade  originaltrade  = null;
@@ -4569,8 +4572,10 @@ import dsServices.ServerConnectionUtil;
 				//	originaltrade.setType(basicData.buysell.getText());
 				}
 			}
-			if(productSubType.equalsIgnoreCase(FXFORWARDOPTION))
-				return;
+			//@yogesh 06/03/2015
+			// below is commented as for split merchant trade the calculations were not done in split child trades
+			/*if(productSubType.equalsIgnoreCase(FXFORWARDOPTION))
+				return;*/
 			if(productSubType.equalsIgnoreCase(FXTAKEUP))
 				return;
 			if(commonUTIL.isEmpty(originaltrade.getTradedesc()) || originaltrade.getBookId() == 0)
