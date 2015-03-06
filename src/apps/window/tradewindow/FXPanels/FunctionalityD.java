@@ -222,7 +222,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	private NumericTextField getJTextField3() {
 		if (jTextField3 == null) {
 			jTextField3 = new NumericTextField(10,format);
-			jTextField3.setText("0.0");
+			jTextField3.setText("0");
 		}
 		return jTextField3;
 	}
@@ -230,6 +230,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 		if (FarRate1 == null) {
 			FarRate1 = new NumericTextField(10,format);
 			FarRate1.setText("0.0");
+			FarRate1.setEditable(false);
 		}
 		return FarRate1;
 	}
@@ -273,6 +274,8 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	private NumericTextField getJTextField2() {
 		if (jTextField2 == null) {
 			jTextField2 =  new NumericTextField(10,format);
+			jTextField2.setText("0.0");
+			jTextField2.setEditable(false);
 		//	jTextField2.setText("0");
 		/*	jTextField2.addActionListener(new ActionListener() {
 				
@@ -362,7 +365,7 @@ public class FunctionalityD extends JPanel  implements Runnable , ExceptionListe
 	private JTextField getJLabel2() {
 		if (jLabel2 == null) {
 			jLabel2 = new JTextField();
-	//		jLabel2.setEditable(false);
+			jLabel2.setEditable(false);
 			//jLabel2.setText("USD/INR");
 		}
 		return jLabel2;
