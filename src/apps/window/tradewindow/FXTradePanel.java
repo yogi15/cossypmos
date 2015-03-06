@@ -952,24 +952,48 @@ import dsServices.ServerConnectionUtil;
 				//takeupW.setUser(user);				
 			}
         });
+        
+        //@yogesh 03/072015
+        // FarRate1 calculated based on farrate2 action
     	functionality.FarRate2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-								setRoutingDataCal();
-								populateRountingData();
-			}
-    	});
-	  functionality.FarRate2.addActionListener(new ActionListener() {		
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
+				double farSplitRate1 = Double.parseDouble(functionality.FarRate2.getText());
+	  			double farRate = Double.parseDouble(swap.jTextField4.getText());
+	  			functionality.FarRate1.setText(String.valueOf(farSplitRate1 * farRate));
+	  			
 				setRoutingDataCal();
 				populateRountingData();
 			}
-	  });
-  
-	  functionality.FarRate1.addKeyListener(new KeyAdapter() { 
+    	});
+    	
+    	//@yogesh 03/072015
+        // FarRate1 calculated based on farrate2 focus lost
+    	 functionality.FarRate2.addFocusListener(new FocusListener() {
+
+ 			@Override
+ 			public void focusGained(FocusEvent arg0) {
+ 				
+ 			}
+
+ 			@Override
+ 			public void focusLost(FocusEvent arg0) {
+ 				
+ 				double farSplitRate1 = Double.parseDouble(functionality.FarRate2.getText());
+	  			double farRate = Double.parseDouble(swap.jTextField4.getText());
+	  			functionality.FarRate1.setText(String.valueOf(farSplitRate1 * farRate));
+	  			
+ 				setRoutingDataCal();
+ 				populateRountingData();
+ 			}
+ 	    	
+ 	    });
+    	 
+    	//@yogesh 03/072015
+         // FarRate1 calculated based on farrate2 action and FarRate1 is disable so no
+    	 // action posiisble on Farrate1 so below code disabled
+/*	  functionality.FarRate1.addKeyListener(new KeyAdapter() { 
 	  		@Override		        
 		  	public void keyTyped(KeyEvent e) {
 		  		if (e.getKeyChar() == KeyEvent.VK_ENTER) {
@@ -977,14 +1001,38 @@ import dsServices.ServerConnectionUtil;
 		  		}
 		  	}
 	  });
-			        
+	
+*/
+    	//@yogesh 03/072015
+         // splitQuoteBaseRate calculated based on splitQuoteNearRate action
+	  functionality.jTextField3.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+				
+			}
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				double splitQuoteNearRate = Double.parseDouble(functionality.jTextField3.getText());
+	  			double rate = Double.parseDouble(out.jTextField4.getText());
+	  			
+	  			functionality.jTextField2.setText(String.valueOf(splitQuoteNearRate * rate));
+				setRoutingDataCal();
+				populateRountingData();
+			}
+	    	
+	    });
 	  // this is used only we press enter on NearRate of  Quoting Leg			        
     functionality.jTextField3.addActionListener(new ActionListener() {
 		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
-			
+			double splitQuoteNearRate = Double.parseDouble(functionality.jTextField3.getText());
+  			double rate = Double.parseDouble(out.jTextField4.getText());
+  			
+  			functionality.jTextField2.setText(String.valueOf(splitQuoteNearRate * rate));
 			setRoutingDataCal();
 			populateRountingData();
 			
@@ -1040,12 +1088,16 @@ import dsServices.ServerConnectionUtil;
 		
 	});
     // this is used when we press enter on Near rate of base currency
-	functionality.jTextField2.addActionListener(new ActionListener() {							
+    
+  //@yogesh 03/072015
+    // jTextField2 calculated based on splitQuoteNearRate action and jTextField2 is disabled field
+    // so action possible on it and hence below code disabled
+/*	functionality.jTextField2.addActionListener(new ActionListener() {							
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
 		setRoutingDataCal();
-		/*try {
+		try {
 			double rate1 = 0.0 ;
 			double rate2 = 0.0 ;	
 			double farRate1 = 0.0;
@@ -1090,11 +1142,11 @@ import dsServices.ServerConnectionUtil;
 		} catch (ParseException e) {
 			
 			e.printStackTrace();
-		}*/
+		}
 		}
 	
 	});
-			        
+			*/        
     takeupW.jTextField1.addKeyListener(new KeyAdapter() { 
     	@Override		        
     	public void keyTyped(KeyEvent e) {
