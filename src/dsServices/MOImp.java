@@ -624,9 +624,9 @@ public void updateCashPositionOnTakeUp(Trade trade) throws RemoteException {
 		    			cash.setOut1amount(realisedCash.getOut1amount());
 	    	} else {
 	    		if(trade.getType().equalsIgnoreCase("BUY"))
-	    		cash.setOut2amount(realisedCash.getOut2amount() *-1);
+	    		cash.setOut2amount(realisedCash.getOut2amount());
 	    		else 
-	    			cash.setOut2amount(realisedCash.getOut2amount() *-1);
+	    			cash.setOut2amount(realisedCash.getOut2amount());
 	    	}
 	    	CashPositionSQL.update(cash, dsSQL.getConn());
 	    	}
