@@ -4,6 +4,32 @@ import java.io.Serializable;
 
 public class CashPosition 
 	implements Serializable {
+		double out1amount;
+		/**
+		 * @return the out1amount
+		 */
+		public double getOut1amount() {
+			return out1amount;
+		}
+		/**
+		 * @param out1amount the out1amount to set
+		 */
+		public void setOut1amount(double out1amount) {
+			this.out1amount = out1amount;
+		}
+		/**
+		 * @return the out2amount
+		 */
+		public double getOut2amount() {
+			return out2amount;
+		}
+		/**
+		 * @param out2amount the out2amount to set
+		 */
+		public void setOut2amount(double out2amount) {
+			this.out2amount = out2amount;
+		}
+		double out2amount;
 		
 		int id;
 		String tradedesc1;
