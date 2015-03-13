@@ -63,5 +63,7 @@ public interface RemoteMO extends Remote {
 			throws RemoteException;
 	public Openpos getOpenPositionOnFxSwapLeg(int tradeid, String fxSwapLeg) throws RemoteException;
 	public void processManualLiquidation(Vector<OpenTrade> dataOpenTrades) throws RemoteException;
+	public void updateCashPositionOnTakeUp(Trade trade) throws RemoteException;
+	
 
 }
