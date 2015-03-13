@@ -17,6 +17,9 @@ final static private String DELETE_FROM_openpos =
 			" FROM 		cashposition 	" +
 			" WHERE 	TRADEID = ? ";
 
+final static private String GETRealisedOutStandingAmt = 
+" select getRealisedOnFirstLeg(id),getRealisedOnSecondLeg(id) from trade where id = " ;
+
 	final static private String INSERT_INTO_openpos =
 			
 			" INSERT INTO cashposition" +
@@ -77,7 +80,9 @@ final static private String DELETE_FROM_openpos =
 				" quotingCurr ='"+ updateOpenpos.getQuotingCurr().trim() +"', " +
 				" currency ='"+ updateOpenpos.getCurrency().trim() +"', " +
 				" actualAmt ="+ updateOpenpos.getActualAmt() +", " +
-				" leg ="+ updateOpenpos.getLeg() +" " +
+				" leg ="+ updateOpenpos.getLeg() +" ," +
+				" amount1out ="+ updateOpenpos.getOut1amount() +", " +
+				" amount2out ="+ updateOpenpos.getOut2amount() +" " +
 				" WHERE	";
 				if(commonUTIL.isEmpty(updateOpenpos.getFxSwapLegType()))
 					updateOpenPos = updateOpenPos +  " TRADEID  = "+ updateOpenpos.getTradeId() + " and leg = "+updateOpenpos.getLeg();
@@ -97,21 +102,20 @@ final static private String DELETE_FROM_openpos =
 	
 	final static private String SELECTALL =
 			
-			" SELECT  " +
-			" tradeid," +
-			"  productid," +
-			"  settledate," +
-			" tradedate," +
-			" quantity," +
-			" openquantity," +
-			" bookid," +
-			" price," +
-			" sign," +
-			" positionid," +
-			" openpositionDate," +
-			" producttype," +
-			" productsubtype,openNominal,quotingAmt,tradeAmt,productFV,originalTradeAmt,id,tradedesc1,fxSwapLegType,tradedesc,primaryCurr,QuotingCurr,actualAmt " +
-			" FROM  " +
+			 " SELECT  " +
+						" tradeid," +
+						"  productid," +
+						"  settledate," +
+						" tradedate," +
+						" quantity," +
+						" openquantity," +
+						" bookid," +
+						" price," +
+						" positionid," +
+						" openpositionDate," +
+						" producttype," +
+						" productsubtype,openNominal,quotingAmt,tradeAmt,productFV,originalTradeAmt,id,tradedesc1,fxSwapLegType,tradedesc,primaryCurr,QuotingCurr,currency,actualAmt,leg,amount1out,amount2out " +
+						" FROM  " +
 			"		cashposition "; 
 			
 	
@@ -298,9 +302,7 @@ final static private String DELETE_FROM_openpos =
 		String sql = getUpdateSQL(updateOpenpos);
 		 try {
 			 con.setAutoCommit(false);
-			
-			 
-			stmt = dsSQL.newPreparedStatement(con, sql);  
+			 stmt = dsSQL.newPreparedStatement(con, sql);  
 		
 		 	int i = stmt.executeUpdate(sql);
 			 con.commit();
@@ -952,7 +954,7 @@ int j = 0;
 					 while(rs.next()) {
 						 
 				    	 CashPosition openpos = new CashPosition();
-				    	  
+				    		
 				    	 openpos.setTradeId(rs.getInt(1));
 						 openpos.setProductId(rs.getInt(2));
 						 openpos.setSettleDate(commonUTIL.convertSQLDatetoString(rs.getTimestamp(3)));
@@ -961,24 +963,24 @@ int j = 0;
 						 openpos.setOpenQuantity(rs.getDouble(6));
 						 openpos.setBookId(rs.getInt(7));
 						 openpos.setPrice(rs.getDouble(8));
-						 openpos.setType(rs.getString(9));
-						 openpos.setPositionId(rs.getInt(10));
-						 openpos.setOpenpositionDate(rs.getString(11));	 
-						 openpos.setProductType(rs.getString(12));
-						 openpos.setProductSubType(rs.getString(13));	          
-						 openpos.setOpenNominal(rs.getDouble(14));
-							openpos.setQuotingAmt(rs.getDouble(15));
-							openpos.setTradeAmt(rs.getDouble(16));
-							openpos.setProductFV(rs.getDouble(17));
-							openpos.setOriginalTradeAmt(rs.getDouble(18));
-							openpos.setId(rs.getInt(19));
-							openpos.setTradedesc1(rs.getString(20));
-							openpos.setFxSwapLegType(rs.getString(21));
-							openpos.setTradedesc(rs.getString(22));
-							openpos.setPrimaryCurr(rs.getString(23));
-							openpos.setQuotingCurr(rs.getString(24));
-							openpos.setCurrency(rs.getString(25));
-							openpos.setActualAmt(rs.getDouble(26));
+						// openpos.setType(rs.getString(9));
+						 openpos.setPositionId(rs.getInt(9));
+						 openpos.setOpenpositionDate(rs.getString(10));	 
+						 openpos.setProductType(rs.getString(11));
+						 openpos.setProductSubType(rs.getString(12));	          
+						 openpos.setOpenNominal(rs.getDouble(13));
+							openpos.setQuotingAmt(rs.getDouble(14));
+							openpos.setTradeAmt(rs.getDouble(15));
+							openpos.setProductFV(rs.getDouble(16));
+							openpos.setOriginalTradeAmt(rs.getDouble(17));
+							openpos.setId(rs.getInt(18));
+							openpos.setTradedesc1(rs.getString(19));
+							openpos.setFxSwapLegType(rs.getString(20));
+							openpos.setTradedesc(rs.getString(21));
+							openpos.setPrimaryCurr(rs.getString(22));
+							openpos.setQuotingCurr(rs.getString(23));
+							openpos.setCurrency(rs.getString(24));
+							openpos.setActualAmt(rs.getDouble(25));
 				    	 openposs.add(openpos);
 			      
 					 }
@@ -987,6 +989,55 @@ int j = 0;
 				 } catch ( Exception e ) {
 					 
 					 commonUTIL.displayError("cashPositionSQL","getOpenPositionWhere " + sql ,e);
+					 return openposs;
+			        
+			     } finally {
+			    	 
+			        try {
+						
+			        	stmt.close();
+			        	
+					} catch ( SQLException e ) {
+						
+						// TODO Auto-generated catch block
+						commonUTIL.displayError("cashPositionSQL","getOpenPositionWhere",e);
+						
+					}
+			     }
+				 
+			     return openposs;
+	}
+	public static Collection getRealisedCashPositionOnTrade(String where,Connection con) {
+		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
+		int j = 0;
+			    
+				PreparedStatement stmt = null;
+			    
+				Vector openposs = new Vector();
+			     String sql = "";
+				 try {
+					 
+					 sql = where;
+					 
+					 stmt = dsSQL.newPreparedStatement(con, sql );
+			      
+					 ResultSet rs = stmt.executeQuery();
+			      
+					 while(rs.next()) {
+						 
+				    	 CashPosition openpos = new CashPosition();
+				    		
+				    	 openpos.setOut1amount(rs.getDouble(1));
+				    	 openpos.setOut2amount(rs.getDouble(2));
+				    	 openposs.add(openpos);
+			      
+					 }
+					 commonUTIL.display("cashPositionSQL","getRealisedCashPositionOnTrade " + sql );
+					 
+				 } catch ( Exception e ) {
+					 
+					 commonUTIL.displayError("cashPositionSQL","getRealisedCashPositionOnTrade " + sql ,e);
 					 return openposs;
 			        
 			     } finally {
@@ -1080,7 +1131,63 @@ int j = 0;
 	    
 	}
 
-	
+	public static Vector<CashPosition> getForwardOptionCashPositionOnTakeup(int tradeid,Connection con) {
+		String sql = SELECTALL + " where tradeid = " + tradeid;
+		PreparedStatement stmt = null;
+	    		Vector<CashPosition> openposs = new Vector<CashPosition>();
+	   
+		 try {
+			 
+			
+			 
+			 stmt = dsSQL.newPreparedStatement(con, sql );
+	      
+			 ResultSet rs = stmt.executeQuery();
+	      
+			 while(rs.next()) {
+				 
+		    	 CashPosition openpos = new CashPosition();
+		    	
+		    	 openpos.setTradeId(rs.getInt(1));
+				 openpos.setProductId(rs.getInt(2));
+				 openpos.setSettleDate(commonUTIL.convertSQLDatetoString(rs.getTimestamp(3)));
+				 openpos.setTradeDate(commonUTIL.convertSQLDatetoString(rs.getTimestamp(4)));
+				 openpos.setQuantity(rs.getInt(5));
+				 openpos.setOpenQuantity(rs.getDouble(6));
+				 openpos.setBookId(rs.getInt(7));
+				 openpos.setPrice(rs.getDouble(8));
+				// openpos.setType(rs.getString(9));
+				 openpos.setPositionId(rs.getInt(9));
+				 openpos.setOpenpositionDate(rs.getString(10));	 
+				 openpos.setProductType(rs.getString(11));
+				 openpos.setProductSubType(rs.getString(12));	          
+				 openpos.setOpenNominal(rs.getDouble(13));
+					openpos.setQuotingAmt(rs.getDouble(14));
+					openpos.setTradeAmt(rs.getDouble(15));
+					openpos.setProductFV(rs.getDouble(16));
+					openpos.setOriginalTradeAmt(rs.getDouble(17));
+					openpos.setId(rs.getInt(18));
+					openpos.setTradedesc1(rs.getString(19));
+					openpos.setFxSwapLegType(rs.getString(20));
+					openpos.setTradedesc(rs.getString(21));
+					openpos.setPrimaryCurr(rs.getString(22));
+					openpos.setQuotingCurr(rs.getString(23));
+					openpos.setCurrency(rs.getString(24));
+					openpos.setActualAmt(rs.getDouble(25));
+					openpos.setLeg(rs.getInt(26));
+					openpos.setOut1amount(rs.getDouble(27));
+					openpos.setOut2amount(rs.getDouble(28));
+		    	 openposs.add(openpos);
+	      
+			 }
+		 }
+			 catch(Exception e) {
+				 commonUTIL.displayError("cashPositionSQL","getForwardOptionCashPositionOnTakeup " + sql, e);
+			 }
+			 commonUTIL.display("cashPositionSQL","getForwardOptionCashPositionOnTakeup " + sql );
+			 
+		return openposs;
+	}
 	
 	public static CashPosition getOpenPositionOnID(int openID,Connection con)  {
 		// TODO Auto-generated method stub
@@ -1088,6 +1195,11 @@ int j = 0;
 		Vector v1 = (Vector) getOpenPositionWhere(sql,con);
 		return (CashPosition)  v1.elementAt(0);
 	}
-	
+	public static CashPosition getRealisedAmt(int tradeID,Connection con)  {
+		// TODO Auto-generated method stub
+		String sql = GETRealisedOutStandingAmt + tradeID;
+		Vector v1 = (Vector) getRealisedCashPositionOnTrade(sql,con);
+		return (CashPosition)  v1.elementAt(0);
+	}
 }
 
