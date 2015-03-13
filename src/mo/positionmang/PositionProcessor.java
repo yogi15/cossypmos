@@ -105,6 +105,16 @@ public class PositionProcessor extends Thread {
 		 commonUTIL.display("PositionManager Processor ", "Trade FX type "+ trade.getId() + "  positionBased **  "+trade.isPositionBased());
 		 if(!trade.isPositionBased()) {
 			 commonUTIL.display("PositionManager", "Trade FX type "+ trade.getId() + " is not Position Based");
+			 if(trade.getTradedesc1().equalsIgnoreCase("FXTAKEUP")) {
+				 try {
+					remoteMO.updateCashPositionOnTakeUp(trade);
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					 commonUTIL.display("PositionManager", "CashPosition getupdated  on trade "+ trade.getId() );
+				}
+				}
+			     
+			 
 			 return;
 		 }
 		  if(trade.getVersion() == 1) {
