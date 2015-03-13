@@ -156,6 +156,9 @@ public class TradeImp implements RemoteTrade {
 						return returnStatus;
 					}
 					trade.setStatus(wf.getOrgStatus());
+					if(trade.getTradedesc1().equalsIgnoreCase("FXTAKEUP")) {
+						trade.setPositionBased(false);
+					}
 				i	= TradeSQL.save(trade, dsSQL.getConn());
 					if( i > 0)  {
 						if(originalTrade != null)
