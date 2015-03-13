@@ -320,6 +320,8 @@ public class MOImp implements RemoteMO {
 		// TODO Auto-generated method stub
 		Position pos = null;
 		if(trade.getProductType().equalsIgnoreCase("FX")) {
+			if( commonUTIL.getOnlyDate(trade.getTradeDate()) == null) 
+				return null;
 			 pos = PositionSQL.selectFXPositionOnSettleDateCurrencyBookKey(trade.getTradeDate().substring(0, 10),trade.getBookId(), trade.getTradedesc(), dsSQL.getConn());
 		} else {
 		     pos = PositionSQL.selectopenposOnKey(trade.getBookId(), trade.getProductId(), trade.getTradedesc1(), dsSQL.getConn());
@@ -597,6 +599,41 @@ private Liquidation genearateManualLiquidation(OpenTrade firstTrade,
 	
 	// TODO Auto-generated method stub
 	return liq;
+}
+
+
+  
+
+@Override
+public void updateCashPositionOnTakeUp(Trade trade) throws RemoteException {
+	// TODO Auto-generated method stub
+	if(trade != null && trade.getTradedesc1().equalsIgnoreCase("FXTAKEUP")) {
+		//String currency 
+	     Vector<CashPosition> cps = CashPositionSQL.getForwardOptionCashPositionOnTakeup(trade.getParentID(),dsSQL.getConn());
+	     CashPosition realisedCash = CashPositionSQL.getRealisedAmt(trade.getParentID(), dsSQL.getConn());
+	     if(!commonUTIL.isEmpty(cps)) {
+	    	for(int i=0;i < cps.size();i++) {
+	    	CashPosition cash =  cps.get(i);
+	    	String primaryCurr = trade.getTradedesc().substring(0, 3);
+	    	String secondCurr = trade.getTradedesc().substring(4, 7);
+	    	if(cash.getCurrency().trim().equalsIgnoreCase(primaryCurr)) {
+	    	
+	    		if(trade.getType().equalsIgnoreCase("BUY"))
+		    		cash.setOut1amount(realisedCash.getOut1amount());
+		    		else 
+		    			cash.setOut1amount(realisedCash.getOut1amount());
+	    	} else {
+	    		if(trade.getType().equalsIgnoreCase("BUY"))
+	    		cash.setOut2amount(realisedCash.getOut2amount() *-1);
+	    		else 
+	    			cash.setOut2amount(realisedCash.getOut2amount() *-1);
+	    	}
+	    	CashPositionSQL.update(cash, dsSQL.getConn());
+	    	}
+	     }
+		
+	}
+	
 }
 
 
