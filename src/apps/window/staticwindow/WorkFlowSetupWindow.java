@@ -279,7 +279,7 @@ public class WorkFlowSetupWindow extends JPanel {
     				choice12.setLocationRelativeTo(choice12);
     				//choice12.setSize(200,200);
     				choice12.setVisible(true);
-				} 
+				} else
             	if(type.equalsIgnoreCase("MESSAGE")) {
                 	choice12 =	new JDialogBoxForChoice(messageRuleemodel);
                 		choice12.jList3.setModel(messageRuleemodel);
