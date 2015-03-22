@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
+import org.dyno.visual.swing.layouts.Trailing;
 
 
 //VS4E -- DO NOT REMOVE THIS LINE!
@@ -18,6 +19,7 @@ public class MMCompound extends JPanel {
 	private JComboBox jComboBox2;
 	private JComboBox jComboBox1;
 	private JComboBox jComboBox0;
+	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 
 	public MMCompound() {
 		initComponents();
@@ -25,12 +27,12 @@ public class MMCompound extends JPanel {
 
 	private void initComponents() {
 		setLayout(new GroupLayout());
-		add(getJLabel0(), new Constraints(new Leading(21, 10, 10), new Leading(12, 12, 12)));
-		add(getJLabel1(), new Constraints(new Leading(191, 10, 10), new Leading(12, 12, 12)));
-		add(getJLabel2(), new Constraints(new Leading(377, 10, 10), new Leading(12, 12, 12)));
-		add(getJComboBox2(), new Constraints(new Leading(447, 10, 10), new Leading(8, 12, 12)));
-		add(getJComboBox1(), new Constraints(new Leading(268, 12, 12), new Leading(8, 12, 12)));
-		add(getJComboBox0(), new Constraints(new Leading(76, 12, 12), new Leading(8, 12, 12)));
+		add(getJLabel1(), new Constraints(new Leading(211, 10, 10), new Trailing(12, 12, 12)));
+		add(getJComboBox1(), new Constraints(new Leading(287, 105, 10, 10), new Leading(14, 24, 10, 10)));
+		add(getJComboBox2(), new Constraints(new Trailing(12, 125, 468, 468), new Leading(12, 23, 12, 12)));
+		add(getJLabel2(), new Constraints(new Leading(413, 10, 10), new Leading(21, 12, 12)));
+		add(getJLabel0(), new Constraints(new Leading(16, 10, 10), new Trailing(12, 12, 12)));
+		add(getJComboBox0(), new Constraints(new Leading(79, 108, 10, 10), new Trailing(12, 12, 12)));
 		setSize(617, 50);
 	}
 
