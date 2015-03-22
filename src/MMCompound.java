@@ -16,11 +16,10 @@ public class MMCompound extends JPanel {
 	private JLabel jLabel0;
 	private JLabel jLabel1;
 	private JLabel jLabel2;
-	private JComboBox jComboBox2;
-	private JComboBox jComboBox1;
-	private JComboBox jComboBox0;
+	private JComboBox compoundFreqCombobox;
+	private JComboBox compoundMethodCombobox;
+	private JComboBox payFreqCombobox;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-
 	public MMCompound() {
 		initComponents();
 	}
@@ -28,42 +27,42 @@ public class MMCompound extends JPanel {
 	private void initComponents() {
 		setLayout(new GroupLayout());
 		add(getJLabel1(), new Constraints(new Leading(211, 10, 10), new Trailing(12, 12, 12)));
-		add(getJComboBox1(), new Constraints(new Leading(287, 105, 10, 10), new Leading(14, 24, 10, 10)));
-		add(getJComboBox2(), new Constraints(new Trailing(12, 125, 468, 468), new Leading(12, 23, 12, 12)));
+		add(getcompoundMethodCombobox(), new Constraints(new Leading(287, 105, 10, 10), new Leading(14, 24, 10, 10)));
+		add(getcompoundFreqCombobox(), new Constraints(new Trailing(12, 125, 468, 468), new Leading(12, 23, 12, 12)));
 		add(getJLabel2(), new Constraints(new Leading(413, 10, 10), new Leading(21, 12, 12)));
 		add(getJLabel0(), new Constraints(new Leading(16, 10, 10), new Trailing(12, 12, 12)));
-		add(getJComboBox0(), new Constraints(new Leading(79, 108, 10, 10), new Trailing(12, 12, 12)));
+		add(getpayFreqCombobox(), new Constraints(new Leading(79, 108, 10, 10), new Trailing(12, 20, 12, 12)));
 		setSize(617, 50);
 	}
 
-	private JComboBox getJComboBox0() {
-		if (jComboBox0 == null) {
-			jComboBox0 = new JComboBox();
-			jComboBox0.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
-			jComboBox0.setDoubleBuffered(false);
-			jComboBox0.setBorder(null);
+	private JComboBox getpayFreqCombobox() {
+		if (payFreqCombobox == null) {
+			payFreqCombobox = new JComboBox();
+			payFreqCombobox.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+			payFreqCombobox.setDoubleBuffered(false);
+			payFreqCombobox.setBorder(null);
 		}
-		return jComboBox0;
+		return payFreqCombobox;
 	}
 
-	private JComboBox getJComboBox1() {
-		if (jComboBox1 == null) {
-			jComboBox1 = new JComboBox();
-			jComboBox1.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
-			jComboBox1.setDoubleBuffered(false);
-			jComboBox1.setBorder(null);
+	private JComboBox getcompoundMethodCombobox() {
+		if (compoundMethodCombobox == null) {
+			compoundMethodCombobox = new JComboBox();
+			compoundMethodCombobox.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+			compoundMethodCombobox.setDoubleBuffered(false);
+			compoundMethodCombobox.setBorder(null);
 		}
-		return jComboBox1;
+		return compoundMethodCombobox;
 	}
 
-	private JComboBox getJComboBox2() {
-		if (jComboBox2 == null) {
-			jComboBox2 = new JComboBox();
-			jComboBox2.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
-			jComboBox2.setDoubleBuffered(false);
-			jComboBox2.setBorder(null);
+	private JComboBox getcompoundFreqCombobox() {
+		if (compoundFreqCombobox == null) {
+			compoundFreqCombobox = new JComboBox();
+			compoundFreqCombobox.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+			compoundFreqCombobox.setDoubleBuffered(false);
+			compoundFreqCombobox.setBorder(null);
 		}
-		return jComboBox2;
+		return compoundFreqCombobox;
 	}
 
 	private JLabel getJLabel2() {
