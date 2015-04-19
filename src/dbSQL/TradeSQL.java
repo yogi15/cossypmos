@@ -108,6 +108,26 @@ public class TradeSQL {
 	  return ftdSQL;
   }
     
+  public static String getVARSQL(String currentDate) {
+	  String varSQL = 
+	  " select  " + 
+				" getVarColumn(currency,to_timestamp('+','dd/mm/yyyy'),settledate,tradedesc1,primarycurr,quotingcurr) as \"var identi\", " + 
+				" sum(actualamt) as \"fcy total\",  " + 
+				" getUSDEquivalentAmount(substr(getVarColumn(currency,to_timestamp('"+ currentDate +"','dd/mm/yyyy'),settledate,tradedesc1,primarycurr,quotingcurr),1,3),abs(sum(actualamt)),'"+ currentDate +"') as \"$ equi\" ,  " + 
+				" getVarQuoteName(getVarColumn(currency,to_timestamp('"+ currentDate +"','dd/mm/yyyy'),settledate,tradedesc1,primarycurr,quotingcurr),'"+ currentDate +"') as \"quotename\",  " + 
+				" getVarColumnName(getVarColumn(currency,to_timestamp('"+ currentDate +"','dd/mm/yyyy'),settledate,tradedesc1,primarycurr,quotingcurr),'"+ currentDate +"') as \"var rate\",  " + 
+				" sum(actualamt) * getVarColumnName(getVarColumn(currency,to_timestamp('"+ currentDate +"','dd/mm/yyyy'),settledate,tradedesc1,primarycurr,quotingcurr),'"+ currentDate +"') as \"inr equi\"  " + 
+			" from  " + 
+				" cashposition  " + 
+			" where  " + 
+				" currency not in ('INR')  " + 
+				" and settledate >= to_timestamp('"+ currentDate +"','dd/mm/yyyy') " + 
+				" and getOutstandingForVar(tradeid,tradedesc1)  <> 0  " + 
+			" group by  " + 
+				" getVarColumn(currency,to_timestamp('"+ currentDate +"','dd/mm/yyyy'),settledate,tradedesc1,primarycurr,quotingcurr) " ;
+	 
+	  return varSQL;
+  }
   
   private static String getUpdateSQL(Trade trade) {
       String updateSQL = "UPDATE  trade set  productId=" +trade.getProductId()+ ",type='"+ trade.getType().trim() +
@@ -1567,7 +1587,7 @@ public static Collection getVarReport(String currentDate, Connection con) {
 	
 	PreparedStatement stmt = null;
     Vector<Object> Trades = new Vector();
-    String sql = getFTDSQL(currentDate);
+    String sql = getVARSQL(currentDate);
     ResultSet rs = null;
     
     try {
