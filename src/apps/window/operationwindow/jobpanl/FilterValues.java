@@ -82,6 +82,9 @@ public class FilterValues {
 				"to_char(Trade.DeliveryDate,'dd/mm/yyyy') DeliveryDate");
 		replaceColumnNameOnSQL.put("Trade.EffectiveDate",
 		"to_char(Trade.DeliveryDate,'dd/mm/yyyy') EffectiveDate");*/
+		replaceColumnNameOnSQL
+		.put("Cashposition.INREquivaluent", "getINREquivaluent(cashposition.actualamt, cashposition.opennominal,cashposition.primarycurr,"
+				+ "cashposition.quotingcurr,cashposition.tradeid,cashposition.tradedesc1,cashposition.currency,cashposition.fxswaplegtype)INR_EQUI");
 		replaceColumnNameOnSQL.put("Trade.TradeDate",
 				"to_char(Trade.TradeDate,'dd/mm/yyyy HH:MM:ss') TradeDate");
 		replaceColumnNameOnSQL.put("Trade.BaseCurrency",
