@@ -1212,7 +1212,7 @@ return status;
 			public Collection<Vector<Trade>> getChildTrades(int parentID)
 					throws RemoteException {
 				
-				String sql = " parentID = " +parentID;
+				String sql = " parentID = " + parentID + " and tradedesc1 like 'FXTAKEUP'";
 				return  TradeSQL.selectwhere(sql, dsSQL.getConn());
 			}
 
