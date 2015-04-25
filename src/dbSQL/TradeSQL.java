@@ -110,21 +110,26 @@ public class TradeSQL {
     
   public static String getVARSQL(String currentDate) {
 	  String varSQL = 
-	  " select  " + 
-				" getVarColumn(currency,to_timestamp('+','dd/mm/yyyy'),settledate,tradedesc1,primarycurr,quotingcurr) as \"var identi\", " + 
-				" sum(actualamt) as \"fcy total\",  " + 
-				" getUSDEquivalentAmount(substr(getVarColumn(currency,to_timestamp('"+ currentDate +"','dd/mm/yyyy'),settledate,tradedesc1,primarycurr,quotingcurr),1,3),abs(sum(actualamt)),'"+ currentDate +"') as \"$ equi\" ,  " + 
-				" getVarQuoteName(getVarColumn(currency,to_timestamp('"+ currentDate +"','dd/mm/yyyy'),settledate,tradedesc1,primarycurr,quotingcurr),'"+ currentDate +"') as \"quotename\",  " + 
-				" getVarColumnName(getVarColumn(currency,to_timestamp('"+ currentDate +"','dd/mm/yyyy'),settledate,tradedesc1,primarycurr,quotingcurr),'"+ currentDate +"') as \"var rate\",  " + 
-				" sum(actualamt) * getVarColumnName(getVarColumn(currency,to_timestamp('"+ currentDate +"','dd/mm/yyyy'),settledate,tradedesc1,primarycurr,quotingcurr),'"+ currentDate +"') as \"inr equi\"  " + 
-			" from  " + 
-				" cashposition  " + 
-			" where  " + 
-				" currency not in ('INR')  " + 
-				" and settledate >= to_timestamp('"+ currentDate +"','dd/mm/yyyy') " + 
-				" and getOutstandingForVar(tradeid,tradedesc1)  <> 0  " + 
-			" group by  " + 
-				" getVarColumn(currency,to_timestamp('"+ currentDate +"','dd/mm/yyyy'),settledate,tradedesc1,primarycurr,quotingcurr) " ;
+			  " select " + 
+					  " gettypeOFDeal(to_timestamp('"+ currentDate +"','dd-mm-yyyy'),settledate,tradedesc1,trim(primarycurr)||'/'||trim(quotingcurr),TO_CHAR(settledate, 'MM YYYY')) " + 
+					  " ,currency " + 
+					  " ,((sum(actualamt) - nvl(sum(amount1out),0) - nvl(sum(amount2out),0) ) + " + 
+					  " 	nvl(getOldOustandingAmt(gettypeOFDeal(to_timestamp('"+ currentDate +"','dd-mm-yyyy'), settledate,tradedesc1,trim(primarycurr)||'/'||trim(quotingcurr),TO_CHAR(settledate, 'MM YYYY')),'"+ currentDate +"',CURRENCY),0))   " + 
+					  "    as \"FCY Amt\" " + 
+					  " ,getUSDEquivalentAmount(currency,abs((sum(actualamt) - nvl(sum(amount1out),0) - nvl(sum(amount2out),0) ) + " + 
+					  "   nvl(getOldOustandingAmt(gettypeOFDeal(to_timestamp('"+ currentDate +"','dd-mm-yyyy'), settledate,tradedesc1,trim(primarycurr)||'/'||trim(quotingcurr),TO_CHAR(settledate, 'MM YYYY')),'"+ currentDate +"',CURRENCY),0)),'"+ currentDate +"') AS \"USD Equi\" " + 
+					  "  " + 
+					  " , getVarColumnName(gettypeOFDeal(to_timestamp('"+ currentDate +"','dd-mm-yyyy'), settledate,tradedesc1,trim(primarycurr)||'/'||trim(quotingcurr),TO_CHAR(settledate, 'MM YYYY')),'"+ currentDate +"') AS \"varRate\" " + 
+					  "  " + 
+					  " , (getUSDEquivalentAmount(currency,abs((sum(actualamt) - nvl(sum(amount1out),0) - nvl(sum(amount2out),0) ) + " + 
+					  "  nvl(getOldOustandingAmt(gettypeOFDeal(to_timestamp('"+ currentDate +"','dd-mm-yyyy'), settledate,tradedesc1,trim(primarycurr)||'/'||trim(quotingcurr),TO_CHAR(settledate, 'MM YYYY')),'"+ currentDate +"',CURRENCY),0)),'"+ currentDate +"') " + 
+					  "   * " + 
+					  "   getVarColumnName(gettypeOFDeal(to_timestamp('"+ currentDate +"','dd-mm-yyyy'), settledate,tradedesc1,trim(primarycurr)||'/'||trim(quotingcurr),TO_CHAR(settledate, 'MM YYYY')),'"+ currentDate +"')) " + 
+					  "   as \"INR VAR\" " + 
+					  " from cashposition where currency not in ('INR') and settledate >= to_timestamp('"+ currentDate +"','dd/mm/yyyy') " + 
+					  " Group by  " + 
+					  "  currency,gettypeOFDeal(to_timestamp('"+ currentDate +"','dd-mm-yyyy'), settledate,tradedesc1,trim(primarycurr)||'/'||trim(quotingcurr),TO_CHAR(settledate, 'MM YYYY')) " + 
+					  " order by gettypeOFDeal(to_timestamp('"+ currentDate +"','dd-mm-yyyy'),settledate,tradedesc1,trim(primarycurr)||'/'||trim(quotingcurr),TO_CHAR(settledate, 'MM YYYY')) asc " ;
 	 
 	  return varSQL;
   }
