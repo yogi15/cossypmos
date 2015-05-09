@@ -17,6 +17,10 @@ public class Trade implements Serializable,Cloneable {
 	boolean isMirrorTrade = false;
 	boolean isPositionBased = true;
 	Vector<Trade> rountingTrades = new Vector<Trade>();
+	Product product = null;
+	public void setProduct(Product prod) {
+		product = prod;
+	}
 	
 	/**
 	 * @return the isPositionBased
@@ -317,11 +321,13 @@ public class Trade implements Serializable,Cloneable {
 	}
 	public void setAmortization(Amortization amortization) {
 		this.amortization = amortization;
+		
 	}
 
 	public String getAmoritizationData() {
 		return amoritizationData;
 	}
+	
 	public void setAmoritizationData(String amoritizationData) {
 		this.amoritizationData = amoritizationData;
 		if (amoritizationData == null)
@@ -728,8 +734,8 @@ public int getUserID() {
 
 	public Product getProduct() {
 		// TODO Auto-generated method stub
-		getProductId();
-		return null;
+	//	getProductId();
+		return product;
 	}
 
 B2BConfig b2bConfig = null;

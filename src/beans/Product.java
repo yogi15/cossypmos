@@ -205,4 +205,13 @@ public String getAttributes() {
 		
 		return attributes;
 	}
+Coupon coupon;
+public Coupon getCoupon() {
+	return coupon;
+}
+public void setCoupon(Coupon coup) {
+	// TODO Auto-generated method stub
+	coupon = coup;
+	
+}
 }
