@@ -528,5 +528,69 @@ protected static int selectMax(Connection con ) {
 	     }
 	     return coupons;
 	 }
+	 public static Coupon getcouponOnProduct(int productId,Connection con ) {
+		 int j = 0;
+	     PreparedStatement stmt = null;
+	     Coupon coupon = new Coupon();
+	     
+		 try {
+			 con.setAutoCommit(true);
+			 String sql = SELECTONPRODUCT + productId;
+			 stmt = dsSQL.newPreparedStatement(con, sql );
+	      
+	      ResultSet rs = stmt.executeQuery();
+	      
+	      while(rs.next()) {
+	    	 // Coupon coupon = new Coupon();
+	    	  
+	    	  	
+	    	  	 coupon.setId(rs.getInt(1));
+	        	 coupon.setProductId(rs.getInt(2));
+	        	 coupon.setCouponType(rs.getString(3));
+	        	 coupon.setFixedRate(rs.getDouble(4));
+	        	 coupon.setCCY(rs.getString(5));
+	        	 coupon.setDayCount(rs.getString(6));
+	        	 coupon.setCouponAdjustMentMethod(rs.getString(7));
+	        	 coupon.setCouponFrequency(rs.getString(8));
+	        	 coupon.setBusinessDayConvention(rs.getString(9));
+	        	 coupon.setCouponDate(rs.getString(10));
+	        	 coupon.setRating(rs.getString(11));
+	        	 coupon.setEx_dividend(rs.getInt(12));
+	        	 coupon.setRecordDays(rs.getInt(13));
+	        	 coupon.setShutDays(rs.getInt(14));
+	        	 coupon.setAccrualDigits(rs.getInt(15));
+	        	 coupon.setPriceDecimals(rs.getInt(16));
+	        	 coupon.setYieldDecimals(rs.getInt(17));
+	        	 coupon.setNominalDecimals(rs.getInt(18));
+	        	 coupon.setAnnounceDate(rs.getString(19));
+	        	 coupon.setAuctionDate(rs.getString(20));
+	        	 coupon.setWithholdingTax(rs.getString(21));
+	        	 coupon.setApplyWithholdingTax(rs.getString(22));
+	        	 coupon.setWhenIssueBond(rs.getString(23));
+	        	 coupon.setTickSize(rs.getString(24));
+	        	 coupon.setYieldMethod(rs.getString(25));
+	        	 coupon.setQuoteType(rs.getString(26));
+	        	 coupon.setActivefrom(rs.getString(27));
+	        	 coupon.setTenor(rs.getString(28));
+		        
+		       // coupons.add(coupon);
+	      
+	      }
+	      commonUTIL.display("couponSQL",sql);
+		 } catch (Exception e) {
+			 commonUTIL.displayError("couponSQL","getcouponOnProduct",e);
+			 return coupon;
+	        
+	     }
+	     finally {
+	        try {
+				stmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				commonUTIL.displayError("couponSQL","getcouponOnProduct",e);
+			}
+	     }
+	     return coupon;
+	 }
 
 }

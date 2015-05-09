@@ -157,6 +157,16 @@ public class ProductSQL {
         	 return null;
          }
 	 }
+	 public static Product selectProductWithCoupons(int ProductId, Connection con) {
+		 try {
+            Product product =   select(ProductId, con);
+            product.setCoupon(getCoupon(ProductId, con));
+            return product;
+         }catch(Exception e) {
+        	 commonUTIL.displayError("ProductSQL","select",e);
+        	 return null;
+         }
+	 }
 	 
 	 public static Product selectProduct(String productName, Connection con) {
 		 try {
@@ -370,6 +380,67 @@ public class ProductSQL {
 		        product.setRepoType(rs.getString(22));
 		        product.setUnderlyingProductType(rs.getString(23));
 		        
+	        commonUTIL.display("productSQL-----",SELECTONE + productID);
+	        
+	      
+	       
+	         
+	         }
+		 } catch (Exception e) {
+			 commonUTIL.displayError("ProductSQL",SELECTONE + productID,e);
+			 return product;
+	           
+	        }
+	        finally {
+	           try {
+				stmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				commonUTIL.displayError("ProductSQL",SELECTONE + productID,e);
+			}
+	        }
+	        return product;
+	 }
+
+protected static Product selectProductWithCoupon(int productID,Connection con ) {
+		 
+		 int j = 0;
+	        PreparedStatement stmt = null;
+	        Product product = new Product();
+	        
+		 try {
+			
+			 stmt = dsSQL.newPreparedStatement(con, SELECTONE + productID);
+	         
+	         ResultSet rs = stmt.executeQuery();
+	         
+	         while(rs.next()) {
+	        
+	     	    product.setId(rs.getInt(1));
+		        product.setProductType(rs.getString(2));
+		        product.setProductname(rs.getString(3));
+		        product.setProdcutShortName(rs.getString(4));
+		        product.setQuantity(rs.getInt(5));
+		        product.setIssueDate(rs.getString(6));
+		        product.setMarturityDate(rs.getString(7));
+		        product.setIssuerId(rs.getInt(8));
+		        product.setCountry(rs.getString(9));
+		        product.setIssuePrice(rs.getDouble(10));
+		        product.setIssueCurrency(rs.getString(11));
+		        product.setRedemptionPrice(rs.getDouble(12));
+		        product.setRedemptionCurrency(rs.getString(13));
+		        product.setFaceValue(rs.getDouble(14));
+		        product.setCode(rs.getString(15));
+		       
+		        product.setDatedDate(rs.getString(16));
+		        product.setTenor(rs.getString(17));
+		        product.setAttributes(rs.getString(18));
+		        product.setIsPosition(rs.getInt(19));
+		        product.setCollateralID(rs.getInt(20));
+		        product.setCallType(rs.getString(21));
+		        product.setRepoType(rs.getString(22));
+		        product.setUnderlyingProductType(rs.getString(23));
+		       
 	        commonUTIL.display("productSQL-----",SELECTONE + productID);
 	        
 	      
@@ -664,5 +735,7 @@ protected static Product select(String productName,Connection con ) {
 	     }
 	     return product;
 	 }
-	 
+	 private static Coupon getCoupon(int productID,Connection con) {
+		 return (Coupon) CouponSQL.getcouponOnProduct(productID, con);
+	 }
 }
