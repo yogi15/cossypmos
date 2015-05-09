@@ -734,7 +734,8 @@ public class TradeImp implements RemoteTrade {
 	public Trade selectTrade(int tradeID) throws RemoteException {
 		
 		Trade trade = TradeSQL.select(tradeID, dsSQL.getConn());
-		
+		if(trade == null)
+			return null;
 		if(trade != null) {
 		Vector fees = (Vector) FeesSQL.selectFeesOnTrades(tradeID, dsSQL.getConn());
 		
@@ -742,6 +743,10 @@ public class TradeImp implements RemoteTrade {
 		
 		if(fees != null)
 		    trade.setFees(fees);
+		}
+		if(trade.getProductId() > 0) {
+		    Product product =     ProductSQL.selectProductWithCoupons(trade.getProductId(), dsSQL.getConn());
+		    trade.setProduct(product);
 		}
 		return trade;
 		
