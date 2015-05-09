@@ -19,6 +19,7 @@ public interface RemoteProduct  extends Remote {
 	public boolean updateProduct(Product product,Coupon coupon) throws RemoteException;
 	public int maxProductId() throws RemoteException;
 	public Collection getCoupon(int productID) throws RemoteException;
+	public  Coupon getCoupon(Product product) throws RemoteException;
 	//public boolean saveCoupon(Coupon coupon)throws RemoteException	
 	public Collection selectProductWhereClaus(String sql) throws RemoteException;
 	public Product selectProductOnType(String productType, String productSubType)
