@@ -15,10 +15,14 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.ComponentInputMap;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -30,7 +34,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
@@ -45,6 +51,7 @@ import org.dyno.visual.swing.layouts.Leading;
 
 import util.ClassInstantiateUtil;
 import util.commonUTIL;
+import apps.window.operationwindow.jobpanl.FilterValues;
 import apps.window.operationwindow.trialBalance.JTreeTable;
 import apps.window.operationwindow.trialBalance.TradeTreeView;
 import apps.window.tradewindow.cashflowpanel.CashFlowPanel;
@@ -102,6 +109,7 @@ public class TradeApplication extends DefaultDockableHolder {
 	// private testingTradePanel jPanel4;
 	private JButton jButton3;
 	private JButton jButton11;
+	FilterValues filterValues = null;
 	// private JButton jButton4; // for rollOver
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 
@@ -271,7 +279,7 @@ public class TradeApplication extends DefaultDockableHolder {
 			jTabbedPane1.add(productWindowpanel);
 			final CashFlowPanel cashFlowp = makeCashFlowPanel(name);
 			cashFlowp.setBackground(commonUTIL.getColors());
-			jTabbedPane1.add("CashFlow", cashFlowp);
+			//jTabbedPane1.add("CashFlow", cashFlowp);
 			jTabbedPane1.setTitleAt(1,"<HTML> C<BR>A<BR>S<BR>H<BR> <BR> <BR>F<BR>L<BR>O<BR>W<BR>");
 			jTabbedPane1.setTabPlacement(JTabbedPane.LEFT);
 			tradeP.setPanelValue(productWindowpanel);
@@ -311,13 +319,13 @@ public class TradeApplication extends DefaultDockableHolder {
 		setJMenuBar(menuBar);
 		processTableDataOpen(tablemodel, getProductTypeName());
 		JMenu fileMenu = new JMenu("File");
-		cashFlow = new JMenu("CashFlow");
-		cashFlow.setEnabled(false);
+		//cashFlow = new JMenu("CashFlow");
+	///	cashFlow.setEnabled(false);
 		
 		//@yogesh 07/02/2015
 		// hide file menu to avoid save, saveasnew code from there
 		//menuBar.add(fileMenu);
-		menuBar.add(cashFlow);
+	//	menuBar.add(cashFlow);
 		commonUTIL.setBackGroundColor(menuBar);
 		// Create and add simple menu item to one of the drop down menu
 		JMenuItem newAction = new JMenuItem("New");
@@ -338,7 +346,7 @@ public class TradeApplication extends DefaultDockableHolder {
 		fileMenu.add(auditAsNewAction);
 		fileMenu.add(deleteAction);
 		fileMenu.add(exitAction);
-		cashFlow.add(cutAction);
+	//	cashFlow.add(cutAction);
 		auditAsNewAction.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (tradeP.getTrade() == null) {
@@ -580,6 +588,7 @@ public class TradeApplication extends DefaultDockableHolder {
 
 				});
 		setSize(1311, 725);
+		 
 	}
 
 	private JButton getJButton3() {
@@ -791,6 +800,7 @@ public class TradeApplication extends DefaultDockableHolder {
 					//panelr.setData(rolloverH);
 					TradeTreeView tb = new TradeTreeView();
 					tb.getFillTree(rolloverH);
+					if(trade != null) {
 					JTreeTable treeTable  = tb.getjTreeTrade(trade.getId());
 					JFrame rollView = new JFrame();
 					//rollView.add(panelr);
@@ -799,7 +809,7 @@ public class TradeApplication extends DefaultDockableHolder {
 					rollView.setVisible(true);
 					rollView.setSize(1128, 240);
 
-					
+					}
 					
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
@@ -1123,10 +1133,15 @@ public class TradeApplication extends DefaultDockableHolder {
 	}
 
 	private void initproductTradePanel(String name, Users user) {
-		tradeP = makeTradePanel(name);
+		tradeP = makeTradePanel(name,user);
+		if(tradeP == null) {
+		tradeP = makeTradePanel(name); 
+	}
 		tradeP.setUser(user);
+		filterValues = new FilterValues(remoteReference, remoteTrade, remoteTask, boremote);
 		productWindowpanel = makeProductPanel(name);
 		tradeP.setTradeApplication(this);
+		tradeP.setFilterValue(filterValues);
 		initTransferPanel(name, user);
 		initPostingPanel(name, user);
 		initSdiPanel(name, user);
@@ -1141,7 +1156,29 @@ public class TradeApplication extends DefaultDockableHolder {
 		tradeP.setTradePostings(postingPanel);
 		tradeP.setFEESPanel(feesPanel);
 		tradeP.setLimitPanel(limitPanel);
-
+		// hot keys 
+		 InputMap keyMap = new ComponentInputMap(tradeP.getHotKeysPanel());
+		    keyMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S,
+		            java.awt.Event.CTRL_MASK), "action_save");
+		    keyMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N,
+		            java.awt.Event.CTRL_MASK), "action_new");
+		    keyMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D,
+		            java.awt.Event.CTRL_MASK), "action_del");
+		    keyMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A,
+		            java.awt.Event.CTRL_MASK), "action_saveasnew");
+		    keyMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O,
+		            java.awt.Event.CTRL_MASK), "action_opentrade");
+		    keyMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C,
+		            java.awt.Event.CTRL_MASK), "action_cashflow");
+		    SwingUtilities.replaceUIActionMap(tradeP.getHotKeysPanel(), tradeP.getHotKeysActionMapper());
+		    SwingUtilities.replaceUIInputMap(tradeP.getHotKeysPanel(), JComponent.WHEN_IN_FOCUSED_WINDOW,
+		            keyMap);
+		    tradeP.getHotKeysActionMapper().put("action_opentrade", new AbstractAction() {
+		        @Override
+		        public void actionPerformed(ActionEvent e) {
+		        	showAllTrades.setVisible(true);
+		        }
+		    });
 		// taskManager.setTradWIndow(tradePanel);
 	}
 
@@ -1377,6 +1414,25 @@ public class TradeApplication extends DefaultDockableHolder {
 		return panel;
 	}
 
+	protected TradePanel makeTradePanel(String name,Users user) {
+		String productWindowName = "apps.window.tradewindow."
+				+ name.toUpperCase() + "TradePanel";
+		TradePanel panel = null;
+
+		try {
+			Class class1 = ClassInstantiateUtil.getClass(productWindowName,
+					true);
+			if(user != null)
+			panel = (TradePanel) class1.getConstructor(Users.class).newInstance(user);
+			else 
+				panel = (TradePanel) class1.getConstructor().newInstance();
+			// productWindow = (BondPanel)
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
+		return panel;
+	}
 	protected TradePanel makeTradePanel(String name) {
 		String productWindowName = "apps.window.tradewindow."
 				+ name.toUpperCase() + "TradePanel";
@@ -1385,7 +1441,8 @@ public class TradeApplication extends DefaultDockableHolder {
 		try {
 			Class class1 = ClassInstantiateUtil.getClass(productWindowName,
 					true);
-			panel = (TradePanel) class1.newInstance();
+			
+				panel = (TradePanel) class1.getConstructor().newInstance();
 			// productWindow = (BondPanel)
 		} catch (Exception e) {
 			System.out.println(e);
