@@ -30,7 +30,7 @@ public abstract class CashFlowPanel extends JPanel  {
 	
 	
     public abstract void setCashFlows(Vector cashFlows);
-
+    public abstract DefaultTableModel getCashFlows(Vector cashFlows);
 	public void setCashFlows2(Vector cashFlows2) {
 		// TODO Auto-generated method stub
 		
