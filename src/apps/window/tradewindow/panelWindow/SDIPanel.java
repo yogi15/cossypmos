@@ -1009,11 +1009,13 @@ public class SDIPanel extends BackOfficePanel {
 				else
 				 key = sdi.getCurrency()+"/"+sdi.getGlName()+"/"+sdi.getProducts();
 				*/
+				if(sdi != null) {
 				key = getLEName(sdi.getAgentId()) + "/"+sdi.getGlName().trim() +"/"+sdi.getMessageType().trim()+"/"+sdi.getPayrec();
 				
 				model.addElement(key);
 				if(sdi.getId() == idSdi)
 				model.setSelectedItem(key);
+				}
 				/*if (!sdi.getkey().equals("")) {
 					model.setSelectedItem(key);
 				}*/
@@ -1083,7 +1085,7 @@ public class SDIPanel extends BackOfficePanel {
 		this.trade = trade;
 		rules = rule.generateRules(trade);
 		
-		if(rules == null) {
+		if(rules == null || rules.isEmpty()) {
 			jCheckBox0.setEnabled(false);
 			jButton3.setEnabled(false);
 			return;
@@ -1330,12 +1332,12 @@ public class SDIPanel extends BackOfficePanel {
 		}
 
 		public void setValueAt(Object value, int row, int col) {
-			System.out.println("Setting value at " + row + "," + col + " to "
-					+ value + " (an instance of " + value.getClass() + ")");
+		//	System.out.println("Setting value at " + row + "," + col + " to "
+		///			+ value + " (an instance of " + value.getClass() + ")");
 			if (value instanceof TransferRule) {
 				data.set(row, (TransferRule) value);
 				this.fireTableDataChanged();
-				System.out.println("New value of data:");
+				//System.out.println("New value of data:");
 			}
 
 		}
