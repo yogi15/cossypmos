@@ -9,4 +9,6 @@ public class MMConstants {
 	final public static String NACOMPOUNDINGTYPE = "NA";
 	
 	final  public static String COMPOUNDING_STR = "Compounding";
+	final public static String FIXED = "Fixed";
+	final public static String FLOAT = "Float";
 }
