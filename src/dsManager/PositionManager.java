@@ -65,10 +65,13 @@ public class PositionManager extends ControllerManager   {
 			TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
 			
 			if(seq) {
-				//System.out.println(tradeEvent.getTradeID() + " version  " + tradeEvent.getTrade().getVersion() + "  " + seq);
+				System.out.println(tradeEvent.getTradeID() + " version  " + tradeEvent.getTrade().getVersion() + "  " + seq);
 				seq = false;
-			  if(!tradeEvent.getTrade().getProductType().equalsIgnoreCase("MM"))  // positions are not created on MM products.  
+			  if(!tradeEvent.getTrade().getProductType().equalsIgnoreCase("MM")) { // positions are not created on MM products. { 
 			  processPosition(tradeEvent.getTrade());
+			  } else {
+				  processCashPositionOnly(tradeEvent.getTrade());
+			  }
 				//posProcessor.addEvents(tradeEvent);
 			  //  posProcessor.readEvents();
 			} else {
@@ -84,8 +87,14 @@ public class PositionManager extends ControllerManager   {
 	}
 		
 
+	// this method is used for MM product Type only in case of MM no open position are created 
+	// But we need for Cashposition to report products
 	
-	
+	private void processCashPositionOnly(Trade trade) {
+		// TODO Auto-generated method stub
+		posProcessor.processPositiononOnMMTrade(trade);
+		
+	}
 	public  void processPosition(Trade trade) {
 		
 		synchronized (posProcessor) {
