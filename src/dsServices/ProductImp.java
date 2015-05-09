@@ -62,7 +62,9 @@ public class ProductImp implements RemoteProduct {
 	@Override
 	public Product selectProduct(int productID) throws RemoteException {
 		// TODO Auto-generated method stub
-		return ProductSQL.selectProduct(productID, dsSQL.getConn());
+		Product product = ProductSQL.selectProduct(productID, dsSQL.getConn());
+		product.setCoupon(getCoupon(product));
+		return product;
 	}
 
 	@Override
@@ -206,5 +208,10 @@ public class ProductImp implements RemoteProduct {
 			String futureContractQuoteName) throws RemoteException {
 		// TODO Auto-generated method stub
 		return FutureContractSQL.selectFutureProductOnQuoteName(futureContractQuoteName, dsSQL.getConn());
+	}
+	@Override
+	public Coupon getCoupon(Product product) throws RemoteException {
+		// TODO Auto-generated method stub
+		return CouponSQL.getcouponOnProduct(product.getId(), dsSQL.getConn());
 	}
 }
