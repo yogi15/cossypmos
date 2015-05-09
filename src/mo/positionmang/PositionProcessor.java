@@ -18,6 +18,7 @@ import dsServices.RemoteMO;
 import dsServices.RemoteProduct;
 import dsServices.RemoteReferenceData;
 import dsServices.RemoteTrade;
+import util.RemoteServiceUtil;
 import util.commonUTIL;
 import beans.Liquidation;
 import beans.LiquidationConfig;
@@ -1378,6 +1379,41 @@ try {
 	public void setRemoteProduct(RemoteProduct remoteProduct) {
 		// TODO Auto-generated method stub
 		this.remoteProduct = remoteProduct;
+		
+	}
+
+
+	public void processPositiononOnMMTrade(Trade trade2) {
+		if(trade2.getVersion() == 1) {
+			 generateNewCashPositionMMTrade(trade2);
+		} else if(trade2.getVersion() > 2) {
+			 generateUpdateCashPositionMMTrade(trade2);
+			 
+		}
+		
+	}
+	private void generateUpdateCashPositionMMTrade(Trade newpos) {
+		// TODO Auto-generated method stub
+		if(newpos != null && newpos.getProductType().equalsIgnoreCase("MM")) {
+			try {
+				remoteMO.updateCashPositionOnMMTrade(newpos);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				commonUTIL.displayError("PositionProcessor", "updateCashPositionOnMMTrade", e);
+			}
+		}
+		
+	}
+	private void generateNewCashPositionMMTrade(Trade newpos) {
+		// TODO Auto-generated method stub
+		if(newpos != null && newpos.getProductType().equalsIgnoreCase("MM")) {
+			try {
+				remoteMO.generateCashPositionOnMMTrade(newpos);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				commonUTIL.displayError("PositionProcessor", "generateNewCashPositionMMTrade", e);
+			}
+		}
 		
 	}
 }
