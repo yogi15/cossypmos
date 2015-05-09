@@ -28,7 +28,7 @@ import com.jidesoft.plaf.LookAndFeelFactory;
 import constants.MMConstants;
 
 public class MMCashFlowPanel extends CashFlowPanel {
-	DefaultTableModel cashFlowsModel = new DefaultTableModel();
+	static DefaultTableModel cashFlowsModel = new DefaultTableModel();
 
 	public MMCashFlowPanel() {
 		initComponents();
@@ -175,14 +175,141 @@ public class MMCashFlowPanel extends CashFlowPanel {
 	// Variables declaration - do not modify
 	private javax.swing.JPanel jPanel1;
 	private javax.swing.JScrollPane jScrollPane1;
-	private javax.swing.JTable jTable1;
+	private static javax.swing.JTable jTable1;
 
 	// End of variables declaration
+public static DefaultTableModel getCashFlow(Vector cashFlows) {
+	String cols[];
+    if(cashFlows == null) {
+    	cols = new String[] { "#", "TradeAmount", "CpnStartDate",
+				"CpnEndDate", "CmpdStartDate",
+				"CmpdEndDate", "PaymentDate", "CpnDays", "Rate", "Interest",  "Type",
+				"PaymentAmt", };
+    	cashFlowsModel = new DefaultTableModel(null, cols);
+    	return cashFlowsModel;
+    	
+    }
+	Flows flow0 = (Flows) cashFlows.elementAt(0);
+	if (flow0.getAmortizationType().equalsIgnoreCase(
+			MMConstants.MORTGAGEAMORTYPE)
+			|| flow0.getAmortizationType().equalsIgnoreCase(
+					MMConstants.SCHEDULEAMORTYPE)) {
 
-	public void setCashFlows(Vector cashFlows) {
+		 cols = new String[] { "#", "Coupon Start Date", "Coupon End Date",
+				"o/s Amount", "Interest", "Fixed Payment Amount",
+				"Balance Amount", "Payment Date", "Type", };
+
+		cashFlowsModel = new DefaultTableModel(null, cols);
+		if (cashFlows != null && (!cashFlows.isEmpty())) {
+			for (int i = 0; i < cashFlows.size(); i++) {
+				Flows flow = (Flows) cashFlows.elementAt(i);
+
+				cashFlowsModel
+						.insertRow(
+								i,
+								new Object[] {
+										i + 1,
+										commonUTIL.getDateFormat(flow
+												.getStartDate()),
+										commonUTIL.getDateFormat(flow
+												.getEndDate()),
+										flow.getOutstandingAmount(),
+										flow.getInterest(),
+										flow.getFixedAmountPayment(),
+										flow.getBalanceAmount(),
+										commonUTIL.getDateFormat(flow
+												.getPaymentDate()),
+										flow.getType(), });
+			}
+
+		}
+
+	} else if (flow0.getAmortizationType().equalsIgnoreCase(MMConstants.SIMPLECOMPOUNDINGAMORTYPE)) {
+		
+		cols = new String[] { "#", "TradeAmount", "CpnStartDate",
+				"CpnEndDate", "CmpdStartDate",
+				"CmpdEndDate", "PaymentDate", "CpnDays", "Rate", "Interest",  "Type",
+				"PaymentAmt", };
+		cashFlowsModel = new DefaultTableModel(null, cols);
+
+		if (cashFlows != null && (!cashFlows.isEmpty())) {
+			for (int i = 0; i < cashFlows.size(); i++) {
+				Flows flow = (Flows) cashFlows.elementAt(i);
+
+				cashFlowsModel
+						.insertRow(
+								i,
+								new Object[] {
+										i + 1,
+										commonUTIL.doubleFormat(flow.getNominal()),
+										commonUTIL.getDateFormat(flow
+												.getStartDate()),
+										commonUTIL.getDateFormat(flow
+												.getEndDate()),
+										commonUTIL.getDateFormat(flow
+												.getCmpdStartDate()),
+										commonUTIL.getDateFormat(flow
+												.getCmpdEnddate()),
+												commonUTIL.getDateFormat(flow
+														.getPaymentDate()),
+										flow.getAccuralDays(),
+										flow.getRate(),
+										commonUTIL.doubleFormat(flow
+												.getInterest()),
+										flow.getType(),
+										commonUTIL.doubleFormat(flow
+												.getCouponAmount()), });
+			}
+
+		}
+	} else {
+
+		cols = new String[] { "#", "TradeAmount", "CpnStartDate",
+				"CpnEndDate", "PaymentDate", "CpnDays", "Rate", "Type",
+				"PaymentAmt", };
+
+		cashFlowsModel = new DefaultTableModel(null, cols);
+
+		if (cashFlows != null && (!cashFlows.isEmpty())) {
+			for (int i = 0; i < cashFlows.size(); i++) {
+				Flows flow = (Flows) cashFlows.elementAt(i);
+
+				cashFlowsModel
+						.insertRow(
+								i,
+								new Object[] {
+										i + 1,
+										commonUTIL.doubleFormat(flow.getNominal()),
+										commonUTIL.getDateFormat(flow
+												.getStartDate()),
+										commonUTIL.getDateFormat(flow
+												.getEndDate()),
+										commonUTIL.getDateFormat(flow
+												.getPaymentDate()),
+										commonUTIL.doubleFormat(flow
+												.getFlowsdays()),
+										flow.getRate(),
+										flow.getType(),
+										commonUTIL.doubleFormat(flow
+												.getCouponAmount()), });
+			}
+
+		}
+
+	}
+
+	//jTable1.removeAll();
+	//jTable1.setModel(cashFlowsModel);
+	return cashFlowsModel;
+
+}
+
+
+	public  void setCashFlows(Vector cashFlows) {
 		String cols[];
 
 		Flows flow0 = (Flows) cashFlows.elementAt(0);
+		
 
 		if (flow0.getAmortizationType().equalsIgnoreCase(
 				MMConstants.MORTGAGEAMORTYPE)
@@ -296,5 +423,11 @@ public class MMCashFlowPanel extends CashFlowPanel {
 		jTable1.removeAll();
 		jTable1.setModel(cashFlowsModel);
 
+	}
+
+	@Override
+	public DefaultTableModel getCashFlows(Vector cashFlows) {
+		// TODO Auto-generated method stub
+		return getCashFlow(cashFlows);
 	}
 }
