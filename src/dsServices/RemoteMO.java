@@ -65,5 +65,9 @@ public interface RemoteMO extends Remote {
 	public void processManualLiquidation(Vector<OpenTrade> dataOpenTrades) throws RemoteException;
 	public void updateCashPositionOnTakeUp(Trade trade) throws RemoteException;
 	
+	public void generateCashPositionOnMMTrade(Trade mmTrade)  throws RemoteException;
+	public void updateCashPositionOnMMTrade(Trade mmTrade)  throws RemoteException;
+	
+	
 
 }
