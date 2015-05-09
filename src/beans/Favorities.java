@@ -5,6 +5,12 @@ import java.io.Serializable;
 public class Favorities implements Serializable {
 	
 	int userId = 0;
+	static public  String book = "Book";
+
+	static public  String CounterParty = "CounterParty";
+	static public  String trader = "Trader";
+	static public  String CurrencyPair = "CurrencyPair";
+	
 	public int getUserId() {
 		return userId;
 	}
