@@ -47,7 +47,10 @@ public class MMCashFlow extends DefaultCashFlow {
 	public void genearteCashFlow(Product product, Coupon coupon, Trade trade,
 			Pricer price) {
 
-		Period periods = new Period(product.getTenor());
+		Period periods = null;
+		if(!commonUTIL.isEmpty(product.getTenor())) {
+			periods = new Period(product.getTenor());
+		}
 		String issueDate = product.getIssueDate();
 		String maturityDate = product.getMarturityDate();
 
@@ -70,14 +73,27 @@ public class MMCashFlow extends DefaultCashFlow {
 		}
 
 		Amortization amortizationObj = trade.getAmortization();
-		String amorType = amortizationObj.getAmortization();
 		
-		System.out.println("amortizationObj.getAmortization() " + amortizationObj.getAmortization());
-
+		String amorType = "NA"; 
+		if(amortizationObj !=  null) {
+			
+			amorType = 	amortizationObj.getAmortization();
+		
+		//System.out.println("amortizationObj.getAmortization() " + amortizationObj.getAmortization());
+		} else {
+			amortizationObj = new Amortization();
+			amortizationObj.setAmortizingFrequency("NA");
+			amortizationObj.setAmortType("NA");
+			amortizationObj.setStartDate(product.getIssueDate());
+			amortizationObj.setEndDate(product.getMarturityDate());
+		}
+        if(commonUTIL.isEmpty(coupon.getCouponFrequency())) {
+        	coupon.setCouponFrequency("ZC");
+        }
 		if (coupon.getCouponFrequency().equals(CommonConstants.ZCFREQUENCY)) {
 
 			String frequency = amortizationObj.getAmortizingFrequency();
-
+           
 			if (frequency.equals(MMConstants.NACOMPOUNDINGTYPE)
 					|| frequency.equals("0")) {
 
@@ -275,6 +291,8 @@ public class MMCashFlow extends DefaultCashFlow {
 				trade.getDelivertyDate(), true);
 
 		String businessDayConvention = coupon.getBusinessDayConvention();
+		if(businessDayConvention == null) 
+			businessDayConvention = "FOLLOWING";
 		int lag = 0;
 
 		DateU startDate = null;
