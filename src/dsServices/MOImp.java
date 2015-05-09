@@ -637,6 +637,73 @@ public void updateCashPositionOnTakeUp(Trade trade) throws RemoteException {
 }
 
 
+@Override
+public void generateCashPositionOnMMTrade(Trade mmTrade) throws RemoteException {
+	// TODO Auto-generated method stub
+	CashPosition cashPosition1 = new CashPosition();
+	cashPosition1.setCpID(mmTrade.getCpID());
+	cashPosition1.setBookId(mmTrade.getBookId());
+	cashPosition1.setOpenpositionDate(mmTrade.getTradeDate());
+	cashPosition1.setQuantity(mmTrade.getQuantity());
+	cashPosition1.setProductId(mmTrade.getProductId());
+	cashPosition1.setTradeId(mmTrade.getId());
+	cashPosition1.setPrice(mmTrade.getPrice());
+	cashPosition1.setProductType(mmTrade.getProductType());
+	cashPosition1.setProductSubType(mmTrade.getTradedesc1());
+	
+	cashPosition1.setType(mmTrade.getType());
+	cashPosition1.setOpenQuantity(mmTrade.getQuantity());
+	cashPosition1.setPositionId(0);
+	cashPosition1.setQuotingAmt(0);
+	cashPosition1.setSettleDate(mmTrade.getDelivertyDate());
+	cashPosition1.setTradeDate(mmTrade.getTradeDate());
+	cashPosition1.setOpenNominal(0);
+	//cashPosition1.setFxSwapLegType(newpos.getFxSwapLegType());
+	cashPosition1.setTradedesc1(mmTrade.getTradedesc1());
+	cashPosition1.setPrimaryCurr(mmTrade.getCurrency());
+//	cashPosition1.setQuotingCurr(newpos.getQuotingCurr());
+	cashPosition1.setCurrency(mmTrade.getCurrency());
+	 cashPosition1.setActualAmt(cashPosition1.getQuantity());
+	 cashPosition1.setId(mmTrade.getId());
+	 CashPositionSQL.save(cashPosition1, dsSQL.getConn());
+	
+}
+
+
+@Override
+public void updateCashPositionOnMMTrade(Trade mmTrade) throws RemoteException {
+	// TODO Auto-generated method stub
+	CashPosition cashPosition1 = CashPositionSQL.selectOpenposOnTradeID(mmTrade.getId(),dsSQL.getConn());
+	cashPosition1.setCpID(mmTrade.getCpID());
+	cashPosition1.setBookId(mmTrade.getBookId());
+	cashPosition1.setOpenpositionDate(mmTrade.getTradeDate());
+	cashPosition1.setQuantity(mmTrade.getQuantity());
+	cashPosition1.setProductId(mmTrade.getProductId());
+	cashPosition1.setTradeId(mmTrade.getId());
+	cashPosition1.setPrice(mmTrade.getPrice());
+	cashPosition1.setProductType(mmTrade.getProductType());
+	cashPosition1.setProductSubType(mmTrade.getTradedesc());
+	
+	cashPosition1.setType(mmTrade.getType());
+	cashPosition1.setOpenQuantity(mmTrade.getQuantity());
+	cashPosition1.setPositionId(0);
+	cashPosition1.setQuotingAmt(0);
+	cashPosition1.setSettleDate(mmTrade.getDelivertyDate());
+	cashPosition1.setTradeDate(mmTrade.getTradeDate());
+	cashPosition1.setOpenNominal(0);
+	//cashPosition1.setFxSwapLegType(newpos.getFxSwapLegType());
+	cashPosition1.setTradedesc1(mmTrade.getTradedesc1());
+	cashPosition1.setPrimaryCurr(mmTrade.getCurrency());
+//	cashPosition1.setQuotingCurr(newpos.getQuotingCurr());
+	 cashPosition1.setCurrency(mmTrade.getCurrency());
+	 cashPosition1.setActualAmt(cashPosition1.getQuantity());
+	 cashPosition1.setId(mmTrade.getId());
+	 CashPositionSQL.update(cashPosition1, dsSQL.getConn());
+	 
+	
+}
+
+
 
 
 }
