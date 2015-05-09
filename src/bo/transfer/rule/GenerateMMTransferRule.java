@@ -99,6 +99,8 @@ public class GenerateMMTransferRule extends ProductTransferRule {
 				 LegalEntity le =  (LegalEntity) getLegalEntity(trade.getCpID());
 				 Sdi recSdi = getSdiOnEntity(trade.getCpID());
 				 Sdi paySdi = getSdiOnEntity(po.getId());
+				 if(recSdi == null || paySdi == null)
+					 return null;
 	         for(int i=0;i<flows.size();i++) {
 	        	 Flows flow = (Flows)  flows.elementAt(i);
 	        	 TransferRule rule = new TransferRule();
