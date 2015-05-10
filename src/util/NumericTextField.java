@@ -40,7 +40,7 @@ public class NumericTextField extends JTextField implements
 	  String text = super.getText();
 	  text = checkAmount(text);
 	 double dd =  NumberFormatUtil.stringToNumber(text, Locale.getDefault());
-	  return text.valueOf(dd);
+	  return text.valueOf(commonUTIL.convertToFinanceFormate(dd));
   }
   public NumericTextField(int columns, DecimalFormat format) {
     this(null, columns, format);
@@ -48,7 +48,7 @@ public class NumericTextField extends JTextField implements
         public void focusLost(java.awt.event.FocusEvent event) {
         	NumericTextField t = (NumericTextField) event.getSource();
         	 double dd =  NumberFormatUtil.stringToNumber(t.getText(), Locale.getDefault());
-            t.setText(String.valueOf(dd));
+            t.setText((String)commonUTIL.convertToFinanceFormate(dd));
         }
 
         public void focusGained(java.awt.event.FocusEvent event) {
