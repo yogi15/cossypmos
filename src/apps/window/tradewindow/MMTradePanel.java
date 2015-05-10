@@ -223,9 +223,9 @@ Users usr = null;
 		setOpaque(true);
 		setLayout(new GroupLayout());
 		add(getJPanel1(), new Constraints(new Leading(1, 866, 8, 8), new Leading(99, 122, 16, 16)));
-		add(getJPanel3(), new Constraints(new Leading(4, 866, 12, 12), new Leading(379, 151, 10, 10)));
+		add(getJPanel3(), new Constraints(new Leading(0, 866, 12, 12), new Leading(314, 151, 12, 12)));
 		add(getJPanel0(), new Constraints(new Leading(1, 866, 12, 12), new Leading(3, 95, 10, 10)));
-		add(getHotKeysPanels(), new Constraints(new Leading(8, 856, 10, 10), new Leading(326, 46, 12, 12)));
+		add(getHotKeysPanels(), new Constraints(new Leading(5, 866,10, 10), new Leading(471, 46,10, 10)));
 		add(getJPanel4(), new Constraints(new Leading(882, 334, 10, 10), new Leading(5, 517, 10, 10)));
 		add(getJPanel2(), new Constraints(new Leading(3, 866, 10, 10), new Leading(224, 94, 10, 10)));
 		setSize(1225, 544);
@@ -915,25 +915,26 @@ Users usr = null;
 			jPanel1.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel1.setLayout(new GroupLayout());
 			//jPanel1.add(getJLabel5(),new Constraints(new Leading(372, 10, 10), new Leading(17, 10, 10)));
-			jPanel1.add(getJLabel10(), new Constraints(new Leading(68, 10, 10), new Leading(12, 12, 12)));
-			jPanel1.add(getJLabel11(), new Constraints(new Leading(206, 10, 10), new Leading(12, 12, 12)));
-			jPanel1.add(getStartDate(), new Constraints(new Leading(66, 138, 12, 12), new Leading(36, 12, 12)));
-			jPanel1.add(getEndDate(), new Constraints(new Leading(210, 138, 10, 10), new Leading(36, 22, 12, 12))); 
-			jPanel1.add(getBuysell(), new Constraints(new Leading(6, 10, 10), new Leading(40, 12, 12)));
+			jPanel1.add(getJLabel10(),  new Constraints(new Leading(69, 10, 10), new Leading(9, 12, 12)));
+			jPanel1.add(getJLabel11(),new Constraints(new Leading(213, 10, 10), new Leading(9, 12, 12)));
+			jPanel1.add(getStartDate(),  new Constraints(new Leading(66, 136, 10, 10), new Leading(28, 25, 12, 12)));
+			jPanel1.add(getEndDate(), new Constraints(new Leading(210, 138, 10, 10), new Leading(28, 25, 12, 12)));
+			jPanel1.add(getBuysell(), new Constraints(new Leading(6, 12, 12), new Leading(31, 12, 12)));
 			//jPanel1.add(getProductName(), new Constraints(new Leading(6, 432, 10, 10), new Leading(93, 25, 12, 12)));
-			jPanel1.add(getNominal(), new Constraints(new Leading(63, 220, 12, 12), new Leading(90, 22, 12, 12)));
-			jPanel1.add(getJLabel6(), new Constraints(new Leading(6, 12, 12), new Leading(90, 12, 12)));
-			jPanel1.add(getJLabel7(), new Constraints(new Leading(427, 10, 10), new Leading(74, 12, 12)));
-			jPanel1.add(getRateSelection(),  new Constraints(new Leading(427, 108, 10, 10), new Leading(90, 22, 12, 12)));
+			jPanel1.add(getNominal(),  new Constraints(new Leading(69, 221, 12, 12), new Leading(68, 25, 12, 12)));
+			jPanel1.add(getJLabel6(),  new Constraints(new Leading(6, 12, 12), new Leading(68, 12, 12)));
+			jPanel1.add(getJLabel7(),new Constraints(new Leading(296, 12, 12), new Leading(68, 12, 12)));
+			jPanel1.add(getRateSelection(), new Constraints(new Leading(366, 108, 12, 12), new Leading(68, 25, 12, 12)));
 			//jPanel1.add(getStatus(), new Constraints(new Trailing(12, 143, 385, 419), new Leading(90, 22, 12, 12)));
-			jPanel1.add(getJLabel15(), new Constraints(new Leading(317, 10, 10), new Leading(71, 12, 12)));
-			jPanel1.add(getDayCount(), new Constraints(new Leading(314, 93, 10, 10), new Leading(90, 22, 12, 12)));
+			jPanel1.add(getJLabel15(),new Constraints(new Leading(447, 10, 10), new Leading(9, 12, 12)));
+			jPanel1.add(getDayCount(),new Constraints(new Leading(447, 93, 12, 12), new Leading(28, 25, 12, 12)));
 		//	jPanel1.add(getJLabel8(),  new Constraints(new Trailing(119, 383, 383), new Leading(76, 12, 12))); 
-			jPanel1.add(getCurrency(), new Constraints(new Leading(372, 138, 12, 12), new Leading(36, 22, 12, 12)));
+			jPanel1.add(getCurrency(), new Constraints(new Leading(366, 54, 12, 12), new Leading(28, 25, 12, 12)));
 			//jPanel1.add(getActionC(),new Constraints(new Leading(562, 138, 10, 10), new Leading(36, 22, 12, 12)));
 			//jPanel1.add(getJLabel9(), new Constraints(new Leading(567, 10, 10), new Leading(12, 12, 12))); 
 
-			jPanel1.add(getJLabel0(), new Constraints(new Leading(372, 12, 12), new Leading(12, 12, 12)));
+			jPanel1.add(getJLabel0(), new Constraints(new Leading(362, 12, 12), new Leading(9, 12, 12)));
+			
 		}
 		return jPanel1;
 	}
@@ -1017,18 +1018,19 @@ Users usr = null;
 			jPanel0 = new JPanel();
 			jPanel0.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel0.setLayout(new GroupLayout());
-			jPanel0.add(getTrader(), new Constraints(new Leading(532, 177, 10, 10), new Leading(37, 26, 12, 12)));
-			jPanel0.add(getJLabel3(), new Constraints(new Leading(532, 41, 12, 12), new Leading(6, 25, 12, 12)));
-			jPanel0.add(getCounterParty(), new Constraints(new Leading(304, 219, 12, 12), new Leading(36, 26, 12, 12)));
-			jPanel0.add(getJLabel2(), new Constraints(new Leading(304, 12, 12), new Leading(14, 12, 12)));
-			jPanel0.add(getBook(), new Constraints(new Leading(153, 145, 12, 12), new Leading(36, 26, 12, 12)));
-			jPanel0.add(getJLabel5(), new Constraints(new Leading(7, 10, 10), new Leading(15, 46, 46)));
-			jPanel0.add(getTradeID(), new Constraints(new Leading(3, 138, 12, 12), new Leading(39, 12, 12)));
-			jPanel0.add(getJLabel1(), new Constraints(new Leading(155, 10, 10), new Leading(15, 12, 12)));
-			jPanel0.add(getJLabel9(), new Constraints(new Leading(725, 71, 12, 12), new Leading(2, 20, 12, 12)));
-			jPanel0.add(getActionC(), new Constraints(new Leading(725, 115, 12, 12), new Leading(22, 25, 12, 12)));
-	//		jPanel0.add(getJLabel8(), new Constraints(new Leading(732, 71, 12, 12), new Leading(39, 25, 12, 12)));
-			jPanel0.add(getStatus(), new Constraints(new Leading(725, 121, 12, 12), new Leading(60, 25, 12, 12)));
+			jPanel0.add(getTrader(), new Constraints(new Leading(532, 177, 10, 10), new Leading(44, 26, 10, 12)));
+			jPanel0.add(getJLabel1(), new Constraints(new Leading(9, 10, 10), new Leading(49, 12, 12)));
+			jPanel0.add(getCounterParty(), new Constraints(new Leading(304, 175, 12, 12), new Leading(44, 26, 10, 12)));
+			jPanel0.add(getJLabel2(),  new Constraints(new Leading(211, 12, 12), new Leading(49, 12, 12)));
+			jPanel0.add(getBook(), new Constraints(new Leading(67, 138, 10, 10), new Leading(44, 26, 10, 12)));
+			jPanel0.add(getJLabel5(),  new Constraints(new Leading(7, 10, 10), new Leading(12, 12, 12)));
+			jPanel0.add(getTradeID(), new Constraints(new Leading(67, 138, 12, 12), new Leading(7, 26, 40, 40)));
+			//jPanel0.add(getJLabel1(), new Constraints(new Leading(155, 10, 10), new Leading(15, 12, 12)));
+			jPanel0.add(getJLabel9(), new Constraints(new Leading(233, 10, 10), new Leading(10, 12, 12)));
+			jPanel0.add(getActionC(), new Constraints(new Leading(304, 174, 12, 12), new Leading(5, 26, 10, 51)));
+			jPanel0.add(getJLabel8(), new Constraints(new Leading(483, 10, 10), new Leading(12, 12, 12)));
+			jPanel0.add(getJLabel3(), new Constraints(new Leading(485, 41, 12, 12), new Leading(49, 25, 12, 12)));
+			jPanel0.add(getStatus(), new Constraints(new Leading(535, 170, 12, 12), new Leading(5, 26, 10, 51)));
 		}
 		return jPanel0;
 	}
@@ -1089,7 +1091,7 @@ Users usr = null;
 	private JPanel getJPanel3() {
 		if (jPanel3 == null) {
 			jPanel3 = new JPanel();
-			jPanel3.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
+		//	jPanel3.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel3.setLayout(new GroupLayout());
 			jPanel3.add(getJScrollPane1(), new Constraints(new Leading(3, 853, 10, 10), new Leading(4, 139, 10, 10)));
 		}
