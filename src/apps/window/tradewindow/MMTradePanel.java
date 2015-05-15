@@ -119,6 +119,7 @@ public class MMTradePanel extends TradePanel {
 	private DateComboBox endDate;
 	private NumericTextField Amount1;
 	private JTextField status;
+	private JTextField buyselltext;
 	private JTable CashFlowTable;
 	private JScrollPane jScrollPane1;
 	private JPanel jPanel7;
@@ -415,12 +416,12 @@ Users usr = null;
 			compPanelSub = new JPanel();
 			compPanelSub.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			compPanelSub.setLayout(new GroupLayout());
-			compPanelSub.add(getPayFreq(), new Constraints(new Leading(5, 118, 10, 10), new Leading(23, 26, 10, 10)));
-			compPanelSub.add(getJLabel21(), new Constraints(new Leading(9, 10, 10), new Leading(1, 12, 12)));
-			compPanelSub.add(getJLabel22(), new Constraints(new Leading(202, 10, 10), new Leading(3, 10, 10)));
-			compPanelSub.add(getJComboBox8(), new Constraints(new Leading(204, 124, 10, 10), new Leading(23, 26, 12, 12)));
-			compPanelSub.add(getJLabel23(), new Constraints(new Leading(381, 10, 10), new Leading(5, 10, 10)));
-			compPanelSub.add(getCompFreq(), new Constraints(new Leading(383, 152, 10, 10), new Leading(23, 26, 12, 12)));
+			compPanelSub.add(getJComboBox8(), new Constraints(new Leading(5, 118, 10, 10), new Leading(23, 26, 10, 10)));
+			compPanelSub.add(getJLabel22(), new Constraints(new Leading(9, 10, 10), new Leading(1, 12, 12)));
+			compPanelSub.add(getJLabel23(), new Constraints(new Leading(202, 10, 10), new Leading(3, 10, 10)));
+			compPanelSub.add(getCompFreq(), new Constraints(new Leading(204, 124, 10, 10), new Leading(23, 26, 12, 12)));
+			//compPanelSub.add(getJLabel23(), new Constraints(new Leading(381, 10, 10), new Leading(5, 10, 10)));
+		//	compPanelSub.add(getCompFreq(), new Constraints(new Leading(383, 152, 10, 10), new Leading(23, 26, 12, 12)));
 		}
 		return compPanelSub;
 	}
@@ -836,7 +837,7 @@ Users usr = null;
 	private JLabel getJLabel7() {
 		if (jLabel7 == null) {
 			jLabel7 = new JLabel();
-			jLabel7.setText("Rate");
+			jLabel7.setText("RateType");
 		}
 		return jLabel7;
 	}
@@ -915,31 +916,45 @@ Users usr = null;
 			jPanel1.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel1.setLayout(new GroupLayout());
 			//jPanel1.add(getJLabel5(),new Constraints(new Leading(372, 10, 10), new Leading(17, 10, 10)));
-			jPanel1.add(getJLabel10(),  new Constraints(new Leading(69, 10, 10), new Leading(9, 12, 12)));
-			jPanel1.add(getJLabel11(),new Constraints(new Leading(213, 10, 10), new Leading(9, 12, 12)));
-			jPanel1.add(getStartDate(),  new Constraints(new Leading(66, 136, 10, 10), new Leading(28, 25, 12, 12)));
-			jPanel1.add(getEndDate(), new Constraints(new Leading(210, 138, 10, 10), new Leading(28, 25, 12, 12)));
-			jPanel1.add(getBuysell(), new Constraints(new Leading(6, 12, 12), new Leading(31, 12, 12)));
+			jPanel1.add(getJLabel10(),  new Constraints(new Leading(89, 10, 10), new Leading(9, 12, 12)));
+			jPanel1.add(getJLabel11(),new Constraints(new Leading(233, 10, 10), new Leading(9, 12, 12)));
+			jPanel1.add(getStartDate(),  new Constraints(new Leading(90, 136, 10, 10), new Leading(28, 25, 12, 12)));
+			jPanel1.add(getEndDate(), new Constraints(new Leading(230, 138, 10, 10), new Leading(28, 25, 12, 12)));
+			jPanel1.add(getBuysell(),  new Constraints(new Leading(7, 12, 12), new Leading(9, 12, 12)));
 			//jPanel1.add(getProductName(), new Constraints(new Leading(6, 432, 10, 10), new Leading(93, 25, 12, 12)));
 			jPanel1.add(getNominal(),  new Constraints(new Leading(69, 221, 12, 12), new Leading(68, 25, 12, 12)));
 			jPanel1.add(getJLabel6(),  new Constraints(new Leading(6, 12, 12), new Leading(68, 12, 12)));
-			jPanel1.add(getJLabel7(),new Constraints(new Leading(296, 12, 12), new Leading(68, 12, 12)));
+			jPanel1.add(getJLabel7(),new Constraints(new Leading(296, 12, 12), new Leading(75, 10, 10)));
 			jPanel1.add(getRateSelection(), new Constraints(new Leading(366, 108, 12, 12), new Leading(68, 25, 12, 12)));
 			//jPanel1.add(getStatus(), new Constraints(new Trailing(12, 143, 385, 419), new Leading(90, 22, 12, 12)));
-			jPanel1.add(getJLabel15(),new Constraints(new Leading(447, 10, 10), new Leading(9, 12, 12)));
-			jPanel1.add(getDayCount(),new Constraints(new Leading(447, 93, 12, 12), new Leading(28, 25, 12, 12)));
+			jPanel1.add(getJLabel15(),new Constraints(new Leading(467, 10, 10), new Leading(9, 12, 12)));
+			jPanel1.add(getDayCount(),new Constraints(new Leading(467, 93, 12, 12), new Leading(28, 25, 12, 12)));
 		//	jPanel1.add(getJLabel8(),  new Constraints(new Trailing(119, 383, 383), new Leading(76, 12, 12))); 
-			jPanel1.add(getCurrency(), new Constraints(new Leading(366, 54, 12, 12), new Leading(28, 25, 12, 12)));
+			jPanel1.add(getCurrency(), new Constraints(new Leading(386, 54, 12, 12), new Leading(28, 25, 12, 12)));
 			//jPanel1.add(getActionC(),new Constraints(new Leading(562, 138, 10, 10), new Leading(36, 22, 12, 12)));
 			//jPanel1.add(getJLabel9(), new Constraints(new Leading(567, 10, 10), new Leading(12, 12, 12))); 
-
-			jPanel1.add(getJLabel0(), new Constraints(new Leading(362, 12, 12), new Leading(9, 12, 12)));
+			jPanel1.add(getBuysellText(), new Constraints(new Leading(6, 55, 10, 10), new Leading(28, 25, 12, 12)));
+			jPanel1.add(getJLabel21(), new Constraints(new Leading(483, 10, 10),new Trailing(28, 25, 12, 12)));
+			jPanel1.add(getPayFreq(), new Constraints(new Leading(588, 81, 12, 12), new Trailing(28, 25, 12, 12)));
+			jPanel1.add(getJLabel0(), new Constraints(new Leading(382, 12, 12), new Leading(9, 12, 12)));
 			
 		}
 		return jPanel1;
 	}
 
 	
+
+	private JTextField getBuysellText() {
+		// TODO Auto-generated method stub
+		if (buyselltext == null) {
+			buyselltext = new JTextField();
+			buyselltext.setText("Deposit");
+    		buyselltext.setBackground(Color.green);
+    		buyselltext.setEditable(false);
+    		buyselltext.setEnabled(false);
+		}
+		return buyselltext;
+	}
 
 	private JLabel getJLabel5() {
 		if (jLabel5 == null) {
@@ -952,17 +967,25 @@ Users usr = null;
 	private JLabel getBuysell() {
 		if (buysell == null) {
 			buysell = new JLabel();
-			buysell.setText("DEPOSIT");
+			buysell.setText("Deposit/Loan");
 		}
 			buysell.addMouseListener(new MouseListener() {
 
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					if (buysell.getText().equalsIgnoreCase("LOAN")) {
-						buysell.setText("DEPOSIT");
-					} else {
-						buysell.setText("LOAN");
-					}
+					String buySell = buysell.getText();
+			    	
+			    	if (buySell.equalsIgnoreCase("Deposit/Loan")) {
+			    		buyselltext.setText("Loan");
+			    		buyselltext.setBackground(Color.red);
+			    		buysell.setText("Loan/Deposit");
+			    	} 
+			    	if (buySell.equalsIgnoreCase("Loan/Deposit")) {
+			    		buyselltext.setText("Deposit");
+			    		buyselltext.setBackground(Color.green);
+			    		buysell.setText("Deposit/Loan");
+			    	} 
+					
 				}
 
 				@Override
@@ -1245,7 +1268,7 @@ Users usr = null;
 		product.setIssueDate(pstartDate);
 		product.setMarturityDate(pendDate);
 		product.setProductType("MM");
-		product.setProdcutShortName("CASH."+buysell.getText());
+		product.setProdcutShortName("CASH."+buyselltext.getText());
 		try {
 			product.setQuantity(Amount1.getDoubleValue().doubleValue());
 		} catch (ParseException e) {
@@ -1335,7 +1358,7 @@ Users usr = null;
 		//trade = new Trade();
 		trade.setQuantity(product.getQuantity());
 		trade.setNominal(0);
-		if(buysell.getText().equalsIgnoreCase("LOAN")) {
+		if(buyselltext.getText().equalsIgnoreCase("Loan")) {
 			 trade.setType("SELL");
 		}else  {
 				trade.setType("BUY");
@@ -1383,7 +1406,7 @@ Users usr = null;
 		trade = new Trade();
 		trade.setQuantity(product.getQuantity());
 		trade.setNominal(0);
-		if(buysell.getText().equalsIgnoreCase("LOAN")) {
+		if(buyselltext.getText().equalsIgnoreCase("Loan")) {
 			 trade.setType("SELL");
 		}else  {
 				trade.setType("BUY");
@@ -1477,7 +1500,15 @@ Users usr = null;
 			 attributeDataValue.clear();
 			 setAttribute(trade.getAttributes(),attributes,attributeDataValue);
 			 setDataFromTradeObject(trade.getCpID(), TradeConstants.COUNTERPARTY,counterParty);
-			
+			 if( trade.getType().equalsIgnoreCase("SELL")) {
+				
+				 buyselltext.setText("Loan");
+				 buysell.setText("Loan/Deposit");
+			}else  {
+				
+					buyselltext.setText("Deposit");
+					 buysell.setText("Deposit/Loan");
+			}
 			 setDataFromTradeObject(trade.getTraderID(), TradeConstants.TRADER,trader);
 			 setDataFromTradeObject(trade.getBookId(), TradeConstants.BOOK,book);
 			Currency.setSelectedItem(trade.getCurrency());
