@@ -1,6 +1,7 @@
 	package apps.window.tradewindow;
 	
 	import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -20,6 +21,7 @@ import java.rmi.RemoteException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -28,6 +30,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
@@ -49,6 +52,7 @@ import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
 import productPricing.Pricer;
+import swingUtils.CustomFocusTraversalPolicy;
 import util.ReferenceDataCache;
 import util.commonUTIL;
 import util.common.DateU;
@@ -169,6 +173,10 @@ import dsServices.ServerConnectionUtil;
 				      {  new JButton("Button 3One"), new JButton("Button Three") },
 				      { new JButton("Button 4One"), new JButton("Button Four") }
 				    };
+			 
+		CustomFocusTraversalPolicy fxFocusPolicy;
+		ArrayList<Component> order;
+		
 		 public BasicData getBasicData() {
 			if (basicData == null) {
 				basicData = new BasicData(remoteReference);
@@ -472,6 +480,7 @@ import dsServices.ServerConnectionUtil;
 
 		public FXTradePanel() {
 			initComponents();
+			assignFocusPolicy();
 		}
 	
 		private void initComponents() {
@@ -498,6 +507,24 @@ import dsServices.ServerConnectionUtil;
 			rollpanel.setVisible(false);
 			init();
 		}
+		
+		private void assignFocusPolicy(){
+			order = new ArrayList<Component>();
+			setPolicyOrder();			
+			fxFocusPolicy = new CustomFocusTraversalPolicy(order);
+			this.setFocusCycleRoot(true);
+			setFocusTraversalPolicy(fxFocusPolicy);
+			
+		}
+		
+		private void setPolicyOrder() {
+			
+			order.add(out.jTextField1);
+			order.add(out.jTextField4);
+			order.add(out.jTextField2);
+			order.add(out.outRightDate);
+		}
+		
 		private String []  convertVectortoSringArray(Vector v) {
 	    	String name [] = null;
 	    	int i=0;
@@ -873,11 +900,6 @@ import dsServices.ServerConnectionUtil;
 			}
 		});
 	    	
-	    
-	    
-	    
-	    
-
 	    basicData.book.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -2117,8 +2139,7 @@ import dsServices.ServerConnectionUtil;
 	        
     out.jTextField4.addActionListener(new java.awt.event.ActionListener() {
 	    public void actionPerformed(java.awt.event.ActionEvent e) {
-	    	 if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL") || basicData.buysell.getText().equalsIgnoreCase("BUY")) {
-					
+	    	 if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL") || basicData.buysell.getText().equalsIgnoreCase("BUY")) {					
 					double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
 					amt1 = Math.abs(amt1);
 					double spot = (new Double(out.jTextField4.getText()).doubleValue());
@@ -2165,98 +2186,34 @@ import dsServices.ServerConnectionUtil;
     });
 	
     basicData.buysell.addFocusListener(new FocusListener() {
-
 		@Override
 		public void focusGained(FocusEvent arg0) {
 			//basicData.jLabel3.setOpaque(true);
-			basicData.jLabel3.setFont(new Font("Tahoma", Font.BOLD, 11));
+			basicData.jLabel3.setFont(new Font("Tahoma", Font.BOLD, 11));			
 		}
-
 		@Override
 		public void focusLost(FocusEvent arg0) {
 			//basicData.jLabel3.setOpaque(false);		
 			basicData.jLabel3.setFont(new Font("Tahoma", 0, 11) );
+			//actonOnBuySell();
 		}
     	
     });
     
     basicData.buysell.addActionListener(new java.awt.event.ActionListener() {
 	    public void actionPerformed(java.awt.event.ActionEvent e) {
-	    	
-	    	String buySell = basicData.buysell.getText();
-	    	
-	    	if (buySell.equalsIgnoreCase("BUY/SELL")) {
-	    		basicData.buysell.setText("SELL/BUY");
-	    		basicData.buysell.setBackground(Color.red);
-	    	} else if (buySell.equalsIgnoreCase("SELL/BUY")) {
-	    		basicData.buysell.setText("BUY/SELL");
-	    		basicData.buysell.setBackground(Color.green);
-	    	} else if (buySell.equalsIgnoreCase("BUY")) {
-	    		basicData.buysell.setText("SELL");
-	    		basicData.buysell.setBackground(Color.red);
-	    	} else if (buySell.equalsIgnoreCase("SELL")) {
-	    		basicData.buysell.setText("BUY");
-	    		basicData.buysell.setBackground(Color.green);
-	    	}
-	    	
-	    	 if(basicData.buysell.getText().equalsIgnoreCase("SELL")) {
-	 			
-	 			double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-	 			amt1 = Math.abs(amt1) * -1;
-	 			out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-	 			 double amt2 = Math.abs( (new Double(out.jTextField2.getText()).doubleValue()));
-	 			 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
-	 			
-	 		 }  else if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
-	 				 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
-	 				 amt2 = Math.abs(amt2) * -1;
-	 				 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
-	 				 double amt1= Math.abs( (new Double(out.jTextField1.getText()).doubleValue()));
-	 				 out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-	 			 }
-	 			 
-	 			 if(basicData.buysell.getText().equalsIgnoreCase("SELL/BUY")) {
-	 					
-	 				 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-	 					amt1 = Math.abs(amt1) * -1;
-	 					out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-	 					 double amt2 = Math.abs( (new Double(out.jTextField2.getText()).doubleValue()));
-	 					 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
-	 					 
-	 					 double samt2 =  (new Double(swap.jTextField1.getText()).doubleValue());
-	 					 samt2 = Math.abs(samt2);
-	 					 double samt1= Math.abs( (new Double(swap.jTextField2.getText()).doubleValue())) * -1;
-	 					 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(samt1));
-	 					
-	 					 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(samt2).toString());
-	 					
-	 				 }  else if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL")) {
-	 					 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
-	 					 amt2 = Math.abs(amt2) * -1;
-	 					 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
-	 					 double amt1= Math.abs( (new Double(out.jTextField1.getText()).doubleValue()));
-	 					 out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-	 					 
-	 					 double samt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
-	 						samt1 = Math.abs(samt1) * -1;
-	 						swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(samt1).toString());
-	 						 double samt2 = Math.abs( (new Double(swap.jTextField2.getText()).doubleValue()));
-	 						 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(samt2).toString());
-	 					
-	 				 }
-	 			 
-	 			 populateRountingData();
-	    	
+	    	actonOnBuySell();
 	    }
-	    });
-	    
-    
-    basicData.jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
+   });
+	
+    //@yogesh 08/03/2015
+    // Below is commented as Buy/Sell action is based on tab or enter key 
+    //and not clicking on label
+   /* basicData.jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
 		 public void mouseClicked(MouseEvent e) {
 			 
 			 if( basicData.buysell.getText().equalsIgnoreCase("BUY")) {
-				 basicData. buysell.setText("SELL");
-				 
+				 basicData. buysell.setText("SELL");				 
 			} else {
 				if(!productSubType.equalsIgnoreCase("FXSWAP")) {
 				      basicData.buysell.setText("BUY");
@@ -2323,7 +2280,7 @@ import dsServices.ServerConnectionUtil;
 			 
 		 }
 	 });
-			        
+	*/		        
 			    /*    out.jCheckBox1.addMouseListener(new java.awt.event.MouseAdapter() {
 						 public void mouseClicked(MouseEvent e) {
 							 if(!basicData.jRadioButton2.isSelected()) {
@@ -2473,262 +2430,161 @@ import dsServices.ServerConnectionUtil;
 			 }
 			 
 		          });  
-					 
-			        
-			        swap.jTextField1.addActionListener(new java.awt.event.ActionListener() {
-					    public void actionPerformed(java.awt.event.ActionEvent e) {
-					    	try{
-					    	 if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL")) {
-								  		 double amt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) * -1;
-									double Fspot = (new Double(swap.jTextField4.getText()).doubleValue());
-									
-									double amt2 = Math.abs(amt1 *-1);								
-									swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * Fspot).toString());
-									
-					    	 } else {
-					    		 
-					    		 double amt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) ;
-									double Fspot = (new Double(swap.jTextField4.getText()).doubleValue());
-									
-									double amt2 = Math.abs(amt1) * -1;								
-									swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * Fspot).toString());
-									
-									
-					    		 
-					    	 }
-					    	 populateRountingData();
-					    }catch(NumberFormatException e1) {
-	                		commonUTIL.showAlertMessage("Enter Number ");
-	                	}
+					 			
+			//Amt1 enter key
+	        swap.jTextField1.addActionListener(new java.awt.event.ActionListener() {
+			    public void actionPerformed(java.awt.event.ActionEvent e) {
+			    	try{
+			    	 if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL")) {
+			    		double amt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
+						amt1 = Math.abs(amt1) * -1;
+						double Fspot = (new Double(swap.jTextField4.getText()).doubleValue());
 						
-					 }
-				 });
-			        
-			        // basic amt1 field
-			        out.jTextField1.addKeyListener(new KeyAdapter() {
-	
-		                @Override
-		                public void keyTyped(KeyEvent e) {
-		                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-		                    	try{
-		                    	String type = basicData.buysell.getText();
-		                    	if(type.equalsIgnoreCase("SELL/BUY")) {
-		                    		type = "SELL";
-		                    	}
-		                    	if(type.equalsIgnoreCase("BUY/SELL")) {
-		                    		type = "BUY";
-		                    	}
-		                    	if(type.equalsIgnoreCase("SELL")) {
-									
-									double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) * -1;
-									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-									double amt2 = Math.abs(amt1);								
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp((amt1 * -1) * spot).toString());
-									
-					    	 } else {
-					    		 
-					    		 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) ;
-									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-									double amt2 = Math.abs(amt1) * -1;								
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp((amt1 * -1) * spot).toString());
-					    		 
-					    	 }
-		                    	populateRountingData();
-		                    }catch(NumberFormatException e1) {
-	                    		commonUTIL.showAlertMessage("Enter Number ");
+						double amt2 = Math.abs(amt1 *-1);								
+						swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * Fspot).toString());
+						
+			    	 } else {			    		
+			    		double amt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
+						amt1 = Math.abs(amt1) ;
+						double Fspot = (new Double(swap.jTextField4.getText()).doubleValue());
+						
+						double amt2 = Math.abs(amt1) * -1;								
+						swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * Fspot).toString());			    		 
+			    	 }
+			    	 populateRountingData();
+			    }catch(NumberFormatException e1) {
+            		commonUTIL.showAlertMessage("Enter Number ");
+            	}
+				
+			 }
+		 });
+	     
+	      //// basic amt1 tab key
+	        out.jTextField1.addFocusListener(new FocusListener() {				
+				@Override
+				public void focusLost(FocusEvent arg0) {
+					actionOnAmt1();
+				}				
+				@Override
+				public void focusGained(FocusEvent arg0) {					
+				}
+			});
+			
+			// basic amt1 field enter
+	        out.jTextField1.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                    	actionOnAmt1();
+                    }                  
+                }              
+            });
+			
+	        // basic amt2 tab key
+	        out.jTextField2.addFocusListener(new FocusListener() {				
+				@Override
+				public void focusLost(FocusEvent arg0) {
+					actionOnAmt2();
+				}				
+				@Override
+				public void focusGained(FocusEvent arg0) {					
+				}
+			});
+	        
+		    // amt2 field Enter key
+	        out.jTextField2.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                    	actionOnAmt2();
+                    }
+                }
+            });
+		    
+	     // spot(rate) rate tab key
+	        out.jTextField4.addFocusListener(new FocusListener() {				
+				@Override
+				public void focusLost(FocusEvent arg0) {
+					actionOnRate();
+				}				
+				@Override
+				public void focusGained(FocusEvent arg0) {					
+				}
+			});
+	        
+	        // spot(rate) field enter key
+	        out.jTextField4.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                    	actionOnRate();
+                    }
+                }                               
+            });
+		    
+	      //swap FarRate Tab key
+	        swap.jTextField4.addFocusListener(new FocusListener() {				
+				@Override
+				public void focusLost(FocusEvent arg0) {
+					actionOnSwapFarRate();
+				}				
+				@Override
+				public void focusGained(FocusEvent arg0) {					
+				}
+			});
+	        
+	        //swap FarRate enter key
+	        swap.jTextField4.addKeyListener(new KeyAdapter() {
+	        	@Override
+                public void keyTyped(KeyEvent e) {
+                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                    	actionOnSwapFarRate();
+                    }                   
+                }
+	            });
+		     // swap forward rate field
+	        //This is already covered in above so have commented it
+		       /* out.jTextField4.addKeyListener(new KeyAdapter() {
+
+	                @Override
+	                public void keyTyped(KeyEvent e) {
+	                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+	                    	try{
+	                    	String type = basicData.buysell.getText();
+	                    	if(type.equalsIgnoreCase("SELL/BUY")) {
+	                    		type = "SELL";
 	                    	}
-		                    	 
-		                    }
-		                  
-		                }
-		              
-		            });
-				 
-			        
-			        // amt2 field
-			        out.jTextField2.addKeyListener(new KeyAdapter() {
-	
-		                @Override
-		                public void keyTyped(KeyEvent e) {
-		                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-		                    	try{
-		                    	String type = basicData.buysell.getText();
-		                    	if(type.equalsIgnoreCase("SELL/BUY")) {
-		                    		type = "SELL";
-		                    	}
-		                    	if(type.equalsIgnoreCase("BUY/SELL")) {
-		                    		type = "BUY";
-		                    	}
-		                    	if(type.equalsIgnoreCase("SELL")) {
-									
-									double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
-									amt2 = Math.abs(amt2);
-									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
-									double amt1 = Math.abs(amt2) * -1;								
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1 / spot).toString());
-									
-					    	 } else {
-					    		 
-					    		 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
-									amt2 = Math.abs(amt2) * -1 ;
-									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
-									double amt1 = Math.abs(amt2);								
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp((amt2 *-1)/ spot).toString());
-					    		 
-					    	 }
-		                    	//populateRountingData();
-		                    	}catch(NumberFormatException e1) {
-		                    		commonUTIL.showAlertMessage("Enter Number ");
-		                    	}
-		                    }
-		                }
-		            });
-			        // spot field
-			        out.jTextField4.addKeyListener(new KeyAdapter() {
-	
-		                @Override
-		                public void keyTyped(KeyEvent e) {
-		                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-		                    	try{
-		                    	if(basicData.buysell.getText().equalsIgnoreCase("SELL")) {
-									
-									double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) * -1;
-									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-									double amt2 = Math.abs(amt1);								
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot).toString());
-									
-					    	 } else {
-					    		 
-					    		 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) ;
-									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-									double amt2 = Math.abs(amt1) * -1;								
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt1 * spot).toString());
-					    		 
-					    	 }
-		                    //	populateRountingData();
-		                    	}catch(NumberFormatException e1) {
-		                    		commonUTIL.showAlertMessage("Enter Number ");
-		                    	}
-		                    }
-		                }
-		                
-		               
-		            });
-			        swap.jTextField4.addKeyListener(new KeyAdapter() {
-	
-		                @Override
-		                public void keyTyped(KeyEvent e) {
-		                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-		                    	try{
-		                    	if(basicData.buysell.getText().equalsIgnoreCase("SELL/BUY")) {
-									
-									
-		                    		 double amt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
-										amt1 = Math.abs(amt1) ;
-										double spot = (new Double(swap.jTextField4.getText()).doubleValue());
-										swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-										double amt2 = Math.abs(amt1) * -1;								
-										swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2* spot).toString());
-		                    		
-									
-					    	 } else {
-					    		 
-					    		 double amt1 =  (new Double(swap.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) * -1;
-									double spot = (new Double(swap.jTextField4.getText()).doubleValue());
-									swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-									double amt2 = Math.abs(amt1);								
-									swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot).toString());
-					    		 
-					    	 }
-		                    	String type = basicData.buysell.getText();
-		                    	if(type.equalsIgnoreCase("SELL/BUY")) {
-		                    		type = "SELL";
-		                    	}
-		                    	if(type.equalsIgnoreCase("BUY/SELL")) {
-		                    		type = "BUY";
-		                    	}
-		                    	if(type.equalsIgnoreCase("SELL")) {
-									
-									double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) * -1;
-									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-									double amt2 = Math.abs(amt1);								
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot).toString());
-									
-					    	 } else {
-					    		 
-					    		 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) ;
-									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
-									double amt2 = Math.abs(amt1) * -1;								
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot));
-					    		 
-					    	 }
-		                    	//populateRountingData();
-		                    	 }catch(NumberFormatException e1) {
-			                    		commonUTIL.showAlertMessage("Enter Number ");
-			                    	}
-		                    }
-		                   
-		                }
-		            });
-			     // swap forward rate field
-			        out.jTextField4.addKeyListener(new KeyAdapter() {
-	
-		                @Override
-		                public void keyTyped(KeyEvent e) {
-		                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-		                    	try{
-		                    	String type = basicData.buysell.getText();
-		                    	if(type.equalsIgnoreCase("SELL/BUY")) {
-		                    		type = "SELL";
-		                    	}
-		                    	if(type.equalsIgnoreCase("BUY/SELL")) {
-		                    		type = "BUY";
-		                    	}
-		                    	if(type.equalsIgnoreCase("SELL")) {
-									
-									double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) * -1;
-									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-									double amt2 = Math.abs(amt1);								
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot).toString());
-									
-					    	 } else {
-					    		 
-					    		 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
-									amt1 = Math.abs(amt1) ;
-									double spot = (new Double(out.jTextField4.getText()).doubleValue());
-									out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
-									double amt2 = Math.abs(amt1) * -1;								
-									out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot));
-					    		 
-					    	 }
-		                    //	populateRountingData();
-		                    }catch(NumberFormatException e1) {
-	                    		commonUTIL.showAlertMessage("Enter Number ");
+	                    	if(type.equalsIgnoreCase("BUY/SELL")) {
+	                    		type = "BUY";
 	                    	}
-		                    }
-		                }
-		              
-		            });
-			        
+	                    	if(type.equalsIgnoreCase("SELL")) {
+								
+								double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+								amt1 = Math.abs(amt1) * -1;
+								double spot = (new Double(out.jTextField4.getText()).doubleValue());
+								out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+								double amt2 = Math.abs(amt1);								
+								out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot).toString());
+								
+				    	 } else {
+				    		 
+				    		 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+								amt1 = Math.abs(amt1) ;
+								double spot = (new Double(out.jTextField4.getText()).doubleValue());
+								out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1));
+								double amt2 = Math.abs(amt1) * -1;								
+								out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot));
+				    		 
+				    	 }
+	                    //	populateRountingData();
+	                    }catch(NumberFormatException e1) {
+                    		commonUTIL.showAlertMessage("Enter Number ");
+                    	}
+	                    }
+	                }
+	              
+	            });
+		*/	        
 			        // caching can be done in this process. 
 			        
 			        functionality.jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -3210,8 +3066,13 @@ import dsServices.ServerConnectionUtil;
 						}  else { 
 							basicData.buysell.setBackground(Color.red);
 						} */
-							basicData.buysell.setText("BUY");
-							basicData.buysell.setBackground(Color.green);
+							if (basicData.buysell.getText().equalsIgnoreCase("SELL/BUY") || basicData.buysell.getText().equalsIgnoreCase("SELL")) {
+								basicData.buysell.setText("SELL");
+								basicData.buysell.setBackground(Color.red);
+							} else {
+								basicData.buysell.setText("BUY");
+								basicData.buysell.setBackground(Color.green);
+							}
 							
 						}
 						
@@ -3220,73 +3081,69 @@ import dsServices.ServerConnectionUtil;
 			    	
 			    });
 			        
-			       // swap  radio button 
-			        
-			        basicData.jRadioButton2.addMouseListener(new java.awt.event.MouseAdapter() {
-	
-						@Override
-						public void mouseClicked(MouseEvent e) {
-							if(!basicData.jRadioButton2.isEnabled())
-								return ;
-							basicData.jRadioButton2.setSelected(true);
-							 functionality.FarRate1.setVisible(true);
-							 functionality.FarRate2.setVisible(true);
-							 functionality.jLabel4.setVisible(true);
-							 functionality.jLabel5.setVisible(true);
-							basicData.jRadioButton1.setSelected(false);
-						//	out.jCheckBox2.setEnabled(true);
-							//out.jCheckBox0.setEnabled(false);
-							functionality.jButton2.setEnabled(true);
-							functionality.jButton3.setEnabled(true);
-							basicData.jRadioButton5.setSelected(false);
-							functionality.jButton0.setEnabled(false);
-							basicData.jRadioButton0.setSelected(false);
-							fwdOp.setVisible(false);
-							productSubType = "FXSWAP";
-							swap.setVisible(true);
-							swap.jTextField1.setText("0.0");
-							swap.jTextField2.setText("0.0");
-							swap.jTextField4.setText("0.0");
-							out.outRightDate.setDate(commonUTIL.addSubtractDate(commonUTIL.getCurrentDate(), 2));
-									
-							//if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
-							//	basicData.buysell.setText("SELL/BUY");
-							//	basicData.buysell.setBackground(Color.red);
-								/*double amt1 = Math.abs(new Double(out.jTextField1.getText()).doubleValue() );
-								
-								double amt2 = Math.abs(new Double(out.jTextField2.getText()).doubleValue()  * -1);
-								swap.jTextField1.setText(out.jTextField1.getText());
-								swap.jTextField2.setText(out.jTextField2.getText());
-								out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1 * -1).toString());
-								out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 ).toString()); */
-								
-								
-							//}
-					//	if(basicData.buysell.getText().equalsIgnoreCase("SELL")) {
-							basicData.buysell.setText("BUY/SELL");
-							basicData.buysell.setBackground(Color.green
-									);
+			       // swap  radio button 			        
+	        basicData.jRadioButton2.addMouseListener(new java.awt.event.MouseAdapter() {	
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					if(!basicData.jRadioButton2.isEnabled())
+						return ;
+					basicData.jRadioButton2.setSelected(true);
+					 functionality.FarRate1.setVisible(true);
+					 functionality.FarRate2.setVisible(true);
+					 functionality.jLabel4.setVisible(true);
+					 functionality.jLabel5.setVisible(true);
+					basicData.jRadioButton1.setSelected(false);
+				//	out.jCheckBox2.setEnabled(true);
+					//out.jCheckBox0.setEnabled(false);
+					functionality.jButton2.setEnabled(true);
+					functionality.jButton3.setEnabled(true);
+					basicData.jRadioButton5.setSelected(false);
+					functionality.jButton0.setEnabled(false);
+					basicData.jRadioButton0.setSelected(false);
+					fwdOp.setVisible(false);
+					productSubType = "FXSWAP";
+					swap.setVisible(true);
+					// below method will set faramounts by calling actionOnSwapFarRate()
+					fillFieldsForBuySellOrSellBuy();
+					
+					out.outRightDate.setDate(commonUTIL.addSubtractDate(commonUTIL.getCurrentDate(), 2));
 							
-							
-							
-						/*	double amt1 = Math.abs(new Double(out.jTextField1.getText()).doubleValue() * -1);
-							//	out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-								
-								double amt2 = Math.abs(new Double(out.jTextField2.getText()).doubleValue());
-							//	out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
-								swap.jTextField1.setText(out.jTextField1.getText());
-								swap.jTextField2.setText(out.jTextField2.getText());
-								out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
-								out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * -1).toString());*/
-							
-						//}
-							}
-							
+					//if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
+					//	basicData.buysell.setText("SELL/BUY");
+					//	basicData.buysell.setBackground(Color.red);
+						/*double amt1 = Math.abs(new Double(out.jTextField1.getText()).doubleValue() );
+						
+						double amt2 = Math.abs(new Double(out.jTextField2.getText()).doubleValue()  * -1);
+						swap.jTextField1.setText(out.jTextField1.getText());
+						swap.jTextField2.setText(out.jTextField2.getText());
+						out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1 * -1).toString());
+						out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 ).toString()); */
 						
 						
-			    
-			    	
-			    });
+					//}
+			//	if(basicData.buysell.getText().equalsIgnoreCase("SELL")) {
+					if (basicData.buysell.getText().equalsIgnoreCase("SELL") || basicData.buysell.getText().equalsIgnoreCase("SELL")) {
+						basicData.buysell.setText("SELL/BUY");
+						basicData.buysell.setBackground(Color.red);
+					} else {
+						basicData.buysell.setText("BUY/SELL");
+						basicData.buysell.setBackground(Color.green);
+					}
+												
+					
+				/*	double amt1 = Math.abs(new Double(out.jTextField1.getText()).doubleValue() * -1);
+					//	out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+						
+						double amt2 = Math.abs(new Double(out.jTextField2.getText()).doubleValue());
+					//	out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
+						swap.jTextField1.setText(out.jTextField1.getText());
+						swap.jTextField2.setText(out.jTextField2.getText());
+						out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+						out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * -1).toString());*/
+					
+				//}
+					}	    	
+	    });
 			        out.jComboBox1.addItemListener(new ItemListener() {
 	
 						@Override
@@ -3305,8 +3162,7 @@ import dsServices.ServerConnectionUtil;
 						}
 			        	
 			        });
-			        // Fwd Option Radio button. 
-			        
+			        // Fwd Option Radio button. 			        
 			        basicData.jRadioButton5.addMouseListener(new java.awt.event.MouseAdapter() {
 	
 						@Override
@@ -3357,8 +3213,17 @@ import dsServices.ServerConnectionUtil;
 							fwdOp.primaryC.setValue(0);
 							fwdOp.quotingC.setValue(0);	
 							// mpankaj 02/02
-							basicData.buysell.setText("BUY");
-							basicData.buysell.setBackground(Color.green);
+							//basicData.buysell.setText("BUY");
+							//basicData.buysell.setBackground(Color.green);
+							
+							if (basicData.buysell.getText().equalsIgnoreCase("SELL/BUY") || basicData.buysell.getText().equalsIgnoreCase("SELL")) {
+								basicData.buysell.setText("SELL");
+								basicData.buysell.setBackground(Color.red);
+							} else {
+								basicData.buysell.setText("BUY");
+								basicData.buysell.setBackground(Color.green);
+							}
+							
 							//@ yogesh 01/02/2015
 							//@ date should be displayes even though currency pair is not selected
 							fwdOp.startDate.setDate(commonUTIL.getCurrentDate());
@@ -4051,10 +3916,10 @@ import dsServices.ServerConnectionUtil;
 			
 			//@yogesh 07/02/2015
 		    // swap.setVisible(false); set its field to zero
-			/*swap.jTextField1.setText("0");
+			swap.jTextField1.setText("0");
 			swap.jTextField2.setText("0");
-			swap.swapDate.setText("0");
-			swap.jTextField4.setText("0");*/
+			swap.swapDate.setDate(commonUTIL.getCurrentDate());
+			swap.jTextField4.setText("0");
 	
 			String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
 	        
@@ -5825,4 +5690,212 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 		    		
 		    	}
 		    }
+		  
+		  private void actionOnAmt1() {
+			  try{
+	            	String type = basicData.buysell.getText();
+	            	if(type.equalsIgnoreCase("SELL/BUY")) {
+	            		type = "SELL";
+	            	}
+	            	if(type.equalsIgnoreCase("BUY/SELL")) {
+	            		type = "BUY";
+	            	}
+	            	if(type.equalsIgnoreCase("SELL")) {							
+						double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+						amt1 = Math.abs(amt1) * -1;
+						double spot = (new Double(out.jTextField4.getText()).doubleValue());
+						out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+						double amt2 = Math.abs(amt1);								
+						out.jTextField2.setText(commonUTIL.getStringFromDoubleExp((amt1 * -1) * spot).toString());							
+			    	 } else {			    		 
+			    		double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+						amt1 = Math.abs(amt1) ;
+						double spot = (new Double(out.jTextField4.getText()).doubleValue());
+						out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+						double amt2 = Math.abs(amt1) * -1;								
+						out.jTextField2.setText(commonUTIL.getStringFromDoubleExp((amt1 * -1) * spot).toString());			    		 
+			    	 }  
+	            	
+	            	if (basicData.jRadioButton2.isSelected()) {
+         	          	fillFieldsForBuySellOrSellBuy();	         	        
+	            	}
+	            	
+	            populateRountingData();
+	            
+          	}catch(NumberFormatException e1) {
+          		commonUTIL.showAlertMessage("Enter Number ");
+          	}          	          
+		  }
+		  
+		  private void actionOnAmt2(){
+          	try{
+          	String type = basicData.buysell.getText();
+          	if(type.equalsIgnoreCase("SELL/BUY")) {
+        		type = "SELL";
+        	}
+        	if(type.equalsIgnoreCase("BUY/SELL")) {
+        		type = "BUY";
+        	}
+        	
+          	if(type.equalsIgnoreCase("SELL")) {					
+				double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
+				amt2 = Math.abs(amt2);
+				double spot = (new Double(out.jTextField4.getText()).doubleValue());
+				out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
+				double amt1 = Math.abs(amt2) * -1;								
+				out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1 / spot).toString());	
+				
+	    	 } else if(type.equalsIgnoreCase("BUY")) {
+	    		 double amt2 =  (new Double(out.jTextField2.getText()).doubleValue());
+	    		 amt2 = Math.abs(amt2) * -1 ;
+	    		 double spot = (new Double(out.jTextField4.getText()).doubleValue());
+	    		 out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2).toString());
+	    		 double amt1 = Math.abs(amt2);								
+	    		 out.jTextField1.setText(commonUTIL.getStringFromDoubleExp((amt2 *-1)/ spot).toString());	    		 
+	    	 } 
+          	
+          	if (basicData.jRadioButton2.isSelected()) {
+ 	          	fillFieldsForBuySellOrSellBuy();	         	        
+        	}
+          	
+          	//populateRountingData();
+          	}catch(NumberFormatException e1) {
+          		commonUTIL.showAlertMessage("Enter Number ");
+          	}
+          
+		  }
+		  
+		  private void actionOnRate() {
+          	try{
+          		String type = basicData.buysell.getText();
+          		if(type.equalsIgnoreCase("SELL/BUY")) {
+            		type = "SELL";
+            	}
+            	if(type.equalsIgnoreCase("BUY/SELL")) {
+            		type = "BUY";
+            	} 
+	          	if(type.equalsIgnoreCase("SELL")) {					
+	          		fillFieldsForSell();
+		    	} else if(type.equalsIgnoreCase("BUY")) { 	    		 
+		    		fillFieldsForBuy();	    		 
+		    	} 
+	          	
+	          	if (basicData.jRadioButton2.isSelected()) {
+	 	          	fillFieldsForBuySellOrSellBuy();	         	        
+	        	}
+	          	
+          //	populateRountingData();
+          	}catch(NumberFormatException e1) {
+          		commonUTIL.showAlertMessage("Enter Number ");
+          	}          
+		  }
+		  
+		  private void  fillFieldsForBuySellOrSellBuy(){
+			  double farAmt1 = 0.0;
+			  double amt1 =  Double.parseDouble(out.jTextField1.getText());
+			  amt1 = Math.abs(amt1);
+			  
+			  if (!out.jTextField1.getText().equals("0.0")) {
+				 //FarAmt1 sign(+/-) is set in actionOnSwapFarRate, so we are just setting its 
+				  //value here
+				  swap.jTextField1.setText(String.valueOf(amt1));			  
+				  // This method is called because it sets the value of far Amt2 based on farAmt1 and farRate
+				  actionOnSwapFarRate();					
+				} else {
+					swap.jTextField1.setText("0.0");
+					swap.jTextField2.setText("0.0");
+					swap.jTextField4.setText("0.0");
+				}
+		  }
+		  
+		  private void fillFieldsForSell () {
+			  double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+			  amt1 = Math.abs(amt1) * -1;
+			  double spot = (new Double(out.jTextField4.getText()).doubleValue());
+			  out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+			  double amt2 = Math.abs(amt1);								
+			  out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot).toString());	
+			 			 
+		  }
+		  
+		  private void fillFieldsForBuy () {
+			  double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+			  amt1 = Math.abs(amt1);
+			  double spot = (new Double(out.jTextField4.getText()).doubleValue());
+			  out.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+			  double amt2 = Math.abs(amt1) * -1;								
+			  out.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2 * spot).toString());
+			  
+		  }
+		  
+		  // This method is called when there is any action on SwapfarRate
+		  // and also called from method fillFieldsForBuySellOrSellBuy()
+		  private void actionOnSwapFarRate(){
+          	try{          		
+          		if(basicData.buysell.getText().equalsIgnoreCase("SELL") || basicData.buysell.getText().equalsIgnoreCase("SELL/BUY")) {					
+          			double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+					amt1 = Math.abs(amt1) ;
+					double spot = (new Double(swap.jTextField4.getText()).doubleValue());
+					swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+					double amt2 = Math.abs(amt1) * -1;								
+					swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2* spot).toString());        							
+          		} else {	    		 
+		    		 double amt1 =  (new Double(out.jTextField1.getText()).doubleValue());
+		    		 amt1 = Math.abs(amt1) * -1;
+		    		 double spot = (new Double(swap.jTextField4.getText()).doubleValue());
+		    		 swap.jTextField1.setText(commonUTIL.getStringFromDoubleExp(amt1).toString());
+		    		 double amt2 = Math.abs(amt1);								
+		    		 swap.jTextField2.setText(commonUTIL.getStringFromDoubleExp(amt2*spot).toString());	    		 
+          		}
+          		
+	          	//populateRountingData();
+          	 }catch(NumberFormatException e1) {
+              		commonUTIL.showAlertMessage("Enter Number ");
+          	 }
+          
+		  }
+		  
+		  private void actonOnBuySell () {
+			String buySell = basicData.buysell.getText();
+		    	
+    		if (buySell.equalsIgnoreCase("BUY/SELL")) {
+	    		basicData.buysell.setText("SELL/BUY");
+	    		basicData.buysell.setBackground(Color.red);
+	    	} else if (buySell.equalsIgnoreCase("SELL/BUY")) {
+	    		basicData.buysell.setText("BUY/SELL");
+	    		basicData.buysell.setBackground(Color.green);
+	    	} else if (buySell.equalsIgnoreCase("BUY")) {
+	    		basicData.buysell.setText("SELL");
+	    		basicData.buysell.setBackground(Color.red);
+	    	} else if (buySell.equalsIgnoreCase("SELL")) {
+	    		basicData.buysell.setText("BUY");
+	    		basicData.buysell.setBackground(Color.green);
+	    	}
+	    	
+	    	 if(basicData.buysell.getText().equalsIgnoreCase("SELL")) {	 			
+	    		 fillFieldsForSell();			
+	    	 }  else if(basicData.buysell.getText().equalsIgnoreCase("BUY")) {
+	    		 fillFieldsForBuy();
+ 			 } else if(basicData.buysell.getText().equalsIgnoreCase("SELL/BUY")) { 					
+ 				fillFieldsForSell();
+ 				fillFieldsForBuySellOrSellBuy(); 					
+ 			 } else if(basicData.buysell.getText().equalsIgnoreCase("BUY/SELL")) {		
+ 				fillFieldsForBuy();
+ 				fillFieldsForBuySellOrSellBuy();
+			 }
+		 			 
+ 			 populateRountingData();		    
+		  }
+
+		@Override
+		public ActionMap getHotKeysActionMapper() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public JPanel getHotKeysPanel() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
