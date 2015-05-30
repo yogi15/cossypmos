@@ -1157,6 +1157,7 @@ public class TradeApplication extends DefaultDockableHolder {
 		tradeP.setFEESPanel(feesPanel);
 		tradeP.setLimitPanel(limitPanel);
 		// hot keys 
+		if(tradeP.getHotKeysPanel() != null) {
 		 InputMap keyMap = new ComponentInputMap(tradeP.getHotKeysPanel());
 		    keyMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S,
 		            java.awt.Event.CTRL_MASK), "action_save");
@@ -1179,6 +1180,7 @@ public class TradeApplication extends DefaultDockableHolder {
 		        	showAllTrades.setVisible(true);
 		        }
 		    });
+		}
 		// taskManager.setTradWIndow(tradePanel);
 	}
 
