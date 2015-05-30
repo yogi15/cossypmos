@@ -720,10 +720,11 @@ Users usr = null;
 					int leid = trader.getSelectedIndex();
 					// @ yogesh 24/02/2015
 					// returns if -1
-					if(leid == 0 || leid == -1)
+					if( leid == -1)
 						return;
 					LegalEntity le = traderData.get(leid);
 					trader.setName(String.valueOf(((le)).getId()));
+					//trader.getModel().setSelectedItem(leid);
 					//System.out.println(counterPary.getName());
 					
 				}
@@ -747,7 +748,7 @@ Users usr = null;
 					int leid = counterParty.getSelectedIndex();
 					// @ yogesh 24/02/2015
 					// returns if -1
-					if(leid == 0 || leid == -1)
+					if( leid == -1)
 						return;
 					LegalEntity le = legalEntityData.get(leid);
 					counterParty.setName(String.valueOf(((le)).getId()));
@@ -773,7 +774,7 @@ Users usr = null;
 					int leid = book.getSelectedIndex();
 					// @ yogesh 24/02/2015
 					// returns if -1
-					if(leid == 0 || leid == -1)
+					if( leid == -1)
 						return;
 					Book boo = bookData.get(leid);
 					book.setName(String.valueOf(((boo)).getBookno()));
@@ -1523,7 +1524,7 @@ Users usr = null;
 			 rateC.setSelectedItem(coupon.getCouponType());
 			 FixedRate.setText(String.valueOf(trade.getPrice()));
 			 if(rateC.getSelectedItem().toString().equalsIgnoreCase(MMConstants.FLOAT)) {
-				    
+				 
 				    
 				    compFreq.setSelectedItem(trade.getProduct().getCoupon().getCouponFrequency());
 				    tenor.setSelectedItem(trade.getProduct().getTenor());
