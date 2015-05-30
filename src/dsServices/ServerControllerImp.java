@@ -27,22 +27,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
-import org.apache.log4j.Logger;
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+
 import util.LogPublishUtil;
 import util.commonUTIL;
-
+import util.PropertiesReader.ConfigPropertiesReader;
 import logAppender.ServerServiceAppender;
 import mqServices.Broker.StartMQBroker;
-
 import dbSQL.UsersSQL;
 import dbSQL.dsSQL;
-
 import dsEventProcessor.AdminEventProcessor;
 import dsEventProcessor.EventProcessor;
 import dsEventProcessor.EventProducerServer;
-
 import beans.DealBean;
 import beans.ServerBean;
 import beans.Users;
@@ -58,12 +56,12 @@ public class ServerControllerImp  extends ServerManager implements RemoteDeal ,R
    String password;
    ServerConnectionUtil sconn = null;
    EventProducerServer eventServer = null;
- static  ConcurrentHashMap<String,String> runningEngines = new ConcurrentHashMap<String,String>();
+   static  ConcurrentHashMap<String,String> runningEngines = new ConcurrentHashMap<String,String>();
    ConcurrentHashMap<Integer,Users> connectedUserData  = new ConcurrentHashMap<Integer,Users>();
 
   static HashMap<String,Users> monitorConnectedUserData  = new  HashMap<String,Users>();
   static boolean holdRemoveEngineSignals = false;
-static ConcurrentHashMap<String, String> engineSignals = new ConcurrentHashMap<String, String> ();
+  static ConcurrentHashMap<String, String> engineSignals = new ConcurrentHashMap<String, String> ();
    static int clientID = 1544;
    RemoteTrade remoteTrade = null; // used for publishing event 
    EngineMonitorService monitorService = null;
@@ -71,32 +69,28 @@ static ConcurrentHashMap<String, String> engineSignals = new ConcurrentHashMap<S
      // get the address of this host.
 	  // getLog4IntputStream();
 	 // PropertyConfigurator.configure(log4P);
-          
-	
-          
-       
-        
+                    
+	   ConfigPropertiesReader configReader = new ConfigPropertiesReader();
+	          
        System.out.println("this address="+thisAddress+",port="+thisPort);
        ExecutorService executor = Executors.newFixedThreadPool(1);
        try{
-    	   thisPort=1099; 
+    	   thisPort=Integer.parseInt(configReader.getPropertyValue("serverport")); 
     	   executor.execute(new LogPublishUtil("ServerControllerImp"));
     	//   executor.execute(new LogPublishUtil("ServerControllerImp"));
     	
-    	   	
-           try {
+    	try {
 			thisAddress = (InetAddress.getLocalHost()).toString();
 			executor.awaitTermination(5, TimeUnit.MILLISECONDS);
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch(InterruptedException e) {
 			e.printStackTrace();
 		}
            sconn = new ServerConnectionUtil();
            sconn.setdefault(sconn);
-           sconn._dataServerName = "localhost";
-           sconn._rmiPort = 1099;
+           sconn._dataServerName = configReader.getPropertyValue("serverpath");
+           sconn._rmiPort = Integer.parseInt(configReader.getPropertyValue("serverport"));
            sconn._hostName = thisAddress;
            String host = thisAddress.substring(0, thisAddress.indexOf('/'));
            System.out.println("Server starting at port "+ sconn._rmiPort + " hostName " + sconn._hostName );
@@ -306,9 +300,12 @@ public void setPassword(String password) {
 public int publishEvent(String messageIndicator,String queueName, String messageType,
 		Object object) throws RemoteException {
 	// TODO Auto-generated method stub
-	if(eventServer == null)
-	 eventServer = new EventProducerServer(commonUTIL.getLocalHostName()+":61616");
-	
+	if(eventServer == null) {
+		ConfigPropertiesReader configReader = new ConfigPropertiesReader();
+		eventServer = new EventProducerServer(commonUTIL.getLocalHostName()+":"+
+				configReader.getPropertyValue("eventserverport"));
+	}
+	 	
 	if(!eventServer.isFlagStartup()) {
 	Thread sendMessage =  new Thread(eventServer);
 	// setNewMessage(messageProducer);
