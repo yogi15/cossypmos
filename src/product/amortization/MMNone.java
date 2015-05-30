@@ -89,7 +89,7 @@ public class MMNone extends MMAmortization {
 		double dayCountFactor = daycount.getDayCountFactor(productStartDate,
 				DateU.valueOf(flow.getEndDate()));
 
-		double fixedInterest = trade.getTradeAmount()
+		double fixedInterest = trade.getQuantity()
 				* (coupon.getFixedRate() / 100) * dayCountFactor;
 
 		return fixedInterest;
@@ -123,7 +123,7 @@ public class MMNone extends MMAmortization {
 		double dayCountFactor = daycount.getDayCountFactor(productStartDate,
 				DateU.valueOf(flow.getEndDate()));
 
-		double couponAmount = trade.getTradeAmount()
+		double couponAmount = trade.getQuantity()
 				* (coupon.getFixedRate() / 100) * dayCountFactor;
 
 		return couponAmount;
