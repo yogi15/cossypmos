@@ -1029,7 +1029,7 @@ public class MMCashFlow extends DefaultCashFlow {
 		long accrualsDays = 0;
 
 		double fixedRate = coupon.getFixedRate();
-		double nominalAmount = trade.getTradeAmount();
+		double nominalAmount = trade.getQuantity();
 
 		CountDay daycount = CountDay.valueOf(coupon.getDayCount());
 
@@ -1069,7 +1069,7 @@ public class MMCashFlow extends DefaultCashFlow {
 				flow.setNominal(nominalAmount);
 				flow.setAccuralDays(0);
 
-				balanceAmount = trade.getTradeAmount() * payMutiflyingfactor;
+				balanceAmount = trade.getQuantity() * payMutiflyingfactor;
 				outstandingAmount = balanceAmount * payMutiflyingfactor;
 
 				// for MM balance loan amount is Payment Amount
@@ -1082,7 +1082,7 @@ public class MMCashFlow extends DefaultCashFlow {
 
 				// calculateFixedInterest method requires daycount facctor which
 				// in turn requires coupon start date and coupon end date
-				// which are absent in first and last flow. So the methos is
+				// which are absent in first and last flow. So the calculateFixedInterest method is
 				// used for in between coupons
 				double fixedInterest = mmAmortizationObject
 						.calculateFixedInterest();
@@ -1128,7 +1128,7 @@ public class MMCashFlow extends DefaultCashFlow {
 				flow.setNominal(nominalAmount);
 				flow.setAccuralDays(0);
 
-				balanceAmount = trade.getTradeAmount()
+				balanceAmount = trade.getQuantity()
 						* receiveMutiflyingfactor;
 
 				flow.setBalanceAmount(balanceAmount);
