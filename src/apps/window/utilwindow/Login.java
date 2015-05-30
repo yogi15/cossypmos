@@ -18,14 +18,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 
-import util.commonUTIL;
 
+
+import util.commonUTIL;
+import util.PropertiesReader.ConfigPropertiesReader;
 import beans.StartUPData;
 import beans.Users;
-
 import dsServices.RemoteReferenceData;
 import dsServices.ServerConnectionUtil;
-
 import apps.window.tradewindow.JFrameMainApplication;
 
 /*
@@ -79,7 +79,12 @@ public class Login extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
     	//installLnF();
-    	de =ServerConnectionUtil.connect("localhost", 1099,commonUTIL.getLocalHost());
+    	ConfigPropertiesReader configReader = new ConfigPropertiesReader();
+    	
+    	String dataServerName = configReader.getPropertyValue("serverpath");
+    	int port = Integer.parseInt(configReader.getPropertyValue("serverport"));
+    	
+    	de =ServerConnectionUtil.connect(dataServerName, port, commonUTIL.getLocalHost());
     	if(de == null) {
     		JOptionPane.showMessageDialog(null,"Server not Started " ,null,
        				JOptionPane.INFORMATION_MESSAGE);
@@ -87,11 +92,9 @@ public class Login extends javax.swing.JDialog {
     	return;
     	}
     	 try {
-    		 remoteBORef = (RemoteReferenceData) de.getRMIService("ReferenceData");
- 			
+    		 remoteBORef = (RemoteReferenceData) de.getRMIService("ReferenceData"); 			
  			System.out.println(remoteBORef);
  		} catch (RemoteException e) {
- 			// TODO Auto-generated catch block
  			e.printStackTrace();
  		}
         jPanel1 = new javax.swing.JPanel();
