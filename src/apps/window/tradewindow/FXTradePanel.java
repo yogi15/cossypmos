@@ -5898,4 +5898,10 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public ArrayList<Component> getFocusOrderList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}

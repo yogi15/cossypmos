@@ -49,6 +49,7 @@ import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
+import swingUtils.CustomFocusTraversalPolicy;
 import util.ClassInstantiateUtil;
 import util.commonUTIL;
 import apps.window.operationwindow.jobpanl.FilterValues;
@@ -220,9 +221,9 @@ public class TradeApplication extends DefaultDockableHolder {
 		Icon icon = getIcon(iconPath);
 		
 		
-		DockableFrame frameT = new DockableFrame(name1 + " " + clock.getText(),JideIconsFactory.getImageIcon(JideIconsFactory.DockableFrame.FRAME1));
+		DockableFrame frameT = new DockableFrame(name1  ,JideIconsFactory.getImageIcon(JideIconsFactory.DockableFrame.FRAME1));
 		frameT.add(clock);
-		frameT.setName(name1 + " " + clock.getText());
+		frameT.setName(name1);
 		frameT.setAvailableButtons(DO_NOTHING_ON_CLOSE);
 		frameT.getContentPane().add(JInternalReportFrame(), BorderLayout.CENTER);
 		frameT.setInitSide(DockContext.DOCK_SIDE_CENTER);
@@ -1139,7 +1140,7 @@ public class TradeApplication extends DefaultDockableHolder {
 	}
 		tradeP.setUser(user);
 		filterValues = new FilterValues(remoteReference, remoteTrade, remoteTask, boremote);
-		productWindowpanel = makeProductPanel(name);
+
 		tradeP.setTradeApplication(this);
 		tradeP.setFilterValue(filterValues);
 		initTransferPanel(name, user);
@@ -1181,6 +1182,9 @@ public class TradeApplication extends DefaultDockableHolder {
 		        }
 		    });
 		}
+		CustomFocusTraversalPolicy focusPolicy =  new CustomFocusTraversalPolicy(tradeP.getFocusOrderList());
+		tradeP.setFocusCycleRoot(true);
+		tradeP.setFocusTraversalPolicy(focusPolicy);
 		// taskManager.setTradWIndow(tradePanel);
 	}
 
@@ -1264,9 +1268,7 @@ public class TradeApplication extends DefaultDockableHolder {
 
 		tradeP.openTrade(newTrade);
 		tradeP.setTrade(newTrade);
-		if (productWindowpanel != null) {
-			productWindowpanel.openTrade(newTrade);
-		}
+		 
 		trade = newTrade;
 		getTradeTask(taskPanel);
 		getTradeMessages(messagePanel);
