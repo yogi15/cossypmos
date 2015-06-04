@@ -22,6 +22,8 @@ public class Product implements Serializable {
 	String dateDate;
 	String startDate;
 	String name;
+	String currency;
+	String productSubType;
 	String productType;
 	String productname;
 	String prodcutShortName;
@@ -213,5 +215,26 @@ public void setCoupon(Coupon coup) {
 	// TODO Auto-generated method stub
 	coupon = coup;
 	
+}
+ProductFXOption productFXOption = null;
+public void setFXOptionProduct(ProductFXOption fxOptionProduct) {
+	// TODO Auto-generated method stub
+	productFXOption = fxOptionProduct;
+}
+public ProductFXOption getFXOptionProduct() {
+	return productFXOption;
+}
+public String getCurrency() {
+	// TODO Auto-generated method stub
+	return currency;
+}
+public String getProductSubType() {
+	return productSubType;
+}
+public void setProductSubType(String productSubType) {
+	this.productSubType = productSubType;
+}
+public void setCurrency(String currency) {
+	this.currency = currency;
 }
 }

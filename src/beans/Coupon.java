@@ -8,6 +8,20 @@ public class Coupon implements Serializable {
 	int productId =0;
 	String couponType;
 	String tenor;
+	String rateIndex = null;
+	
+	/**
+	 * @return the rateIndex
+	 */
+	public String getRateIndex() {
+		return rateIndex;
+	}
+	/**
+	 * @param rateIndex the rateIndex to set
+	 */
+	public void setRateIndex(String rateIndex) {
+		this.rateIndex = rateIndex;
+	}
 	public String getTenor() {
 		return tenor;
 	}
