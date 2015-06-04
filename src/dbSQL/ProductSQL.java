@@ -19,7 +19,7 @@ public class ProductSQL {
 	final static private String DELETE =
 		"DELETE FROM " + tableName + "   where id =? ";
 	final static private String INSERT =
-		"INSERT into " + tableName + "(id,productType,productName,productShortName ,quantity,issueDate,marturityDate,IssuerId,Country,IssuePrice,IssueCurrency,RedemptionPrice,RedemptionCurrency,FaceValue,code,dateddate,tenor,attributes,ispositionBased,collateralId,callableType,repoType,UNDERLYINGTYPE) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		"INSERT into " + tableName + "(id,productType,productName,productShortName ,quantity,issueDate,marturityDate,IssuerId,Country,IssuePrice,IssueCurrency,RedemptionPrice,RedemptionCurrency,FaceValue,code,dateddate,tenor,attributes,ispositionBased,collateralId,callableType,repoType,UNDERLYINGTYPE,currency,productsubtype) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 				//"issueDate,marturityDate,IssuerId,Country,IssuePrice,IssueCurrency,RedemptionPrice,RedemptionCurrency,FaceValue,code,dateddate,tenor ) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	final static private String UPDATE =
 		"UPDATE " + tableName +
@@ -70,6 +70,8 @@ public class ProductSQL {
 			.append(" collateralId=").append(product.getCollateralID()).append(",")
 			.append(" callableType='").append(product.getCallType()).append("',")
 			.append(" repoType='").append(product.getRepoType()).append("',")
+			.append(" currency='").append(product.getCurrency()).append("',")
+			.append(" productSubType='").append(product.getProductSubType()).append("',")
 			.append(" UNDERLYINGTYPE='").append(product.getUnderlyingProductType()).append("'")
 			.append("where 	id = ").append(product.getId()).toString();
 	      //System.out.println(updateSQL);
@@ -79,15 +81,15 @@ public class ProductSQL {
 	final static private String SELECT_MAX =
 		" SELECT PRODUCT_SEQ.NEXTVAL DESC_ID FROM DUAL";
 	final static private String SELECTALL =
-		"SELECT id,productType,productName,productShortName ,quantity,issueDate,marturityDate,IssuerId,Country,IssuePrice,IssueCurrency,RedemptionPrice,RedemptionCurrency,FaceValue,code,dateddate,tenor,attributes,ispositionBased,collateralId,callableType,repoType,UNDERLYINGTYPE FROM " + tableName + " order by id ";
+		"SELECT id,productType,productName,productShortName ,quantity,issueDate,marturityDate,IssuerId,Country,IssuePrice,IssueCurrency,RedemptionPrice,RedemptionCurrency,FaceValue,code,dateddate,tenor,attributes,ispositionBased,collateralId,callableType,repoType,UNDERLYINGTYPE,currency,productSubType FROM " + tableName + " order by id ";
 	final static private String SELECT =
-		"SELECT id,productType,productName,productShortName ,quantity,issueDate,marturityDate,IssuerId,Country,IssuePrice,IssueCurrency,RedemptionPrice,RedemptionCurrency,FaceValue,code,dateddate,tenor,attributes,ispositionBased,collateralId,callableType,repoType,UNDERLYINGTYPE FROM " + tableName + " where id =  ?";
+		"SELECT id,productType,productName,productShortName ,quantity,issueDate,marturityDate,IssuerId,Country,IssuePrice,IssueCurrency,RedemptionPrice,RedemptionCurrency,FaceValue,code,dateddate,tenor,attributes,ispositionBased,collateralId,callableType,repoType,UNDERLYINGTYPE,currency,productSubType FROM " + tableName + " where id =  ?";
 	 static private String SELECTONE =
-		"SELECT id,productType,productName,productShortName ,quantity,issueDate,marturityDate,IssuerId,Country,IssuePrice,IssueCurrency,RedemptionPrice,RedemptionCurrency,FaceValue,code,dateddate,tenor,attributes,ispositionBased,collateralId,callableType,repoType,UNDERLYINGTYPE FROM " + tableName + " where id =  ";
+		"SELECT id,productType,productName,productShortName ,quantity,issueDate,marturityDate,IssuerId,Country,IssuePrice,IssueCurrency,RedemptionPrice,RedemptionCurrency,FaceValue,code,dateddate,tenor,attributes,ispositionBased,collateralId,callableType,repoType,UNDERLYINGTYPE,currency,productSubType FROM " + tableName + " where id =  ";
 	 final static private String SELECTWHRE = 
-		 "SELECT id,productType,productName,productShortName ,quantity,issueDate,marturityDate,IssuerId,Country,IssuePrice,IssueCurrency,RedemptionPrice,RedemptionCurrency,FaceValue,code,dateddate,tenor,attributes,ispositionBased ,collateralId,callableType,repoType,UNDERLYINGTYPE FROM " + tableName + " where   ";
+		 "SELECT id,productType,productName,productShortName ,quantity,issueDate,marturityDate,IssuerId,Country,IssuePrice,IssueCurrency,RedemptionPrice,RedemptionCurrency,FaceValue,code,dateddate,tenor,attributes,ispositionBased ,collateralId,callableType,repoType,UNDERLYINGTYPE,currency,productSubType FROM " + tableName + " where   ";
 	 final static private String SELECTFROMATTRIBUTES = " select id,attributes FROM " + tableName + " where attributes = '%like" ; // this working only with oralce..  
-	final static private String selectExisitingName = " select id,producttype,productname,productshortname from product ";
+	final static private String selectExisitingName = " select id,producttype,productname,productshortname,productSubType from product ";
 	final static private String selectFutureProduct = " select id,productType,productName,productShortName ,quantity,issueDate,marturityDate,IssuerId,Country,IssuePrice,IssueCurrency,RedemptionPrice,RedemptionCurrency,FaceValue,code,dateddate,tenor,attributes,ispositionBased,collateralId,callableType,repoType,UNDERLYINGTYPE  from product where id = (select underlying_productid from FUTURECONTRACT_PRODUCT where id = (select PRODUCTID from futurecontract where id = ";
 	 
 	 
@@ -316,7 +318,8 @@ public class ProductSQL {
  	stmt.setString(21, inserProduct.getCallType());
  	stmt.setString(22, inserProduct.getRepoType());
  	stmt.setString(23, inserProduct.getUnderlyingProductType());
- 	
+ 	stmt.setString(24, inserProduct.getCurrency());
+ 	stmt.setString(25, inserProduct.getProductSubType());
    	      
 	            
 	            stmt.executeUpdate();
@@ -379,6 +382,8 @@ public class ProductSQL {
 		        product.setCallType(rs.getString(21));
 		        product.setRepoType(rs.getString(22));
 		        product.setUnderlyingProductType(rs.getString(23));
+		        product.setCurrency(rs.getString(24));
+		        product.setProductSubType(rs.getString(25));
 		        
 	        commonUTIL.display("productSQL-----",SELECTONE + productID);
 	        
@@ -440,7 +445,8 @@ protected static Product selectProductWithCoupon(int productID,Connection con ) 
 		        product.setCallType(rs.getString(21));
 		        product.setRepoType(rs.getString(22));
 		        product.setUnderlyingProductType(rs.getString(23));
-		       
+		        product.setCurrency(rs.getString(24));
+		        product.setProductSubType(rs.getString(25));
 	        commonUTIL.display("productSQL-----",SELECTONE + productID);
 	        
 	      
@@ -484,6 +490,7 @@ protected static Product select(String productName,Connection con ) {
 	        product.setProductType(rs.getString(3));
 	        product.setProductname(rs.getString(2));
 	        product.setProdcutShortName(rs.getString(4));
+	        product.setProductSubType(rs.getString(5));
 	        
 	         }
 		 } catch (Exception e) {
@@ -542,7 +549,8 @@ protected static Product select(String productName,Connection con ) {
 		        product.setCallType(rs.getString(21));
 		        product.setRepoType(rs.getString(22));
 		        product.setUnderlyingProductType(rs.getString(23));
-
+		        product.setCurrency(rs.getString(24));
+		        product.setProductSubType(rs.getString(25));
 		        products.add(product);
 		       
 	      }
@@ -602,7 +610,9 @@ protected static Product select(String productName,Connection con ) {
 		        product.setCallType(rs.getString(21));
 		        product.setRepoType(rs.getString(22));
 		        product.setUnderlyingProductType(rs.getString(23));
-
+		        product.setCurrency(rs.getString(24));
+		        product.setProductSubType(rs.getString(25));
+		        product.setCoupon(CouponSQL.getcouponOnProduct(product.getId(), dsSQL.getConn()));
 		        products.add(product);
 		       
 	      }
@@ -661,6 +671,8 @@ protected static Product select(String productName,Connection con ) {
 		        product.setCallType(rs.getString(21));
 		        product.setRepoType(rs.getString(22));
 		        product.setUnderlyingProductType(rs.getString(23));
+		        product.setCurrency(rs.getString(24));
+		        product.setProductSubType(rs.getString(25));
 
 	      }
 	      commonUTIL.display("productSQL selectonWhereClauseOnProductSubType ",sql);
@@ -717,6 +729,8 @@ protected static Product select(String productName,Connection con ) {
 		        product.setCallType(rs.getString(21));
 		        product.setRepoType(rs.getString(22));
 		        product.setUnderlyingProductType(rs.getString(23));
+		        product.setCurrency(rs.getString(24));
+		        product.setProductSubType(rs.getString(25));
 
 	      }
 	      commonUTIL.display("productSQL getFutureProduct ",sql);
