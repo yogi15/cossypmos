@@ -1,463 +1,1300 @@
 package apps.window.tradewindow;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.FocusAdapter;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.rmi.RemoteException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.border.BevelBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.plaf.ActionMapUIResource;
 import javax.swing.table.DefaultTableModel;
 
-import org.dyno.visual.swing.layouts.Bilateral;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
-import constants.CommonConstants;
-
 import productPricing.BONDPricing;
-import productPricing.MMPricing;
+import productPricing.BONDZCPricing;
 import productPricing.Pricer;
+import productPricing.pricingUtil.BondCashFlow;
 import util.NumericTextField;
+import util.RemoteServiceUtil;
 import util.commonUTIL;
-import dsEventProcessor.TaskEventProcessor;
-import dsServices.RemoteBOProcess;
-import dsServices.RemoteReferenceData;
-import dsServices.RemoteTask;
-import dsServices.RemoteTrade;
-import dsServices.ServerConnectionUtil;
-import beans.Trade;
-import beans.Users;
-import apps.window.tradewindow.BackOfficePanel;
-import apps.window.tradewindow.CommonPanel;
-import apps.window.tradewindow.TradePanel;
+import util.common.DateU;
+import apps.window.tradewindow.FXPanels.TradeAttributesD;
 import apps.window.tradewindow.panelWindow.FeesPanel;
-import apps.window.tradewindow.panelWindow.PostingPanel;
 import apps.window.tradewindow.panelWindow.SDIPanel;
 import apps.window.tradewindow.panelWindow.TaskPanel;
 import apps.window.tradewindow.panelWindow.TransferPanel;
-import beans.Book;
+import apps.window.tradewindow.util.StaticDataCacheUtil;
+import beans.Book; 
+import beans.Coupon;
+import beans.Favorities;
+import beans.Flows;
 import beans.LegalEntity;
-import beans.StartUPData;
+import beans.Product;
+import beans.Trade;
+import beans.Users;
 
+import com.jidesoft.combobox.TableExComboBox;
+
+import constants.CommonConstants;
+import constants.ProductConstants;
+import constants.TradeConstants;
+import dsEventProcessor.TaskEventProcessor;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
-public class BONDTradePanel extends  TradePanel  {
+public class BONDTradePanel  extends TradePanel {
 
 	private static final long serialVersionUID = 1L;
-	private JTable JTable1;
-	private JScrollPane jScrollPane0;
 	private JPanel jPanel0;
-	private JLabel jLabel0;
+	private JPanel jPanel1;
+	private JPanel jPanel2;
+	private JPanel jPanel3;
+	 TradeAttributesD attributes = null;
+	private JPanel jPanel5;
 	private JLabel jLabel1;
 	private JLabel jLabel2;
-	private JComboBox jcp;
-	private JComboBox book;
-	private JComboBox ttradername;
-	private JLabel jLabel4;
 	private JLabel jLabel3;
 	private JLabel jLabel5;
-	private JTextField tradestatus;
-	private JComboBox caction;
-	//private JTextField tradeamount;
-	public JLabel jLabel6;
-	public JLabel jLabel7;
-	public JTextField tradeid;
-	public JLabel jLabel8;
-	public JComboBox tcurrency;
+	private JButton New;
+	private JButton Save;
+	private JButton SaveAsNew;
+	private JButton Delete;
+	private JLabel jLabel8;
 	private JLabel jLabel9;
-	//private JTextField tradedate;
-	public JTextField tuse;
-	public JLabel jLabel10;
-	private JLabel jLabel11;
-	public NumericTextField tradeamount;
-	public JTextField tradeDate;
-	public NumericTextField tprice;
-	public NumericTextField tradeyield;
-	public JTextField jTextField0;
-	public JPanel jPanel1;
-	 public javax.swing.JTextField tsettlement;
-	 public NumericTextField tquantity;
+	private JTextField TradeID;
+	private NumericTextField Amount1;
+	private JTextField status;
+	private JTable CashFlowTable;
+	private JScrollPane jScrollPane1;
+	private JButton jButton4;
+	private JButton jButton5;
+	private JComboBox actionC;
+	private JLabel jLabel18;
+	private JLabel RateIndexjLabel21;
 	
-	 TaskPanel taskPanel = null; 
-	 PostingPanel postingPanel = null;
-	 TransferPanel transferPanel = null;
+	private JLabel tradeDatejLabel7;
+	private com.jidesoft.combobox.DateComboBox tradeDate;
+	private com.jidesoft.combobox.DateComboBox settleDate;
+	private JLabel settleDatejLabel0;
+	private JLabel pricejLabel4;
+	private NumericTextField priceText;
+	private JLabel BUYSELLJLabel6;
+	private JTextField buySelltext;
+	private JTextField  rateType;
+	private JTextField   rateIndex;
+	private JLabel tradeCurrJLabel10jLabel10;
+	
+
+	private JComboBox currency;
+	private JLabel amountjLabel11;
+	private NumericTextField amount;
+	private JComboBox underlying;
+	private JLabel underlyingjLabel;
+	private JButton searchProduct;
+	
+	private JLabel PrevCPNjLabel14;
+	private JTextField previousCoupon;
+	private JLabel NextCPNjLabel15;
+	private JTextField nextCoupon;
+	private JLabel MaturityDatejLabel16;
+	private JTextField maturityDate;
+	private JLabel AccruedDaysjLabel17;
+	private JTextField accruedDays;
+	private JLabel AccuredIntjLabel18;
+	private NumericTextField accuredInt;
+	private JLabel SettlementAMTjLabel19;
+	private NumericTextField settlementAMT;
+	private JLabel QTYjLabel20;
+	private NumericTextField quantity;
+	private JLabel DayCountjLabel21;
+	private JTextField daycount;
+	private JLabel BDCjLabel22;
+	private JTextField bdcText;
+	private JLabel RatejLabel23;
+	private JLabel  RateTypejLabel22;
+	private NumericTextField rate;
+	
+	Vector<String> currencyData = null;
+	Vector<LegalEntity> legalEntityData  = null;
+	Vector<LegalEntity> traderData  = null;
+	Vector<beans.Book> bookData = null;
+	TradeApplication app = null;
 	 SDIPanel sdiPanel = null;
 	 FeesPanel feesPanel = null;
-	 Trade trade = null;
-	 BONDPanel productWindowpanel = null;
+	 TaskPanel taskPanel = null; 
+	 TransferPanel transferPanel;
 	 
-	 
-	
-	 Users user = null;
- 	 String productType = "";
- 	 
- 	 public static  ServerConnectionUtil de = null;
- 	 RemoteReferenceData referenceData; 	
- 	 RemoteTrade rtradeservices;
- 	 RemoteBOProcess remoteBO;
-	 RemoteTask remoteTask;
-	 
-	 
-	 javax.swing.DefaultComboBoxModel bookCombo = new javax.swing.DefaultComboBoxModel();
- 	 Hashtable bookData = new Hashtable();
- 	 javax.swing.DefaultComboBoxModel cpCombo = new javax.swing.DefaultComboBoxModel();
- 	 Hashtable cpData = new Hashtable();
- 	 javax.swing.DefaultComboBoxModel traderCombo = new javax.swing.DefaultComboBoxModel();
- 	 Hashtable trader = new Hashtable();
- 	 javax.swing.DefaultComboBoxModel actionstatus = new javax.swing.DefaultComboBoxModel();
- 	 javax.swing.DefaultComboBoxModel currencyDataModel = new javax.swing.DefaultComboBoxModel();
- 	 Hashtable<String,String>  attributeValue = new Hashtable<String,String> ();
- 	 DefaultTableModel attributeModel = null;
- 	 DecimalFormat format = new DecimalFormat("##,###,#######");
- 	 
- 	 
- 	 
- 	 
- 	 
- 	 
- 	 
-	
+	public TableExComboBox counterParty = null;
+	public TableExComboBox book = null;
+	public TableExComboBox trader = null;
+	Trade trade = null;
+	Product product = null;
+	Coupon coupon = null;
+	DecimalFormat format1 = new DecimalFormat("##,###,#######.######");
+	JTextField freq = null;
+	javax.swing.DefaultComboBoxModel<String> actionstatus = null;
+	String productType = "BOND";
+	String productSubType = "";
+	 Hashtable<String,String>  attributeDataValue = new Hashtable<String,String>();
+	 DefaultTableModel attributeModel = null;
+	 BONDPricing pricing =  new BONDPricing();
+		JLabel FREQjLabel23 = null;
+	 ActionMap actionMap =null;
+Users usr = null;
+
+javax.swing.DefaultComboBoxModel productData = null; 
+Hashtable productIDs = new Hashtable();
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-	public BONDTradePanel() {
-		 init();
+	
+	public BONDTradePanel(Users user) {
+		setUser(user);
+		init();
 		initComponents();
-		
+	
 	}
+	//public MMTradePanel() {
+	//	initComponents();
+//	}
+
+	private void init() {
+		// TODO Auto-generated method stub
+		productData = new DefaultComboBoxModel<>();
+	     processProductData(productData,productIDs);
+	}
+
+	private void processProductData(DefaultComboBoxModel underlyingData2,
+			Hashtable productIDs2) {
+		// TODO Auto-generated method stub
+	
+			Vector vector;
+			 
+				
+				vector = StaticDataCacheUtil.getProductDefinationData();
+				 
+				Iterator it = vector.iterator();
+		    	int i =0;
+		    	while(it.hasNext()) {
+	    		Product product = (Product) it.next();
+	    		underlyingData2.insertElementAt(product.getProductname(), i);
+	    		productIDs2.put(i, product);
+	    		i++;
+	    	}	
+			 
+	    	
+	    	
+	    }
+		
+	
 
 	private void initComponents() {
+		
+		
+		currencyData = StaticDataCacheUtil.getDomainValues("Currency");
+		actionstatus = new javax.swing.DefaultComboBoxModel<String>();
+		bookData = StaticDataCacheUtil.getUserFavBooks(usr.getId(),Favorities.book);
+		traderData = StaticDataCacheUtil.getUserFavTrader(usr.getId(), Favorities.trader);
+		legalEntityData = StaticDataCacheUtil.getUserFavLegalEntity(usr.getId(), Favorities.CounterParty);
+		
+	
+	
+		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
+		setFocusable(true);
+		setEnabled(true);
+		setVisible(true);
+		setVerifyInputWhenFocusTarget(true);
+		setDoubleBuffered(true);
+		setRequestFocusEnabled(true);
+		setOpaque(true);
 		setLayout(new GroupLayout());
-		
-	//	tsettlement = new JTextField();
-		tquantity = new NumericTextField(10,format);
-		tquantity.setText("0");
-		
-		add(getJPanel0(), new Constraints(new Bilateral(8, 10, 1146), new Bilateral(6, 20, 10)));
-		setSize(1164, 230);
+		add(getJPanel1(), new Constraints(new Leading(1, 866, 8, 8), new Leading(99, 112, 16, 16))); // business 
+		add(getJPanel3(), new Constraints(new Leading(0, 866, 12, 12), new Leading(324, 151, 12, 12))); // cashflow
+		add(getJPanel0(), new Constraints(new Leading(1, 866, 12, 12), new Leading(3, 95, 10, 10)));  // trade main common fields
+		add(getHotKeysPanels(), new Constraints(new Leading(5, 866,10, 10), new Leading(481, 46,10, 10))); // buttons
+		add(getJPanel4(), new Constraints(new Leading(882, 334, 10, 10), new Leading(5, 517, 10, 10))); // attributes
+		add(getJPanel2(), new Constraints(new Leading(3, 866, 10, 10), new Leading(214, 110, 10, 10))); // bussiness
+		setSize(1225, 544);
+		  actionMap = new ActionMapUIResource();
+		    actionMap.put("action_save", new AbstractAction() {
+		        @Override
+		        public void actionPerformed(ActionEvent e) {
+		        	buildTrade(trade,"save");
+		        }
+		    });
+		    actionMap.put("action_new", new AbstractAction() {
+		        @Override
+		        public void actionPerformed(ActionEvent e) {
+		        	//commonUTIL.showAlertMessage("New action performed.");
+		        	buildTrade(trade,"NEW");
+		        }
+		    });
+		    actionMap.put("action_del", new AbstractAction() {
+		        @Override
+		        public void actionPerformed(ActionEvent e) {
+		        	commonUTIL.showAlertMessage("Delete action performed.");
+		        }
+		    });
+		    actionMap.put("action_saveasnew", new AbstractAction() {
+		        @Override
+		        public void actionPerformed(ActionEvent e) {
+		        	//commonUTIL.showAlertMessage("Save As New action performed.");
+		        	buildTrade(trade,"saveAsNew");
+		        
+		        //	commonUTIL.showAlertMessage("Save As new  action performed.");
+		        }
+		    });
+		    actionMap.put("action_cashflow", new AbstractAction() {
+		        @Override
+		        public void actionPerformed(ActionEvent e) {
+		        	//commonUTIL.showAlertMessage("Save As New action performed.");
+		        	buildCashFlow();
+		        
+		        //	commonUTIL.showAlertMessage("Save As new  action performed.");
+		        }
+
+				
+		    });
+		   
+		    processTableData(attributeDataValue,attributeModel,attributes); 
+		    setCashFlow(getCashFlowTable(), null, "BOND"); // for empty Cash Flow
+
 	}
 
-	private JPanel getJPanel1() {
-		if (jPanel1 == null) {
-			jPanel1 = new JPanel();
-			jPanel1.setLayout(new GroupLayout());
-			jPanel1.add(getJScrollPane0(), new Constraints(new Bilateral(10, 12, 25), new Leading(10, 164, 10, 10)));
-			 commonUTIL.setBackGroundColor(jPanel1);
+	
+	private JComboBox getActionC() {
+		if (actionC == null) {
+			actionC = new JComboBox();
+			 actionstatus.insertElementAt("NEW", 0);
+	   		 actionstatus.setSelectedItem("NEW");
+	   		actionC.setModel(actionstatus);
 		}
-		return jPanel1;
+		return actionC;
 	}
 
-	private JTextField getJTextField0() {
-		if (jTextField0 == null) {
-			jTextField0 = new JTextField();
-			jTextField0.setBackground(Color.white);
-		//	jTextField0.setFont(new Font("Dialog", Font.PLAIN, 13));
-			jTextField0.setText("jTextField0");
+
+
+	private JButton getJButton5() {
+		if (jButton5 == null) {
+			jButton5 = new JButton();
+			jButton5.setText("RollBack");
+		}
+		return jButton5;
+	}
+
+	private JButton getJButton4() {
+		if (jButton4 == null) {
+			jButton4 = new JButton();
+			jButton4.setText("RollOver");
+		}
+		return jButton4;
+	}
+
+	private JPanel getJPanel2() {
+		if (jPanel2 == null) {
+			jPanel2 = new JPanel();
+			jPanel2.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
+			jPanel2.setLayout(new GroupLayout());
+			jPanel2.add(getPrevCPNjLabel14(), new Constraints(new Leading(5, 10, 10), new Leading(7, 10, 10)));
+			jPanel2.add(AccruedDaysjLabel17(), new Constraints(new Leading(2, 12, 12), new Leading(46, 12, 12)));
+			jPanel2.add(getPreviousCoupon(), new Constraints(new Leading(70, 80, 8, 8), new Leading(2, 25, 8,8)));
+			jPanel2.add(getAccruedDays(), new Constraints(new Leading(78, 50, 10, 10), new Leading(37, 25, 12, 12)));
+			jPanel2.add(getNextCPNjLabel15JLabel15(), new Constraints(new Leading(155, 12, 12), new Leading(7, 12, 12)));
+			jPanel2.add(getNextCoupon(), new Constraints(new Leading(212, 80, 10, 10), new Leading(2, 25, 12, 12)));
+			jPanel2.add(getMaturityDatejLabel16(), new Constraints(new Leading(300, 10, 10), new Leading(4, 12, 12)));
+			jPanel2.add(getFREQjLabel23(), new Constraints(new Leading(608, 10, 10), new Leading(4, 12, 12)));
+			jPanel2.add(getDayCountjLabel21(), new Constraints(new Leading(463, 10, 10), new Leading(4, 12, 12)));
+			jPanel2.add(getDaycount(), new Constraints(new Leading(526, 80, 10, 10), new Leading(2, 25, 12, 12)));
+			jPanel2.add(getMaturityDate(), new Constraints(new Leading(380, 80, 10, 10), new Leading(2, 25, 12, 12)));
+			jPanel2.add(getFREQ(), new Constraints(new Leading(645, 80, 10, 10), new Leading(2, 25, 12, 12)));
+			jPanel2.add(getBDCjLabel22(), new Constraints(new Leading(726, 80, 10, 10), new Leading(2, 25, 12, 12)));
+			jPanel2.add(getBdcText(), new Constraints(new Leading(760, 100, 10, 10), new Leading(2, 25, 12, 12)));
+			jPanel2.add(getAccuredIntjLabel18(), new Constraints(new Leading(220, 12, 12), new Leading(41, 12, 12)));
+			jPanel2.add(getAccuredInt(), new Constraints(new Leading(288, 130, 10, 10), new Leading(36, 25, 12, 12)));
+			jPanel2.add(getSettlementAMTJLabel19(), new Constraints(new Leading(424, 90, 10, 10), new Leading(41, 12, 12)));
+			jPanel2.add(getAccredAmtjLabel22(), new Constraints(new Leading(653, 90, 10, 10), new Leading(41, 12, 12)));
+			jPanel2.add(getSettlementAMT(), new Constraints(new Leading(516, 130, 12, 12), new Leading(38, 25, 12, 12)));
+			jPanel2.add(getAccrAmtText(), new Constraints(new Leading(726, 120, 12, 12), new Leading(38, 25, 12, 12)));
+			jPanel2.add(getQTYJLabel20(), new Constraints(new Leading(2, 73, 12, 12), new Leading(80, 12, 12)));
+			jPanel2.add(getQuantity(), new Constraints(new Leading(38, 130, 10, 10), new Leading(74, 25, 12, 12)));
+			jPanel2.add(getRateIndexjLabel21(), new Constraints(new Leading(170, 73, 12, 12), new Leading(80, 12, 12)));
+			jPanel2.add(getRateTypejLabel22(), new Constraints(new Leading(301, 12, 12), new Leading(83, 12, 12)));
+			jPanel2.add(getRateTypeext(), new Constraints(new Leading(364, 60, 10, 10), new Leading(75, 25, 12, 12)));
+			jPanel2.add(getRatejLabel23(), new Constraints(new Leading(428, 33, 10, 10), new Leading(83, 12, 12)));
+			jPanel2.add(getRateIndexext(), new Constraints(new Leading(230, 70, 10, 10), new Leading(75, 25, 12, 12)));
+			jPanel2.add(getRate(), new Constraints(new Leading(455, 74, 10, 10), new Leading(77, 25, 12, 12)));	 
+			jPanel2.add(getCleanPricejLabel23(), new Constraints(new Leading(529, 130, 10, 10), new Leading(75, 25, 12, 12)));
+			jPanel2.add(getCleanPrice(), new Constraints(new Leading(590, 100, 10, 10), new Leading(77, 25, 12, 12)));	 
+			jPanel2.add(getDirtyPricejLabel23(), new Constraints(new Leading(690, 130, 10, 10), new Leading(75, 25, 12, 12)));
+			jPanel2.add(getDirtyPrice(), new Constraints(new Leading(753, 100, 10, 10), new Leading(77, 25, 12, 12)));	 
 			
 		}
-		return jTextField0;
+		return jPanel2;
+	}
+	
+	private JTextField getFREQ() {
+		// TODO Auto-generated method stub
+		if (freq == null) {
+			freq = new JTextField();
+			freq.setEditable(false);
+			freq.setEnabled(false);
+		}
+		return freq;
+	}
+	JTextField CleanPrice = null;
+	private JTextField getCleanPrice() {
+		// TODO Auto-generated method stub
+		if (CleanPrice == null) {
+			CleanPrice = new JTextField();
+			CleanPrice.setEditable(false);
+			CleanPrice.setEnabled(false);
+		}
+		return CleanPrice;
+	}
+	JTextField dirtyPrice = null;
+	private JTextField getDirtyPrice() {
+		// TODO Auto-generated method stub
+		if (dirtyPrice == null) {
+			dirtyPrice = new JTextField();
+			dirtyPrice.setEditable(false);
+			dirtyPrice.setEnabled(false);
+		}
+		return dirtyPrice;
+	}
+	private JTextField getRateTypeext() {
+		// TODO Auto-generated method stub
+		if (rateType == null) {
+			rateType = new JTextField();
+			rateType.setEditable(false);
+			rateType.setEnabled(false);
+		}
+		return rateType;
+	}
+	private JTextField getRateIndexext() {
+		// TODO Auto-generated method stub
+		if (rateIndex == null) {
+			rateIndex = new JTextField();
+			rateIndex.setEditable(false);
+			rateIndex.setEnabled(false);
+			
+		}
+		return rateIndex;
 	}
 
-	private JTextField getTprice() {
-		if (tprice == null) {
-			tprice = new NumericTextField(10,format);
-			tprice.setBackground(Color.white);
-		//	tprice.setFont(new Font("Dialog", Font.PLAIN, 13));
-			tprice.setText("0"); // NOI18N
-	        tprice.setVisible(true);
-		}tprice.addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-                if (e.getKeyChar() == KeyEvent.VK_ENTER) { 
-                	if(trade != null) {
-                	
-                	if(trade.getProductType().equalsIgnoreCase("Bond")) {
-                		BONDPricing pricing = (BONDPricing) productWindowpanel.getPricer();
-                	pricing.calculateYield(new Double(tprice.getText()).doubleValue());
-				    tradeyield.setText(commonUTIL.doubleFormat(pricing.getYield()));
-                	}
-                }
-                
-                }
-            }
-        	
-        });
-		return tprice;
-	} 
-
-	private JTextField getTradeyield() {
-		if (tradeyield == null) {
-			tradeyield = new NumericTextField(10,format);
-			tradeyield.setBackground(Color.white);
-		//	tradeyield.setFont(new Font("Dialog", Font.PLAIN, 13));
-			tradeyield.setText("0");
+	private JLabel getRateTypejLabel22() {
+		// TODO Auto-generated method stub
+		if (RateTypejLabel22 == null) {
+			RateTypejLabel22 = new JLabel();
+			RateTypejLabel22.setText("RateType");
 		}
-		return tradeyield;
+		return RateTypejLabel22;
 	}
 
-	private JTextField getTradedate() {
-		if (tradeDate == null) {
-			tradeDate = new JTextField();
-			tradeDate.setBackground(Color.white);
-		//	tradeDate.setFont(new Font("Dialog", Font.PLAIN, 13));
-			 tradeDate.setText((commonUTIL.getDateFormat(commonUTIL.getCurrentDate())));
-		      //  tradeDate.setEditable(true);
+	private JTextField getRate() {
+		if (rate == null) {
+			rate = new NumericTextField();
+			rate.setEditable(false);
+			rate.setEnabled(false);
 		}
-		return tradeDate;
+		return rate;
 	}
-	private JTextField getSettledate() {
-		if (tsettlement == null) {
-			tsettlement = new JTextField();
-			tsettlement.setBackground(Color.white);
-		//	tradeDate.setFont(new Font("Dialog", Font.PLAIN, 13));
-			// tradeDate.setText((commonUTIL.getDateFormat(commonUTIL.getCurrentDate())));
-			tsettlement.setEditable(true);
-			getTradedate();
-		}
-		return tsettlement;
-	}
-	private NumericTextField getTradeamount() {
-		if (tradeamount == null) {
-			tradeamount = new NumericTextField(10,format);
-			tradeamount.setBackground(Color.white);
-		//	tradeamount.setFont(new Font("Dialog", Font.PLAIN, 13));
-			 tradeamount.setText("0");
-		}
-		tradeamount.addKeyListener(new KeyAdapter() {
 
-            
-            public void keyTyped(KeyEvent e) {
-                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-                //	trade.getTradeAmount() / product.getFaceValue();
-                  try {
-					double amt  = tradeamount.getDoubleValue();
-					if(productWindowpanel.product == null) {
-						commonUTIL.showAlertMessage("Select Product");
-						return;
-					}
-					//String value = new Double(amt/   productWindowpanel.product.getFaceValue()).toString();
-					productWindowpanel.nominal.setValue(amt/   productWindowpanel.product.getFaceValue());
-				} catch (ParseException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+	private JLabel getRatejLabel23() {
+		if (RatejLabel23 == null) {
+			RatejLabel23 = new JLabel();
+			RatejLabel23.setText("Rate");
+		}
+		return RatejLabel23;
+	}
+	private JLabel getFREQjLabel23() {
+		if (FREQjLabel23 == null) {
+			FREQjLabel23 = new JLabel();
+			FREQjLabel23.setText("FREQ");
+		}
+		return FREQjLabel23;
+	}
+	JLabel CleanPricejLabel23 = null;
+	private JLabel getCleanPricejLabel23() {
+		if (CleanPricejLabel23 == null) {
+			CleanPricejLabel23 = new JLabel();
+			CleanPricejLabel23.setText("CleanPrice");
+		}
+		return CleanPricejLabel23;
+	}
+	JLabel DirtyPricejLabel23 = null;
+	private JLabel getDirtyPricejLabel23() {
+		if (DirtyPricejLabel23 == null) {
+			DirtyPricejLabel23 = new JLabel();
+			DirtyPricejLabel23.setText("DirtyPrice");
+		}
+		return DirtyPricejLabel23;
+	}
+	private JTextField getBdcText() {
+		if (bdcText == null) {
+			bdcText = new JTextField();
+			bdcText.setEditable(false);
+			bdcText.setEnabled(false);
+		}
+		return bdcText;
+	}
+	NumericTextField AccrAmtText = null;
+	private NumericTextField getAccrAmtText() {
+		if (AccrAmtText == null) {
+			AccrAmtText = new NumericTextField();
+			AccrAmtText.setEditable(false);
+			AccrAmtText.setEnabled(false);
+		}
+		return AccrAmtText;
+	}
+
+	private JLabel getBDCjLabel22() {
+		if (BDCjLabel22 == null) {
+			BDCjLabel22 = new JLabel();
+			BDCjLabel22.setText("BDC");
+			
+		}
+		return BDCjLabel22;
+	}
+	JLabel AccredAmtjLabel22 = null;
+	private JLabel getAccredAmtjLabel22() {
+		if (AccredAmtjLabel22 == null) {
+			AccredAmtjLabel22 = new JLabel();
+			AccredAmtjLabel22.setText("Accr. Amt");
+			
+		}
+		return AccredAmtjLabel22;
+	}
+	private JTextField getDaycount() {
+		if (daycount == null) {
+			daycount = new JTextField();
+
+			daycount.setEditable(false);
+			daycount.setEnabled(false);
+		}
+		return daycount;
+	}
+
+	private JLabel getDayCountjLabel21() {
+		if (DayCountjLabel21 == null) {
+			DayCountjLabel21 = new JLabel();
+			DayCountjLabel21.setText("DayCount");
+		}
+		return DayCountjLabel21;
+	}
+	private JLabel getRateIndexjLabel21() {
+		if (RateIndexjLabel21 == null) {
+			RateIndexjLabel21 = new JLabel();
+			RateIndexjLabel21.setText("RateIndex");
+		}
+		return RateIndexjLabel21;
+	}
+	private JTextField getQuantity() {
+		if (quantity == null) {
+			quantity = new NumericTextField();
+			quantity.setEditable(false);
+			quantity.setEnabled(false);
+		}
+		return quantity;
+	}
+
+	private JLabel getQTYJLabel20() {
+		if (QTYjLabel20 == null) {
+			QTYjLabel20 = new JLabel();
+			QTYjLabel20.setText("QTY");
+		}
+		return QTYjLabel20;
+	}
+
+	private NumericTextField getSettlementAMT() {
+		if (settlementAMT == null) {
+			settlementAMT = new NumericTextField();
+			settlementAMT.setEditable(false);
+			settlementAMT.setEnabled(false);
+		}
+		return settlementAMT;
+	}
+
+	private JLabel getSettlementAMTJLabel19() {
+		if (SettlementAMTjLabel19 == null) {
+			SettlementAMTjLabel19 = new JLabel();
+			SettlementAMTjLabel19.setText("SettlementAMT");
+		}
+		return SettlementAMTjLabel19;
+	}
+
+	private NumericTextField getAccuredInt() {
+		if (accuredInt == null) {
+			accuredInt = new NumericTextField();
+			accuredInt.setEditable(false);
+			accuredInt.setEnabled(false);
+		}
+		return accuredInt;
+	}
+
+	private JLabel getAccuredIntjLabel18() {
+		if (AccuredIntjLabel18 == null) {
+			AccuredIntjLabel18 = new JLabel();
+			AccuredIntjLabel18.setText("Accured Int");
+		}
+		return AccuredIntjLabel18;
+	}
+
+	private JTextField getAccruedDays() {
+		if (accruedDays == null) {
+			accruedDays = new JTextField();
+			accruedDays.setEditable(false);
+			accruedDays.setEnabled(false);
+		}
+		return accruedDays;
+	}
+
+	private JLabel AccruedDaysjLabel17() {
+		if (AccruedDaysjLabel17 == null) {
+			AccruedDaysjLabel17 = new JLabel();
+			AccruedDaysjLabel17.setText("AccruedDays");
+		}
+		return AccruedDaysjLabel17;
+	}
+
+	private JTextField getMaturityDate() {
+		if (maturityDate == null) {
+			 
+			maturityDate = new JTextField();
+			maturityDate.setEditable(false);
+			maturityDate.setEnabled(false);
+			 
+		}
+		return maturityDate;
+	}
+
+	private JLabel getMaturityDatejLabel16() {
+		if (MaturityDatejLabel16 == null) {
+			MaturityDatejLabel16 = new JLabel();
+			MaturityDatejLabel16.setText("MaturityDate");
+		}
+		return MaturityDatejLabel16;
+	}
+
+	private JTextField getNextCoupon() {
+		if (nextCoupon == null) {
+			nextCoupon = new JTextField();
+			nextCoupon.setEditable(false);
+			nextCoupon.setEnabled(false);
+			 
+		}
+		return nextCoupon;
+	}
+
+	private JLabel getNextCPNjLabel15JLabel15() {
+		if (NextCPNjLabel15 == null) {
+			NextCPNjLabel15 = new JLabel();
+			NextCPNjLabel15.setText("Next CPN");
+		}
+		return NextCPNjLabel15;
+	}
+
+	private JTextField getPreviousCoupon() {
+		if (previousCoupon == null) {
+			previousCoupon = new JTextField();
+			previousCoupon.setEditable(false);
+			previousCoupon.setEnabled(false);
+		}
+		return previousCoupon;
+	}
+
+	private JLabel getPrevCPNjLabel14() {
+		if (PrevCPNjLabel14 == null) {
+			PrevCPNjLabel14 = new JLabel();
+			PrevCPNjLabel14.setText("Prev. CPN");
+		}
+		return PrevCPNjLabel14;
+	}
+
+
+	private JScrollPane getJScrollPane1() {
+		if (jScrollPane1 == null) {
+			jScrollPane1 = new JScrollPane();
+			jScrollPane1.setViewportView(getCashFlowTable());
+		}
+		return jScrollPane1;
+	}
+
+	
+	
+	public JTable getCashFlowTable() {
+		if (CashFlowTable == null) {
+			CashFlowTable = new JTable();
+			CashFlowTable.setModel(new DefaultTableModel(new Object[][] { { "0x0", "0x1", }, { "1x0", "1x1", }, }, new String[] { "Title 0", "Title 1", }) {
+				private static final long serialVersionUID = 1L;
+				Class<?>[] types = new Class<?>[] { Object.class, Object.class, };
+	
+				public Class<?> getColumnClass(int columnIndex) {
+					return types[columnIndex];
 				}
-                  
+			});
+		}
+		return CashFlowTable;
+	}
+
+	private JTextField getStatus() {
+		if (status == null) {
+			status = new JTextField();
+			status.setBackground(new Color(128, 255, 255));
+			status.setEditable(false);
+			status.setText("NONE");
+		}
+		return status;
+	}
+
+
+	private NumericTextField getNominal() {
+		if (Amount1 == null) {
+			Amount1 = new NumericTextField(10,format1);
+			Amount1.addKeyListener(new KeyAdapter() {
+
+	            
+	            public void keyTyped(KeyEvent e) {
+	                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+	                //	trade.getTradeAmount() / product.getFaceValue();
+	                  try {
+						double amt  =Amount1.getDoubleValue();
+						if(product == null) {
+							commonUTIL.showAlertMessage("Select Product");
+							return;
+						}
+						//String value = new Double(amt/   productWindowpanel.product.getFaceValue()).toString();
+						quantity.setValue(amt/    product.getFaceValue());
+					} catch (ParseException e1) {
+						// TODO Auto-generated catch block
+					   commonUTIL.displayError("BONDTradePanel", "getNominal", e1);
+					}
+	                  
+	                
+	                }
+	            }
+	            });
+			Amount1.addFocusListener(new FocusListener() {
+				
+				@Override
+				public void focusLost(FocusEvent arg0) {
+					try {
+						double amt  =Amount1.getDoubleValue();
+						if(product == null) {
+							commonUTIL.showAlertMessage("Select Product");
+							return;
+						}
+						//String value = new Double(amt/   productWindowpanel.product.getFaceValue()).toString();
+						quantity.setValue(amt/    product.getFaceValue());
+					} catch (ParseException e1) {
+						// TODO Auto-generated catch block
+					   commonUTIL.displayError("BONDTradePanel", "getNominal", e1);
+					}
+				}
+
+				@Override
+				public void focusGained(FocusEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+		}
+		return Amount1;
+	}
+
+
+	private JTextField getTradeID() {
+		if (TradeID == null) {
+			TradeID = new JTextField();
+			TradeID.setText("0");
+			TradeID.addKeyListener(new KeyAdapter() {
+			@Override
+            public void keyTyped(KeyEvent e) {
+            	 try {
+                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
                 
+                	 String number = TradeID.getText();
+	                   int tradeId = Integer.parseInt(number); 
+	                  
+						trade = (Trade) RemoteServiceUtil.getRemoteTradeService().selectTrade(tradeId);
+					
+                 
                 }
+            	 } catch (RemoteException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}catch(NumberFormatException n) {
+						TradeID.setText("");
+	                	 commonUTIL.showAlertMessage("Enter Number only " );
+	                	 
+	                 }
             }
             });
-		tradeamount.addFocusListener(new FocusListener() {
-			
-			@Override
-			public void focusLost(FocusEvent arg0) {
-				// TODO Auto-generated method stub
-				try {
-					double amt  = tradeamount.getDoubleValue();
-					if(productWindowpanel.product != null) {
-						productWindowpanel.nominal.setValue(amt/   productWindowpanel.product.getFaceValue());
-					//	productWindowpanel.nominal.setText(value);
-					}
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-			}
-			
-			@Override
-			public void focusGained(FocusEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
+		}
 		
-		});
-		return tradeamount;
+		return TradeID;
 	}
 
-	private JComboBox getTcurrency() {													
-		if (tcurrency == null) {
-			tcurrency = new JComboBox();
-		//	tcurrency.setFont(new Font("SansSerif", Font.PLAIN, 13));
-			tcurrency.setModel(new DefaultComboBoxModel(new Object[] {"INR", "item0", "item1", "item2", "item3" }));
-			tcurrency.setSelectedItem(new String("INR"));
+	private TableExComboBox getTrader() {
+		if (trader == null) {
+			trader  =  getTraderComboBox(traderData);
+			trader.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					// TODO Auto-generated method stub
+					int leid = trader.getSelectedIndex();
+					// @ yogesh 24/02/2015
+					// returns if -1
+					if( leid == -1)
+						return;
+					LegalEntity le = traderData.get(leid);
+					trader.setName(String.valueOf(((le)).getId()));
+					//trader.getModel().setSelectedItem(leid);
+					//System.out.println(counterPary.getName());
+					
+				}
+			});
+			
 		}
-		return tcurrency;
+			return trader;
+			
+			
+		
 	}
 
-	private JLabel getJLabel11() {
-		if (jLabel11 == null) {
-			jLabel11 = new JLabel();
-		//	jLabel11.setFont(new Font("Dialog", Font.PLAIN, 13));
-			jLabel11.setText("Market Price");
+	private TableExComboBox getCounterParty() {
+		if (counterParty == null) {
+			counterParty =  getCounterPartyComboBox(legalEntityData);
+			counterParty.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					int leid = counterParty.getSelectedIndex();
+					// @ yogesh 24/02/2015
+					// returns if -1
+					if( leid == -1)
+						return;
+					LegalEntity le = legalEntityData.get(leid);
+					counterParty.setName(String.valueOf(((le)).getId()));
+					//System.out.println(counterPary.getName());
+					
+				}
+			});
+			
 		}
-		return jLabel11;
+			return counterParty;
 	}
 
-	private JLabel getJLabel10() {
-		if (jLabel10 == null) {
-			jLabel10 = new JLabel();
-		//	jLabel10.setFont(new Font("Dialog", Font.PLAIN, 13));
-			jLabel10.setText("Trade Yield");
+	private TableExComboBox getBook() {
+		if (book == null) {
+			book =  getBookComboBox(bookData);
+			book.setEditable(false);
+			book.setBorder(null);
+			book.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					int leid = book.getSelectedIndex();
+					// @ yogesh 24/02/2015
+					// returns if -1
+					if( leid == -1)
+						return;
+					Book boo = bookData.get(leid);
+					book.setName(String.valueOf(((boo)).getBookno()));
+					//System.out.println(counterPary.getName());
+					
+				}
+			});
+			
 		}
-		return jLabel10;
+			return book;
 	}
-
-	private JTextField getTuse() {
-		if (tuse == null) {
-			tuse = new JTextField();
-			tuse.setBackground(Color.white);
-			tuse.setEditable(false);
-	//		tuse.setFont(new Font("Dialog", Font.PLAIN, 13));
-		}
-		return tuse;
-	}
+	
 
 	private JLabel getJLabel9() {
 		if (jLabel9 == null) {
 			jLabel9 = new JLabel();
-	//		jLabel9.setFont(new Font("Dialog", Font.PLAIN, 13));
-			jLabel9.setText("Settle Date");
+			jLabel9.setText("Action");
 		}
 		return jLabel9;
-	}
-
-	private JComboBox getJComboBox4() {
-		if (tcurrency == null) {
-			tcurrency = new JComboBox();
-		//	tcurrency.setFont(new Font("Tahoma", Font.PLAIN, 13));
-			 tcurrency.setSelectedItem(new String("INR"));
-			tcurrency.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
-		}
-		return tcurrency;
 	}
 
 	private JLabel getJLabel8() {
 		if (jLabel8 == null) {
 			jLabel8 = new JLabel();
-		//	jLabel8.setFont(new Font("Dialog", Font.PLAIN, 13));
-			jLabel8.setText("Currency");
+			jLabel8.setText("Status");
 		}
 		return jLabel8;
 	}
 
-	private JTextField getTradeid() {
-		if (tradeid == null) {
-			tradeid = new JTextField();
-			tradeid.setBackground(Color.white);
-			tradeid.setEditable(true);
-			tradeid.setText("0");
-			 commonUTIL.setBackGroundColor(jcp);
-		//	tradeid.setFont(new Font("Dialog", Font.PLAIN, 13));
-		}tradeid.addKeyListener(new KeyAdapter() {
+	private JButton getJButton3() {
+		if (Delete == null) {
+			Delete = new JButton();
+			Delete.setText("Delete");
+		}
+		return Delete;
+	}
 
-            
-            public void keyTyped(KeyEvent e) {
-                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-                 try {	
-                   String number = tradeid.getText();
-                   int tradeId = Integer.parseInt(number); 
-                   trade = (Trade) rtradeservices.selectTrade(tradeId);
-                   
-                   if(trade != null) {
-                	   if(! trade.getProductType().equalsIgnoreCase(productType)) {
-                     	  commonUTIL.showAlertMessage("This Trade Will not open in current Window");
-                       }
-                	   setTrade(trade);
-					openTrade(trade);
-					productWindowpanel.openTrade(trade);
-					//if(e.getClickCount() == 2) 
-					 getTradeTask(taskPanel);
-					 getTradeSDI(sdiPanel);
-                   } else {
-                	   commonUTIL.showAlertMessage("Trade does not Exists with id " );
-                   }
-                   
-                 } catch(NumberFormatException n) {
-                	 tradeid.setText("");
-                	 commonUTIL.showAlertMessage("Enter Number only ");
-                	 
-                 } catch(RemoteException r) {
-                	 System.out.println("JFrameTradeWindowApplication  " +  e);
-                 }
-                }
-            }
-        });
+	private JButton getJButton2() {
+		if (SaveAsNew == null) {
+			SaveAsNew = new JButton();
+			SaveAsNew.setText("saveAsnew");
+		
+			SaveAsNew.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					buildTrade(trade,"saveAsNew");
+					
+				}
+			});
+		}
+		return SaveAsNew;
+	}
+
+	private JButton getJButton1() {
+		if (Save == null) {
+			Save = new JButton();
+			Save.setText("Save");
+			Save.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					buildTrade(trade,"save");
+					
+				}
+			});
+		}
+		return Save;
+	}
+
+	private JButton getJButton0() {
+		if (New == null) {
+			New = new JButton();
+			New.setText("New");
+			New.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					buildTrade(trade,"NEW");
+					
+				}
+			});
+		}
+		return New;
+	}
+
+	private JPanel getJPanel1() {
+		if (jPanel1 == null) {
+			jPanel1 = new JPanel();
+			jPanel1.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
+			jPanel1.setLayout(new GroupLayout());
+			jPanel1.add(getTradeDateJLabel7(), new Constraints(new Leading(4, 10, 10), new Leading(20, 10, 10)));
+			jPanel1.add(getSettleDateJLabel0(), new Constraints(new Leading(222, 12, 12), new Leading(20, 10, 10)));
+			jPanel1.add(getSettleDate(), new Constraints(new Leading(303, 167, 12, 12), new Leading(9, 25, 12, 12)));
+			jPanel1.add(getPriceJLabel4(), new Constraints(new Leading(482, 12, 12), new Leading(14, 12, 12)));
+			jPanel1.add(getPriceText(), new Constraints(new Leading(528, 150, 10, 10), new Leading(9, 25, 12, 12)));
+			jPanel1.add(getTradeCurrJLabel10(), new Constraints(new Leading(224, 12, 12), new Leading(50, 12, 12)));
+			jPanel1.add(getCurrency(), new Constraints(new Leading(303, 90, 12, 12), new Leading(42, 25, 12, 12)));
+			jPanel1.add(getTradeDate(), new Constraints(new Leading(70, 145, 12, 12), new Leading(11, 25, 12, 12)));
+			jPanel1.add(getAmountJLabel11(), new Constraints(new Leading(469, 10, 10), new Leading(50, 12, 12)));
+			jPanel1.add(getBUYSELLJLabel6(), new Constraints(new Leading(7, 12, 12), new Leading(51, 12, 12)));
+			jPanel1.add(getUnderlying(), new Constraints(new Leading(70, 323, 10, 10), new Leading(78, 25, 12, 12)));
+			jPanel1.add(getUnderlyingJLabel12(), new Constraints(new Leading(7, 12, 12), new Leading(81, 10, 10)));
+			jPanel1.add(getSearchProduct(), new Constraints(new Leading(407, 12, 12), new Leading(78, 12, 12)));
+			jPanel1.add(getBuySellText(), new Constraints(new Leading(70, 72, 12, 12), new Leading(46, 25, 12, 12)));
+			jPanel1.add(getAmount(), new Constraints(new Leading(528, 150, 12, 12), new Leading(42, 25, 10, 10)));
+			
+		}
+		return jPanel1;
+	}
+
+
+	private JButton getSearchProduct() {
+		if (searchProduct == null) {
+			searchProduct = new JButton();
+			searchProduct.setText("...");
+		}
+		return searchProduct;
+	}
+
+	private JLabel getUnderlyingJLabel12() {
+		if (underlyingjLabel == null) {
+			underlyingjLabel = new JLabel();
+			underlyingjLabel.setText("Underlying");
+		}
+		return underlyingjLabel;
+	}
+
+	private JComboBox getUnderlying() {
+		if (underlying == null) {
+			underlying =new JComboBox();
+			underlying.setModel(productData);
+		}underlying.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				int index = underlying.getSelectedIndex();
+				if(index >= 0) {
+				 product = returnProducID(index,productIDs);
+				 coupon = product.getCoupon();
+				 setTableValues(product); 
+				} else {
+					product = null;
+				//	setTableValuesBlank();
+					//nominal.setText("0");
+				}
+				 
+				
+			}
+
+			
+
+			
+			
+		});
+		return underlying;
+	}
+	private void setTableValues(Product product) {
+		// TODO Auto-generated method stub
+		maturityDate.setText(product.getMarturityDate());
+		daycount.setText(product.getCoupon().getDayCount());
+		rateType.setText(product.getCoupon().getCouponType());
+		currency.setSelectedItem(product.getCoupon().getCCY());
+		
         
-		return tradeid;
-	}
-
-	private JLabel getJLabel7() {
-		if (jLabel7 == null) {
-			jLabel7 = new JLabel();
-		//	jLabel7.setFont(new Font("Dialog", Font.PLAIN, 13));
-			jLabel7.setText("ID");
-			 commonUTIL.setBackGroundColor(jcp);
+		if(product.getCoupon().getCouponType().equalsIgnoreCase(ProductConstants.RATETYPEFLOAT)) {
+			rateIndex.setText(product.getCoupon().getRateIndex());
+		} else {
+			rateIndex.setText(TradeConstants.BLANK);
 		}
-		return jLabel7;
-	}
-
-	private JLabel getJLabel6() {
-		if (jLabel6 == null) {
-			jLabel6 = new JLabel();
-		//	jLabel6.setFont(new Font("Dialog", Font.PLAIN, 13));
-			jLabel6.setText("User");
-			 commonUTIL.setBackGroundColor(jcp);
+		bdcText.setText(product.getCoupon().getBusinessDayConvention());
+		rate.setValue(product.getCoupon().getFixedRate());
+		freq.setText(product.getCoupon().getCouponFrequency());
+		try {
+			if(amount.getDoubleValue() != 0.0) {
+			 quantity.setValue(amount.getDoubleValue()/product.getFaceValue());
+			}
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("BONDTradePanel", "setTableValues", e1);
 		}
-		return jLabel6;
-	}
+		if(coupon.getCouponFrequency().equalsIgnoreCase("ZC")) {
+        	pricing = new BONDZCPricing();
+        	if(trade == null) 
+        		trade = new Trade();
+        		try {
+					trade.setPrice(priceText.getDoubleValue());
+					trade.setTradeAmount(amount.getDoubleValue());
+					trade.setNominal(amount.getDoubleValue());
+					trade.setTradeDate(commonUTIL.convertDateTOString(tradeDate.getDate()));
+					trade.setDelivertyDate(commonUTIL.convertDateTOString(settleDate.getDate()));
+					trade.setQuantity(quantity.getDoubleValue());
+					DateU mdate = DateU.valueOf(commonUTIL.stringToDate(product.getMarturityDate(), false));
+			        DateU settdate = DateU.valueOf(commonUTIL.stringToDate(trade.getDelivertyDate(), false));
+			        DateU tdate =  DateU.valueOf(commonUTIL.stringToDate(trade.getTradeDate(), false));
+			        if(settdate.gte(mdate)) {
+			        	commonUTIL.showAlertMessage(" Settlement Date greater then Product Maturity Date ");
+			        	return;
+			        }
+			        if(tdate.gte(settdate)) {
+			        	commonUTIL.showAlertMessage(" Trade Date greater then Settlement Date ");
+			        	return;
+			        }
+					 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					commonUTIL.displayError("BONDTradePanel", "setTableValues", e);
+				}
+        		
+        		
+        	
+        	calculatePrice(pricing,trade,product,coupon);
+        	
+        } else {
+        	if(trade == null) 
+        		trade = new Trade();
+        		try {
+					trade.setPrice(priceText.getDoubleValue());
+					trade.setTradeAmount(amount.getDoubleValue());
+					trade.setTradeDate(commonUTIL.convertDateTOString(tradeDate.getDate()));
+					trade.setDelivertyDate(commonUTIL.convertDateTOString(settleDate.getDate()));
+					trade.setQuantity(quantity.getDoubleValue());
+					trade.setNominal(amount.getDoubleValue());
+					DateU mdate = DateU.valueOf(commonUTIL.stringToDate(product.getMarturityDate(), false));
+			        DateU settdate = DateU.valueOf(commonUTIL.stringToDate(trade.getDelivertyDate(), false));
+			        DateU tdate =  DateU.valueOf(commonUTIL.stringToDate(trade.getTradeDate(), false));
+			        if(settdate.gte(mdate)) {
+			        	commonUTIL.showAlertMessage(" Settlement Date greater then Product Maturity Date ");
+			        	return;
+			        }
+			        if(tdate.gte(settdate)) {
+			        	commonUTIL.showAlertMessage(" Trade Date greater then Settlement Date ");
+			        	return;
+			        }
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					commonUTIL.displayError("BONDTradePanel", "setTableValues", e);
+				}
+        		
+        		
+        	
+        	calculatePrice(pricing,trade,product,coupon);
+        	previousCoupon.setText(commonUTIL.dateToString(pricing.getPreviousCouponDate()));
 
+        	nextCoupon.setText(commonUTIL.dateToString(pricing.getNextCouponDate()));
+        	accruedDays.setText(String.valueOf(pricing.getAccrualDays()));
+        	accuredInt.setText(String.valueOf(commonUTIL.convertToFinanceFormate(pricing.getAccrualInterest())));
+        	AccrAmtText.setText(String.valueOf(commonUTIL.convertToFinanceFormate(pricing.getAccural())));
+        	CleanPrice.setText(String.valueOf(pricing.getCleanPrice()));
+        	dirtyPrice.setText(String.valueOf(commonUTIL.convertToFinanceFormate(pricing.getDirtyPrice())));
+        	settlementAMT.setText(String.valueOf(commonUTIL.convertToFinanceFormate(pricing.getTotalAmount())));
+        	
+         
+        }
+		
+	}
 	
-
-	private JComboBox getCaction() {
-		if (caction == null) {
-			caction = new JComboBox();
-			actionstatus.insertElementAt("NEW", 0);
-	        caction.setModel(actionstatus);
-	        caction.setSelectedIndex(0);
-	        commonUTIL.setBackGroundColor(jcp);
+	private void setTradeValues() {
+		
+	}
+	private JTextField getAmount() {
+		if (amount == null) {
+			amount = new NumericTextField();
+			//amount.setText("jTextField3");
+			amount.addKeyListener(new KeyAdapter() {
+				@Override
+	            public void keyTyped(KeyEvent e) {
+	            	  
+	                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+	                	setTableValues(product);
+	                }
+	            	 }
+			 
+        });
 		}
-		return caction;
+		return  amount;
 	}
 
-	private JTextField getTradestatus() {
-		if (tradestatus == null) {
-			tradestatus = new JTextField();
-			tradestatus.setBackground(new Color(128, 255, 255));
-			tradestatus.setEditable(false);
-		//	tradestatus.setBackground(colr);
-		//	tradestatus.setFont(new Font("Dialog", Font.PLAIN, 13));
-			 tradestatus.setText("NONE");
-			 commonUTIL.setBackGroundColor(jcp);
+	private JLabel getAmountJLabel11() {
+		if (amountjLabel11 == null) {
+			amountjLabel11 = new JLabel();
+			amountjLabel11.setText("Amount");
 		}
-		return tradestatus;
+		return amountjLabel11;
+	}
+
+	private JComboBox getCurrency() {
+		if (currency == null) {
+			currency = new JComboBox(commonUTIL.convertVectortoSringArray(currencyData));
+			//currency.setModel(new DefaultComboBoxModel(new Object[] { "item0", "item1", "item2", "item3" }));
+		}
+		return currency;
+	}
+
+	private JLabel getTradeCurrJLabel10() {
+		if (tradeCurrJLabel10jLabel10 == null) {
+			tradeCurrJLabel10jLabel10 = new JLabel();
+			tradeCurrJLabel10jLabel10.setText("TradeCurr");
+		}
+		return tradeCurrJLabel10jLabel10;
+	}
+
+	private JTextField getBuySellText() {
+		if (buySelltext == null) {
+			buySelltext = new JTextField();
+			buySelltext.setText("BUY");
+			buySelltext.setBackground(Color.green);
+			buySelltext.setEditable(false);
+			buySelltext.setEnabled(false);
+			
+		}
+		return buySelltext;
+	}
+
+	private JLabel getBUYSELLJLabel6() {
+		if (BUYSELLJLabel6 == null) {
+			BUYSELLJLabel6 = new JLabel();
+			BUYSELLJLabel6.setText("BUY/SELL");
+			BUYSELLJLabel6.addMouseListener(new MouseListener() {
+
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					String buySell = buySelltext.getText();
+			    	
+			    	if (buySell.equalsIgnoreCase("BUY")) {
+			    		buySelltext.setText("SELL");
+			    		buySelltext.setBackground(Color.red);
+			    		BUYSELLJLabel6.setText("SELL/BUY");
+			    	} 
+			    	if (buySell.equalsIgnoreCase("SELL")) {
+			    		buySelltext.setText("BUY");
+			    		buySelltext.setBackground(Color.green);
+			    		BUYSELLJLabel6.setText("BUY/SELL");
+			    	} 
+					
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseExited(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mousePressed(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+			});	
+		}
+		return BUYSELLJLabel6;
+	}
+
+	private JTextField getPriceText() {
+		if (priceText == null) {
+			priceText = new NumericTextField();
+			priceText.addKeyListener(new KeyAdapter() {
+				@Override
+	            public void keyTyped(KeyEvent e) {
+	            	  
+	                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+	                	 setTableValues(product); 
+	                }
+	            	 }
+			 
+        });
+		}
+		return priceText;
+	}
+
+	private JLabel getPriceJLabel4() {
+		if (pricejLabel4 == null) {
+			pricejLabel4 = new JLabel();
+			pricejLabel4.setText("Price");
+		}
+		return pricejLabel4;
+	}
+
+	private JLabel getSettleDateJLabel0() {
+		if (settleDatejLabel0 == null) {
+			settleDatejLabel0 = new JLabel();
+			settleDatejLabel0.setText("SettleDate");
+		}
+		return settleDatejLabel0;
+	}
+
+	private com.jidesoft.combobox.DateComboBox getSettleDate() {
+		if (settleDate == null) {
+			
+			settleDate = new com.jidesoft.combobox.DateComboBox();
+			settleDate.setFormat(new SimpleDateFormat("dd/MM/yyyy"));
+			Calendar currentDate = Calendar.getInstance();
+			settleDate.setDate(currentDate.getTime());
+			settleDate.setName("settleDate");
+			settleDate.addKeyListener(new KeyAdapter() {
+				@Override
+	            public void keyTyped(KeyEvent e) {
+	            	  
+	                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+	                	setTableValues(product);
+	                }
+	            	 }
+			 
+        });
+			settleDate.addFocusListener(new FocusListener() {
+				
+				@Override
+				public void focusLost(FocusEvent e) {
+					// TODO Auto-generated method stub
+					//commonUTIL.showAlertMessage("COming");
+					settleDate.hidePopup();
+				}
+				
+				@Override
+				public void focusGained(FocusEvent e) {
+					// TODO Auto-generated method stub
+					settleDate.showPopup();
+					
+				}
+			});
+				
+			
+		}
+		return settleDate;
+	}
+
+	private com.jidesoft.combobox.DateComboBox getTradeDate() {
+		if (tradeDate == null) {
+			tradeDate = new com.jidesoft.combobox.DateComboBox();
+			tradeDate = new com.jidesoft.combobox.DateComboBox();
+			tradeDate.setFormat(new SimpleDateFormat("dd/MM/yyyy"));
+			Calendar currentDate = Calendar.getInstance();
+			tradeDate.setDate(currentDate.getTime());
+			tradeDate.setName("tradeDate");
+		}
+		return tradeDate;
+	}
+
+	private JLabel getTradeDateJLabel7() {
+		if (tradeDatejLabel7 == null) {
+			tradeDatejLabel7 = new JLabel();
+			tradeDatejLabel7.setText("TradeDate");
+		}
+		return tradeDatejLabel7;
 	}
 
 	private JLabel getJLabel5() {
 		if (jLabel5 == null) {
 			jLabel5 = new JLabel();
-		//	jLabel5.setFont(new Font("Dialog",Font.PLAIN, 13));
-			jLabel5.setText("Trade Amount");
-			 commonUTIL.setBackGroundColor(jcp);
+			jLabel5.setText("Trade ID");
 		}
 		return jLabel5;
 	}
@@ -465,55 +1302,37 @@ public class BONDTradePanel extends  TradePanel  {
 	private JLabel getJLabel3() {
 		if (jLabel3 == null) {
 			jLabel3 = new JLabel();
-		//	jLabel3.setFont(new Font("Dialog", Font.PLAIN, 13));
-			jLabel3.setText("Status");
+			jLabel3.setText("Trader");
 		}
 		return jLabel3;
 	}
 
-	private JLabel getJLabel4() {
-		if (jLabel4 == null) {
-			jLabel4 = new JLabel();
-		//	jLabel4.setFont(new Font("Dialog", Font.PLAIN, 13));
-			jLabel4.setText("Action");
-			 commonUTIL.setBackGroundColor(jcp);
+	private JPanel getJPanel0() {
+		if (jPanel0 == null) {
+			jPanel0 = new JPanel();
+			jPanel0.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
+			jPanel0.setLayout(new GroupLayout());
+			jPanel0.add(getTrader(), new Constraints(new Leading(532, 177, 10, 10), new Leading(44, 26, 10, 12)));
+			jPanel0.add(getJLabel1(), new Constraints(new Leading(9, 10, 10), new Leading(49, 12, 12)));
+			jPanel0.add(getCounterParty(), new Constraints(new Leading(304, 175, 12, 12), new Leading(44, 26, 10, 12)));
+			jPanel0.add(getJLabel2(),  new Constraints(new Leading(211, 12, 12), new Leading(49, 12, 12)));
+			jPanel0.add(getBook(), new Constraints(new Leading(67, 138, 10, 10), new Leading(44, 26, 10, 12)));
+			jPanel0.add(getJLabel5(),  new Constraints(new Leading(7, 10, 10), new Leading(12, 12, 12)));
+			jPanel0.add(getTradeID(), new Constraints(new Leading(67, 138, 12, 12), new Leading(7, 26, 40, 40)));
+			//jPanel0.add(getJLabel1(), new Constraints(new Leading(155, 10, 10), new Leading(15, 12, 12)));
+			jPanel0.add(getJLabel9(), new Constraints(new Leading(233, 10, 10), new Leading(10, 12, 12)));
+			jPanel0.add(getActionC(), new Constraints(new Leading(304, 174, 12, 12), new Leading(5, 26, 10, 51)));
+			jPanel0.add(getJLabel8(), new Constraints(new Leading(483, 10, 10), new Leading(12, 12, 12)));
+			jPanel0.add(getJLabel3(), new Constraints(new Leading(485, 41, 12, 12), new Leading(49, 25, 12, 12)));
+			jPanel0.add(getStatus(), new Constraints(new Leading(535, 170, 12, 12), new Leading(5, 26, 10, 51)));
 		}
-		return jLabel4;
-	}
-
-	private JComboBox getTtradername() {
-		if (ttradername == null) {
-			ttradername = new JComboBox();
-			 ttradername.setModel(traderCombo);
-			 commonUTIL.setBackGroundColor(jcp);
-		}
-		return ttradername;
-	}
-
-	private JComboBox getBook() {
-		if (book == null) {
-			book = new JComboBox();
-			 book.setModel(bookCombo);
-			 commonUTIL.setBackGroundColor(jcp);
-		}
-		return book;
-	}
-
-	private JComboBox getJcp() {
-		if (jcp == null) {
-			jcp = new JComboBox();
-			 jcp.setModel(cpCombo);
-			 commonUTIL.setBackGroundColor(jcp);
-		}
-		return jcp;
+		return jPanel0;
 	}
 
 	private JLabel getJLabel2() {
 		if (jLabel2 == null) {
 			jLabel2 = new JLabel();
-		//	commonUTIL.setLabelFont(jLabel2);
-			//jLabel2.setFont(new Font("SansSerif-12", Font.PLAIN, 12));
-			jLabel2.setText("Trader Name");
+			jLabel2.setText("CounterParty");
 		}
 		return jLabel2;
 	}
@@ -521,263 +1340,114 @@ public class BONDTradePanel extends  TradePanel  {
 	private JLabel getJLabel1() {
 		if (jLabel1 == null) {
 			jLabel1 = new JLabel();
-		//.setLabelFont(jLabel2);
-		//	jLabel1.setFont(new Font("Dialog", Font.PLAIN, 13));
 			jLabel1.setText("Book");
 		}
 		return jLabel1;
 	}
 
-	private JLabel getJLabel0() {
-		if (jLabel0 == null) {
-			jLabel0 = new JLabel();
-			//commonUTIL.setLabelFont(jLabel2);
-	//		jLabel0.setFont(new Font("Dialog", Font.PLAIN, 13));
-			jLabel0.setText("Legal Entity");
+
+	private JPanel getHotKeysPanels() {
+		if (jPanel5 == null) {
+			jPanel5 = new JPanel();
+			jPanel5.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
+			jPanel5.setLayout(new GroupLayout());
+			jPanel5.add(getJButton0(), new Constraints(new Leading(19, 10, 10), new Leading(8, 10, 10)));
+			jPanel5.add(getJButton1(), new Constraints(new Leading(98, 10, 10), new Leading(8, 12, 12)));
+			jPanel5.add(getJButton2(), new Constraints(new Leading(179, 10, 10), new Leading(8, 12, 12)));
+			jPanel5.add(getJButton4(), new Constraints(new Leading(301, 10, 10), new Leading(8, 12, 12)));
+			jPanel5.add(getJButton5(), new Constraints(new Leading(388, 12, 12), new Leading(8, 12, 12)));
+		//	jPanel5.add(getJButton5(), new Constraints(new Leading(489, 10, 10), new Leading(8, 12, 12)));
 		}
-		return jLabel0;
+		return jPanel5;
+	}
+// for Attributes. 
+	private JPanel getJPanel4() {
+		if (attributes == null) {
+			attributes = new TradeAttributesD();
+			attributes.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
+			//attributes.setLayout(new GroupLayout());
+			
+		}
+		return attributes;
 	}
 
-	private JPanel getJPanel0() {
-		if (jPanel0 == null) {
-			jPanel0 = new JPanel();
-			jPanel0.setFont(new Font("SansSerif-12", Font.PLAIN, 12));
-		//	jPanel0.setBorder(new LineBorder(Color.black, 1, false));
-			jPanel0.setLayout(new GroupLayout());
-			jPanel0.add(getJLabel0(), new Constraints(new Leading(12, 95, 10, 10), new Leading(22, 21, 12, 12)));
-			jPanel0.add(getJLabel1(), new Constraints(new Leading(12, 95, 40, 469), new Leading(70, 21, 12, 12)));
-			jPanel0.add(getJLabel2(), new Constraints(new Leading(12, 95, 40, 469), new Leading(114, 21, 10, 10)));
-			jPanel0.add(getJcp(), new Constraints(new Leading(131, 160, 10, 10), new Leading(16, 27, 12, 12)));
-			jPanel0.add(getBook(), new Constraints(new Leading(131, 160, 46, 314), new Leading(64, 27, 12, 12)));
-			jPanel0.add(getTtradername(), new Constraints(new Leading(131, 160, 46, 314), new Leading(108, 27, 12, 12)));
-			jPanel0.add(getJLabel9(), new Constraints(new Leading(309, 82, 10, 10), new Leading(162, 21, 12, 12)));
-			jPanel0.add(getJLabel6(), new Constraints(new Leading(573, 34, 10, 10), new Leading(22, 21, 12, 12)));
-			jPanel0.add(getJLabel7(), new Constraints(new Leading(573, 25, 10, 10), new Leading(70, 21, 12, 12)));
-			jPanel0.add(getTradeamount(), new Constraints(new Leading(406, 127, 46, 314), new Leading(111, 27, 12, 12)));
-			jPanel0.add(getJLabel5(), new Constraints(new Leading(309, 92, 10, 10), new Leading(114, 21, 12, 12)));
-			jPanel0.add(getSettledate(), new Constraints(new Leading(406, 127, 46, 314), new Leading(159, 27, 12, 12)));
-			jPanel0.add(getTcurrency(), new Constraints(new Leading(131, 160, 332, 503), new Leading(156, 27, 12, 12)));
-			jPanel0.add(getJLabel8(), new Constraints(new Leading(12, 82, 10, 10), new Leading(162, 21, 12, 12)));
-			jPanel0.add(getJLabel10(), new Constraints(new Leading(309, 76, 10, 10), new Leading(25, 21, 12, 12)));
-			jPanel0.add(getTradeyield(), new Constraints(new Leading(406, 127, 46, 314), new Leading(16, 27, 12, 12)));
-			jPanel0.add(getJLabel4(), new Constraints(new Leading(577, 49, 10, 10), new Leading(117, 21, 12, 12)));
-			jPanel0.add(getJLabel11(), new Constraints(new Leading(309, 82, 46, 314), new Leading(70, 21, 12, 12)));
-			jPanel0.add(getTprice(), new Constraints(new Leading(406, 127, 46, 314), new Leading(64, 27, 12, 12)));
-			jPanel0.add(getJLabel3(), new Constraints(new Leading(577, 48, 46, 314), new Leading(159, 21, 12, 12)));
-			jPanel0.add(getTradeid(), new Constraints(new Leading(625, 140, 10, 10), new Leading(64, 27, 12, 12)));
-			jPanel0.add(getTuse(), new Constraints(new Leading(625, 140, 46, 314), new Leading(16, 27, 12, 12)));
-			jPanel0.add(getCaction(), new Constraints(new Leading(629, 140, 10, 10), new Leading(115, 27, 12, 12)));
-			jPanel0.add(getTradestatus(), new Constraints(new Leading(633, 136, 46, 314), new Leading(162, 27, 12, 12)));
-			jPanel0.add(getJPanel1(), new Constraints(new Bilateral(780, 14, 350), new Leading(14, 179, 10, 10)));
-			//jPanel0.setBackground(commonUTIL.getColors());
-			commonUTIL.setLabelFont(jLabel0);
-			commonUTIL.setLabelFont(jLabel1);
-			commonUTIL.setLabelFont(jLabel2);
-			commonUTIL.setLabelFont(jLabel9);
-			commonUTIL.setLabelFont(jLabel6);
-			commonUTIL.setLabelFont(jLabel7);
-			commonUTIL.setLabelFont(jLabel5);
-			commonUTIL.setLabelFont(jLabel4);
-			commonUTIL.setLabelFont(jLabel3);
-			commonUTIL.setLabelFont(jLabel11);
-			commonUTIL.setLabelFont(jLabel8);
-			commonUTIL.setLabelFont(jLabel10);
-			
-		
-	        //  commonUTIL.setLabelFont(jCom);
-			
-			
-			
-            processDataCombo1(bookCombo,bookData,"Book",null); 
-			
-			processDataCombo1(cpCombo,cpData,"cp","CounterParty"); 
-			processDataCombo1(traderCombo, trader, "cp", "Trader");
-		}
-		return jPanel0;
-	}
-
-	private JScrollPane getJScrollPane0() {
-		if (jScrollPane0 == null) {
-			jScrollPane0 = new JScrollPane();
-			jScrollPane0.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, null, null, null, null));
-			jScrollPane0.setViewportView(getJTable0());
-			 commonUTIL.setBackGroundColor(jScrollPane0);
-		}
-		return jScrollPane0;
-	}
-
-	private JTable getJTable0() {
-		if (JTable1 == null) {
-			JTable1 = new JTable();
-			 String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
-             
-		        attributeModel = new DefaultTableModel(attributeColumnName,0);
-		        processTableData(attributeValue,attributeModel);
-		        JTable1.setModel(attributeModel);
-		        commonUTIL.setBackGroundColor(JTable1);
-			
-		}
-		return JTable1;
-	}
 	
 	
-	 private void setAttribute(String attributes) {
-	    	String attributeColumnName [] =    {"Attribute Name ", "Attribute  Value "};
-	        
-	        DefaultTableModel attributeModel = new DefaultTableModel(attributeColumnName,0);
-	        
-	        
-	    		if(attributes != null && attributes.length() > 0) {
-	    		String atttoken [] = attributes.trim().split(";"); 
-	    		
-	    		
-	    		
-	    		for(int i =0;i<atttoken.length;i++) {
-    				String att = (String) atttoken[i];
-    				if(att.contains("=")) {
-    						String attvalue = att.substring(att.indexOf('=')+1, att.length());
-    						String attnameName = att.substring(0, att.indexOf('='));
-    						int atRows = JTable1.getRowCount();
-    						for(int t=0;t <atRows; t++) {
-    									String atName = (String) JTable1.getModel().getValueAt(t,0);
-    									if(atName.trim().equalsIgnoreCase(attnameName.trim())) {
-    										JTable1.setValueAt(attvalue, t, 1);
-    										attributeValue.put(attnameName,attvalue);
-    									} 
-    						}
-    				}
-    		}
-    	//	attributes.jTable1.removeAll();
-    	//	attributes.jTable1.setModel(attributeModel);
-    		}
-	        
-			
-		}
-	 public void getTradeSDI(BackOfficePanel panel) {
-			try {
-				
-				sdiPanel.setTrade(trade);
-				panel.fillJTabel((Vector) rtradeservices.getSDisOnTrade(trade));
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-	 
-	 public int getBookKey(Hashtable t , int id) {
-			int i = 0;
-			Set set = t.entrySet();
-		    Iterator it = set.iterator();
-		    while (it.hasNext()) {
-		      Map.Entry entry = (Map.Entry) it.next();
-		     Book book =  ((Book) entry.getValue());
-		     if(id == book.getBookno())
-		    	 i = ((Integer) entry.getKey()).intValue();
-		    }
-	       return i;	    
-
-		
-			
-		}
-		public int getLEKey(Hashtable t , int id) {
-			int i = 0;
-			Set set = t.entrySet();
-		    Iterator it = set.iterator();
-		    while (it.hasNext()) {
-		      Map.Entry entry = (Map.Entry) it.next();
-		      LegalEntity le =  ((LegalEntity) entry.getValue());
-		     if(id == le.getId())
-		    	 i = ((Integer) entry.getKey()).intValue();
-		    }
-	       return i;	    
-
-		
-			
-		}
-	 
-		
 	
-		private void processTableData(Hashtable<String,String> attributes,DefaultTableModel model) {
-			// TODO Auto-generated method stub
-	    	Vector vector;
-			try {
-				vector = (Vector) referenceData.getStartUPData("TradeAttribute");
-				Iterator it = vector.iterator();
-		    	int i =0;
-		    	while(it.hasNext()) {
-		    		
-		    		StartUPData tradeAttributes = (StartUPData) it.next();
-		    	    if(tradeAttributes.getName().equalsIgnoreCase("Trade Date")) {
-		    	    	model.insertRow(i, new Object[]{tradeAttributes.getName(),commonUTIL.getCurrentDateTime()});
-		    	    	attributes.put(tradeAttributes.getName(),(String) model.getValueAt(i, 1));
-		    	    } else {
-		    		   model.insertRow(i, new Object[]{tradeAttributes.getName(),""});
-		    		   attributes.put(tradeAttributes.getName(),"");
-		    	    }
-		    		i++;
-		    		}
-		    		
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	    }
-	
-	public void processDataCombo1( javax.swing.DefaultComboBoxModel combodata,Hashtable ids,String name,String leRole) {
-		Vector vector;
-		try {
-			if(name.equalsIgnoreCase("Book"))
-			vector = (Vector) referenceData.selectALLBooks();
-			else 
-				vector = (Vector) referenceData.selectLEonWhereClause(" role like '%"+leRole + "%'");
-			Iterator it = vector.iterator();
-	    	int i =0;
-	    	while(it.hasNext()) {
-	    		
-	    	Object obj =	 it.next();
-	    	
-    		
-	    	if(name.equalsIgnoreCase("Book"))	
-    		combodata.insertElementAt(((Book)obj).getBook_name(), i);
-	    	else 
-	    		combodata.insertElementAt(((LegalEntity)obj).getName(), i);
-    		ids.put(i, obj);
-    		i++;
-    	}	
-		}catch (RemoteException e) {
-    				// TODO Auto-generated catch block
-    				e.printStackTrace();
-    			}
-    	
-    	
-    }
-	
-	private void init() {
-		this.productType = "BOND";
-			de =ServerConnectionUtil.connect("localhost", 1099,commonUTIL.getServerIP());
-		   	 try {
-		   	 referenceData = (RemoteReferenceData) de.getRMIService("ReferenceData");
-		   	rtradeservices = (RemoteTrade)	de.getRMIService("Trade");
-		   	remoteTask = (RemoteTask) de.getRMIService("Task");
-		   	remoteBO = (RemoteBOProcess) de.getRMIService("BOProcess");
-					
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+// cash flow panel
+	private JPanel getJPanel3() {
+		if (jPanel3 == null) {
+			jPanel3 = new JPanel();
+		//	jPanel3.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
+			jPanel3.setLayout(new GroupLayout());
+			jPanel3.add(getJScrollPane1(), new Constraints(new Leading(3, 853, 10, 10), new Leading(4, 139, 10, 10)));
+		}
+		return jPanel3;
 	}
 
 	@Override
 	public void setTaskPanel(BackOfficePanel panel) {
 		// TODO Auto-generated method stub
-		taskPanel = (TaskPanel) panel;
+		this.taskPanel = taskPanel;
+		
+	}
+	public TaskPanel getTaskPanel() {
+		return taskPanel;
+	}
+	public FeesPanel getFeesPanel() {
+		return feesPanel;
+	}
+	public SDIPanel getSdiPanel() {
+		return sdiPanel;
+	}
+
+	public void setSdiPanel(SDIPanel sdiPanel) {
+		this.sdiPanel = sdiPanel;
+	}
+	@Override
+	public void setSDIPanel(BackOfficePanel panel) {
+		// TODO Auto-generated method stub
+		sdiPanel = (SDIPanel) panel;
+	}
+
+	@Override
+	public void setFEESPanel(BackOfficePanel panel) {
+		// TODO Auto-generated method stub
+		feesPanel = (FeesPanel) panel;
+	}
+
+	@Override
+	public void setLimitPanel(BackOfficePanel panel) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setTradeTransfers(BackOfficePanel panel) {
+		// TODO Auto-generated method stub
+		transferPanel = (TransferPanel) panel;
+		
+	}
+	public void getTradeTransfers(BackOfficePanel panel) {
+		try {
+			transferPanel.setTrade(trade);
+			panel.fillJTabel((Vector)RemoteServiceUtil.getRemoteBOProcessService().queryWhere("Transfer", "tradeId = " + trade.getId()));
+		} catch (RemoteException e) {
+			
+			e.printStackTrace();
+		}
+	}
+	@Override
+	public void setTradePostings(BackOfficePanel panel) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void setTrade(Trade trade) {
 		// TODO Auto-generated method stub
-		 this.trade = trade;
+		this.trade = trade;
+		
 	}
 
 	@Override
@@ -789,322 +1459,302 @@ public class BONDTradePanel extends  TradePanel  {
 	@Override
 	public void saveASNew(Trade trade) {
 		// TODO Auto-generated method stub
-		tradeid.setText(new Integer(trade.getId()).toString());
-		tradestatus.setText(trade.getStatus());
-		actionstatus.removeAllElements();
 		
-	//	processActionData(actionstatus,trade.getTradedesc1()); 
-		/// imp note : wf understand CASH productType as MM so passing MM as hardcoded
-        processActionData(actionstatus,productType.toUpperCase(),trade.getTradedesc1(),tradestatus.getText(),rtradeservices);
-		this.trade = trade;
-		setTrade(trade);
-		getTradeTransfers(transferPanel);
-		getTradeTask(taskPanel);
-		getTradeSDI(sdiPanel);
 	}
 
 	@Override
 	public void setUser(Users user) {
-		this.user = user;
-		tuse.setText(user.getUser_name());
+		// TODO Auto-generated method stub
+		this.usr =user;
 		
 	}
 
 	@Override
 	public String getAction() {
 		// TODO Auto-generated method stub
-		String action = null;
-		if(caction.getSelectedIndex() == -1) {
-			return null;
-	}
-	if(caction.getSelectedIndex() >= 0) {
-			action = caction.getSelectedItem().toString();
-	}
-		return action;
-	
+		return null;
 	}
 
 	@Override
+	public void setTradeApplication(TradeApplication app) {
+		// TODO Auto-generated method stub
+		this.app = app;
+	}
+
+	@Override
+	public void processTask(TaskEventProcessor taskEvent, Users WindowUser) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setLimitBreachMarkOnAction(int i) {
+		// TODO Auto-generated method stub
+		
+	}
+	private boolean validateProductData() {
+		boolean flag = false;
+		
+		
+		return flag;
+		
+	}
+	@Override
 	public void buildTrade(Trade trade, String actionType) {
-	
+		// TODO Auto-generated method stub
 		if(actionType.equalsIgnoreCase("NEW")) {
-			tradeid.setText("0");
-			tradestatus.setEditable(true);
-			tradestatus.setText("NONE");
-			tradestatus.setEditable(false);
-			tcurrency.setSelectedItem(new String("INR"));
-			tprice.setText("0");
-			tquantity.setText("0");
-			tradeyield.setValue(0);
-			tradeamount.setText("0");
-			actionstatus.removeAllElements();
-			tsettlement.setText("");
-			//processActionData(actionstatus,trade.getTradedesc1());
-			actionstatus.insertElementAt("NEW", 0);
-		
-			caction.setModel(actionstatus);
-			String ss = "";
-			processTableData(attributeValue,attributeModel);
-	        JTable1.setModel(attributeModel);
-			 trade.setProductType(productType);
-		//	JTable1.setValueAt("",JTable1.getSelectedRow(),1);
-			book.setSelectedIndex(-1);
-			jcp.setSelectedIndex(-1);
-			ttradername.setSelectedIndex(-1);
-		}else {
-			
-			
-			validateTradeDetails(trade,actionType);
-			
-			trade.setId(new Integer(tradeid.getText()).intValue());
-			/*trade.setId(new Integer(tradeid.getText()).intValue());
-	        trade.setCpID(((LegalEntity) cpData.get(jcp.getSelectedIndex())).getId());
-	        trade.setTraderID((((LegalEntity) trader.get(ttradername.getSelectedIndex())).getId()));
-	        trade.setBookId(((Book) bookData.get(book.getSelectedIndex())).getBookno());
-	        trade.setStatus(tradestatus.getText());
-	        trade.setPrice(new Double(tprice.getText()).doubleValue());
-	        trade.setTradeDate(getValueOfAttribute("Trade Date"));
-	        if(!(caction.getSelectedIndex() == -1))
-	        trade.setAction(caction.getSelectedItem().toString());
-	        trade.setCurrency((String)tcurrency.getSelectedItem());
-	        trade.setYield(new Double(tradeyield.getText()).doubleValue());
-	        trade.setAttributes(getAttributeValue());
-	        trade.setTradeAmount(new Double(tradeamount.getText()));
-	        trade.setQuantity(0);
-	        trade.setDelivertyDate(tsettlement.getText());
-	        trade.setEffectiveDate(tsettlement.getText());
-	        //trade.setTradeDate(commonUTIL.getTimeStampToString(commonUTIL.getSQLTimeStamp()));
-	        trade.setProductType(productType);*/
-	        
-	       // System.out.println(trade.getAttributes());
-	      
+			setNewAction(trade);
 		}
+		if(actionType.equalsIgnoreCase("saveAsNew")) {
+			 
+			actionC.setSelectedItem("NEW");
+			actionC.getModel().setSelectedItem("NEW");
+			if( validateTradeData()) {
+				setSaveAsNew(trade);
+			}
+		}
+		if(actionType.equalsIgnoreCase("save")) {
+			if(  validateTradeData()) {
+				setSave(trade);
+			}
+		}
+		
 	}
 	
-	/**
-	 *	Validates trade details
-	 *
-	 *	@author yogesh
-	 *
-	 */
-	private void validateTradeDetails(Trade trade,String actionType) {
-		
-		
-		LegalEntity cp = (LegalEntity) cpData.get(jcp.getSelectedIndex());
-		int cpId = cp.getId();
-		if (jcp.getSelectedIndex() == -1) {
-			
-			commonUTIL.showAlertMessage("Please select Legal Entity");
-			return;
-		
+	private boolean validateTradeData() {
+		boolean flag = false;
+		if(product == null) {
+			commonUTIL.showAlertMessage("Select Underlying Product");
+			return flag;
 		}
-		trade.setCpID(cp.getId());
-		
-		if (ttradername.getSelectedIndex() == -1) {
+		//String act = actionC.getSelectedItem().toString();
+		if(!actionC.getSelectedItem().toString().equalsIgnoreCase("NEW")) {
+			if(actionC.getSelectedIndex() ==  -1) {
+				commonUTIL.showAlertMessage("Select Action");
+				return flag;
+			}
+		}
+if (tradeDate.equals(CommonConstants.BLANKSTRING)) {
+        	
+        	commonUTIL.showAlertMessage("Please Enter Trade Date");
+			return flag;
 			
-			commonUTIL.showAlertMessage("Please select Trader");
-			return;
+        }
+if (settleDate.equals(CommonConstants.BLANKSTRING)) {
+	
+	commonUTIL.showAlertMessage("Please Enter Settle Date");
+	return flag;
+	
+}
+		if(commonUTIL.isEmpty(((String)currency.getSelectedItem())))  {
+		    commonUTIL.showAlertMessage("Select Currency");
+			return flag;
+	}
+		if (counterParty.getSelectedIndex() == -1) {
+			commonUTIL.showAlertMessage("Select CounterParty");
+			return flag;
+		}
 		
-		}		
-        trade.setTraderID((((LegalEntity) trader.get(ttradername.getSelectedIndex())).getId()));
-        
-       
 		if (book.getSelectedIndex() == -1) {
-			
-			commonUTIL.showAlertMessage("Please select Book");
-			return;
+			commonUTIL.showAlertMessage("Select Book");
+			return flag;
 		}
-        trade.setBookId(((Book) bookData.get(book.getSelectedIndex())).getBookno());
-        
-        String status = tradestatus.getText();
-        if (status.equals(CommonConstants.BLANKSTRING)) {
-        	
-        	commonUTIL.showAlertMessage("Please set workflow");
-			return;
-        	
-        }
-        trade.setStatus(status);
-        
-        String marketPrice = tprice.getText();
-        if (marketPrice.equals(CommonConstants.BLANKSTRING)) {
-        	
-        	commonUTIL.showAlertMessage("Please enter Market Price");
-			return;
-        	
-        }
-        trade.setPrice(new Double(marketPrice).doubleValue());
-        
-        String tradeDate = getValueOfAttribute("Trade Date");
-        if (tradeDate.equals(CommonConstants.BLANKSTRING)) {
-        	
-        	commonUTIL.showAlertMessage("Please enter Trade Date");
-			return;
-        	
-        }
-        trade.setTradeDate(tradeDate);
-        if(!actionType.equalsIgnoreCase("SAVEASNEW")) {
-        if(!(caction.getSelectedIndex() == -1)) {
-        	
-        	trade.setAction(caction.getSelectedItem().toString());
-        	
-        } else {
-        	
-        	commonUTIL.showAlertMessage("Please set action in workflow");
-			return;
-        } 
-        }
-        if (tcurrency.getSelectedItem().equals(CommonConstants.BLANKSTRING)) {
-        	
-        	commonUTIL.showAlertMessage("Please set Currency");
-			return;
-			
-        }
-        trade.setCurrency((String)tcurrency.getSelectedItem());
-        
-        String yield = tradeyield.getText();
-        if (yield.equals(CommonConstants.BLANKSTRING)) {
-        	
-        	commonUTIL.showAlertMessage("Please Enter Yield");
-			return;
-			
-        }
-        trade.setYield(new Double(yield).doubleValue());
-        
-        trade.setAttributes(getAttributeValue());
-        
-        String tradeAmount = tradeamount.getText();
-        if (tradeAmount.equals(CommonConstants.BLANKSTRING)) {
-        	
-        	commonUTIL.showAlertMessage("Please Trade Amount");
-			return;
-			
-        }
-        trade.setTradeAmount(new Double(tradeAmount));
-        trade.setQuantity(0);
-        
-        String deliveryDate = tsettlement.getText();
-        if (deliveryDate.equals(CommonConstants.BLANKSTRING)) {
-        	
-        	commonUTIL.showAlertMessage("Please Enter Settle Date");
-			return;
-			
-        }
-        trade.setDelivertyDate(deliveryDate);
-        trade.setEffectiveDate(deliveryDate);
-        trade.setProductType(productType);
-        
-        //trade.setTradeDate(commonUTIL.getTimeStampToString(commonUTIL.getSQLTimeStamp()));
-        
+		if (tradeDate.getDate().after(settleDate.getDate())){
+    		commonUTIL.showAlertMessage("SettleDate date cannot be before Trade end date");
+    		return flag;	
+    	}
+		if (tradeDate.getDate().after(settleDate.getDate())){
+    		commonUTIL.showAlertMessage("SettleDate date cannot be before Trade end date");
+    		return flag;	
+    	}
+		flag = true;
+		return flag;
+	}
+	private void setSave(Trade trade2) {
+		// TODO Auto-generated method stub
+		//trade = new Trade();
+		trade2.setProductId(product.getId());
+		trade2.setTradedesc(product.getProdcutShortName());
+		trade2.setTradedesc1(product.getProductType());
+		trade2.setProductType(product.getProductType());
+		trade2.setType(buySelltext.getText());
+		trade2.setCurrency(currency.getSelectedItem().toString());
+		trade2.setCpID(commonUTIL.converStringToInteger(counterParty.getName()));
+		trade2.setBookId(commonUTIL.converStringToInteger(book.getName()));
+		trade2.setTraderID(commonUTIL.converStringToInteger(trader.getName()));
+		trade.setAction(actionC.getSelectedItem().toString());
+		trade.setStatus(status.getText());
+		trade2.setAttributes(getAttributeValue(attributes));
+       	trade2.setFees(feesPanel.getFeesDataV());
+       	trade2.setUserID(usr.getId());
+		trade2.setDelivertyDate(commonUTIL.convertDateTOString(tradeDate.getDate()));
+        trade2.setEffectiveDate(commonUTIL.convertDateTOString(settleDate.getDate()));
+        try {
+			trade2.setTradeAmount(amount.getDoubleValue());
+			 trade2.setPrice(priceText.getDoubleValue());
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("BONDTradePanel", "setSave", e);
+		}
+       
+        trade2.setQuantity(trade2.getTradeAmount()/product.getFaceValue());
+        trade2.setNominal(trade2.getTradeAmount());
+		
+		
+			} 
+		
+	private void setSaveAsNew(Trade trade2) {
+		// TODO Auto-generated method stub
+		trade2.setProductId(product.getId());
+		trade2.setTradedesc(product.getProdcutShortName());
+		trade2.setTradedesc1(product.getProductType());
+		trade2.setProductType(product.getProductType());
+		trade2.setType(buySelltext.getText());
+		trade2.setCurrency(currency.getSelectedItem().toString());
+		trade2.setCpID(commonUTIL.converStringToInteger(counterParty.getName()));
+		trade2.setBookId(commonUTIL.converStringToInteger(book.getName()));
+		trade2.setTraderID(commonUTIL.converStringToInteger(trader.getName()));
+		trade2.setAction(TradeConstants.TRADEACTIONNEW);
+		trade2.setStatus(TradeConstants.TRADESTATUSNONE);
+		trade2.setAttributes(getAttributeValue(attributes));
+       	trade2.setFees(feesPanel.getFeesDataV());
+       	trade2.setUserID(usr.getId());
+		trade2.setDelivertyDate(commonUTIL.convertDateTOString(tradeDate.getDate()));
+        trade2.setEffectiveDate(commonUTIL.convertDateTOString(settleDate.getDate()));
+        try {
+			trade2.setTradeAmount(amount.getDoubleValue());
+			 trade2.setPrice(priceText.getDoubleValue());
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("BONDTradePanel", "setSaveAsNew", e);
+		}
+       
+        trade2.setQuantity(trade2.getTradeAmount()/product.getFaceValue());
+        trade2.setNominal(trade2.getTradeAmount());
+        Vector<String> message = new Vector<String>();
+    	trade = saveTrade(message,trade);
+       	if(trade  != null) {
+       		commonUTIL.showAlertMessage("Trade Saved with ID " + trade.getId());
+       		openTrade(trade);
+       	}
+			} 
+		
+		
+	//	trade.sett
+		
+	
+
+	private void setNewAction(Trade tradeNew) {
+		// TODO Auto-generated method stub
+		trade = new Trade();
+		product = new Product();
+		coupon = new Coupon();
+		TradeID.setText(TradeConstants.ZERO);
+		book.setSelectedIndex(-1);
+		counterParty.setSelectedIndex(-1);
+		trader.setSelectedIndex(-1);
+		tradeDate.setDate(commonUTIL.getCurrentDate());
+		settleDate.setDate(commonUTIL.getCurrentDate());
+		actionC.setSelectedIndex(0);
+		status.setText(TradeConstants.TRADESTATUSNONE);
+		Amount1.setValue(0.0);
+		priceText.setValue(0.0);
+		underlying.setSelectedIndex(-1);
+		previousCoupon.setText(TradeConstants.BLANK);
+		nextCoupon.setText(TradeConstants.BLANK);
+
+		maturityDate.setText(TradeConstants.BLANK);
+
+		daycount.setText(TradeConstants.BLANK);
+
+		freq.setText(TradeConstants.BLANK);
+
+		accruedDays.setText(TradeConstants.BLANK);
+
+		AccrAmtText.setText(TradeConstants.BLANK);
+
+		accuredInt.setText(TradeConstants.BLANK);
+
+		settlementAMT.setText(TradeConstants.BLANK);
+
+		quantity.setText(TradeConstants.BLANK);
+
+		rateType.setText(TradeConstants.BLANK);
+
+		rate.setText(TradeConstants.BLANK);
+
+		rateIndex.setText(TradeConstants.BLANK);
+
+		CleanPrice.setText(TradeConstants.BLANK);
+		dirtyPrice.setText(TradeConstants.BLANK);
+		daycount.setText(TradeConstants.BLANK);
+		bdcText.setText(TradeConstants.BLANK);
+		buySelltext.setText("BUY");
+		BUYSELLJLabel6.setText("BUY/SELL");
+		buySelltext.setBackground(Color.green);
+		setCashFlow(getCashFlowTable(), null, ProductConstants.PRODUCTTYPEBOND);
+		
+		
+		
+		
+		
 	}
 	
+	
+
 	@Override
 	public void openTrade(Trade trade) {
-		this.trade = trade;
-		tradeid.setText(new Integer(trade.getId()).toString());
-	      //  trade.setCpID(((LegalEntity) cpData.get(jcp.getSelectedIndex())).getId());
-	        //trade.setBookId(((Book) bookData.get(book.getSelectedIndex())).getBookno());
-	        tradestatus.setText(trade.getStatus());
-	      //  tprice.setText(new Integer(trade.getPrice()).toString());
-	        tradeDate.setText(trade.getTradeDate());
-	        
-	    //    processActionData(actionstatus,trade.getTradedesc1());
-	        /// imp note : wf understand CASH productType as MM so passing MM as hardcoded
-	        processActionData(actionstatus,"BOND",trade.getTradedesc1(),tradestatus.getText(),rtradeservices);
-	        book.setSelectedIndex(getBookKey(bookData,trade.getBookId()));
-	        jcp.setSelectedIndex(getLEKey(cpData,trade.getCpID()));
-	        ttradername.setSelectedIndex(getLEKey(trader,trade.getTraderID()));
-	        
-	        caction.setSelectedItem(trade.getAction());
-	        tsettlement.setText(trade.getDelivertyDate());
-	      
-	       tcurrency.setSelectedItem((trade.getCurrency()));
-	       tradeyield.setText(new Double(trade.getYield()).toString());
-	       tradeDate.setText(trade.getTradeDate());
-	       DecimalFormat nf = new DecimalFormat("#################.000");
-	       tradeamount.setText(nf.format(trade.getTradeAmount()));
-	      
-	       tprice.setText(new Double(trade.getPrice()).toString());
-	       tquantity.setText(new Double(trade.getQuantity()).toString());
-	       tuse.setText(getUser(trade.getUserID()).getUser_name());
-	       setAttribute(trade.getAttributes());
-	       commonUTIL.display("testing delivery ",  tsettlement.getText());
-	   //    getTradeTask(taskPanel);
-		//	 getTradeSDI(sdiPanel);
-		
-	}
-	private String getAttributeValue() {
 		// TODO Auto-generated method stub
-		String attributes  = "";
-		for(int i=0;i< JTable1.getRowCount();i++ ) {
-			String attributename = ((String) JTable1.getValueAt(i, 0)).trim();
-			String attributeValue = ((String) JTable1.getValueAt(i, 1)).trim();
-			//attributeValue.trim();
-			if(attributeValue != null && attributeValue.length() > 0)
-			attributes = attributes.trim() + attributename+ "=" + attributeValue + ";";
+		if(trade != null) {
 			
+			 this.trade = trade; 
+			 this.product = trade.getProduct();
+			 this.coupon = trade.getProduct().getCoupon();
+			 if(!trade.getProductType().equalsIgnoreCase(ProductConstants.PRODUCTTYPEBOND)) {
+				 commonUTIL.showAlertMessage("Trade Type is not BOND");
+				 return;
+			 }
+			 underlying.setSelectedItem(product.getProdcutShortName());
+			 setTrade(trade);
+			 CashFlowTable.removeAll();
+			 attributeDataValue.clear();
+			 TradeID.setText(String.valueOf(trade.getId()));
+			 setAttribute(trade.getAttributes(),attributes,attributeDataValue);
+			 setDataFromTradeObject(trade.getCpID(), TradeConstants.COUNTERPARTY,counterParty);
+			
+			 if (trade.getType().equalsIgnoreCase("BUY")) {
+				 buySelltext.setText("BUY");
+		    		buySelltext.setBackground(Color.green);
+		    		BUYSELLJLabel6.setText("BUY/SELL");
+		    		
+		    	} 
+		    	if (trade.getType().equalsIgnoreCase("SELL")) {
+		    		buySelltext.setText("SELL");
+		    		buySelltext.setBackground(Color.red);
+		    		BUYSELLJLabel6.setText("SELL/BUY");
+		    	} 
+			 setDataFromTradeObject(trade.getTraderID(), TradeConstants.TRADER,trader);
+			 setDataFromTradeObject(trade.getBookId(), TradeConstants.BOOK,book);
+			currency.setSelectedItem(trade.getCurrency());
+			tradeDate.setDate(commonUTIL.stringToDate(trade.getTradeDate(), false));
+			settleDate.setDate(commonUTIL.stringToDate(trade.getTradeDate(), false));
+		    priceText.setValue(trade.getPrice());
+		    amount.setValue(trade.getNominal());
+		    
+			setTableValues(product);
 		}
-		if(attributes.trim().length() > 0)
-		return attributes.substring(0, attributes.length()-1);
-		return attributes;
-	}
-	
-	
-	private Users getUser(int i) {
-		 try {
-	    	 
-			Users user = (Users) referenceData.selectUser(i);
-			
-			if (user.getUser_name() == null || user.getUser_name().equals(CommonConstants.BLANKSTRING) ) {
-				
-				commonUTIL.showAlertMessage("User not found");
-			
-			}
-			
-			setUser(user);
-			
-			return getUser();
-			
-		 } catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return null;
-			}
-			
-	}
-	
-	private String getValueOfAttribute(String attributeName) {
-		String value = "";
-		for(int i=0; i< JTable1.getRowCount();i++) {
-		     String attributeN =  JTable1.getValueAt(i, 0).toString();
-		     if(attributeN.equalsIgnoreCase(attributeName)) {
-		    	 value = JTable1.getValueAt(i, 1).toString();
-		    	 System.out.println("value----" + value);
-		    	 break;
-		     }
-		}
-		return value;
-	}
-	
-	
-	
-	public void getTradeTask(BackOfficePanel panel) {
-		try {
-			System.out.println(panel);
+		    
 		
-			panel.fillJTabel((Vector)remoteTask.selectTaskWhere("tradeId = " + trade.getId()));
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	}
-	public Users getUser() {
-		return user;
+	private void buildCashFlow() {
+		// TODO Auto-generated method stub
+		pricing = (BONDPricing) getPricer();
+		setCashFlow(getCashFlowTable(),(Vector<Flows>) getCashFlows(),"BOND");
 	}
-	
 	@Override
 	public void setPanelValue(CommonPanel tradeValue) {
 		// TODO Auto-generated method stub
-		productWindowpanel = (BONDPanel) tradeValue;
 		
 	}
 
@@ -1117,88 +1767,75 @@ public class BONDTradePanel extends  TradePanel  {
 	@Override
 	public Collection getCashFlows() {
 		// TODO Auto-generated method stub
-		return null;
+		pricing.price(getTrade(),product, product.getCoupon());
+		BondCashFlow cashFlow =   pricing.generateCashFlow();
+		
+		return cashFlow.getFlows();
 	}
-
+	
 	@Override
 	public Pricer getPricer() {
 		// TODO Auto-generated method stub
-		return null;
+		pricing = new BONDPricing();
+		
+		return pricing;
 	}
-	 public void getTradeTransfers(BackOfficePanel panel) {
-			try {
-				transferPanel.setTrade(trade);
-				panel.fillJTabel((Vector)remoteBO.queryWhere("Transfer", "tradeId = " + trade.getId()));
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		@Override
-		public void setTradeTransfers(BackOfficePanel panel) {
-			// TODO Auto-generated method stub
-			transferPanel = (TransferPanel) panel;
-		}
-
-
-		@Override
-		public void setSDIPanel(BackOfficePanel panel) {
-			// TODO Auto-generated method stub
-			sdiPanel = (SDIPanel) panel;
-		}
+	
+	public void setPricing(BONDPricing pricing) {
+		pricing = (BONDPricing) getPricer();
 		
-
-		@Override
-		public void setFEESPanel(BackOfficePanel panel) {
-			// TODO Auto-generated method stub
-			feesPanel = (FeesPanel) panel;
-		}
-
-
-		@Override
-		public void setTradePostings(BackOfficePanel panel) {
-			// TODO Auto-generated method stub
-			
-		}
-
-
-		@Override
-		public void processTask(TaskEventProcessor taskEvent,Users WindowUser) {
-			// TODO Auto-generated method stub
-			System.out.println(productType);
-			System.out.println("Task" + taskEvent.getUserID());
-			System.out.println(" WindowUser " + WindowUser.getId());
-		}
-
-		@Override
-		public void setTradeApplication(TradeApplication app) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void setLimitPanel(BackOfficePanel panel) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void setLimitBreachMarkOnAction(int i) {
-			// TODO Auto-generated method stub
-			if( i <= 0) {
-					int red = 240;
-					int green = 31;
-					int blue = 122;
-					Color colr = new Color(red,green,blue);
-					tradestatus.setBackground(colr);
-					//tradeid.setBackground(colr);
-			} else { 
-				tradestatus.setBackground(new Color(128, 255, 255));
-				tradestatus.setEditable(false);
-			}
-			
-		}
-
+	}
+ 
+public void calculatePrice(BONDPricing price,Trade trade,Product product,Coupon coupon) {
 		
+	price.price(trade, product, coupon);
+         BondCashFlow cashFlow = price.generateCashFlow();
+         pricing.setTradeData(cashFlow);
+        // setCashFlows(cashFlow.getFlows());
+        // setPricing(pricing);
+         
+       
+	}
+@Override
+public ActionMap getHotKeysActionMapper() {
+	// TODO Auto-generated method stub
+	return actionMap;
+}
+
+@Override
+public JPanel getHotKeysPanel() {
+	// TODO Auto-generated method stub
+	return jPanel5;
+}
+private Product returnProducID(int indexid,Hashtable h) {
+	return ((Product) h.get(indexid));
+	
 
 }
+
+@Override
+public ArrayList<Component> getFocusOrderList() {
+	// TODO Auto-generated method stub
+	ArrayList<Component> list = new ArrayList<Component>();
+	//list
+	list.add(TradeID);
+	list.add(actionC);
+	list.add(book);
+	list.add(counterParty);
+	list.add(trader);
+	list.add(tradeDate);
+	list.add(settleDate);
+	list.add(priceText);
+	list.add(buySelltext);
+	list.add(currency);
+	list.add(amount);
+	list.add(underlying);
+	list.add(searchProduct);
+	
+	
+	//list.add(e)
+	return list;
+}
+
+}
+

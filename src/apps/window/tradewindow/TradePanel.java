@@ -1,7 +1,12 @@
 package apps.window.tradewindow;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.rmi.RemoteException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -9,8 +14,10 @@ import java.util.Vector;
 
 import javax.swing.ActionMap;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -37,6 +44,8 @@ import apps.window.utilwindow.TableBookModelUtil;
 import apps.window.utilwindow.TableLegalEntityModelUtil;
 import beans.Attribute;
 import beans.Book;
+import beans.CurrencyPair;
+import beans.Favorities;
 import beans.Flows;
 import beans.LegalEntity;
 import beans.StartUPData;
@@ -51,6 +60,7 @@ public abstract class TradePanel extends CommonPanel  {
 	 */
 	Hashtable<String,CashFlowPanel> cashFlowPanel = new Hashtable<String,CashFlowPanel>();
 	FilterValues filterValue = null;
+	Vector<String> currencyPair = null;
 	
 
 //	public abstract void processActionData( javax.swing.DefaultComboBoxModel combodata,String productSubType);
@@ -60,7 +70,7 @@ public abstract class TradePanel extends CommonPanel  {
 	public abstract void setLimitPanel(BackOfficePanel panel);
 	public abstract void setTradeTransfers(BackOfficePanel panel);
 	public abstract void setTradePostings(BackOfficePanel panel);
-	
+	public abstract ArrayList<Component>  getFocusOrderList();
 	public abstract void setTrade(Trade trade);
 	public abstract Trade getTrade();
 	public abstract void saveASNew(Trade trade);
@@ -235,6 +245,7 @@ public abstract class TradePanel extends CommonPanel  {
 				
 				
 			};
+			 
 			trader.setEditable(false);
 			trader.setBorder(null);
 			trader.setValueColumnIndex(1);
@@ -258,6 +269,51 @@ public abstract class TradePanel extends CommonPanel  {
 			return book;
 	}
 	
+	protected void setBUYSELL(final JLabel buysellLabel,final JTextField buysellText) {
+		buysellLabel.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String buySell = buysellLabel.getText();
+		    	
+		    	if (buySell.equalsIgnoreCase("BUY/SELL")) {
+		    		buysellText.setText("SELL");
+		    		buysellText.setBackground(Color.red);
+		    		buysellLabel.setText("SELL/BUY");
+		    	} 
+		    	if (buySell.equalsIgnoreCase("SELL/BUY")) {
+		    		buysellText.setText("BUY");
+		    		buysellText.setBackground(Color.green);
+		    		buysellLabel.setText("BUY/SELL");
+		    	} 
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+	}
 	
 	protected  String getAttributeValue( TradeAttributesD attributes) {
 		String attributesV  = "";
@@ -335,6 +391,45 @@ public abstract class TradePanel extends CommonPanel  {
 			
 		}
 		
+		
+	}
+	
+	protected  void getFavCurrencyPairForUser(int userID) {
+		Favorities fav = new Favorities();
+		fav.setType("CurrencyPair");
+			 
+		fav.setUserId(userID);
+		Vector favData;
+		try {
+			favData = (Vector) RemoteServiceUtil.getRemoteReferenceDataService().selectFavourites(fav);
+			
+		} catch (RemoteException e) {				
+			e.printStackTrace();
+		}			   
+	}
+	
+	
+	
+	protected Vector<String> getAllCurrencyPair(){
+		Vector<String> _vectorCPs  = new Vector<String>();
+		try {
+			if(currencyPair == null) {
+				currencyPair = (Vector) RemoteServiceUtil.getRemoteReferenceDataService().selectALLCurrencyPair();
+			    Iterator it = currencyPair.iterator();
+	 		
+	 		    int p = 0;
+			
+			while (it.hasNext()) {
+				CurrencyPair data = (CurrencyPair) it.next();
+				_vectorCPs.add(new String(data.getPrimary_currency()+"/"+data.getQuoting_currency()));	
+			  }
+			currencyPair = _vectorCPs;
+			} 
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return currencyPair;
 		
 	}
 	

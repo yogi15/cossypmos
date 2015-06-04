@@ -12,6 +12,7 @@ import java.rmi.RemoteException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -53,6 +54,7 @@ import com.jidesoft.combobox.TableExComboBoxSearchable;
 import com.jidesoft.grid.SortableTable;
 
 import constants.MMConstants;
+import constants.ProductConstants;
 import constants.TradeConstants;
 
 import apps.window.tradewindow.FXPanels.TradeAttributesD;
@@ -1496,6 +1498,10 @@ Users usr = null;
 			 this.trade = trade; 
 			 this.product = trade.getProduct();
 			 this.coupon = trade.getProduct().getCoupon();
+			 if(!trade.getProductType().equalsIgnoreCase(ProductConstants.PRODUCTTYPEMM)) {
+				 commonUTIL.showAlertMessage("Trade Product is not MM");
+				 return;
+			 }
 			 setTrade(trade);
 			 CashFlowTable.removeAll();
 			 attributeDataValue.clear();
@@ -1617,5 +1623,11 @@ public ActionMap getHotKeysActionMapper() {
 public JPanel getHotKeysPanel() {
 	// TODO Auto-generated method stub
 	return jPanel5;
+}
+
+@Override
+public ArrayList<Component> getFocusOrderList() {
+	// TODO Auto-generated method stub
+	return null;
 }
 }
