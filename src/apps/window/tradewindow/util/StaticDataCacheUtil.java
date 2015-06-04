@@ -9,6 +9,7 @@ import util.RemoteServiceUtil;
 import util.commonUTIL;
 
 import dsServices.RemoteBOProcess;
+import dsServices.RemoteProduct;
 import dsServices.RemoteReferenceData;
 import dsServices.RemoteTask;
 import dsServices.RemoteTrade;
@@ -17,21 +18,25 @@ import apps.window.operationwindow.jobpanl.FilterValues;
 import beans.Book;
 import beans.Favorities;
 import beans.LegalEntity;
+import beans.Product;
 
 public class StaticDataCacheUtil {
 	
 	static	Hashtable<String, Vector> bookValues = new Hashtable<String, Vector>();
 	static Hashtable<String, Vector> cpValues = new Hashtable<String, Vector>();
-
+   public static final String PRODUCTDATA = "ProductData";
+   public static final String DELETE_PRODUCT = "DELETE";
 	static Hashtable<String, Vector>  traderValues = new Hashtable<String, Vector>();
 	static Hashtable<String, String>  currency = new Hashtable<String, String>();
 	static Hashtable<String, Vector> dataValues = new Hashtable<String, Vector>();
+	static Hashtable<String,Vector> productDefinationData  = new Hashtable<String, Vector>();
 	static FilterValues filterValue = null;
 	
 	static RemoteTrade remoteTrade = null;
 	static RemoteBOProcess remoteBO = null;
 	static RemoteTask remoteTask = null;
 	static RemoteReferenceData remoteReference = null;
+	static RemoteProduct remoteProduct = null;
 	
 	static  {
 		
@@ -39,8 +44,56 @@ public class StaticDataCacheUtil {
 		remoteTask = RemoteServiceUtil.getRemoteTaskService();
 		remoteTrade = RemoteServiceUtil.getRemoteTradeService();
 		remoteBO = RemoteServiceUtil.getRemoteBOProcessService();
+		remoteProduct = RemoteServiceUtil.getRemoteProductService();
 		filterValue = new FilterValues(remoteReference,remoteTrade,remoteTask,remoteBO);
 	 }
+	
+	public static Vector getProductDefinationData() {
+		Vector 	productD = null;
+		try {
+			productD = productDefinationData.get(PRODUCTDATA);
+			if(commonUTIL.isEmpty(productD)) {
+			String sql = " producttype ='BOND' and   productname like 'BOND%'";
+			productD = (Vector) remoteProduct.selectProductWhereClaus(sql);
+			productDefinationData.put(PRODUCTDATA,productD);
+			}
+			
+		}catch(RemoteException e) {
+			commonUTIL.displayError("StaticDataCacheUtil", "getProductDefData", e);
+			return null;
+		}
+		return productD;
+	}
+	public static synchronized void addProductToCache(Product product,String type) {
+		if(!commonUTIL.isEmpty(productDefinationData)) {
+			Vector productD = productDefinationData.get(PRODUCTDATA);
+			productD = containProductID(productD,product.getId());
+			if(type.equalsIgnoreCase(DELETE_PRODUCT)) {
+			    productD.add(product); 
+			    productDefinationData.put(PRODUCTDATA,productD);
+			}
+			
+			
+		}
+		
+	}
+	private static Vector  containProductID(Vector productData,int productID) {
+		boolean flag = false;
+		int productAtID = 0;
+		Vector productD = productData;
+		for(int i=0;i<productData.size();i++) {
+			Product product = (Product) productData.get(i);
+			if(product.getId() == productID) {
+				flag = true;
+				productAtID = i; 
+			}
+		}
+		if(flag) {
+			productD.removeElementAt(productAtID);
+		}
+		return productD;
+		 
+	}
 	private static Vector getDataOnUserFavourities(int userid,String type) {
 		Favorities fav = new Favorities();
 		fav.setType(type);
