@@ -395,7 +395,9 @@ public class TradeAttributesD extends JPanel {
                     return value;
                 }
 
-                public boolean isCellEditable(int row, int col) {                        
+                public boolean isCellEditable(int row, int col) {   
+                	  if (col == 0)       //first column will be uneditable   
+                          return false;
                     String attrName = getValueAt(row, 0).toString();
                         
                     if ((attrName.equals("Trade Date") || attrName.equals("TradeModifiedDateTime"))  
@@ -418,8 +420,8 @@ public class TradeAttributesD extends JPanel {
                 		return;
                     if (value == null)
                             return;
-                    System.out.println("Setting value at " + row + "," + col + " to "
-                                    + value + " (an instance of " + value.getClass() + ")");
+                //    System.out.println("Setting value at " + row + "," + col + " to "
+                //                    + value + " (an instance of " + value.getClass() + ")");
                     Attribute ff = (Attribute)      data.get(row);
                     ff.setValue((String) value);
   
@@ -777,7 +779,7 @@ class MyTableCellEditor  extends DefaultCellEditor {
 
           @Override
           public void keyTyped(KeyEvent e) {
-                  System.out.println(e.getKeyChar());
+                //  System.out.println(e.getKeyChar());
     
             
                         
@@ -822,11 +824,6 @@ class MyTableCellEditor  extends DefaultCellEditor {
     return getValue();
   }
 
-}
-
-public void isCellEditable(int t, int i) {
-        // TODO Auto-generated method stub
-        
 }
 
 
