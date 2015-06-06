@@ -196,4 +196,56 @@ DefaultTableModel cashFlowsModel = new DefaultTableModel();
 		commonUTIL.setBackGroundColor(jTable1);
 		
   }
+
+	@Override
+	public DefaultTableModel getCashFlows(Vector cashFlows) {
+		// TODO Auto-generated method stub
+		return getCashFlow(cashFlows);
+	}
+
+	private DefaultTableModel getCashFlow(Vector cashFlows) {
+		// TODO Auto-generated method stub
+		String cols[];
+		if(cashFlows == null) {
+	    	cols = new String[] { "#", "TradeAmount", "CpnStartDate",
+					"CpnEndDate", "CmpdStartDate",
+					"CmpdEndDate", "PaymentDate", "CpnDays", "Rate", "Interest",  "Type",
+					"PaymentAmt", };
+	    	cashFlowsModel = new DefaultTableModel(null, cols);
+	    	return cashFlowsModel;
+	    	
+	    }
+		cols = new String[] { "#", "TradeAmount", "CpnStartDate",
+				"CpnEndDate",  "PaymentDate", "CpnDays", "Rate", "Interest",  "Type",
+				"PaymentAmt", };
+		cashFlowsModel = new DefaultTableModel(null, cols);
+
+		if (cashFlows != null && (!cashFlows.isEmpty())) {
+			for (int i = 0; i < cashFlows.size(); i++) {
+				Flows flow = (Flows) cashFlows.elementAt(i);
+
+				cashFlowsModel
+						.insertRow(
+								i,
+								new Object[] {
+										i + 1, 
+										commonUTIL.doubleFormat(flow.getNominal()),
+										commonUTIL.getDateFormat(flow
+												.getStartDate()),
+										commonUTIL.getDateFormat(flow
+												.getEndDate()),
+										commonUTIL.getDateFormat(flow
+												.getPaymentDate()),
+										commonUTIL.doubleFormat(flow
+												.getFlowsdays()),
+										flow.getRate(),flow.getAccuralInterest(),
+										flow.getType(),
+										commonUTIL.doubleFormat(flow
+												.getCouponAmount()), });
+			}
+
+		}
+	//	Flows flow0 = (Flows) cashFlows.elementAt(0);
+		return cashFlowsModel;
+	}
 }
