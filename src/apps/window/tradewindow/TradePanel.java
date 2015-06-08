@@ -26,10 +26,8 @@ import com.jidesoft.combobox.TableExComboBoxSearchable;
 import com.jidesoft.grid.SortableTable;
 
 import constants.TradeConstants;
-
 import dsEventProcessor.TaskEventProcessor;
 import dsServices.RemoteTrade;
-
 import productPricing.Pricer;
 import productPricing.pricingUtil.CashFlow;
 import util.ClassInstantiateUtil;
@@ -40,6 +38,7 @@ import apps.window.operationwindow.jobpanl.FilterValues;
 import apps.window.tradewindow.FXPanels.TradeAttributesD;
 import apps.window.tradewindow.cashflowpanel.CashFlowPanel;
 import apps.window.tradewindow.util.StaticDataCacheUtil;
+import apps.window.utilwindow.ComponentUtil;
 import apps.window.utilwindow.TableBookModelUtil;
 import apps.window.utilwindow.TableLegalEntityModelUtil;
 import beans.Attribute;
@@ -204,69 +203,15 @@ public abstract class TradePanel extends CommonPanel  {
 	    		
 		
     }
-	
-	
-	protected TableBookModelUtil getBookModelUtil(Vector<Book> bookData) {
-		String cols[] = { "Bookid", "Name "  };
-		return new TableBookModelUtil(bookData,cols);
-	}
-	protected TableLegalEntityModelUtil getTraderModelUtil(Vector<LegalEntity> traderData) {
-		String traderCol[] = { "ID", "TraderName "  };
-		return new TableLegalEntityModelUtil(traderData,traderCol);
-	}
-	protected TableLegalEntityModelUtil getCPModelUtil(Vector<LegalEntity> traderData) {
-		String col[] = { "Id", "Name " };
-		return new TableLegalEntityModelUtil(traderData,col);
-	}
-	
+			
 	protected TableExComboBox getCounterPartyComboBox(Vector<LegalEntity> leData) {
-		TableExComboBox counterParty =  new TableExComboBox(
-					getCPModelUtil(leData)) {
-				@Override
-				protected JTable createTable(TableModel model) {
-					return new SortableTable(model);
-				}
-				
-				
-			};
-			counterParty.setEditable(false);
-			counterParty.setBorder(null);
-			counterParty.setValueColumnIndex(1);
-			new TableExComboBoxSearchable(counterParty);
-			return counterParty;
+		return ComponentUtil.getCounterPartyComboBox(leData);
 	}
 	protected TableExComboBox getTraderComboBox(Vector<LegalEntity> leData) {
-		TableExComboBox trader =  new TableExComboBox(
-					getCPModelUtil(leData)) {
-				@Override
-				protected JTable createTable(TableModel model) {
-					return new SortableTable(model);
-				}
-				
-				
-			};
-			 
-			trader.setEditable(false);
-			trader.setBorder(null);
-			trader.setValueColumnIndex(1);
-			new TableExComboBoxSearchable(trader);
-			return trader;
+		return ComponentUtil.getCounterPartyComboBox(leData);
 	}
 	protected TableExComboBox getBookComboBox(Vector<Book> bookData) {
-		TableExComboBox book =  new TableExComboBox(
-				getBookModelUtil(bookData)) {
-				@Override
-				protected JTable createTable(TableModel model) {
-					return new SortableTable(model);
-				}
-				
-				
-			};
-			book.setEditable(false);
-			book.setBorder(null);
-			book.setValueColumnIndex(1);
-			new TableExComboBoxSearchable(book);
-			return book;
+		return ComponentUtil.getBookComboBox(bookData);
 	}
 	
 	protected void setBUYSELL(final JLabel buysellLabel,final JTextField buysellText) {
