@@ -6,6 +6,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
 import beans.Book;
+import beans.Folder;
 import beans.LegalEntity;
 
 import com.jidesoft.combobox.TableExComboBox;
@@ -26,6 +27,12 @@ public class ComponentUtil {
 		String col[] = { "Id", "Name " };
 		return new TableLegalEntityModelUtil(traderData,col);
 	}
+	private static TableFolderModelUtil getFolderModelUtil(Vector<Folder> folderData) {
+		String col[] = { "Id", "Name " };
+		return new TableFolderModelUtil(folderData,col);
+	}
+	
+	
 	private static TableBookModelUtil getBookModelUtil(Vector<Book> bookData, String col[]) {
 		return new TableBookModelUtil(bookData,col);
 	}
@@ -35,15 +42,16 @@ public class ComponentUtil {
 	private static TableLegalEntityModelUtil getCPModelUtil(Vector<LegalEntity> traderData, String col[]) {
 		return new TableLegalEntityModelUtil(traderData,col);
 	}
+	private static TableFolderModelUtil getFolderModelUtil(Vector<Folder> folderData, String col[]) {
+		return new TableFolderModelUtil(folderData,col);
+	}
+	
 	public static TableExComboBox getCounterPartyComboBox(Vector<LegalEntity> leData) {
-		TableExComboBox counterParty =  new TableExComboBox(
-					getCPModelUtil(leData)) {
+		TableExComboBox counterParty =  new TableExComboBox(getCPModelUtil(leData)) {
 				@Override
 				public JTable createTable(TableModel model) {
 					return new SortableTable(model);
-				}
-				
-				
+				}				
 			};
 			counterParty.setEditable(false);
 			counterParty.setBorder(null);
@@ -52,13 +60,11 @@ public class ComponentUtil {
 			return counterParty;
 	}
 	public static TableExComboBox getTraderComboBox(Vector<LegalEntity> leData) {
-		TableExComboBox trader =  new TableExComboBox(
-					getCPModelUtil(leData)) {
+		TableExComboBox trader =  new TableExComboBox(getCPModelUtil(leData)) {
 				@Override
 				public JTable createTable(TableModel model) {
 					return new SortableTable(model);
 				}				
-				
 			};
 			 
 			trader.setEditable(false);
@@ -68,14 +74,11 @@ public class ComponentUtil {
 			return trader;
 	}
 	public static TableExComboBox getBookComboBox(Vector<Book> bookData) {
-		TableExComboBox book =  new TableExComboBox(
-				getBookModelUtil(bookData)) {
+		TableExComboBox book =  new TableExComboBox(getBookModelUtil(bookData)) {
 				@Override
 				public JTable createTable(TableModel model) {
 					return new SortableTable(model);
 				}
-				
-				
 			};
 			book.setEditable(false);
 			book.setBorder(null);
@@ -83,16 +86,28 @@ public class ComponentUtil {
 			new TableExComboBoxSearchable(book);
 			return book;
 	}
-	
-	public static TableExComboBox getCounterPartyComboBox(Vector<LegalEntity> leData, String col[]) {
-		TableExComboBox counterParty =  new TableExComboBox(
-					getCPModelUtil(leData, col)) {
+	public static TableExComboBox getFolderComboBox(Vector<Book> folderData) {
+		TableExComboBox folder =  new TableExComboBox(getBookModelUtil(folderData)) {
 				@Override
 				public JTable createTable(TableModel model) {
 					return new SortableTable(model);
 				}
-				
-				
+			};
+			folder.setEditable(false);
+			folder.setBorder(null);
+			folder.setValueColumnIndex(1);
+			new TableExComboBoxSearchable(folder);
+			return folder;
+	}
+	
+	
+	
+	public static TableExComboBox getCounterPartyComboBox(Vector<LegalEntity> leData, String col[]) {
+		TableExComboBox counterParty =  new TableExComboBox(getCPModelUtil(leData, col)) {
+				@Override
+				public JTable createTable(TableModel model) {
+					return new SortableTable(model);
+				}				
 			};
 			counterParty.setEditable(false);
 			counterParty.setBorder(null);
@@ -101,14 +116,11 @@ public class ComponentUtil {
 			return counterParty;
 	}
 	public static TableExComboBox getTraderComboBox(Vector<LegalEntity> leData, String col[]) {
-		TableExComboBox trader =  new TableExComboBox(
-					getCPModelUtil(leData, col)) {
+		TableExComboBox trader =  new TableExComboBox(getCPModelUtil(leData, col)) {
 				@Override
 				public JTable createTable(TableModel model) {
 					return new SortableTable(model);
-				}
-				
-				
+				}								
 			};
 			 
 			trader.setEditable(false);
@@ -118,20 +130,31 @@ public class ComponentUtil {
 			return trader;
 	}
 	public static TableExComboBox getBookComboBox(Vector<Book> bookData, String col[]) {
-		TableExComboBox book =  new TableExComboBox(
-				getBookModelUtil(bookData, col)) {
-				@Override
+		TableExComboBox book =  new TableExComboBox(getBookModelUtil(bookData, col)) {
+			@Override
 				public JTable createTable(TableModel model) {
 					return new SortableTable(model);
-				}
-				
-				
+				}							
 			};
 			book.setEditable(false);
 			book.setBorder(null);
 			book.setValueColumnIndex(1);
 			new TableExComboBoxSearchable(book);
 			return book;
+	}
+	
+	public static TableExComboBox getFolderComboBox(Vector<Book> folderData, String cols[]) {
+		TableExComboBox folder =  new TableExComboBox(getBookModelUtil(folderData, cols)) {
+				@Override
+				public JTable createTable(TableModel model) {
+					return new SortableTable(model);
+				}							
+			};
+			folder.setEditable(false);
+			folder.setBorder(null);
+			folder.setValueColumnIndex(1);
+			new TableExComboBoxSearchable(folder);
+			return folder;
 	}
 	
 }
