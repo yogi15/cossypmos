@@ -2,13 +2,14 @@ package productPricing.pricingUtil;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 
 import constants.CommonConstants;
 import constants.MMConstants;
 import constants.ProductConstants;
 import constants.TradeConstants;
-
 import product.amortization.MMAmortization;
 import product.amortization.MMAmortizationFactory;
 import product.amortization.MMCompounding;
@@ -16,13 +17,11 @@ import product.amortization.MMSchedule;
 import product.amortization.RepoCompounding;
 import productPricing.DefaultCashFlow;
 import productPricing.Pricer;
-
 import beans.Amortization;
 import beans.Coupon;
 import beans.Flows;
 import beans.Product;
 import beans.Trade;
-
 import util.HolidayUtil;
 import util.commonUTIL;
 import util.common.CountDay;
@@ -66,7 +65,7 @@ public class MMCashFlow extends DefaultCashFlow {
 		 * 
 		 * setCountCashFlows((period / f) + remainingMonths);
 		 */
-		String tradeSettlement = trade.getDelivertyDate();
+		String tradeSettlement = trade.getEffectiveDate();
 
 		if (commonUTIL.isEmpty(tradeSettlement)) {
 			tradeSettlement = issueDate;
@@ -139,7 +138,7 @@ public class MMCashFlow extends DefaultCashFlow {
 					commonUTIL.stringToDate(issueDate, true),
 					commonUTIL.stringToDate(maturityDate, true),
 					commonUTIL.stringToDate(tradeSettlement, true),
-					coupon.getCouponFrequency(), product, coupon);
+					coupon.getCouponFrequency(), product.getIssueCurrency(), coupon);
 
 			calculateflows(flows, product, coupon, trade, amortizationObj);
 
@@ -1145,32 +1144,66 @@ public class MMCashFlow extends DefaultCashFlow {
 
 	private void generateFlow(int noOfCashFlows, Date issueDate,
 			Date maturityDate, Date tradeSettleDate, String freq,
-			Product product, Coupon coupon) {
+			String issueCurrency, Coupon coupon) {
 
-		DateU date = null;
-		DateU tempStartDate = null;
-
-		String businessDayConvention = coupon.getBusinessDayConvention();
-		boolean startaddingFlows = true;
-
-		int lag = 0;
-		int flowCount = 0;
-
+		//DateU date = null;
+		//DateU tempStartDate = null;
 		Date endDate = maturityDate;
 
+		int lag = 0;
+		//int flowCount = 0;
 		int no = -1 * frequencyUtil.frequencyNumberToSubtract(freq);
 
 		String criteria = frequencyUtil.getCriteria(freq);
-
-		// for (int i = 0; i < noOfCashFlows; i++) {
-		while (startaddingFlows) {
+		String businessDayConvention = coupon.getBusinessDayConvention();
+		//boolean startaddingFlows = true;
+			
+		Flows endPrincipalFlow = new Flows();
+		endPrincipalFlow.setEndDate(endDate);
+		
+		Date firstFlowPayMentDate = commonUTIL.stringToDate(HolidayUtil.applyBusinessDayConvention(issueCurrency, 
+				commonUTIL.dateToString(commonUTIL.addSubtractDate(endDate, lag)), 
+				businessDayConvention), true);
+		
+		endPrincipalFlow.setPaymentDate(firstFlowPayMentDate);
+		flows.add(endPrincipalFlow);
+		
+		LinkedHashMap<Date, Date> dateHashTable = CashFlowUtil.getCashFlowDates(tradeSettleDate, endDate, no, criteria,
+				businessDayConvention, issueCurrency);
+		
+		for (Date startDate: dateHashTable.keySet()) {
+			
+			Flows flow = new Flows();
+			flow.setStartDate(startDate);
+			Date flowEndDate = dateHashTable.get(startDate);
+			flow.setEndDate(flowEndDate);
+			flow.setPaymentDate(flowEndDate);
+			
+			flows.add(flow);
+		}
+		
+		Flows firstPrincipalFlow = new Flows();
+		firstPrincipalFlow.setEndDate(tradeSettleDate);
+		
+		Date payMentDate = commonUTIL.stringToDate(HolidayUtil.applyBusinessDayConvention(issueCurrency, 
+						commonUTIL.dateToString(commonUTIL.addSubtractDate(tradeSettleDate, lag)), 
+						businessDayConvention), true);
+						
+		firstPrincipalFlow.setPaymentDate(payMentDate);
+		flows.add(firstPrincipalFlow);
+		
+/*		while (startaddingFlows) {
 
 			Flows flow = new Flows();
+			flow.setEndDate(endDate);
 
+			date = DateU.valueOf(endDate);
+			date.deductFrequecyCode(freq);
+
+			flow.setStartDate(date.getDate());
+			
 			if (flowCount == 0) {
-
 				flowCount++;
-
 				flow.setEndDate(endDate);
 
 				date = DateU.valueOf(endDate);
@@ -1179,23 +1212,15 @@ public class MMCashFlow extends DefaultCashFlow {
 				flow.setStartDate(date.getDate());
 				tempStartDate = DateU.valueOf(flow.getStartDate());
 				//System.out.println("tempStartDate0" + tempStartDate.getDate());
-				//System.out.println("if " + flow.getStartDate());
-				//System.out.println("if " + flow.getEndDate());
+				System.out.println("if " + flow.getStartDate());
+				System.out.println("if " + flow.getEndDate());
 			} else {
-
 				flowCount = 2;
 				//System.out.println("date " + date.getDate());
 				flow.setEndDate(date.getDate());
 
 				date = DateU.valueOf(endDate);
-				// date.deductFrequecyCode(freq);
-				// System.out.println("tempStartDate1 " +
-				// tempStartDate.getDate());
-				tempStartDate = DateU.valueOf(commonUTIL.addSubtractDate(
-						flow.getEndDate(), no, criteria));
-				// tempStartDate.deductFrequecyCode(freq);
-				// System.out.println("tempStartDate2 " +
-				// tempStartDate.getDate());
+				tempStartDate = DateU.valueOf(commonUTIL.addSubtractDate(flow.getEndDate(), no, criteria));
 				flow.setStartDate(tempStartDate.getDate());
 				//System.out.println("else " + flow.getStartDate());
 				//System.out.println("else " + flow.getEndDate());
@@ -1203,36 +1228,27 @@ public class MMCashFlow extends DefaultCashFlow {
 			}
 
 			if (commonUTIL.checkGreaterDate(flow.getEndDate(), tradeSettleDate)) {
-
+			
 				if (flows.size() == 0) {
 					Flows secondPrincipalFlow = new Flows();
 					secondPrincipalFlow.setEndDate(endDate);
-					secondPrincipalFlow.setPaymentDate(commonUTIL
-							.addSubtractDate(secondPrincipalFlow.getEndDate(),
-									lag));
+					secondPrincipalFlow.setPaymentDate(commonUTIL.addSubtractDate(secondPrincipalFlow.getEndDate(),	lag));
 					flows.add(secondPrincipalFlow);
 
 				} else {
 
 					if (commonUTIL.checkGreaterDate(tradeSettleDate,
 							flow.getStartDate())) {
-
 						flow.setStartDate(tradeSettleDate);
 						startaddingFlows = false;
-
 					}
 
 					if (!businessDayConvention.equals("NO_ADJUST")) {
-
 						String stringStartDate = HolidayUtil
-								.applyBusinessDayConvention(product
-										.getIssueCurrency(), commonUTIL
-										.dateToString(flow.getStartDate()),
-										businessDayConvention);
+								.applyBusinessDayConvention(product.getIssueCurrency(), 
+										commonUTIL.dateToString(flow.getStartDate()), businessDayConvention);
 
-						flow.setStartDate(commonUTIL.stringToDate(
-								stringStartDate, true));
-
+						flow.setStartDate(commonUTIL.stringToDate(stringStartDate, true));
 					}
 
 					flow.setPaymentDate(commonUTIL.addSubtractDate(
@@ -1240,49 +1256,36 @@ public class MMCashFlow extends DefaultCashFlow {
 
 					// bdc for payment date is always FOLLOWING;
 					String paymentDate = HolidayUtil
-							.applyBusinessDayConvention(product
-									.getIssueCurrency(), commonUTIL
-									.dateToString(flow.getPaymentDate()),
-									"FOLLOWING");
+							.applyBusinessDayConvention(product.getIssueCurrency(), 
+									commonUTIL.dateToString(flow.getPaymentDate()),"FOLLOWING");
 
-					flow.setPaymentDate((commonUTIL.stringToDate(paymentDate,
-							true)));
+					flow.setPaymentDate((commonUTIL.stringToDate(paymentDate, true)));
 					flow.setType(ProductConstants.INTEREST);
 
 					if (!flow.getStartDate().equals(flow.getEndDate())) {
 						System.out.println("start ---" + flow.getStartDate());
 						System.out.println("end ---" + flow.getEndDate());
 						flows.add(flow);
-
 					}
 
 				}
 
 				if (flowCount == 1) {
-
 					date = DateU.valueOf(endDate);
 				} else {
-
 					date = DateU.valueOf(flow.getStartDate());
-
 				}
 
 			} else {
-
 				startaddingFlows = false;
-
 			}
-
 		}
-
 		Flows firstPrincipalFlow = new Flows();
 		firstPrincipalFlow.setEndDate(tradeSettleDate);
-		firstPrincipalFlow.setPaymentDate(commonUTIL.addSubtractDate(
-				tradeSettleDate, lag));
+		firstPrincipalFlow.setPaymentDate(commonUTIL.addSubtractDate(tradeSettleDate, lag));
 		flows.add(firstPrincipalFlow);
-
+*/
 		Collections.reverse(flows);
-
 	}
 
 	public int getCountCashFlows() {
@@ -1297,7 +1300,6 @@ public class MMCashFlow extends DefaultCashFlow {
 
 	public void setFrequencyInYear(double fy) {
 		this.frequencyInYear = fy;
-
 	}
 
 	public double getFrequencyInYear() {
