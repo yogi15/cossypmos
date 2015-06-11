@@ -955,7 +955,7 @@ public class CountDay {
 	 * @param endDate
 	 * @return double
 	 */
-	static private double dayCountFactor30_360(DateU startDate, DateU endDate) {
+	private double dayCountFactor30_360(DateU startDate, DateU endDate) {
 
 		int y2 = endDate.get_year();
 		int m2 = endDate.get_month();
@@ -995,7 +995,7 @@ public class CountDay {
 	 * @param endDate
 	 * @return double
 	 */
-	static private double dayCountFactor30_360_US(DateU startDate, DateU endDate) {
+	private double days30_360_US(DateU startDate, DateU endDate) {
 
 		int y2 = endDate.get_year();
 		int m2 = endDate.get_month();
@@ -1012,9 +1012,9 @@ public class CountDay {
 		if (d1 == 31)
 			d1 = 30;
 
-		double dayCountFactor = (((d2 - d1) + 30 * (m2 - m1) + 360 * (y2 - y1))) / 360.0;
+		double days = (((d2 - d1) + 30 * (m2 - m1) + 360 * (y2 - y1)));
 
-		return Math.round(dayCountFactor * 1000000.0) / 1000000.0;
+		return days;
 
 	}
 
@@ -1026,7 +1026,7 @@ public class CountDay {
 	 * @param endDate
 	 * @return double
 	 */
-	static private double dayCountFactor30_360_ISDA(DateU startDate,
+	private double days30_360_ISDA(DateU startDate,
 			DateU endDate) {
 
 		int y2 = endDate.get_year();
@@ -1051,9 +1051,9 @@ public class CountDay {
 
 		}
 
-		double dayCountFactor = (((d2 - d1) + 30 * (m2 - m1) + 360 * (y2 - y1))) / 360.0;
+		double days = (((d2 - d1) + 30 * (m2 - m1) + 360 * (y2 - y1)));
 
-		return Math.floor(dayCountFactor * 1000000.0) / 1000000.0;
+		return days;
 
 	}
 
@@ -1065,7 +1065,7 @@ public class CountDay {
 	 * @param endDate
 	 * @return double
 	 */
-	static private double dayCountFactor30E_360(DateU startDate, DateU endDate) {
+	private double dayCountFactor30E_360(DateU startDate, DateU endDate) {
 
 		int y2 = endDate.get_year();
 		int m2 = endDate.get_month();
@@ -1101,7 +1101,7 @@ public class CountDay {
 	 * @param endDate
 	 * @return double
 	 */
-	static private double dayCountFactor30EP_360(DateU startDate, DateU endDate) {
+	private double dayCountFactor30EP_360(DateU startDate, DateU endDate) {
 
 		int y2 = endDate.get_year();
 		int m2 = endDate.get_month();
@@ -1144,7 +1144,7 @@ public class CountDay {
 	 * @param endDate
 	 * @return double
 	 */
-	static private double dayCountFactorACT_360(DateU startDate, DateU endDate) {
+	private double dayCountFactorACT_360(DateU startDate, DateU endDate) {
 
 		long diffInDays = commonUTIL.jodaDiffInDays(startDate.getDate(), endDate.getDate());
 
@@ -1162,7 +1162,7 @@ public class CountDay {
 	 * @param endDate
 	 * @return double
 	 */
-	static private double dayCountFactorACT_365(DateU startDate, DateU endDate) {
+	private double dayCountFactorACT_365(DateU startDate, DateU endDate) {
 
 		long diffInDays = commonUTIL.jodaDiffInDays(startDate.getDate(), endDate.getDate());
 
@@ -1180,7 +1180,7 @@ public class CountDay {
 	 * @param endDate
 	 * @return double
 	 */
-	static private double dayCountFactorACT_366(DateU startDate, DateU endDate) {
+	private double dayCountFactorACT_366(DateU startDate, DateU endDate) {
 
 		long diffInDays = commonUTIL.jodaDiffInDays(startDate.getDate(), endDate.getDate());
 
@@ -1189,7 +1189,310 @@ public class CountDay {
 		return Math.round(dayCountFactor * 1000000.0) / 1000000.0;
 
 	}
+	
+	/**
+	 * Returns number of days between two days according to Count Factor
+	 * 
+	 * @author yogesh
+	 * @param startDate
+	 * @param endDate
+	 * @return double
+	 */
+	
+	public double getNumberofDaysBasedOnCountFactor(DateU start, DateU end) {
+		DateU d1, d2;
+		if (start.before(end)) {
+			d1 = start;
+			d2 = end;
+		} else {
+			d1 = end;
+			d2 = start;
+		}
 
+		switch (_dc) {
+		case DC_30_360:
+			return days30_360(d1, d2);
+		case DC_30E_360:
+			return days30E_360(d1, d2);
+		case DC_30EP_360:
+			return days30EP_360(d1, d2);
+		case DC_ACT_360:
+			return daysACT_360(d1, d2);
+		case DC_ACT_365:
+			return daysACT_365(d1, d2);
+		case DC_ACT_365_ISDA:
+			return (int) DateU.diff(d1, d2);
+		case DC_ACT_ACT:
+			return (int) DateU.diff(d1, d2);
+		case DC_ACT_ACT29:
+			return (int) DateU.diff(d1, d2);
+		case DC_ACTB_ACTB:
+			return (int) DateU.diff(d1, d2);
+			// case DC_ACT_nACT : return (int) JDate.diff(d1,d2);
+		case DC_ACT_365_25:
+			return (int) DateU.diff(d1, d2);
+		case DC_ACT_365CM:
+			return (dayDiffACT_365CM(start, end));
+		case DC_BU_252:
+			// return (dayCountFactorBU_252(start, end));
+		case DC_1_1:
+			return (int) DateU.diff(d1, d2);
+		case DC_ACT_366:
+			return daysACT_366(d1, d2);
+		case DC_30_360_ISDA:
+			return days30_360_ISDA(d1, d2);
+		case DC_30_360_US_BOND:
+			return days30_360_US(d1, d2);
+		default: {
+			return -1;
+		}
+		}
+	}
+	
+	
+	/**
+	 * Returns  number of days  for 30/360 Day Count Convention
+	 * 
+	 * @author yogesh
+	 * @param startDate
+	 * @param endDate
+	 * @return double
+	 */
+	private double days30_360(DateU startDate, DateU endDate) {
+
+		int y2 = endDate.get_year();
+		int m2 = endDate.get_month();
+		int d2 = endDate.get_dayOfMonth();
+
+		int y1 = startDate.get_year();
+		int m1 = startDate.get_month();
+		int d1 = startDate.get_dayOfMonth();
+
+		if (d1 == 30 || d1 == 31) {
+			if (d2 == 31)
+				d2 = 30;
+		}
+		if (d1 == 31)
+			d1 = 30;
+
+		if (m1 == 2 && commonUTIL.isLeapYear(y1) && d1 == 29) {
+
+			d1 = 30;
+
+		} else if (m1 == 2 && !commonUTIL.isLeapYear(y1) && d1 == 28) {
+
+			d1 = 30;
+		}
+
+		double days = (((d2 - d1) + 30 * (m2 - m1) + 360 * (y2 - y1)));
+
+		return days;
+
+	}
+
+	/**
+	 * Returns number of days for 30/360 US Day Count Convention
+	 * 
+	 * @author yogesh
+	 * @param startDate
+	 * @param endDate
+	 * @return double
+	 */
+	private double dayCountFactor30_360_US(DateU startDate, DateU endDate) {
+
+		int y2 = endDate.get_year();
+		int m2 = endDate.get_month();
+		int d2 = endDate.get_dayOfMonth();
+
+		int y1 = startDate.get_year();
+		int m1 = startDate.get_month();
+		int d1 = startDate.get_dayOfMonth();
+
+		if (d1 == 30 || d1 == 31) {
+			if (d2 == 31)
+				d2 = 30;
+		}
+		if (d1 == 31)
+			d1 = 30;
+
+		double dayCountFactor = (((d2 - d1) + 30 * (m2 - m1) + 360 * (y2 - y1))) / 360.0;
+
+		return Math.round(dayCountFactor * 1000000.0) / 1000000.0;
+
+	}
+
+	/**
+	 * Returns Day Count factor for 30/360 ISDA Day Count Convention
+	 * 
+	 * @author yogesh
+	 * @param startDate
+	 * @param endDate
+	 * @return double
+	 */
+	private double dayCountFactor30_360_ISDA(DateU startDate,
+			DateU endDate) {
+
+		int y2 = endDate.get_year();
+		int m2 = endDate.get_month();
+		int d2 = endDate.get_dayOfMonth();
+
+		int y1 = startDate.get_year();
+		int m1 = startDate.get_month();
+		int d1 = startDate.get_dayOfMonth();
+
+		int d11 = commonUTIL.getLastDayofMonth(startDate.getDate());
+		int d21 = commonUTIL.getLastDayofMonth(endDate.getDate());
+
+		if (d1 == d11) {
+
+			d1 = 30;
+		}
+
+		if (d2 == d21) {
+
+			d2 = 30;
+
+		}
+
+		double dayCountFactor = (((d2 - d1) + 30 * (m2 - m1) + 360 * (y2 - y1))) / 360.0;
+
+		return Math.floor(dayCountFactor * 1000000.0) / 1000000.0;
+
+	}
+
+	/**
+	 * Returns number of days for 30E/360 Day Count Convention
+	 * 
+	 * @author yogesh
+	 * @param startDate
+	 * @param endDate
+	 * @return double
+	 */
+	private double days30E_360(DateU startDate, DateU endDate) {
+
+		int y2 = endDate.get_year();
+		int m2 = endDate.get_month();
+		int d2 = endDate.get_dayOfMonth();
+
+		int y1 = startDate.get_year();
+		int m1 = startDate.get_month();
+		int d1 = startDate.get_dayOfMonth();
+
+		if (d1 == 31) {
+
+			d1 = 30;
+
+		}
+
+		if (d2 == 31) {
+
+			d2 = 30;
+
+		}
+
+		double days = (((d2 - d1) + 30 * (m2 - m1) + 360 * (y2 - y1))) / 360.0;
+
+		return days;
+
+	}
+
+	/**
+	 * Returns number of days for 30EP/360 Day Count Convention
+	 * 
+	 * @author yogesh
+	 * @param startDate
+	 * @param endDate
+	 * @return double
+	 */
+	private double days30EP_360(DateU startDate, DateU endDate) {
+
+		int y2 = endDate.get_year();
+		int m2 = endDate.get_month();
+		int d2 = endDate.get_dayOfMonth();
+
+		int y1 = startDate.get_year();
+		int m1 = startDate.get_month();
+		int d1 = startDate.get_dayOfMonth();
+
+		if (d1 == 31) {
+
+			d1 = 30;
+
+		}
+
+		if (d2 == 31 && m2 == 12) {
+
+			d2 = 1;
+			m2 = 1;
+			y2 = y2 + 1;
+
+		} else if (d2 == 31) {
+
+			d2 = 1;
+			m2 = m2 + 1;
+
+		}
+
+		double days = (((d2 - d1) + 30 * (m2 - m1) + 360 * (y2 - y1)));
+
+		return days;
+
+	}
+
+	/**
+	 * Returns number of days for ACT/360 Day Count Convention
+	 * 
+	 * @author yogesh
+	 * @param startDate
+	 * @param endDate
+	 * @return double
+	 */
+	private double daysACT_360(DateU startDate, DateU endDate) {
+
+		long diffInDays = commonUTIL.jodaDiffInDays(startDate.getDate(), endDate.getDate());
+
+		double days  = diffInDays;
+		
+		return days;
+
+	}
+
+	/**
+	 * Returns number of days for ACT/365 Day Count Convention
+	 * 
+	 * @author yogesh
+	 * @param startDate
+	 * @param endDate
+	 * @return double
+	 */
+	private double daysACT_365(DateU startDate, DateU endDate) {
+
+		long diffInDays = commonUTIL.jodaDiffInDays(startDate.getDate(), endDate.getDate());
+
+		double days  = diffInDays;
+		
+		return days;
+
+	}
+
+	/**
+	 * Returns number of days for ACT/366 Day Count Convention
+	 * 
+	 * @author yogesh
+	 * @param startDate
+	 * @param endDate
+	 * @return double
+	 */
+	private double daysACT_366(DateU startDate, DateU endDate) {
+
+		long diffInDays = commonUTIL.jodaDiffInDays(startDate.getDate(), endDate.getDate());
+
+		double days  = diffInDays;
+		
+		return days;
+
+	}
+	
 	static public void main(String args[]) {
 		DateU start = DateU
 				.valueOf(commonUTIL.stringToDate("25/03/2004", true));
