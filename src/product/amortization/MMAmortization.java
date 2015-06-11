@@ -1,8 +1,11 @@
 package product.amortization;
 
+import util.common.CountDay;
+
 public abstract class MMAmortization {
 	
 	double interest = 0.0;
+	CountDay dayCount = null;
 	/*double loanAmount = 0.0;
 	double rateofInterest = 0.0;
 	long noofMonths = 0;
@@ -27,6 +30,10 @@ public abstract class MMAmortization {
 	public void setInterest(double interest) {
 		this.interest = interest;
 	}
+	public CountDay getDayCount() {
+		return dayCount;
+	}
+	
 	
 	/*public double getLoanAmount() {
 		return loanAmount;
