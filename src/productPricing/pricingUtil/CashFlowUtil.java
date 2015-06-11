@@ -100,7 +100,7 @@ public class CashFlowUtil {
 
 			}
 			if (i != 0) {				
-				if(bdcdate.before(startDate) || bdcdate.equals(startDate)) {
+				if(startDateCal.before(startDate) || startDateCal.equals(startDate)) {
 					bdcdate = startDate;
 				}
 				dateHash.put(bdcdate, previousBdcEndDate);
