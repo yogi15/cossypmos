@@ -8,7 +8,13 @@ import java.util.Properties;
 import util.commonUTIL;
 
 
+
+
 import java.io.InputStream;
+
+import org.apache.commons.configuration.PropertiesConfiguration.PropertiesReader;
+
+
 
 public class ConfigPropertiesReader {
 	public static Hashtable<String, String> serverConfigTable;
@@ -18,7 +24,7 @@ public class ConfigPropertiesReader {
 		InputStream input = null;
 		input = Thread.currentThread().getContextClassLoader().getResourceAsStream("serverConfig.properties");
 		try {
-			prop.load(input);
+			prop.load(PropertiesReader.class.getResourceAsStream("/resources/serverConfig.properties"));
 		} catch (IOException e) {
 			commonUTIL.showAlertMessage("Error during loading Configuration file. Properies file not found in classpath");
 			System.exit(1);
