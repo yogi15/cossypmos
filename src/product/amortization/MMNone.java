@@ -34,7 +34,8 @@ public class MMNone extends MMAmortization {
 		this.flows = flows;
 
 		daycount = CountDay.valueOf(coupon.getDayCount());
-
+		setDayCount(daycount);
+		
 	}
 
 	public Amortization getAmortizationObj() {
@@ -68,7 +69,15 @@ public class MMNone extends MMAmortization {
 	public void setInterest(double interest) {
 		this.interest = interest;
 	}
-
+	
+	public CountDay getDayCount() {
+		return dayCount;
+	}
+	
+	private void setDayCount(CountDay daycount) {
+		this.dayCount =daycount;
+	}
+	
 	public double calculateFixedInterest() {
 
 		Flows flow = (Flows) flows.elementAt(flowNo);
