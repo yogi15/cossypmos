@@ -1029,9 +1029,7 @@ public class MMCashFlow extends DefaultCashFlow {
 
 		double fixedRate = coupon.getFixedRate();
 		double nominalAmount = trade.getQuantity();
-
-		CountDay daycount = CountDay.valueOf(coupon.getDayCount());
-
+		
 		if (trade.getType().equalsIgnoreCase(TradeConstants.TRADETYPE_BUY)) {
 
 			payMutiflyingfactor = 1;
@@ -1051,7 +1049,9 @@ public class MMCashFlow extends DefaultCashFlow {
 		MMAmortization mmAmortizationObject = MMAmortizationFactory
 				.getMMAmortizationObject(amortizationObj, trade, coupon,
 						product, noofMonths, flows2);
-
+		
+		CountDay daycount = mmAmortizationObject.getDayCount();
+		
 		int flowSize = flows2.size();
 		int oneLessFlowSize =flowSize - 1;
 		
@@ -1089,11 +1089,10 @@ public class MMCashFlow extends DefaultCashFlow {
 				DateU couponStartDate = DateU.valueOf(flow.getStartDate());
 				DateU couponEndDate = DateU.valueOf(flow.getEndDate());
 
-				accrualsDays = commonUTIL.jodaDiffInDays(
-						couponStartDate.getDate(), couponEndDate.getDate());
-				double dayCountFactor = daycount.getDayCountFactor(
-						couponStartDate, couponEndDate);
-
+				/*accrualsDays = commonUTIL.jodaDiffInDays(
+						couponStartDate.getDate(), couponEndDate.getDate());*/
+				accrualsDays = daycount.dayDiff(couponStartDate, couponEndDate);
+				
 				balanceAmount = mmAmortizationObject.calculatePayment() * receiveMutiflyingfactor;
 
 				flow.setFlowsdays(accrualsDays);
