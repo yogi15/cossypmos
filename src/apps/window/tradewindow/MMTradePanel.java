@@ -1281,12 +1281,13 @@ Users usr = null;
 			return flag;
 		}
 		//coupon = new Coupon();
+		 coupon.setBusinessDayConvention("FOLLOWING");
 		coupon.setCCY(curr);
 		coupon.setCouponType(cType);
 		coupon.setDayCount(cDayCount);
-			coupon.setFixedRate(cfixedRate);
-		if(cType.equalsIgnoreCase(MMConstants.FLOAT)) {
-			coupon.setCouponFrequency(cFreq);
+		coupon.setFixedRate(cfixedRate);
+		coupon.setCouponFrequency(cFreq);	
+		if(cType.equalsIgnoreCase(MMConstants.FLOAT)) {			
 			product.setTenor(cTenor);
 			coupon.setYieldDecimals(cspread); // yieldDecimals treated as spread as don't want to create unneccessary columns. 
 			coupon.setYieldMethod(cRateIndex); 
@@ -1306,7 +1307,7 @@ Users usr = null;
 	}
 	@Override
 	public void buildTrade(Trade trade, String actionType) {
-		// TODO Auto-generated method stub
+		
 		if(actionType.equalsIgnoreCase("NEW")) {
 			setNewAction(trade);
 		}
@@ -1317,16 +1318,21 @@ Users usr = null;
 			actionC.getModel().setSelectedItem("NEW");
 			if(validateProductData() && validateTradeData()) {
 				setSaveAsNew(trade);
+				buildCashFlow();
 			}
 		}
 		if(actionType.equalsIgnoreCase("save")) {
 			if(validateProductData() && validateTradeData()) {
 				setSave(trade);
+				buildCashFlow();
 			}
 		}
 		
 	}
 	
+	private void clearCashflows() {
+		getCashFlowTable().clearSelection();
+	}
 	private boolean validateTradeData() {
 		boolean flag = false;
 		String act = actionC.getSelectedItem().toString();
@@ -1336,24 +1342,25 @@ Users usr = null;
 				return flag;
 			}
 		}
-		if(commonUTIL.isEmpty(((String)Currency.getSelectedItem())))  {
-		    commonUTIL.showAlertMessage("Select Currency");
+				
+		if (book.getSelectedIndex() == -1) {
+			commonUTIL.showAlertMessage("Select Book");
 			return flag;
-	}
+		}
 		if (counterParty.getSelectedIndex() == -1) {
 			commonUTIL.showAlertMessage("Select CounterParty");
 			return flag;
 		}
-		
-		if (book.getSelectedIndex() == -1) {
-			commonUTIL.showAlertMessage("Select Book");
+		if(commonUTIL.isEmpty(((String)Currency.getSelectedItem())))  {
+		    commonUTIL.showAlertMessage("Select Currency");
 			return flag;
 		}
 		if (startDate.getDate().after(endDate.getDate())){
     		commonUTIL.showAlertMessage("End date cannot be before Trade end date");
     		return flag;	
     	}
-			flag = true;
+		
+		flag = true;
 		return flag;
 	}
 	private void setSave(Trade trade2) {
@@ -1468,7 +1475,7 @@ Users usr = null;
 		trader.setSelectedIndex(-1);
 		startDate.setDate(commonUTIL.getCurrentDate());
 		endDate.setDate(commonUTIL.getCurrentDate());
-		actionC.setSelectedIndex(0);
+		actionC.setSelectedIndex(-1);
 		status.setText("NONE");
 		Amount1.setValue(0.0);
 		rateC.setSelectedIndex(0);
@@ -1481,13 +1488,16 @@ Users usr = null;
 		payFreq.setSelectedIndex(0);
 		compFreq.setSelectedIndex(0);
 		compMethod.setSelectedIndex(0);
-		setCashFlow(getCashFlowTable(), null, "MM");
-		
-		
+		//setCashFlow(getCashFlowTable(), null, "MM");
+		clearCashFlows();
 		
 		
 	}
-	
+	 private void clearCashFlows() {
+		 DefaultTableModel dm = ((DefaultTableModel) CashFlowTable.getModel());
+		 dm.getDataVector().removeAllElements();
+		 dm.fireTableDataChanged();		 
+	 }
 	
 
 	@Override
@@ -1529,8 +1539,8 @@ Users usr = null;
 			 processActionData(actionstatus,productType,trade.getTradedesc(),trade.getStatus());
 			 rateC.setSelectedItem(coupon.getCouponType());
 			 FixedRate.setText(String.valueOf(trade.getPrice()));
-			 if(rateC.getSelectedItem().toString().equalsIgnoreCase(MMConstants.FLOAT)) {
-				 
+			 payFreq.setSelectedItem(coupon.getCouponFrequency());
+			 if(rateC.getSelectedItem().toString().equalsIgnoreCase(MMConstants.FLOAT)) {			 
 				    
 				    compFreq.setSelectedItem(trade.getProduct().getCoupon().getCouponFrequency());
 				    tenor.setSelectedItem(trade.getProduct().getTenor());
@@ -1560,12 +1570,11 @@ Users usr = null;
 					
 				}
 			
-		    
+				buildCashFlow();
 		}
 		
 	}
 	private void buildCashFlow() {
-		// TODO Auto-generated method stub
 		pricing = (MMPricing) getPricer();
 		setCashFlow(getCashFlowTable(),(Vector<Flows>) getCashFlows(),"MM");
 	}
