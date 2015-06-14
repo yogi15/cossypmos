@@ -214,6 +214,16 @@ public abstract class TradePanel extends CommonPanel  {
 		return ComponentUtil.getBookComboBox(bookData);
 	}
 	
+	protected TableExComboBox getCounterPartyComboBox(Vector<LegalEntity> leData, String cols[]) {
+		return ComponentUtil.getCounterPartyComboBox(leData, cols);
+	}
+	protected TableExComboBox getTraderComboBox(Vector<LegalEntity> leData, String cols[]) {
+		return ComponentUtil.getCounterPartyComboBox(leData, cols);
+	}
+	protected TableExComboBox getBookComboBox(Vector<Book> bookData, String cols[]) {
+		return ComponentUtil.getBookComboBox(bookData, cols);
+	}
+	
 	protected void setBUYSELL(final JLabel buysellLabel,final JTextField buysellText) {
 		buysellLabel.addMouseListener(new MouseListener() {
 
