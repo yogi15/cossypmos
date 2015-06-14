@@ -1169,7 +1169,7 @@ public class MMCashFlow extends DefaultCashFlow {
 		
 		LinkedHashMap<Date, Date> dateHashTable = CashFlowUtil.getCashFlowDates(tradeSettleDate, endDate, no, criteria,
 				businessDayConvention, issueCurrency);
-		
+		int i =0;
 		for (Date startDate: dateHashTable.keySet()) {
 			
 			Flows flow = new Flows();
@@ -1177,6 +1177,16 @@ public class MMCashFlow extends DefaultCashFlow {
 			Date flowEndDate = dateHashTable.get(startDate);
 			flow.setEndDate(flowEndDate);
 			flow.setPaymentDate(flowEndDate);
+			
+			if (i == 0) {
+				i++;
+				Date lastInterestPayMentDate = commonUTIL.stringToDate(HolidayUtil.applyBusinessDayConvention(issueCurrency, 
+						commonUTIL.dateToString(commonUTIL.addSubtractDate(flowEndDate, lag)), 
+						businessDayConvention), true);
+				
+				flow.setPaymentDate(lastInterestPayMentDate);
+			}
+			
 			
 			flows.add(flow);
 		}
