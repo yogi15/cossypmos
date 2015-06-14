@@ -199,7 +199,13 @@ public static DefaultTableModel getCashFlow(Vector cashFlows) {
 				"o/s Amount", "Interest", "Fixed Payment Amount",
 				"Balance Amount", "Payment Date", "Type", };
 
-		cashFlowsModel = new DefaultTableModel(null, cols);
+		cashFlowsModel = new DefaultTableModel(null, cols){
+			@Override
+			public boolean isCellEditable(int row, int column)
+		    {									
+				return false;
+			};
+		};
 		if (cashFlows != null && (!cashFlows.isEmpty())) {
 			for (int i = 0; i < cashFlows.size(); i++) {
 				Flows flow = (Flows) cashFlows.elementAt(i);
@@ -230,7 +236,13 @@ public static DefaultTableModel getCashFlow(Vector cashFlows) {
 				"CpnEndDate", "CmpdStartDate",
 				"CmpdEndDate", "PaymentDate", "CpnDays", "Rate", "Interest",  "Type",
 				"PaymentAmt", };
-		cashFlowsModel = new DefaultTableModel(null, cols);
+		cashFlowsModel = new DefaultTableModel(null, cols){
+			@Override
+			public boolean isCellEditable(int row, int column)
+		    {									
+				return false;
+			};
+		};;
 
 		if (cashFlows != null && (!cashFlows.isEmpty())) {
 			for (int i = 0; i < cashFlows.size(); i++) {
@@ -268,7 +280,13 @@ public static DefaultTableModel getCashFlow(Vector cashFlows) {
 				"CpnEndDate", "PaymentDate", "CpnDays", "Rate", "Type",
 				"PaymentAmt", };
 
-		cashFlowsModel = new DefaultTableModel(null, cols);
+		cashFlowsModel = new DefaultTableModel(null, cols){
+			@Override
+			public boolean isCellEditable(int row, int column)
+		    {									
+				return false;
+			};
+		};;
 
 		if (cashFlows != null && (!cashFlows.isEmpty())) {
 			for (int i = 0; i < cashFlows.size(); i++) {
@@ -320,7 +338,13 @@ public static DefaultTableModel getCashFlow(Vector cashFlows) {
 					"o/s Amount", "Interest", "Fixed Payment Amount",
 					"Balance Amount", "Payment Date", "Type", };
 
-			cashFlowsModel = new DefaultTableModel(null, cols);
+			cashFlowsModel = new DefaultTableModel(null, cols){
+				@Override
+				public boolean isCellEditable(int row, int column)
+			    {									
+					return false;
+				};
+			};;
 
 			if (cashFlows != null && (!cashFlows.isEmpty())) {
 				for (int i = 0; i < cashFlows.size(); i++) {
@@ -352,7 +376,13 @@ public static DefaultTableModel getCashFlow(Vector cashFlows) {
 					"CpnEndDate", "CmpdStartDate",
 					"CmpdEndDate", "PaymentDate", "CpnDays", "Rate", "Interest",  "Type",
 					"PaymentAmt", };
-			cashFlowsModel = new DefaultTableModel(null, cols);
+			cashFlowsModel = new DefaultTableModel(null, cols){
+				@Override
+				public boolean isCellEditable(int row, int column)
+			    {									
+					return false;
+				};
+			};;
 
 			if (cashFlows != null && (!cashFlows.isEmpty())) {
 				for (int i = 0; i < cashFlows.size(); i++) {
@@ -390,7 +420,13 @@ public static DefaultTableModel getCashFlow(Vector cashFlows) {
 					"CpnEndDate", "PaymentDate", "CpnDays", "Rate", "Type",
 					"PaymentAmt", };
 
-			cashFlowsModel = new DefaultTableModel(null, cols);
+			cashFlowsModel = new DefaultTableModel(null, cols){
+				@Override
+				public boolean isCellEditable(int row, int column)
+			    {									
+					return false;
+				};
+			};;
 
 			if (cashFlows != null && (!cashFlows.isEmpty())) {
 				for (int i = 0; i < cashFlows.size(); i++) {
