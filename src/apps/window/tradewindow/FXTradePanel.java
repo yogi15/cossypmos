@@ -24,12 +24,15 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
@@ -42,6 +45,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.plaf.ActionMapUIResource;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -59,6 +63,7 @@ import util.common.DateU;
 import apps.window.tradewindow.FXPanels.BasicData;
 import apps.window.tradewindow.FXPanels.FWDOptionPanel;
 import apps.window.tradewindow.FXPanels.FunctionalityD;
+import apps.window.tradewindow.FXPanels.Funtionality;
 import apps.window.tradewindow.FXPanels.JTableButtonRenderer;
 import apps.window.tradewindow.FXPanels.Swap;
 import apps.window.tradewindow.FXPanels.TakeUPWindow;
@@ -150,6 +155,7 @@ import dsServices.ServerConnectionUtil;
 			DefaultTableModel booktablemodel = new DefaultTableModel(s,0);
 			Hashtable<Integer,Book> books = new Hashtable<Integer,Book>();
 			
+		 ActionMap actionMap =null;
 		 javax.swing.DefaultComboBoxModel actionstatus = new javax.swing.DefaultComboBoxModel();
 		 
 		 Hashtable<String,String>  attributeDataValue = new Hashtable<String,String>();
@@ -502,7 +508,36 @@ import dsServices.ServerConnectionUtil;
 			add(getBasicData(), new Constraints(new Leading(7, 835, 10, 10), new Leading(8, 90, 10, 10)));
 			add(getRollPanel(),  new Constraints(new Leading(483, 360, 10, 10), new Leading(193, 89, 10, 10)));
 			
-			
+			actionMap = new ActionMapUIResource();
+		    actionMap.put("action_save", new AbstractAction() {
+		        @Override
+		        public void actionPerformed(ActionEvent e) {
+		        	buildTrade(trade,"save");
+		        }
+		    });
+		    actionMap.put("action_new", new AbstractAction() {
+		        @Override
+		        public void actionPerformed(ActionEvent e) {
+		        	//commonUTIL.showAlertMessage("New action performed.");
+		        	buildTrade(trade,"NEW");
+		        }
+		    });
+		    actionMap.put("action_del", new AbstractAction() {
+		        @Override
+		        public void actionPerformed(ActionEvent e) {
+		        	commonUTIL.showAlertMessage("Delete action performed.");
+		        }
+		    });
+		    actionMap.put("action_saveasnew", new AbstractAction() {
+		        @Override
+		        public void actionPerformed(ActionEvent e) {
+		        	//commonUTIL.showAlertMessage("Save As New action performed.");
+		        	buildTrade(trade,"saveAsNew");
+		        
+		        //	commonUTIL.showAlertMessage("Save As new  action performed.");
+		        }
+		    });
+		    			
 			setSize(1234, 698);
 			rollpanel.setVisible(false);
 			init();
@@ -3743,6 +3778,17 @@ import dsServices.ServerConnectionUtil;
 			try {
 				this.attributes.clearllCriteriaModel();
 				vector = (Vector) remoteReference.getStartUPData("TradeAttribute");
+				
+				Collections.sort(vector, new Comparator<StartUPData>() {
+					 
+					@Override
+					public int compare(StartUPData o1, StartUPData o2) {
+						
+						return o1.getName().compareTo(o2.getName());
+		 
+					}
+		 
+				});
 				Iterator it = vector.iterator();
 		    	int i =0;
 		    	while(it.hasNext()) {
@@ -5890,18 +5936,34 @@ private JTable fillFavourites(Object __rows12 [][],com.jidesoft.combobox.DateCom
 		@Override
 		public ActionMap getHotKeysActionMapper() {
 			// TODO Auto-generated method stub
-			return null;
+			return actionMap;
 		}
 
 		@Override
 		public JPanel getHotKeysPanel() {
 			// TODO Auto-generated method stub
-			return null;
+			return functionality;
 		}
 
 		@Override
 		public ArrayList<Component> getFocusOrderList() {
 			// TODO Auto-generated method stub
-			return null;
+			ArrayList<Component> list = new ArrayList<Component>();
+			//list
+			list.add(basicData.currencyPair);
+			list.add(basicData.book);
+			list.add(basicData.buysell);
+			list.add(basicData.counterPary);
+			list.add(basicData.jTextField7);
+			list.add(out.jTextField1);
+			list.add(out.jTextField2);
+			list.add(out.jTextField4);
+			/*list.add(buySelltext);
+			list.add(currency);
+			list.add(amount);
+			list.add(underlying);
+			list.add(searchProduct);*/
+
+			return list;
 		}
 	}
