@@ -46,12 +46,12 @@ import util.commonUTIL;
 public class JFrameMainApplication extends JFrame {
 
 	private static JMenu[] menu = { new JMenu("Static Configuration"),new JMenu("Reference"), new JMenu("Trade"), new JMenu("Report"),	new JMenu("Jobs"), new JMenu("Help") };
-	private static JMenuItem[] menuitemTrade = { new JMenu("FixedIncome"),new JMenuItem("MoneyMarket"), new JMenuItem("FX") ,new JMenuItem("Future")};
+	private static JMenuItem[] menuitemTrade = { new JMenu("FixedIncome"),new JMenuItem("MoneyMarket"), new JMenu("ForeignExchange") ,new JMenuItem("Future")};
 	private static JMenuItem[] menuReferencedata = { new JMenuItem("CounterParty"), new JMenuItem("Product"),	new JMenuItem("Book"), new JMenuItem("User"),
 			new JMenu("Accounting"), new JMenuItem("LiquidationConfig"),
 			new JMenuItem("LimitConfiguration"), new JMenu("Settlements"),
 			new JMenuItem("MarketQuote"), new JMenu("FXAutoConfig"),new JMenuItem("DateRule"),new JMenu("Listed Derivatives") };
-	private static JMenuItem[] menuStaticdata = { new JMenuItem("StartDataUP"),
+	private static JMenuItem[] menuStaticdata = { new JMenuItem("AccessPermission"),new JMenuItem("StartDataUP"),
 			new JMenuItem("WorkFlowSetup"), new JMenuItem("CurrencyDefault"),
 			new JMenuItem("Holiday"), new JMenuItem("Folder"),
 			new JMenu("Favorities"), new JMenuItem("MessageConfig") };
@@ -63,6 +63,8 @@ public class JFrameMainApplication extends JFrame {
 			new JMenuItem("Book"), new JMenuItem("CurrencyPair") };
 	private static JMenuItem[] accountItems = { new JMenuItem("Account"),
 			new JMenuItem("AccountFlowConfig"), new JMenuItem("AccEventConfig") };
+	private static JMenuItem[] fxitems = { new JMenuItem("FX"),
+		new JMenuItem("FXOption") };
 	private static JMenuItem[] derivativeItems = { new JMenuItem("FutureProduct"),
 		new JMenuItem("FutureOptionContract") };
 	
@@ -105,6 +107,8 @@ public class JFrameMainApplication extends JFrame {
 		subMenu.put("FXAutoConfig", fxConfigItems);
 		subMenu.put("Listed Derivatives", derivativeItems);
 		subMenu.put("RBIReport", RBIReport);
+		subMenu.put("ForeignExchange", fxitems);
+		
 		
 
 		setTitle(" Main Apps " + user.getUser_name());
@@ -353,6 +357,7 @@ public class JFrameMainApplication extends JFrame {
 					// favoritiesWindow.setSize(1200,650);
 					favoritiesWindow.setVisible(true);
 					favoritiesWindow.setLocation(200, 150);
+					
 
 				}
 
@@ -415,6 +420,32 @@ public class JFrameMainApplication extends JFrame {
 
 			});
 
+		}
+		for (int i = 0; i < fxitems.length; i++) {
+			final Users us1 = user;
+			fxitems[i].setFont(Font.decode("SansSerif-12"));
+			fxitems[i].addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					String productName = arg0.getActionCommand().toString();
+					TradeApplication tradeWindow = new TradeApplication(
+							productName, name);
+					// JFrameTradeWindowApplication tradeWindow = new
+					// JFrameTradeWindowApplication(productName,name);
+					tradeWindow.setUserName(name);
+					// tradeWindow.setResizable(false);
+					tradeWindow.setTitle(arg0.getActionCommand()
+							+ " Trade Window " + name.getUser_name() + " :"
+							+ name.getId());
+					tradeWindow.setIconImage(Toolkit.getDefaultToolkit()
+							.getImage(imgURL));
+					tradeWindow.setVisible(true);
+					tradeWindow.setTitle("CosMos productName Trade Window  "
+							+ name.getUser_name() + " : " + name.getId());
+					tradeWindow.setSize(1340, 740);
+					tradeWindow.setLocation(5, 5);
+					
+				}
+			});
 		}
 		for (int i = 0; i < accountItems.length; i++) {
 			final Users us1 = user;
@@ -591,6 +622,10 @@ public class JFrameMainApplication extends JFrame {
 							staticwindow.setLocation(100, 100);
 							staticwindow.setSize(1350, 675);
 
+						}else   {
+							staticwindow.setLocation(100, 100);
+							staticwindow.setSize(1220, 480);
+
 						}
 						staticwindow.setResizable(false);
 						staticwindow.setVisible(true);
@@ -655,11 +690,14 @@ public class JFrameMainApplication extends JFrame {
 							.equalsIgnoreCase("LimitConfiguration")) {
 						refWindow.setSize(1250, 580);
 					} else {
-						refWindow.setSize(1050, 500);
+						refWindow.setSize(1000, 720);
+						
+						 
 					}
+					refWindow.setResizable(false);
 					refWindow.setLocationRelativeTo(j);
 					refWindow.setVisible(true);
-					refWindow.setLocation(200, 150);
+					refWindow.setLocation(150, 100);
 				}
 
 			});
