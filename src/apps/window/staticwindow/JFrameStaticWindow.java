@@ -14,7 +14,7 @@ public class JFrameStaticWindow  extends JFrame {
 	public JFrameStaticWindow(String name) {
 		setTitle( "Cosmos " + name + " Window");
 		JPanel staticDataPanel = makeStaticPanel(name);
-		setSize(1200,1500);
+		//setSize(1200,1500);
 		add(staticDataPanel);
 		
 	}
