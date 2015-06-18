@@ -23,7 +23,6 @@ import javax.swing.UIManager;
 import dsManager.TaskManager;
 import dsServices.ServerConnectionUtil;
 import beans.Users;
-import apps.window.adminmonitor.JFrameAdminMonitorWindow;
 import apps.window.limitdashboardpanel.JFrameLimitDashBoard;
 import apps.window.operationwindow.JFrameJobApplication;
 import apps.window.operationwindow.JFrameTradeBrowser;
@@ -46,47 +45,38 @@ import util.commonUTIL;
 public class JFrameMainApplication extends JFrame {
 
 	private static JMenu[] menu = { new JMenu("Static Configuration"),new JMenu("Reference"), new JMenu("Trade"), new JMenu("Report"),	new JMenu("Jobs"), new JMenu("Help") };
-	private static JMenuItem[] menuitemTrade = { new JMenu("FixedIncome"),new JMenuItem("MoneyMarket"), new JMenu("ForeignExchange") ,new JMenuItem("Future")};
+	private static JMenuItem[] menuitemTrade = { new JMenu("FixedIncome"),new JMenuItem("MoneyMarket"), new JMenuItem("FX") ,new JMenuItem("Future")};
 	private static JMenuItem[] menuReferencedata = { new JMenuItem("CounterParty"), new JMenuItem("Product"),	new JMenuItem("Book"), new JMenuItem("User"),
 			new JMenu("Accounting"), new JMenuItem("LiquidationConfig"),
 			new JMenuItem("LimitConfiguration"), new JMenu("Settlements"),
 			new JMenuItem("MarketQuote"), new JMenu("FXAutoConfig"),new JMenuItem("DateRule"),new JMenu("Listed Derivatives") };
-	private static JMenuItem[] menuStaticdata = { new JMenuItem("AccessPermission"),new JMenuItem("StartDataUP"),
+	private static JMenuItem[] menuStaticdata = { new JMenuItem("StartDataUP"),
 			new JMenuItem("WorkFlowSetup"), new JMenuItem("CurrencyDefault"),
 			new JMenuItem("Holiday"), new JMenuItem("Folder"),
 			new JMenu("Favorities"), new JMenuItem("MessageConfig") };
 	private static JMenuItem[] reports = { new JMenuItem("TradeReport"),
 			new JMenuItem("TransferReport"), new JMenuItem("PostingReport"),new JMenuItem("MessageReport"),new JMenuItem("CashLedgerPositionReport"),new JMenuItem("CashPositionReport"),new JMenuItem("ForwardLadderReport"),
-			new JMenuItem("PNLReport"), new JMenu("RBIReport") };
+			new JMenuItem("PNLReport"), new JMenuItem("Other") };
 	private static JMenuItem[] favItems = { new JMenuItem("CounterParty"),
 			new JMenuItem("Trader"), new JMenuItem("Tenor"),
 			new JMenuItem("Book"), new JMenuItem("CurrencyPair") };
 	private static JMenuItem[] accountItems = { new JMenuItem("Account"),
 			new JMenuItem("AccountFlowConfig"), new JMenuItem("AccEventConfig") };
-	private static JMenuItem[] fxitems = { new JMenuItem("FX"),
-		new JMenuItem("FXOption") };
 	private static JMenuItem[] derivativeItems = { new JMenuItem("FutureProduct"),
 		new JMenuItem("FutureOptionContract") };
-	
 	private static JMenuItem[] fxConfigItems = {
 			new JMenuItem("CurrencySplit"), new JMenuItem("B2BConfig"),
 			new JMenuItem("SpotRollOver") };
-	private static JMenuItem[] settlements = { new JMenuItem("SDI"),
+	private static JMenuItem[] settlements = { new JMenuItem("SDI1"),
 			new JMenuItem("NettingConfiguration") };
 	private static JMenuItem[] jobs = { new JMenuItem("Jobs"),
 			new JMenuItem("Deal Viewer"), new JMenuItem("Quick Look Up"),
 			new JMenu("PositionManagement"), new JMenuItem("LimitDashBoard") };
 	private static JMenuItem[] fixedIncome = { new JMenuItem("Bond"),
 			new JMenuItem("Repo") };
-	private static JMenuItem[] RBIReport = { new JMenuItem("FTDReport"),new JMenuItem("VARReport"), new JMenuItem("OtherReport"), 
-		 };
 	private static JMenuItem[] positionmenu = {
 			new JMenuItem("PositionManager"),
 			new JMenuItem("ManualLiquidation") };
-	private static JMenuItem[] adminUtilmenu = {
-		new JMenuItem("AdminMonitorUtil")
-		 };
-	
 	Hashtable<String, JMenuItem[]> subMenu = new Hashtable<String, JMenuItem[]>();
 	URL imgURL = null;
 	Users name = null;
@@ -106,10 +96,6 @@ public class JFrameMainApplication extends JFrame {
 		subMenu.put("Settlements", settlements);
 		subMenu.put("FXAutoConfig", fxConfigItems);
 		subMenu.put("Listed Derivatives", derivativeItems);
-		subMenu.put("RBIReport", RBIReport);
-		subMenu.put("ForeignExchange", fxitems);
-		
-		
 
 		setTitle(" Main Apps " + user.getUser_name());
 		this.name = user;
@@ -122,7 +108,6 @@ public class JFrameMainApplication extends JFrame {
 
 		for (int i = 0; i < menuitemTrade.length; i++) {
 			// getMenu("Trade").add(menuitemTrade[i]);
-			
 			JMenuItem submenu1[] = getSubMenuItems(menuitemTrade[i].getText());
 			if (submenu1 == null) {
 				menu[2].add(menuitemTrade[i]);
@@ -298,8 +283,6 @@ public class JFrameMainApplication extends JFrame {
 		}
 
 		for (int i = 0; i < reports.length; i++) {
-			JMenuItem submenu1[] = getSubMenuItems(reports[i].getText());
-			if (submenu1 == null) {
 			// getMenu("Trade").add(menuitemTrade[i]);
 			menu[3].add(reports[i]);
 			menu[3].setFont(Font.decode("SansSerif-12"));
@@ -325,19 +308,6 @@ public class JFrameMainApplication extends JFrame {
 				}
 
 			});
-		} else {
-			for (int s = 0; s < submenu1.length; s++) {
-				reports[i].add(submenu1[s]);
-				commonUTIL.setBackGroundColor(reports[i]);
-			}
-			menu[3].add(reports[i]);
-
-			menu[3].setFont(Font.decode("SansSerif-12"));
-			reports[i].setFont(Font.decode("SansSerif-12"));
-			commonUTIL.setBackGroundColor(menu[3]);
-			commonUTIL.setBackGroundColor(menu[3]);
-		}
-
 
 		}
 		for (int i = 0; i < favItems.length; i++) {
@@ -357,34 +327,17 @@ public class JFrameMainApplication extends JFrame {
 					// favoritiesWindow.setSize(1200,650);
 					favoritiesWindow.setVisible(true);
 					favoritiesWindow.setLocation(200, 150);
-					
 
 				}
 
 			});
 
-		}
-		for (int i = 0; i < adminUtilmenu.length; i++) {
-			final Users us1 = user;
-			menu[5].add(adminUtilmenu[i]);
-			adminUtilmenu[i].setFont(Font.decode("SansSerif-12"));
-			adminUtilmenu[i].addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					JFrameAdminMonitorWindow pm = new JFrameAdminMonitorWindow("AdminMonitor", name);
-					pm.setSize(900, 750);
-					pm.setVisible(true);
-					pm.setIconImage(Toolkit.getDefaultToolkit().getImage(
-							imgURL));
-					pm.setTitle("Admin Monitor " + name.getUser_name());
-				}
-
-			});
 		}
 		for (int i = 0; i < positionmenu.length; i++) {
 			final Users us1 = user;
 			positionmenu[i].setFont(Font.decode("SansSerif-12"));
 			// commonUTIL.setBackGroundColor( reports[i]);
-			
+			commonUTIL.setBackGroundColor(favItems[i]);
 			positionmenu[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 
@@ -421,32 +374,6 @@ public class JFrameMainApplication extends JFrame {
 			});
 
 		}
-		for (int i = 0; i < fxitems.length; i++) {
-			final Users us1 = user;
-			fxitems[i].setFont(Font.decode("SansSerif-12"));
-			fxitems[i].addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					String productName = arg0.getActionCommand().toString();
-					TradeApplication tradeWindow = new TradeApplication(
-							productName, name);
-					// JFrameTradeWindowApplication tradeWindow = new
-					// JFrameTradeWindowApplication(productName,name);
-					tradeWindow.setUserName(name);
-					// tradeWindow.setResizable(false);
-					tradeWindow.setTitle(arg0.getActionCommand()
-							+ " Trade Window " + name.getUser_name() + " :"
-							+ name.getId());
-					tradeWindow.setIconImage(Toolkit.getDefaultToolkit()
-							.getImage(imgURL));
-					tradeWindow.setVisible(true);
-					tradeWindow.setTitle("CosMos productName Trade Window  "
-							+ name.getUser_name() + " : " + name.getId());
-					tradeWindow.setSize(1340, 740);
-					tradeWindow.setLocation(5, 5);
-					
-				}
-			});
-		}
 		for (int i = 0; i < accountItems.length; i++) {
 			final Users us1 = user;
 			accountItems[i].setFont(Font.decode("SansSerif-12"));
@@ -482,8 +409,8 @@ public class JFrameMainApplication extends JFrame {
 					refWindow.setIconImage(Toolkit.getDefaultToolkit()
 							.getImage(imgURL));
 					if (arg0.getActionCommand().toString()
-							.equalsIgnoreCase("SDI")) {
-					//	refWindow.setSize(1050, 540);
+							.equalsIgnoreCase("SDI1")) {
+						refWindow.setSize(900, 500);
 					}
 					if (arg0.getActionCommand().toString()
 							.equalsIgnoreCase("NettingConfiguration")) {
@@ -529,23 +456,6 @@ public class JFrameMainApplication extends JFrame {
 					refWindow.setLocationRelativeTo(j);
 					refWindow.setVisible(true);
 					refWindow.setLocation(100, 100);
-
-				}
-			});
-		}
-		for (int r = 0; r < RBIReport.length; r++) {
-			//derivativeItems[s].setFont(Font.decode("SansSerif-12"));
-			commonUTIL.setBackGroundColor(RBIReport[r]);
-			RBIReport[r].addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					JFrameNewReport reports = new JFrameNewReport(arg0
-							.getActionCommand(), name);
-					reports.setIconImage(Toolkit.getDefaultToolkit().getImage(
-							imgURL));
-					reports.setSize(1250, 750);
-					reports.setVisible(true);
-					reports.setTitle(arg0.getActionCommand() + " : "
-							+ name.getUser_name());
 
 				}
 			});
@@ -622,10 +532,6 @@ public class JFrameMainApplication extends JFrame {
 							staticwindow.setLocation(100, 100);
 							staticwindow.setSize(1350, 675);
 
-						}else   {
-							staticwindow.setLocation(100, 100);
-							staticwindow.setSize(1220, 480);
-
 						}
 						staticwindow.setResizable(false);
 						staticwindow.setVisible(true);
@@ -690,14 +596,11 @@ public class JFrameMainApplication extends JFrame {
 							.equalsIgnoreCase("LimitConfiguration")) {
 						refWindow.setSize(1250, 580);
 					} else {
-						refWindow.setSize(1000, 720);
-						
-						 
+						refWindow.setSize(1050, 500);
 					}
-					refWindow.setResizable(false);
 					refWindow.setLocationRelativeTo(j);
 					refWindow.setVisible(true);
-					refWindow.setLocation(150, 100);
+					refWindow.setLocation(200, 150);
 				}
 
 			});
@@ -736,7 +639,6 @@ public class JFrameMainApplication extends JFrame {
 
 		JMenuItem items[] = null;
 		if (subMenu.containsKey(itemname)) {
-		
 			items = subMenu.get(itemname);
 
 		}
