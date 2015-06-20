@@ -15,7 +15,8 @@ import dsServices.ServiceManager;
 public class MessageManagerStartup extends ServiceManager {
 
 	MessageManager amanager = null;
-    Thread t = null;
+	MessageManager aTransfermanager = null;
+ //   Thread t = null;
 	String managerName = "MessageManager";
 	Users user = null;
 	/**
@@ -51,14 +52,15 @@ public class MessageManagerStartup extends ServiceManager {
 		String hostName = commonUTIL.getLocalHostName();
 		String localHost = "localhost";
 		try {
-			amanager = new MessageManager(localHost,hostName,managerName,this);
+			amanager = new MessageManager(localHost,hostName,managerName,this,"MESSAGE");
+		//	aTransfermanager = new MessageManager(localHost,hostName,managerName,this,"Transfer");
 			if(amanager == null) {
 				amanager = null;
 				System.exit(0);
 			}
 			amanager.publishStartEvent(managerName,"Started",getClientID());
 			amanager.start(amanager);
-			
+		//	aTransfermanager.start(aTransfermanager);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			commonUTIL.displayError("MessageManagerStartUP", "Start ", e);

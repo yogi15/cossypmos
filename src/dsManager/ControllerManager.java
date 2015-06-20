@@ -28,9 +28,12 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 	 static private String hostName = "";
 	 public static  ServerConnectionUtil de = null;
 	 public String managerName = "";
+	 boolean   isJMSConnectionON = false;
 	 public ServiceManager serviceManager;
 	 public String queueName = "TRADE";
 	 Thread managerThread = null;
+	 Session session = null;
+	 Connection connection;
 	 public String getQueueName() {
 		return queueName;
 	}
@@ -48,36 +51,55 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 	}
 	 
 	 public ControllerManager(String host,String hostName,String managerName) {
+		  
 		 de =ServerConnectionUtil.connect(host, 1099,commonUTIL.getServerIP());
 		 this.hostName = hostName;
 		 this.managerName = managerName;
 		 queueName = "TRADE";
+		 
 	 }
+	 
 	 public ControllerManager(String host,String hostName,String managerName,String queueName) {
+		
 		 de =ServerConnectionUtil.connect(host, 1099,commonUTIL.getServerIP());
 		 this.hostName = hostName;
 		 this.managerName = managerName;
 		 this.queueName = queueName;
+		  
 	 }
 	 public ControllerManager(String host,String hostName,String managerName,String userName,String Password) {
+		
 		 de =ServerConnectionUtil.connectServer(host, 1099,commonUTIL.getServerIP(),managerName,userName,Password);
 		 this.hostName = hostName;
 		 this.managerName = managerName;
 		 queueName = "TRADE";
+		 
 	 }
+	 
 	 public ControllerManager(String host,String hostName,String managerName,Users user) {
+		
 		 de =ServerConnectionUtil.connectServer(host, 1099,commonUTIL.getServerIP(),managerName,user);
 		
 		 this.hostName = hostName;
 		 this.managerName = managerName;
 		 queueName = "TRADE";
+		 
 	 }
 	 public ControllerManager(String host,String hostName,String managerName,Users user,ServiceManager serviceManager) {
+		 
 		 de =ServerConnectionUtil.connectServer(host, 1099,commonUTIL.getServerIP(),managerName,user);
 		 this.serviceManager = serviceManager;
 		 this.hostName = hostName;
 		 this.managerName = managerName;
 		 queueName = "TRADE";
+	 }
+	 public ControllerManager(String host,String hostName,String managerName,Users user,ServiceManager serviceManager,String queueN ) {
+		  
+		 de =ServerConnectionUtil.connectServer(host, 1099,commonUTIL.getServerIP(),managerName,user);
+		 this.serviceManager = serviceManager;
+		 this.hostName = hostName;
+		 this.managerName = managerName;
+		 queueName = queueN;
 	 }
 	@Override
 		public void onException(JMSException e) {
@@ -95,30 +117,27 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 
 				try {
 					
-					  ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://"+hostName+":61616");
-
-			            // Create a Connection
-			            Connection connection = connectionFactory.createConnection();
-			            connection.start();
-
-			            connection.setExceptionListener(this);
+					 if(!isJMSConnectionON) {
+						 Jmsconnection(hostName);
+					 }
 
 			            // Create a Session
-			            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			          
 
 			            // Create the destination (Topic or Queue)
 			           
 			            
 			            Destination destination =  session.createTopic(queueName);
-                    //    System.out.println("TTTTTTTTTTTTTTTTTTTTTTTTTT consumer " +    queueName);
-			            // Create a MessageConsumer from the Session to the Topic or Queue
+			         //   if(queueName.equalsIgnoreCase("TRADE"))            	
+			                //System.out.println("TTTTTTTTTTTTTTTTTTTTTTTTTT producer " +    queueName);
+			    	         // Create a MessageConsumer from the Session to the Topic or Queue
 			            MessageConsumer consumer = session.createConsumer(destination);
 			           
-			            Message message = consumer.receive(1210000);
+			            Message message = consumer.receive();
 
 			            if (message instanceof ObjectMessage) {
 			            	ObjectMessage oMessage = (ObjectMessage) message;
-			            	//System.out.println(manager.managerName + "       >>>>>>>>>>>>>>>   " + ((EventProcessor)oMessage.getObject()).getClassName());
+			            //	System.out.println(manager.managerName + "       >>>>>>>>>>>>>>>   " + ((EventProcessor)oMessage.getObject()).getClassName());
 			            
 			            	//if(checkEvents((EventProcessor)  oMessage.getObject())) {
 			            	manager.handleEvent((EventProcessor) oMessage.getObject());
@@ -129,8 +148,7 @@ public abstract class ControllerManager  implements Runnable , ExceptionListener
 			            } 
 
 			            consumer.close();
-			            session.close();
-			            connection.close();
+			           
 			            Thread.sleep(10);
 				 } catch (java.lang.NullPointerException e) {
 						// TODO Auto-generated catch block
@@ -222,4 +240,22 @@ if(managerThread.isInterrupted()) {
 		
 		
 	}
+	private void Jmsconnection(String hostname) {
+		
+		 ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://"+hostname+":61616");
+
+        // Create a Connection
+       
+		try {
+			connection = connectionFactory.createConnection();
+			connection.start();
+
+	         connection.setExceptionListener(this);
+	           session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+	           isJMSConnectionON = true;
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	 }
 }
