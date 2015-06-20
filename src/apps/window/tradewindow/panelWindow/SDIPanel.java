@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
@@ -27,7 +26,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import org.dyno.visual.swing.layouts.Bilateral;
@@ -36,6 +34,8 @@ import org.dyno.visual.swing.layouts.GroupLayout;
 import org.dyno.visual.swing.layouts.Leading;
 
 import swingUtils.TableColumnAdjuster;
+import util.ReferenceDataCache;
+import util.RemoteServiceUtil;
 import util.commonUTIL;
 import apps.window.referencewindow.JFrameReferenceWindow;
 import apps.window.tradewindow.BackOfficePanel;
@@ -49,6 +49,7 @@ import beans.TransferRule;
 import bo.transfer.rule.ProductTransferRule;
 import bo.util.SDISelectorUtil;
 import constants.SDIConstants;
+import constants.TradeConstants;
 import dsServices.RemoteReferenceData;
 import dsServices.ServerConnectionUtil;
 
@@ -83,11 +84,14 @@ public class SDIPanel extends BackOfficePanel {
 	private JTextField jTextField9;
 	private JTextField jTextField10;
 	private JTextField jTextField11;
+	Hashtable<Integer,Sdi> payerSDIData = new Hashtable<Integer,Sdi>();
+	Hashtable<Integer,Sdi> receiverSDIData = new Hashtable<Integer,Sdi>();
+	
 	String ruleNofound = "White";
 	private JButton jButton0;
 	Vector<Sdi> payerPreferredSDIs = null;
 	Vector<Sdi> receiverPreferredSDIs = null;
-	boolean customChangeApply = false;
+	public boolean customChangeApply = false;
 	DefaultComboBoxModel<String> payerModel = new DefaultComboBoxModel<String>();
 	DefaultComboBoxModel payerRolemodel =	new DefaultComboBoxModel<String>();
 	DefaultComboBoxModel<String> receiverRolemodel =	new DefaultComboBoxModel<String>();
@@ -95,7 +99,7 @@ public class SDIPanel extends BackOfficePanel {
 	String col[] = { "Pay/Rec", "TransferType        ", "Currency", "ProductType        ",
 			"PayerName    ", "Payer Role", "PayerMethod" , "Payer Agent    ", "Receiver     ",
 			"ReceiverRole", "ReceiverAgent      ", "ReceiverMethod", "TradeID",
-			"Security", "SettleDate       " };
+			"Security", "SettleDate       ","PayerSDI_ID","ReceiverSDI_ID" };
 	public SDIPanel() {
 		initComponents();
 		init();
@@ -104,6 +108,9 @@ public class SDIPanel extends BackOfficePanel {
 		
 		//@ yogesh 07/02/2015
 		// components are cleared
+		rules = null;
+		customChangeApply = false;
+		this.trade = null;
 		jCheckBox0.setSelected(false);
 		payerSDI.setText("");
 		receiverSDI.setText("");
@@ -120,6 +127,21 @@ public class SDIPanel extends BackOfficePanel {
 		originalRules = null;
 		tmodel.removeALL();
 		rules = null;
+		jButton3.setEnabled(false);
+		jTextField1.setText(TradeConstants.BLANK);
+		jTextField4.setText(TradeConstants.BLANK);
+		jTextField8.setText(TradeConstants.BLANK);
+		jTextField0.setText(TradeConstants.BLANK);
+		jTextField5.setText(TradeConstants.BLANK);
+		jTextField9.setText(TradeConstants.BLANK);
+		jTextField2.setText(TradeConstants.BLANK);
+		jTextField7.setText(TradeConstants.BLANK);
+		jTextField10.setText(TradeConstants.BLANK);
+		jTextField3.setText(TradeConstants.BLANK);
+		jTextField6.setText(TradeConstants.BLANK);
+		jTextField12.setText(TradeConstants.BLANK);
+		jTextField13.setText(TradeConstants.BLANK);
+		jTextField11.setText(TradeConstants.BLANK);
 		
 	}
 
@@ -135,11 +157,21 @@ public class SDIPanel extends BackOfficePanel {
 		add(getJPanel1(), new Constraints(new Bilateral(8, 10, 1220), new Leading(7, 257, 10, 10)));
 		add(getJPanel0(), new Constraints(new Bilateral(8, 9, 0), new Bilateral(276, 12, 229)));
 		setSize(1234, 567);
-		this.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-			}
-		});
+		jTextField1.setEnabled(false);
+		jTextField4.setEnabled(false);
+		jTextField8.setEnabled(false);
+		jTextField0.setEnabled(false);
+		jTextField5.setEnabled(false);
+		jTextField9.setEnabled(false);
+		jTextField2.setEnabled(false);
+		jTextField7.setEnabled(false);
+		jTextField10.setEnabled(false);
+		jTextField3.setEnabled(false);
+		jTextField6.setEnabled(false);
+		jTextField12.setEnabled(false);
+		jTextField13.setEnabled(false);
+		jTextField11.setEnabled(false);
+		 
 	}
 
 	private JLabel getJLabel19() {
@@ -182,11 +214,12 @@ public class SDIPanel extends BackOfficePanel {
 						    	Book book =  getBook(trade.getBookId());
 						    	leid = book.getLe_id();
 						    }
-							String payerKey =  role+"|"+rule.get_settlementCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(leid);
-							payerPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(payerKey);
+							 payerPreferredSDIs	 = ReferenceDataCache.getSdisonLegelEntityRole(role, leid,rule.get_settlementCurrency(),trade.getProductType());
+						    
+							
 							payerInstr.removeAllItems();
 							payerModel.removeAllElements();
-							processComboxData(payerPreferredSDIs,payerModel,rule.get_payerSDId());
+							processComboxData(payerPreferredSDIs,payerModel,payerSDIData);
 						}
 						
 					}
@@ -218,11 +251,11 @@ public class SDIPanel extends BackOfficePanel {
 						    	Book book =  getBook(trade.getBookId());
 						    	leid = book.getLe_id();
 						    }
-								String receiverKey =  role+"|"+rule.get_settlementCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(leid);
-								receiverPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(receiverKey);
+								 receiverPreferredSDIs	 = ReferenceDataCache.getSdisonLegelEntityRole(role, leid,rule.get_settlementCurrency(),trade.getProductType());
+							    
 								receiverInstr.removeAllItems();
 								receiverModel.removeAllElements();
-								processComboxData(receiverPreferredSDIs,receiverModel,rule.get_receiverSDId());
+								processComboxData(receiverPreferredSDIs,receiverModel,receiverSDIData);
 					}
 					
 				}
@@ -279,6 +312,9 @@ public class SDIPanel extends BackOfficePanel {
 		if (jButton3 == null) {
 			jButton3 = new JButton();
 			jButton3.setText("Apply");
+			jButton3.setEnabled(false);
+			 
+		 
 			jButton3.addActionListener(new ActionListener() {
 				
 				@Override
@@ -314,17 +350,11 @@ public class SDIPanel extends BackOfficePanel {
 					rule.set_receiverAgentID(payersdi.getAgentId());
 					rule.setPayerMethodType(payersdi.getMessageType());
 					rule.setReceiverMethodType(recievers.getMessageType());
-					// System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"+originalRules.get(1).get_payerAgentID() + " "+ rule1.get_payerAgentID() + " " + rule.get_payerAgentID());
-					String payerKey =  rule.get_payerLegalEntityRole()+"|"+rule.get_settlementCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(payersdi.getCpId());
-					String receiverKey =  rule.get_receiverLegalEntityRole()+"|"+rule.get_settlementCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(recievers.getCpId());
-					payersdi.setkey(payerKey);
-					recievers.setkey(receiverKey);
-					SDISelectorUtil.updateSDIPreferredKeys(payersdi,referenceData,payerKey);
-					SDISelectorUtil.updateSDIPreferredKeys(recievers,referenceData,receiverKey);
-					rule.set_payerAgentID(payersdi.getAgentId());
+				 	rule.set_payerAgentID(payersdi.getAgentId());
 					rule.set_receiverAgentID(recievers.getAgentId());
 					rule.setPayerMethodType(payersdi.getMessageType());
 					rule.setReceiverMethodType(recievers.getMessageType());
+					rules.setElementAt(rule, selectID);
 					if(payersdi.getMessageType().equalsIgnoreCase(recievers.getMessageType())) {
 						ruleNofound = "Green";
 					} else {
@@ -333,14 +363,22 @@ public class SDIPanel extends BackOfficePanel {
 					
 					tmodel.udpateValueAt(rule, jTable0.getSelectedRow(), 0);
 					ruleNofound = "White";
+				 setRulesonTrade(rules);
 					// System.out.println(originalRules.get(1).get_payerAgentID());
 					
 				}
+
+				
 			});
 		}
 		return jButton3;
 	}
-
+	private void setRulesonTrade(Vector<TransferRule> rules) {
+		// TODO Auto-generated method stub
+		this.trade.setCustomRuleApply(true);
+		this.trade.setCustomtransferRules(rules);
+		
+	}
 	private JCheckBox getJCheckBox0() {
 		if (jCheckBox0 == null) {
 			jCheckBox0 = new JCheckBox();
@@ -357,21 +395,27 @@ public class SDIPanel extends BackOfficePanel {
 						if(selectRow == -1) {
 							commonUTIL.showAlertMessage("Select TransferRule ");
 							jCheckBox0.setSelected(false);
+							jButton3.setEnabled(false);
 							return;
-						} 
+						}  else {
+							jButton3.setEnabled(true);
+						}
 						
 					}
 					if(customChangeApply) {
 				 //	rules.clear();
-						
+						jButton3.setEnabled(false);
+						 
 				 	commonUTIL.showAlertMessage(" Setting to Default ");
 				 	rules = (Vector<TransferRule>) originalRules.clone();
+				 	
 						tmodel = new TableModelUtil(rules, col);
-						
+						//jButt
 						jTable0.setModel(tmodel);
 						tca.adjustColumns();
 						 customChangeApply = false;
-						
+							trade.setCustomRuleApply(false);
+							trade.setCustomtransferRules(null);
 						
 					}
 					
@@ -386,28 +430,27 @@ public class SDIPanel extends BackOfficePanel {
 			jPanel2 = new JPanel();
 			jPanel2.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel2.setLayout(new GroupLayout());
-			jPanel2.add(getReceiverInstr(), new Constraints(new Leading(63, 212, 12, 12), new Leading(130, 27, 10, 10)));
-			jPanel2.add(getJButton2(), new Constraints(new Leading(279, 24, 12, 12), new Leading(130, 27, 10, 10)));
-			jPanel2.add(getPayerInstr(), new Constraints(new Leading(65, 212, 12, 12), new Leading(44, 27, 10, 10)));
-			jPanel2.add(getJButton1(), new Constraints(new Leading(283, 24, 12, 12), new Leading(44, 27, 12, 12)));
 			jPanel2.add(getJLabel14(), new Constraints(new Leading(6, 65, 12, 12), new Leading(52, 10, 10)));
 			jPanel2.add(getJLabel15(), new Constraints(new Leading(6, 12, 12), new Leading(140, 12, 12)));
 			jPanel2.add(getJLabel16(), new Constraints(new Leading(8, 65, 10, 10), new Leading(17, 12, 12)));
 			jPanel2.add(getJLabel17(), new Constraints(new Leading(4, 65, 10, 10), new Leading(104, 12, 12)));
 			jPanel2.add(getJCheckBox0(), new Constraints(new Leading(65, 139, 10, 10), new Leading(163, 10, 10)));
-			jPanel2.add(getPayerSDI(), new Constraints(new Leading(65, 210, 12, 12), new Leading(12, 22, 12, 12)));
-			jPanel2.add(getReceiverSDI(), new Constraints(new Leading(65, 210, 12, 12), new Leading(96, 22, 12, 12)));
-			jPanel2.add(getJButton3(), new Constraints(new Leading(426, 12, 12), new Leading(160, 10, 10)));
-			jPanel2.add(getPayerRole(), new Constraints(new Leading(351, 141, 10, 10), new Leading(12, 27, 12, 12)));
-			jPanel2.add(getJComboBox1(), new Constraints(new Leading(351, 141, 10, 10), new Leading(44, 27, 12, 12)));
-			jPanel2.add(getReceiverRole(), new Constraints(new Leading(351, 141, 12, 12), new Leading(96, 27, 12, 12)));
-			jPanel2.add(getJComboBox3(), new Constraints(new Leading(352, 140, 12, 12), new Leading(130, 27, 10, 10)));
-			jPanel2.add(getJLabel18(), new Constraints(new Leading(312, 12, 12), new Leading(18, 12, 12)));
-			jPanel2.add(getJLabel19(), new Constraints(new Leading(312, 21, 12, 12), new Leading(100, 12, 12)));
+			jPanel2.add(getJButton3(), new Constraints(new Leading(483, 10, 10), new Leading(156, 10, 10)));
+			jPanel2.add(getPayerRole(), new Constraints(new Leading(408, 141, 10, 10), new Leading(7, 27, 12, 12)));
+			jPanel2.add(getJComboBox1(), new Constraints(new Leading(408, 141, 10, 10), new Leading(39, 27, 12, 12)));
+			jPanel2.add(getReceiverRole(), new Constraints(new Leading(408, 141, 10, 10), new Leading(91, 27, 12, 12)));
+			jPanel2.add(getJComboBox3(), new Constraints(new Leading(409, 140, 10, 10), new Leading(126, 27, 12, 12)));
+			jPanel2.add(getJLabel18(), new Constraints(new Leading(369, 10, 10), new Leading(15, 12, 12)));
+			jPanel2.add(getJLabel19(), new Constraints(new Leading(369, 33, 12, 12), new Leading(96, 12, 12)));
+			jPanel2.add(getJButton1(), new Constraints(new Leading(334, 24, 10, 10), new Leading(43, 27, 12, 12)));
+			jPanel2.add(getPayerInstr(), new Constraints(new Leading(65, 265, 10, 10), new Leading(44, 27, 10, 10)));
+			jPanel2.add(getReceiverInstr(), new Constraints(new Leading(63, 268, 12, 12), new Leading(130, 27, 10, 10)));
+			jPanel2.add(getJButton2(), new Constraints(new Leading(340, 24, 10, 10), new Leading(129, 27, 12, 12)));
+			jPanel2.add(getPayerSDI(), new Constraints(new Leading(65, 261, 10, 10), new Leading(12, 12, 12)));
+			jPanel2.add(getReceiverSDI(), new Constraints(new Leading(65, 260, 12, 12), new Leading(96, 12, 12)));
 		}
 		return jPanel2;
 	}
-
 	private JComboBox getJComboBox3() {
 		if (jComboBox3 == null) {
 			jComboBox3 = new JComboBox();
@@ -651,31 +694,31 @@ public class SDIPanel extends BackOfficePanel {
 				jTextField13.setText((String) jTable0.getValueAt(selectRow, 14));
 				jTextField11.setText(new Integer((Integer) jTable0.getValueAt(
 						selectRow, 12)).toString());
-				if(jCheckBox0.isSelected()) {
-				if(selectRow == -1)
-					return;
+				 
+				 
 				TransferRule rule = rules.get(selectRow);
 				
 				receiverSDI.setText(getLEName(rule.get_receiverLegalEntityId()));
 				payerSDI.setText(getLEName(rule.get_payerLegalEntityId()));
-				
-				String payKey = rule.get_payerLegalEntityRole()+"|"+rule.get_settlementCurrency()+"|"+rule.get_productType()+"|"+String.valueOf(rule.get_payerLegalEntityId());
-				String recKey = rule.get_receiverLegalEntityRole()+"|"+rule.get_settlementCurrency()+"|"+rule.get_productType()+"|"+String.valueOf(rule.get_receiverLegalEntityId());
-				payerPreferredSDIs	 = SDISelectorUtil.getPreferredSdisOnKey(payKey);
-			    receiverPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(recKey);
-			  //   payerInstr.removeAllItems();
-			//     receiverInstr.removeAllItems();
-			     payerModel.removeAllElements();
-			     receiverModel.removeAllElements();
-			     
-			     processComboxData(payerPreferredSDIs,payerModel,rule.get_payerSDId());
-			     processComboxData(receiverPreferredSDIs,receiverModel,rule.get_receiverSDId());
+				 
+				payerPreferredSDIs	 = ReferenceDataCache.getSdisonLegelEntityRole(rule.get_payerLegalEntityRole(), rule.get_payerLegalEntityId(),rule.get_settlementCurrency(),rule.get_productType());
+			    receiverPreferredSDIs = ReferenceDataCache.getSdisonLegelEntityRole( rule.get_receiverLegalEntityRole(), rule.get_receiverLegalEntityId(),rule.get_settlementCurrency(),rule.get_productType());
+			      payerInstr.removeAllItems();
+			      payerModel.removeAllElements();
+			      receiverInstr.removeAllItems();
+			      receiverModel.removeAllElements();
+			      payerSDIData.clear();
+			      receiverSDIData.clear();
+			     processComboxData(payerPreferredSDIs,payerModel,payerSDIData);
+			     processComboxData(receiverPreferredSDIs,receiverModel,receiverSDIData);
 			     payerInstr.setModel(payerModel);
 			     receiverInstr.setModel(receiverModel);
-			     payerRole.setSelectedItem(rule.get_payerLegalEntityRole());
-			     receiverRole.setSelectedItem(rule.get_receiverLegalEntityRole());
+			    payerInstr.setSelectedIndex(getIndex(rule.get_payerSDId(),payerSDIData));
+			     receiverInstr.setSelectedIndex(getIndex(rule.get_receiverSDId(),receiverSDIData));
+			 //    payerRole.setSelectedItem(rule.get_payerLegalEntityRole());
+			   //  receiverRole.setSelectedItem(rule.get_receiverLegalEntityRole());
 			    
-				}
+				
 			     
 				//processpayerCo
 
@@ -826,36 +869,36 @@ public class SDIPanel extends BackOfficePanel {
 			jPanel0 = new JPanel();
 			jPanel0.setBorder(new LineBorder(Color.black, 1, false));
 			jPanel0.setLayout(new GroupLayout());
-			jPanel0.add(getJLabel0(), new Constraints(new Leading(9, 10, 10), new Leading(16, 10, 10)));
-			jPanel0.add(getJTextField1(), new Constraints(new Leading(101, 71, 12, 12), new Leading(14, 12, 12)));
-			jPanel0.add(getJLabel4(), new Constraints(new Leading(181, 93, 10, 10), new Leading(16, 12, 12)));
-			jPanel0.add(getJTextField4(), new Constraints(new Leading(276, 137, 10, 10), new Leading(14, 12, 12)));
-			jPanel0.add(getJLabel8(), new Constraints(new Leading(435, 93, 10, 10), new Leading(14, 12, 12)));
-			jPanel0.add(getJLabel9(), new Constraints(new Leading(435, 93, 12, 12), new Leading(40, 12, 12)));
-			jPanel0.add(getJLabel10(), new Constraints(new Leading(435, 93, 12, 12), new Leading(68, 12, 12)));
-			jPanel0.add(getJLabel11(), new Constraints(new Leading(435, 93, 12, 12), new Leading(96, 12, 12)));
-			jPanel0.add(getJLabel2(), new Constraints(new Leading(7, 78, 12, 12), new Leading(72, 12, 12)));
-			jPanel0.add(getJLabel13(), new Constraints(new Leading(435, 93, 10, 10), new Leading(122, 12, 12)));
-			jPanel0.add(getJTextField13(), new Constraints(new Leading(540, 137, 10, 10), new Leading(122, 12, 12)));
-			jPanel0.add(getJTextField8(), new Constraints(new Leading(540, 137, 12, 12), new Leading(14, 12, 12)));
-			jPanel0.add(getJTextField9(), new Constraints(new Leading(540, 137, 12, 12), new Leading(38, 12, 12)));
-			jPanel0.add(getJTextField10(), new Constraints(new Leading(540, 137, 12, 12), new Leading(66, 12, 12)));
-			jPanel0.add(getJTextField11(), new Constraints(new Leading(540, 137, 12, 12), new Leading(94, 12, 12)));
-			jPanel0.add(getJPanel2(), new Constraints(new Leading(695, 513, 10, 10), new Leading(8, 209, 10, 10)));
 			jPanel0.add(getJButton0(), new Constraints(new Leading(7, 12, 12), new Leading(209, 10, 10)));
-			jPanel0.add(getJLabel12(), new Constraints(new Leading(9, 74, 12, 12), new Leading(177, 10, 10)));
-			jPanel0.add(getJTextField12(), new Constraints(new Leading(101, 320, 12, 12), new Leading(174, 12, 12)));
-			jPanel0.add(getJLabel6(), new Constraints(new Leading(7, 64, 12, 12), new Leading(106, 12, 12)));
-			jPanel0.add(getJTextField7(), new Constraints(new Leading(101, 235, 12, 12), new Leading(102, 12, 12)));
 			jPanel0.add(getJLabel3(), new Constraints(new Leading(9, 12, 12), new Leading(132, 10, 10)));
-			jPanel0.add(getJTextField6(), new Constraints(new Leading(538, 137, 10, 10), new Leading(152, 12, 12)));
-			jPanel0.add(getJTextField3(), new Constraints(new Leading(101, 235, 12, 12), new Leading(130, 12, 12)));
-			jPanel0.add(getJLabel7(), new Constraints(new Leading(435, 81, 12, 12), new Leading(158, 13, 12, 12)));
-			jPanel0.add(getJTextField2(), new Constraints(new Leading(101, 235, 12, 12), new Leading(72, 12, 12)));
-			jPanel0.add(getJLabel5(), new Constraints(new Leading(9, 93, 12, 12), new Leading(45, 12, 12)));
-			jPanel0.add(getJTextField5(), new Constraints(new Leading(101, 234, 12, 12), new Leading(44, 12, 12)));
-			jPanel0.add(getJTextField0(), new Constraints(new Leading(546, 129, 12, 12), new Leading(186, 12, 12)));
-			jPanel0.add(getJLabel1(), new Constraints(new Leading(438, 74, 12, 12), new Leading(189, 20, 12, 12)));
+			jPanel0.add(getJLabel12(), new Constraints(new Leading(9, 74, 12, 12), new Leading(167, 12, 12)));
+			jPanel0.add(getJTextField3(), new Constraints(new Leading(79, 235, 12, 12), new Leading(132, 12, 12)));
+			jPanel0.add(getJLabel0(), new Constraints(new Leading(9, 12, 12), new Leading(6, 12, 12)));
+			jPanel0.add(getJTextField1(), new Constraints(new Leading(80, 71, 12, 12), new Leading(6, 12, 12)));
+			jPanel0.add(getJLabel4(), new Constraints(new Leading(157, 80, 12, 12), new Leading(6, 12, 12)));
+			jPanel0.add(getJTextField4(), new Constraints(new Leading(247, 137, 10, 10), new Leading(6, 12, 12)));
+			jPanel0.add(getJTextField5(), new Constraints(new Leading(80, 234, 12, 12), new Leading(36, 10, 10)));
+			jPanel0.add(getJLabel5(), new Constraints(new Leading(9, 69, 12, 12), new Leading(36, 10, 10)));
+			jPanel0.add(getJLabel2(), new Constraints(new Leading(7, 78, 12, 12), new Leading(64, 12, 12)));
+			jPanel0.add(getJTextField2(), new Constraints(new Leading(80, 235, 12, 12), new Leading(64, 12, 12)));
+			jPanel0.add(getJLabel6(), new Constraints(new Leading(7, 64, 12, 12), new Leading(102, 12, 12)));
+			jPanel0.add(getJTextField7(), new Constraints(new Leading(80, 235, 12, 12), new Leading(96, 12, 12)));
+			jPanel0.add(getJTextField12(), new Constraints(new Leading(80, 309, 10, 10), new Leading(166, 12, 12)));
+			jPanel0.add(getJLabel9(), new Constraints(new Leading(398, 68, 10, 10), new Leading(36, 12, 12)));
+			jPanel0.add(getJLabel10(), new Constraints(new Leading(398, 75, 12, 12), new Leading(64, 12, 12)));
+			jPanel0.add(getJLabel11(), new Constraints(new Leading(398, 55, 10, 10), new Leading(101, 12, 12)));
+			jPanel0.add(getJLabel13(), new Constraints(new Leading(399, 93, 12, 12), new Leading(130, 12, 12)));
+			jPanel0.add(getJLabel7(), new Constraints(new Leading(399, 81, 12, 12), new Leading(164, 13, 12, 12)));
+			jPanel0.add(getJLabel8(), new Constraints(new Leading(398, 68, 12, 12), new Leading(6, 12, 12)));
+			jPanel0.add(getJLabel1(), new Constraints(new Leading(398, 74, 12, 12), new Leading(189, 20, 12, 12)));
+			jPanel0.add(getJTextField13(), new Constraints(new Leading(493, 137, 10, 10), new Leading(126, 12, 12)));
+			jPanel0.add(getJTextField0(), new Constraints(new Leading(493, 137, 10, 10), new Leading(191, 10, 10)));
+			jPanel0.add(getJTextField8(), new Constraints(new Leading(493, 137, 10, 10), new Leading(8, 12, 12)));
+			jPanel0.add(getJTextField10(), new Constraints(new Leading(493, 137, 10, 10), new Leading(68, 12, 12)));
+			jPanel0.add(getJTextField11(), new Constraints(new Leading(493, 137, 10, 10), new Leading(98, 12, 12)));
+			jPanel0.add(getJTextField9(), new Constraints(new Leading(492, 137, 12, 12), new Leading(36, 12, 12)));
+			jPanel0.add(getJTextField6(), new Constraints(new Leading(492, 137, 12, 12), new Leading(160, 12, 12)));
+			jPanel0.add(getJPanel2(), new Constraints(new Leading(639, 569, 10, 10), new Leading(8, 209, 10, 10)));
 		}
 		return jPanel0;
 	}
@@ -886,7 +929,7 @@ public class SDIPanel extends BackOfficePanel {
 	private JLabel getJLabel3() {
 		if (jLabel3 == null) {
 			jLabel3 = new JLabel();
-			jLabel3.setText("Receiver Agent");
+			jLabel3.setText("Rec Agent");
 		}
 		return jLabel3;
 	}
@@ -941,6 +984,7 @@ public class SDIPanel extends BackOfficePanel {
 			jButton3.setEnabled(false);
 			return;
 		}
+		Vector<String> messages = new Vector<String>();
 		jCheckBox0.setEnabled(true);
 		jButton3.setEnabled(true);
 		if (data != null && (!data.isEmpty())) {
@@ -955,7 +999,7 @@ public class SDIPanel extends BackOfficePanel {
 				return;
 			if(trade == null)
 				return;
-			rules = rule.generateRules(trade);
+			rules = rule.generateRules(trade,messages);
 
 			Iterator it = rules.iterator();
 			int r = tmodel.getRowCount();
@@ -995,7 +1039,7 @@ public class SDIPanel extends BackOfficePanel {
 		
 	}
 
-	private DefaultComboBoxModel processComboxData(Vector<Sdi> preferredSDis,DefaultComboBoxModel model,int idSdi) {
+	private DefaultComboBoxModel processComboxData(Vector<Sdi> preferredSDis,DefaultComboBoxModel model,Hashtable<Integer,Sdi> sdiDataHolder) {
       //  model.removeAllElements();
 		
 		if(preferredSDis != null) {
@@ -1010,10 +1054,11 @@ public class SDIPanel extends BackOfficePanel {
 				 key = sdi.getCurrency()+"/"+sdi.getGlName()+"/"+sdi.getProducts();
 				*/
 				if(sdi != null) {
-				key = getLEName(sdi.getAgentId()) + "/"+sdi.getGlName().trim() +"/"+sdi.getMessageType().trim()+"/"+sdi.getPayrec();
+				key = getLEName(sdi.getAgentId()) + "/"+sdi.getGlName()  +"/"+sdi.getMessageType().trim()+"/"+sdi.getPayrec();
 				
-				model.addElement(key);
-				if(sdi.getId() == idSdi)
+				model.insertElementAt(key, i);
+				//if(sdi.getId() == idSdi)
+				sdiDataHolder.put(i, sdi);
 				model.setSelectedItem(key);
 				}
 				/*if (!sdi.getkey().equals("")) {
@@ -1022,6 +1067,17 @@ public class SDIPanel extends BackOfficePanel {
 			}
 		}
 		return model;
+	}
+	private int getIndex(int sdiID,Hashtable<Integer,Sdi> sdiData) {
+		int index = 0;
+		for(int i=0;i<sdiData.size();i++) {
+			Sdi sdi = (Sdi) sdiData.get(i);
+			if(sdi.getId() == sdiID) {
+				index = i;
+				break;
+			}
+		}
+		return index;
 	}
 	public static ServerConnectionUtil de = null;
 //	DefaultTableModel tmodel;
@@ -1037,7 +1093,29 @@ public class SDIPanel extends BackOfficePanel {
 
 	ProductTransferRule rule;
 	Trade trade = null;
-	Vector<TransferRule> rules = null;
+	public Vector<TransferRule> rules = null;
+	/**
+	 * @return the rules
+	 */
+	public Vector<TransferRule> getRules() {
+		boolean rulesMatched = true;
+		if(!commonUTIL.isEmpty(rules)) {
+			for(int i=0;i<rules.size();i++) {
+				TransferRule rule = rules.get(i);
+				if(!rule.getPayerMethodType().equalsIgnoreCase(rule.getReceiverMethodType())) {
+					rulesMatched = false;
+					break;
+				}
+			}
+		}
+		if(!rulesMatched)
+			return null;
+		return rules;
+	}
+	/**
+	 * @param rules the rules to set
+	 */
+	 
 	Vector<TransferRule> originalRules = null;//new Vector<TransferRule>();
 	/**
 	 * @return the originalRules
@@ -1080,58 +1158,70 @@ public class SDIPanel extends BackOfficePanel {
 	public Trade getTrade() {
 		return trade;
 	}
-
+	
+	public boolean  ischeckTradeAttribute(Trade newtrade) {
+		boolean flag = false;
+		if(getTrade() == null)
+			return flag;
+		String key =getTrade().getId() +"|"+getTrade().getType() +"|"+getTrade().getCpID()+"|"+getTrade().getBookId()+"|"+getTrade().getCurrency();
+		if(newtrade == null)
+			return flag;
+		String newtradekey =newtrade.getId() +"|"+ newtrade.getType() +"|"+newtrade.getCpID()+"|"+newtrade.getBookId()+"|"+newtrade.getCurrency();
+		if(key.equalsIgnoreCase(newtradekey))
+			flag = true;
+		return flag;
+		
+	}
+	 
 	public void setTrade(Trade trade) {
 		this.trade = trade;
-		rules = rule.generateRules(trade);
-		
-		if(rules == null || rules.isEmpty()) {
-			jCheckBox0.setEnabled(false);
-			jButton3.setEnabled(false);
-			return;
-		}
-		jCheckBox0.setEnabled(true);
-		jButton3.setEnabled(true);
-		tmodel = new TableModelUtil(rules,col);
-		originalRules = new Vector(rules);
-		// System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"+originalRules.get(1).get_payerAgentID());
-		jTable0.setModel(tmodel);
-		/*jTable0.getColumnModel().getColumn(0).setPreferredWidth(150); 
-		 jTable0.getColumnModel().getColumn(1).setPreferredWidth(150); 
-		 jTable0.getColumnModel().getColumn(2).setPreferredWidth(250); 
-		 jTable0.getColumnModel().getColumn(3).setPreferredWidth(250); 
-		 jTable0.getColumnModel().getColumn(4).setPreferredWidth(250); 
-		 jTable0.getColumnModel().getColumn(5).setPreferredWidth(280); 
-		 jTable0.getColumnModel().getColumn(6).setPreferredWidth(230); 
-		 jTable0.getColumnModel().getColumn(7).setPreferredWidth(230); 
-		 jTable0.getColumnModel().getColumn(8).setPreferredWidth(230); 
-		 jTable0.getColumnModel().getColumn(9).setPreferredWidth(200); 
-		 jTable0.getColumnModel().getColumn(10).setPreferredWidth(240); 
-		 jTable0.getColumnModel().getColumn(11).setPreferredWidth(200); 
-		 jTable0.getColumnModel().getColumn(12).setPreferredWidth(200); 
-		 jTable0.getColumnModel().getColumn(13).setPreferredWidth(190); */
-		 //tca = new TableColumnAdjuster(jTable0);
-		 tca.adjustColumns();
-		 
-		 TransferRule rule = rules.get(0); // for first time it will be first record only. 
-			receiverSDI.setText(getLEName(rule.get_receiverLegalEntityId()));
-			payerSDI.setText(getLEName(rule.get_payerLegalEntityId()));
-			String payKey = rule.get_payerLegalEntityRole()+"|"+rule.get_settlementCurrency()+"|"+rule.get_productType()+"|"+String.valueOf(rule.get_payerLegalEntityId());
-			String recKey = rule.get_receiverLegalEntityRole()+"|"+rule.get_settlementCurrency()+"|"+rule.get_productType()+"|"+String.valueOf(rule.get_receiverLegalEntityId());
-			payerPreferredSDIs	 = SDISelectorUtil.getPreferredSdisOnKey(payKey);
-		    receiverPreferredSDIs = SDISelectorUtil.getPreferredSdisOnKey(recKey);
-		      payerInstr.removeAllItems();
-		      payerModel.removeAllElements();
-		      receiverInstr.removeAllItems();
-		      receiverModel.removeAllElements();
-		     processComboxData(payerPreferredSDIs,payerModel,rule.get_payerSDId());
-		     processComboxData(receiverPreferredSDIs,receiverModel,rule.get_receiverSDId());
-		     payerInstr.setModel(payerModel);
-		     receiverInstr.setModel(receiverModel);
-		     processStartUpData(receiverRolemodel);
-		     processStartUpData(payerRolemodel);
-		     payerRole.setModel(payerRolemodel);
-		     receiverRole.setModel(receiverRolemodel);
+				
+				Vector<String> message = new Vector<String>();
+				 if(!trade.isCustomRuleApply()) {
+				   rules = rule.generateRules(trade,message);
+				 } else {
+					 try {
+						 
+						rules =  (Vector<TransferRule>) RemoteServiceUtil.getRemoteBOProcessService().getCustomTransferRule(trade.getId());
+						jButton3.setEnabled(true);
+					 } catch (RemoteException e) {
+						// TODO Auto-generated catch block
+					    commonUTIL.displayError("SDIPanel", "setTrade while getting custom Transfer rule on Trade id "+trade.getId(), e);
+					}
+				 }
+				 
+				if(commonUTIL.isEmpty(rules)) {
+					jCheckBox0.setEnabled(false);
+					jButton3.setEnabled(false);
+					String mess = message.elementAt(0);
+					commonUTIL.showAlertMessage(mess);
+					return;
+				}
+				jCheckBox0.setEnabled(true);
+		 		tmodel = new TableModelUtil(rules,col);
+		 		originalRules = new Vector(rules);
+		 		jTable0.setModel(tmodel);
+		 		tca.adjustColumns();		 
+				 TransferRule rule = rules.get(0);   
+					receiverSDI.setText(getLEName(rule.get_receiverLegalEntityId()));
+					payerSDI.setText(getLEName(rule.get_payerLegalEntityId()));
+				 	payerPreferredSDIs	 = ReferenceDataCache.getSdisonLegelEntityRole(rule.get_payerLegalEntityRole(), rule.get_payerLegalEntityId(),rule.get_settlementCurrency(),rule.get_productType());
+				    receiverPreferredSDIs = ReferenceDataCache.getSdisonLegelEntityRole( rule.get_receiverLegalEntityRole(), rule.get_receiverLegalEntityId(),rule.get_settlementCurrency(),rule.get_productType());
+				      payerInstr.removeAllItems();
+				      payerModel.removeAllElements();
+				      receiverInstr.removeAllItems();
+				      receiverModel.removeAllElements();
+				      payerSDIData.clear();
+				      receiverSDIData.clear();
+				     processComboxData(payerPreferredSDIs,payerModel,payerSDIData);
+				     processComboxData(receiverPreferredSDIs,receiverModel,receiverSDIData);
+				     payerInstr.setModel(payerModel);
+				     receiverInstr.setModel(receiverModel);
+				     processStartUpData(receiverRolemodel);
+				     processStartUpData(payerRolemodel);
+				     payerRole.setModel(payerRolemodel);
+				     receiverRole.setModel(receiverRolemodel);
+			
         }
 	
 
@@ -1157,6 +1247,8 @@ public class SDIPanel extends BackOfficePanel {
 		return flag;
 	}
 
+	
+	 
 	private Sdi getSdi(int sdid) {
 		Sdi sd = null;
 		if ((sdis != null) && (!sdis.isEmpty())) {
@@ -1223,18 +1315,13 @@ public class SDIPanel extends BackOfficePanel {
 	}
 
 	public void init() {
-		de = ServerConnectionUtil.connect("localhost", 1099,
-				commonUTIL.getServerIP());
-		try {
-			referenceData = (RemoteReferenceData) de
-					.getRMIService("ReferenceData");
+	 
+		 
+			referenceData = RemoteServiceUtil.getRemoteReferenceDataService();
 
 			jTable0.setModel(tmodel);
 			tca.adjustColumns();
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		 
 	}
 	
 	
@@ -1294,10 +1381,10 @@ public class SDIPanel extends BackOfficePanel {
 				value = trule.getPayerMethodType();
 				break;
 			case 7:
-				if(sdi != null) 
+			//	if(sdi != null) 
 				value =getLEName(trule.get_payerAgentID());
-				else 
-					value = "";
+				//else 
+				//	value = "";
 				break;
 			case 8:
 				value = getLEName(trule.get_receiverLegalEntityId());
@@ -1306,10 +1393,10 @@ public class SDIPanel extends BackOfficePanel {
 				value = trule.get_receiverLegalEntityRole();
 				break;
 			case 10:
-				if(sdi != null) 
+			//	if(sdi != null) 
 					value =getLEName(trule.get_receiverAgentID());
-					else 
-						value = "";
+				//	else 
+					//	value = "";
 				break;
 			case 11:
 				 value = trule.getReceiverMethodType();
@@ -1318,10 +1405,16 @@ public class SDIPanel extends BackOfficePanel {
 				value = trade.getId();
 				break;
 			case 13:
-				value =getProductName(trule.get_productId());
+				value =trade.getProduct().getProductname();
 				break;
 			case 14:
-				value =commonUTIL.dateToString(trule.get_settleDate().getDate());
+				value = trule.get_settleDate();
+				break;
+			case 15:
+				value =trule.get_payerSDId();
+				break;
+			case 16:
+				value =trule.get_receiverSDId();
 				break;
 			}
 			return value;
