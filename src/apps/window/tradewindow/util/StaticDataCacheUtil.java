@@ -19,6 +19,7 @@ import beans.Book;
 import beans.Favorities;
 import beans.LegalEntity;
 import beans.Product;
+import beans.Sdi;
 
 public class StaticDataCacheUtil {
 	
@@ -30,6 +31,7 @@ public class StaticDataCacheUtil {
 	static Hashtable<String, String>  currency = new Hashtable<String, String>();
 	static Hashtable<String, Vector> dataValues = new Hashtable<String, Vector>();
 	static Hashtable<String,Vector> productDefinationData  = new Hashtable<String, Vector>();
+
 	static FilterValues filterValue = null;
 	
 	static RemoteTrade remoteTrade = null;
@@ -77,6 +79,7 @@ public class StaticDataCacheUtil {
 		}
 		
 	}
+	
 	private static Vector  containProductID(Vector productData,int productID) {
 		boolean flag = false;
 		int productAtID = 0;
