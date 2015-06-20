@@ -2,6 +2,8 @@ package bo.message.bomessagehandler;
 
 import java.util.Vector;
 
+import constants.SDIConstants;
+
 import util.commonUTIL;
 import dsEventProcessor.TradeEventProcessor;
 import dsEventProcessor.TransferEventProcessor;
@@ -45,26 +47,26 @@ public class BOFXMessageHandler extends BOMessageHandler {
 			
 			message.setReceiverRole(mConfig.getReceiverRole());
 			message.setSenderName(po.getName());
-			message.setSenderRole("PO"); // i have doubt on the same. 
+			message.setSenderRole(SDIConstants.PO); // i have doubt on the same. 
 			message.setTemplateName(mConfig.getTemplateName());
 			message.setFormat(mConfig.getFormatType());
 			message.setAddressType(mConfig.getAddressType());
 			message.setSenderContactType(mConfig.getPoContactType());
 			message.setReceiverContactType(mConfig.getReceiverContactType());
 			if(mConfig.getReceiverID() == 0) {
-				if(mConfig.getReceiverRole().equalsIgnoreCase("CounterParty")) {
+				if(mConfig.getReceiverRole().equalsIgnoreCase(SDIConstants.COUNTERPARY)) {
 					message.setReceiverId(trade.getCpID());
 				} else {
 						
 					if(message.getTriggerON().equalsIgnoreCase("TRADE")) {
-						String key = "PO|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(mConfig.getPoid());
-						 Vector<Sdi> sdiperferred = SDISelectorUtil.getPreferredSdisOnKey(key);
-						 if(sdiperferred != null) {
-							 Sdi sdi = sdiperferred.elementAt(0);
-							 message.setReceiverId(sdi.getAgentId());
-						 } else {
-							 message.setReceiverId(0); // no sdi found. 
-						 }
+						 Sdi s = SDISelectorUtil.getSdi(SDIConstants.PO,po.getId() ,trade.getCurrency(),trade.getProductType(),message.getMessageType(),0);
+						 if(s != null)
+					      message.setReceiverId(s.getAgentId());
+						 else 
+							 message.setReceiverId(0);
+					 } else {
+						 message.setReceiverId(0); // no sdi found. 
+					 
 						 
 					}
 				}

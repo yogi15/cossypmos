@@ -2,6 +2,8 @@ package bo.message.bomessagehandler;
 
 import java.util.Vector;
 
+import constants.SDIConstants;
+
 import util.commonUTIL;
 import dsEventProcessor.TradeEventProcessor;
 import dsEventProcessor.TransferEventProcessor;
@@ -58,15 +60,15 @@ public class BOFXFXSWAPHandler extends BOMessageHandler {
 				} else {
 						
 					if(message.getTriggerON().equalsIgnoreCase("TRADE")) {
-						String key = "PO|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+String.valueOf(mConfig.getPoid());
-						 Vector<Sdi> sdiperferred = SDISelectorUtil.getPreferredSdisOnKey(key);
-						 if(sdiperferred != null) {
-							 Sdi sdi = sdiperferred.elementAt(0);
-							 message.setReceiverId(sdi.getAgentId());
-						 } else {
-							 message.setReceiverId(0); // no sdi found. 
-						 }
-						 
+						 Sdi s = SDISelectorUtil.getSdi(SDIConstants.PO,po.getId() ,trade.getCurrency(),trade.getProductType(),message.getMessageType(),0);
+						 if(s != null)
+							 message.setReceiverId(s.getAgentId());
+						 else 
+							 message.setReceiverId(0);
+					 } else {
+						 message.setReceiverId(0); // no sdi found. 
+					 
+						  
 					}
 				}
 			} else {
