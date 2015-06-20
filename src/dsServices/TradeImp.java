@@ -21,6 +21,7 @@ import beans.Product;
 import beans.Sdi;
 import beans.Task;
 import beans.Trade;
+import beans.TransferRule;
 import beans.Users;
 import beans.WFConfig;
 import bo.transfer.rule.ProductTransferRule;
@@ -33,6 +34,7 @@ import dbSQL.LegalEntitySQL;
 import dbSQL.ProductSQL;
 import dbSQL.SdiSQL;
 import dbSQL.TaskSQL;
+import dbSQL.TradeCustomXFerRuleSQL;
 import dbSQL.TradeSQL;
 import dbSQL.WFConfigSQL;
 import dbSQL.dsSQL;
@@ -74,11 +76,10 @@ public class TradeImp implements RemoteTrade {
 				if(event.isSavetoDB()) {
 					
 					event = EventSQL.save((EventProcessor) object, dsSQL.getConn());
-				//	System.out.println(event.getType() + "  "+ event.getObjectID());
+				 
 				}
-			
-			newMessage.produceNewMessage(messageIndicator,"TRADE",messageType,(Serializable) event,null); 
-			//newMessage.run();
+				newMessage.produceNewMessage(messageIndicator,"TRADE",messageType,(Serializable) event,null); 
+			 
 			}
 			}catch(Exception e){
 					commonUTIL.displayError("TradeImp", "publishnewTrade", e);
@@ -142,6 +143,7 @@ public class TradeImp implements RemoteTrade {
 			   String productType = null; 
 			      Trade oldTrade = trade;
 		            Vector fees = trade.getFees();
+		            Vector<TransferRule> customTransferRules = trade.getCustomtransferRules();
 		          //  System.out.println("fees size " + fees.size());
 					WFConfig wf = getStatusOnTradeAction(trade,trade.getStatus(),returnStatus);
 					if(wf == null) {
@@ -166,6 +168,8 @@ public class TradeImp implements RemoteTrade {
 						processFees(fees,i);
 						
 						trade = (Trade) TradeSQL.select(i, dsSQL.getConn());
+						if(trade.isCustomRuleApply()) 
+							processCustomRules(customTransferRules,i);
 						//productType = ( ProductSQL.selectProduct(trade.getProductId(), dsSQL.getConn())).getProductType();
 						processAttribues(trade.getId(), trade.getAttributes(), trade.getVersion());
 						
@@ -224,6 +228,23 @@ public class TradeImp implements RemoteTrade {
 	
 
 	
+
+
+  // This is method is used to save customTransferRUle  if CustomRule applied 
+	private void processCustomRules(Vector<TransferRule> customTransferRules,
+			int tradeID) {
+		// TODO Auto-generated method stub
+		
+		if(tradeID > 0 && !commonUTIL.isEmpty(customTransferRules)) {
+			TradeCustomXFerRuleSQL.delete(customTransferRules.get(0), dsSQL.getConn()); // first delete customTransfer from table for that trade 
+			for(int i=0;i<customTransferRules.size();i++) {
+				TransferRule rule = customTransferRules.get(i);
+				rule.set_tradeId(tradeID);
+				TradeCustomXFerRuleSQL.save(rule, dsSQL.getConn());
+			}
+			
+		}
+	}
 
 
 
@@ -457,7 +478,7 @@ public class TradeImp implements RemoteTrade {
 		 tradeEvent.setSavetoDB(true);
 		 tradeEvent.setProcessName("TradeProcess");
 		 //tradeEvent.setUser(new Userstrade.getUserID());
-		 tradeEvent.setComments(" Trade status on " + trade.getStatus() + " for Action "+trade.getAction() );
+		 tradeEvent.setComments(" Trade  " +trade.getId() +  " for Action "+trade.getAction() );
 		 return tradeEvent;
 	}
 	
