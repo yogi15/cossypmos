@@ -210,6 +210,8 @@ public interface RemoteReferenceData extends Remote{
 			String currency) throws RemoteException;
 	
 	public Vector getSDIONLegalEntityRole(String role,int leID) throws RemoteException;
+
+	public Vector getSDIONLegalEntity( int leID) throws RemoteException;
 	
 	public Vector getPreferredSDIONLegalEntityRoleCurrencyProduct(String role,String productType,String Currency,int leID) throws RemoteException;
 	

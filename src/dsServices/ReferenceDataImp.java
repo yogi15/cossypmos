@@ -1405,6 +1405,13 @@ String sql = " quoting_currency = '"+cp.getQuoting_currency() + "'";
 		// TODO Auto-generated method stub
 		return HolidaySQL.getHolidaysOnCp(currencyPair, date, dsSQL.getConn());
 	}
+
+	@Override
+	public Vector getSDIONLegalEntity(int leID) throws RemoteException {
+		// TODO Auto-generated method stub
+		String sql = "   cpid = " + leID;
+		return SDIWhere(sql);
+	}
 	
 
 }

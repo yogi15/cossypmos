@@ -22,6 +22,7 @@ import dbSQL.MessageSQL;
 import dbSQL.PostingSQL;
 import dbSQL.ProductSQL;
 import dbSQL.TaskSQL;
+import dbSQL.TradeCustomXFerRuleSQL;
 import dbSQL.TransferSQL;
 import dbSQL.WFConfigSQL;
 import dbSQL.dsSQL;
@@ -38,6 +39,7 @@ import beans.Posting;
 import beans.Product;
 import beans.Task;
 import beans.Trade;
+import beans.TradeCustomXferRule;
 import beans.Transfer;
 import beans.WFConfig;
 import bo.swift.bic.BICSwiftData;
@@ -1699,6 +1701,13 @@ return status;
 			messages = 	(Vector<Message>) MessageSQL.getMessageOnWhere(sql, dsSQL.getConn());
 		}
 		return messages;
+	}
+	@Override
+	public Collection getCustomTransferRule(int tradeID) throws RemoteException {
+		// TODO Auto-generated method stub
+return TradeCustomXFerRuleSQL.selectTransfer(tradeID, dsSQL.getConn());
+	 
+	 
 	}
 
 }
