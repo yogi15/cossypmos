@@ -43,6 +43,7 @@ public class TransferManager extends ControllerManager {
 	String transferTriggerEvt = "TRANSFERTriggerEvent";
 	String canceltransferTriggerEvt = "TRANSFERCancelTriggerEvent";
 	Vector<String> transferTriggerEvts = new Vector<String>();
+	Hashtable<String, TransferEventProcessor> publishEventsData = new Hashtable<String, TransferEventProcessor> ();
 	Vector<EventProcessor> eventNotProcess = new Vector<EventProcessor>();
 	boolean newEvent = false;
 	boolean serviceStarted = false;
@@ -98,9 +99,9 @@ public class TransferManager extends ControllerManager {
 	}
 	
 
-	public TransferManager(String host,String hostName,String managerName,TransferManagerStartup startUpManager ) throws JMSException {
+	public TransferManager(String host,String hostName,String managerName,TransferManagerStartup startUpManager,String queueName ) throws JMSException {
 		
-		super(host,hostName,managerName,startUpManager.getUser(),startUpManager);
+		super(host,hostName,managerName,startUpManager.getUser(),startUpManager,queueName);
 		this.startUpManager = startUpManager;
 		
 		try {
@@ -157,7 +158,7 @@ public class TransferManager extends ControllerManager {
    		
 	}
 	
-	
+	// this method when engine is started. 
 		public void publishStartEvent(String engineName,String siginal) {
 			
 			try {
@@ -226,6 +227,7 @@ public void updateEventProcess(EventProcessor event) {
 
 
 	public  synchronized void handleEvent(EventProcessor event)	 {
+	 
 	//	System.out.println("Starting of  ****** " +   event.getTradeID());
 	//	setNewEvent(true);
 		try {
@@ -253,7 +255,7 @@ public void updateEventProcess(EventProcessor event) {
 					
 					      
 					        synchronized (transferEvents) {
-					        	if( tradeEvent.getTrade() == null) {
+					        	if( tradeEvent.getTrade() == null && filteroutTrade(tradeEvent.getTrade())) {
 					        		Trade trade;
 									try {
 										trade = remoteTrade.getTradeOnVersion(tradeEvent.getObjectID(),tradeEvent.getObjectVersionID());
@@ -305,7 +307,21 @@ public void updateEventProcess(EventProcessor event) {
 		//tradeEvent = null;
 	}
 	
+	// filterout split trades
+	private boolean filteroutTrade(Trade trade) {
+		// TODO Auto-generated method stub
+		if(commonUTIL.isEmpty(trade.getAutoType()) || trade.getAutoType().equalsIgnoreCase("Original"))
+		return true;
+		return false;
+	}
 	
+	private boolean checkEventAlreadPublish(TransferEventProcessor event) {
+		String eventU = event.getType()+"_"+event.getTradeID()+"_"+event.getTradeVersion()+"_"+event.getTransferID()+"_"+event.getTransferVerson();
+		//System.out.println(eventU + " ))))))))))))))))))))))) ");
+		if(publishEventsData.containsKey(eventU))
+			return true;
+		return false;
+	}
 	// this method is called when trade event is consumed by transfer service and publish transfer event. 
 public void publishTransfer(Trade trade) throws JMSException {
 		
@@ -320,8 +336,10 @@ public void publishTransfer(Trade trade) throws JMSException {
 						  TransferServiceAppender.printLog("DEBUG", "TransferService creating  TransferEvent for"+transfers.get(i).getId() + " on Trade trade "+trade.getId());
 							
 						TransferEventProcessor event = getTransferEvent(transfers.get(i),trade);
-						if(event != null) {
+						if(event != null && !checkEventAlreadPublish(event)) {
 						  remoteTrade.publishnewTrade("TRANS_NEWTRANSFER","TRADE",event);
+						  String eventU = event.getType()+"_"+event.getTradeID()+"_"+event.getTradeVersion()+"_"+event.getTransfer()+"_"+event.getTransferVerson();
+						  publishEventsData.put(eventU, event);
 						  TransferServiceAppender.printLog("DEBUG", "TransferService published  TransferEvent with"+event.getEventType() + " on Trade trade "+trade.getId());
 							
 						} 
@@ -365,7 +383,8 @@ public TransferEventProcessor getTransferEvent(Transfer transfer,Trade trade ) {
 	
 	transferEvent.setType("Transfer");
 	transferEvent.setObjectID(transfer.getId());
-	transferEvent.setComments(" Transfer status  " + transfer.getStatus() + " for Action "+transfer.getAction() + " on Trade_"+trade.getId()+"_Version_"+trade.getVersion() );
+	transferEvent.setObjectVersionID(transfer.getVersion());
+	transferEvent.setComments(" Transfer " +transfer.getId()+ " for consuming Trade_"+trade.getId()+"_Version_"+trade.getVersion()+"_"+trade.getStatus());
 	TransferServiceAppender.printLog("DEBUG", "TransferService creating  TransferEvent with"+transferEvent.getEventType() + " on Trade trade "+trade.getId());
 	
 	commonUTIL.display("TransferManager",transferEvent.getEventType());

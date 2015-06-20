@@ -41,6 +41,7 @@ public class MessageManager extends ControllerManager {
 	String queueName = "MESSAGE";
 	MessageManagerStartup startUpManager ;
 	Vector<EventProcessor> eventNotProcess = new Vector<EventProcessor>();
+	Hashtable<String, MessageEventProcessor> publishEventsData = new Hashtable<String, MessageEventProcessor> ();
 	
 int counter = 0;
 Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
@@ -88,11 +89,11 @@ Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
 		
 	}
 	
-	public MessageManager(String host,String hostName,String managerName,MessageManagerStartup startUpManager) {
+	public MessageManager(String host,String hostName,String managerName,MessageManagerStartup startUpManager,String queueName) {
 		
 		
 
-		super(host,hostName,managerName,startUpManager.getUser(),startUpManager);
+		super(host,hostName,managerName,startUpManager.getUser(),startUpManager,queueName);
 		MessageServiceAppender.printLog("INFO", "MessageService connecting... to "+ host + " "+hostName + " with User "+startUpManager.getUser().getUser_name());
 		
 		
@@ -124,6 +125,7 @@ Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
    	    		handleEvent(event);
    	    	}
    	    }
+	   	processor.start();
 	   	        // setTransferTriggerEvt(refData.getStartUPData(transferTriggerEvt));
 	   	    //  processor.setCancelTransferTriggerEvent(refData.getStartUPData(canceltransferTriggerEvt));
 		} catch (RemoteException e) {
@@ -142,8 +144,9 @@ Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
 	}
 	
   public synchronized void handleEvent(EventProcessor event)	 {
-	  commonUTIL.display("Message Handle Event coming  ", event.getClassName() + " "+event.getEventType() );
-	  if(event instanceof AdminEventProcessor ) {
+	  System.out.println("Message Handle Event coming  "+event.getClassName() + " "+event.getEventType()+ " " + event.getTradeID());
+	  commonUTIL.display("Message coming in HandleEvent  ", event.getClassName() + " "+event.getEventType()+ " " + event.getTradeID() );
+	 if(event instanceof AdminEventProcessor ) {
 		  AdminEventProcessor  adminEvent = (AdminEventProcessor) event;
 		  if(adminEvent.getEngineStartedSignal().contains(managerName))  {
 			  if(adminEvent.getEngineStartedSignal().contains(managerName)) {
@@ -154,9 +157,12 @@ Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
 					  }
 			  }
 		  }
+	  } else {
+	 balance.put(balance.size(), event);
+	  
 	  }
-		if(event instanceof TradeEventProcessor) {
-			
+		/*if(event instanceof TradeEventProcessor) {
+			processor.clearPublishMessages();
 			TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
 			//System.out.println(tradeEvent.getTrade().getId()); 
 			 MessageServiceAppender.printLog("DEBUG", "MessageService Starting process Message for trade "+tradeEvent.getTrade().getId() + " on Trade status "+ tradeEvent.getTrade().getStatus());
@@ -165,6 +171,7 @@ Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
 			    publishMessage(tradeEvent.getTrade(),null);
 			
 		}if(event instanceof TransferEventProcessor) {
+		processor.clearPublishMessages();
 			TransferEventProcessor transferEvent = (TransferEventProcessor) event;
 			//System.out.println(transferEvent.getTrade().getId());
 			 MessageServiceAppender.printLog("DEBUG", "MessageService Starting process Message for Transfer "+transferEvent.getTransfer().getId());
@@ -172,14 +179,14 @@ Hashtable<String,Integer> duplicateEventCheck = new Hashtable<String,Integer>();
 		    	processor.processMessage(transferEvent);
 			   publishMessage(transferEvent.getTrade(),transferEvent.getTransfer());
 			
-		} 
+		}*/
 		
 	}
 public void updateEventProcess(EventProcessor event) {
 	    try {
 	    	event.setSubscribableList("Message");
 			remoteTrade.isEventExceuted(event);
-			MessageServiceAppender.printLog("DEBUG", "MessageService processed event "+event.getEventid() + " on event for Trade event "+event.getEventType());
+			MessageServiceAppender.printLog("DEBUG", "MessageService   updating  event table for event id "+event.getEventid() + " on event for Trade event "+event.getEventType());
 			
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
@@ -192,6 +199,15 @@ public void updateEventProcess(EventProcessor event) {
 			
 		}
 		
+}
+
+private boolean checkEventAlreadPublish(MessageEventProcessor event) {
+	 
+	String eventU = event.getType()+"_"+event.getTradeID()+"_"+event.getTradeVersion()+"_"+event.getTransferID()+"_"+event.getTransferVerson();
+	//System.out.println(eventU + " ))))))))))))))))))))))) ");
+	if(publishEventsData.containsKey(eventU))
+		return true;
+	return false;
 }
 	
 public void publishMessage(Trade trade,Transfer transfer) {
@@ -209,7 +225,7 @@ public void publishMessage(Trade trade,Transfer transfer) {
 						MessageEventProcessor event = getMessageEvent(messages.get(i),transfer,trade);
 					//	MessageServiceAppender.printLog("DEBUG", "MessageService  publishing message id "+ messages.get(i).getId() + " for trade   "+ trade.getId() + "  on transfer  " +transfer.getId() + " on event type " + event.getEventType() + " "+event.getEventid());
 						
-						if(event != null) {
+						if(event != null && !checkEventAlreadPublish(event)) {
 						  remoteTrade.publishnewTrade("TRANS_NEWTRANSFER","TRADE",event);
 						  MessageServiceAppender.printLog("DEBUG", "MessageService  published message id "+ event.getMessage().getId()  + " for trade   "+ trade.getId() );// + "  on transfer  " +transfer.getId() + " on event type " + event.getEventType() + " "+event.getEventid());
 							
@@ -254,11 +270,11 @@ public MessageEventProcessor getMessageEvent(Message message,Transfer transfer,T
 	messageEvent.setType("Message");
 	messageEvent.setObjectVersionID(message.getVersion());
 	messageEvent.setObjectID(message.getId());
-	if(transfer != null && transfer.getId() > 0)
-		messageEvent.setComments(" Message status on " + message.getStatus() + " for Action "+message.getAction() + " on Transfer_"+transfer.getId()+"  transfer status "+transfer.getStatus());
+	 if(transfer != null && transfer.getId() > 0)
+		messageEvent.setComments(" Message " + message.getId() + " for consuming Transfer_ "+transfer.getId()+"_Version_"+transfer.getVersion()+"_"+transfer.getStatus());
 	
 	else 
-	messageEvent.setComments(" Message status on " + message.getStatus() + " for Action "+message.getAction() + " on Trade_"+trade.getId()+" trade status "+trade.getStatus());
+	messageEvent.setComments(" Message " + message.getId() + " for consuming Trade "+trade.getId()+"_Version_"+trade.getVersion()+"_"+trade.getStatus());
 	
 	MessageServiceAppender.printLog("DEBUG", "MessageService creating  messageEvent with"+messageEvent.getEventType() + " on Trade trade "+trade.getId() );
 	
