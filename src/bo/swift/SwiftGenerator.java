@@ -96,7 +96,8 @@ public class SwiftGenerator extends BaseFormatter  {
 		  ProductTransferRule  transferRule =  getTransferRule(trade.getProductType());
 		  transferRule.setRemoteTrade(remoteTrade);
 		  transferRule.setRefDate(remoteRef);
-		  Vector<TransferRule> rules = transferRule.generateRules(trade);
+		  Vector<String> messageError = new Vector<String>();
+		  Vector<TransferRule> rules = transferRule.generateRules(trade,messageError);
 		  _producttransferRule = transferRule;
 		 
 		 

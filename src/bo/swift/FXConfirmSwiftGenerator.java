@@ -3,6 +3,11 @@ package bo.swift;
 import java.sql.Connection;
 import java.util.Vector;
 
+import javax.swing.plaf.synth.SynthDesktopIconUI;
+
+import constants.MessageConstants;
+import constants.SDIConstants;
+
 import dsServices.RemoteReferenceData;
 import dsServices.RemoteTrade;
 
@@ -41,15 +46,16 @@ public class FXConfirmSwiftGenerator extends SwiftGenerator {
 		
 		fxTransferRule.setRemoteTrade(remoteTrade);
 		fxTransferRule.setRefDate(remoteRef);
-		Vector<TransferRule> transferRules =  fxTransferRule.generateRules(trade);
-		String type = "MT300";
+		Vector<String> errorMessage = new Vector<String>();
+		Vector<TransferRule> transferRules =  fxTransferRule.generateRules(trade,errorMessage);
+		String type = MessageConstants.MT300;
 		refeCache = ReferenceDataCache.getSingleInstatnce();
 		LegalEntity po = refeCache.getPO(trade.getBookId());
-		String poKey = "PO|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+po.getId();
-		String cpKey =  "CounterParty|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+trade.getCpID();
-		Sdi poPerferedSdi = SDISelectorUtil.getPreferredSdiOnly(poKey);
+		 Sdi poPerferedSdi = SDISelectorUtil.getSdi(SDIConstants.PO,po.getId() ,trade.getCurrency(),trade.getProductType(),MessageConstants.SWIFT,0);
+		 Sdi cpPerferedSdis = SDISelectorUtil.getSdi(SDIConstants.COUNTERPARY,trade.getCpID(),trade.getCurrency(),trade.getProductType(),MessageConstants.SWIFT,0);
+		 
 		fxTransferRule.setPOSdi(poPerferedSdi);
-		Sdi cpPerferedSdis =SDISelectorUtil.getPreferredSdiOnly(cpKey); 
+		 
 		fxTransferRule.setCounterPartySDI(cpPerferedSdis);
 		
 		String senderMessageCode = ReferenceDataCache.getSenderMessageCode(message.getSenderRole(),po.getId(),trade.getProductType(),message.getAddressType(),message.getSenderContactType());
