@@ -43,12 +43,12 @@ public class TransferManagerStartup  extends ServiceManager  {
 		String localHost = "localhost";
 		user = new Users();
 		user.setUser_name("UserTransfer1");
-		user.setPassword("464554831da6b8d7359067d502d55e8bf6aa900ceea5ec50feb7d43b778bd9c8");
+		user.setPassword("1");
 		user.setHostName(hostName);
 		user.setApplicattionNameLoginOn("TransferManager");
 		setUser(user);
 		try {
-			amanager = new TransferManager(localHost,hostName,managerName,this);
+			amanager = new TransferManager(localHost,hostName,managerName,this,"TRANSFER");
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			commonUTIL.displayError("TransferManagerStartUP", "Start ", e);
