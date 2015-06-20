@@ -500,7 +500,73 @@ protected static int selectMax(Connection con ) {
 	     return Transfers;
 		
 	}
-
+	public static Transfer getSingleTransfer(String where, Connection conn) {
+		int j = 0;
+	     PreparedStatement stmt = null;
+	     Transfer transfer = new Transfer();
+	     String sql = SELECTWHERE;
+	     sql = sql + where;
+		 try {
+			
+			 stmt = dsSQL.newPreparedStatement(conn, sql);
+	      
+	      ResultSet rs = stmt.executeQuery();
+	      
+	      while(rs.next()) {
+	    	 
+	        	 transfer.setId(rs.getInt(1));
+			        transfer.setTradeId(rs.getInt(2));
+			        transfer.setProductId(rs.getInt(3));
+			        transfer.setAmount(rs.getDouble(4));
+		            transfer.setEventType(rs.getString(5));
+		            transfer.setTranserType(rs.getString(6));
+		           transfer.setTransferStatus(rs.getString(7));
+		          transfer.setSettlecurrency(rs.getString(8));
+		             transfer.setPayerCode(rs.getString(9));
+		             transfer.setPayerRole(rs.getString(10));
+		           transfer.setReceiverCode(rs.getString(11));
+		             transfer.setReceiverRole(rs.getString(12));
+		             transfer.setPaymentStatus(rs.getString(13));
+		             transfer.setDeliveryDate(rs.getString(14));
+		            transfer.setValueDate(rs.getString(15));
+		            transfer.setMethod(rs.getString(16));
+		             transfer.setReceiverInst(rs.getString(17));
+		             transfer.setPayerInst(rs.getString(18));
+		             transfer.setAttributes(rs.getString(19));
+		             transfer.setStatus(rs.getString(20));
+		             transfer.setAction(rs.getString(21));
+		             transfer.setTradeVersionID(rs.getInt(22));
+		             transfer.setLinkid(rs.getInt(23));
+		             transfer.setNettedTransferID(rs.getInt(24));
+				       
+				        transfer.setNettedConfigID(rs.getInt(25));
+				        transfer.setVersion(rs.getInt(26));
+				        transfer.setSettleAmount(rs.getDouble(27));
+				        transfer.setCPid(rs.getInt(28));
+				        transfer.setProductType(rs.getString(29));
+				        transfer.setUserid(rs.getInt(30));
+				        transfer.setBookId(rs.getInt(31));
+				        transfer.setQuantity(rs.getDouble(32));
+		         
+	      
+	      }
+	      commonUTIL.display("TransferSQL" , "getSingleTransfer " + sql);
+		 } catch (Exception e) {
+			 commonUTIL.displayError("TransferSQL","getSingleTransfer" + SELECTWHERE,e);
+			 return null;
+	        
+	     }
+	     finally {
+	        try {
+				stmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				commonUTIL.displayError("TransferSQL",SELECTWHERE,e);
+			}
+	     }
+	     return transfer;
+		
+	}
 	public static Collection getTransferOnTrade(int tradeID, Connection conn) {
 		// TODO Auto-generated method stub
 		int j = 0;
