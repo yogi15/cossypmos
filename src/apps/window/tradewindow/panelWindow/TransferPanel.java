@@ -222,6 +222,8 @@ public class TransferPanel extends BackOfficePanel {
 				if (selectRow >= 0) {
 					Transfer transfer = (Transfer) settlementdata
 							.get(selectRow);
+					if(transfer == null)
+						return;
 					Vector nettedTransfers = null;
 					try {
 						nettedTransfers = (Vector) remoteBO
@@ -254,6 +256,12 @@ public class TransferPanel extends BackOfficePanel {
 		JPanel panel = new JPanel();
 		panel.setLayout(new GroupLayout());
 		JScrollPane jScrollPane = new JScrollPane();
+		if(nettedTransfers == null) {
+			commonUTIL.showAlertMessage("NO netting Found");
+			panel.add(jScrollPane, new Constraints(new Leading(9, 1240, 10, 10),
+					new Leading(6, 187, 10, 10)));
+			return panel;
+		}
 		jScrollPane.setViewportView(getTableDyn(nettedTransfers, userID,deliveryDate));
 		panel.add(jScrollPane, new Constraints(new Leading(9, 1240, 10, 10),
 				new Leading(6, 187, 10, 10)));
@@ -278,7 +286,7 @@ public class TransferPanel extends BackOfficePanel {
 					String type = (String) getModel().getValueAt(modelRow,
 							8);
 					
-					if ("SETTLED".equals(type))
+					if (!commonUTIL.isEmpty(type) && "SETTLED".equals(type))
 						c.setBackground(Color.pink);
 
 				}
@@ -355,9 +363,9 @@ public class TransferPanel extends BackOfficePanel {
 						int modelRow = convertRowIndexToModel(row);
 						String type = (String) getModel().getValueAt(modelRow,
 								8);
-						if ("CANCELLED".equals(type))
+						if (!commonUTIL.isEmpty(type) && "CANCELLED".equals(type))
 							c.setBackground(Color.orange);
-						if ("SETTLED".equals(type))
+						if (!commonUTIL.isEmpty(type) && "SETTLED".equals(type))
 							c.setBackground(Color.pink);
 
 					}
@@ -908,7 +916,7 @@ public class TransferPanel extends BackOfficePanel {
 			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			commonUTIL.displayError("TransferPanel", "fillJTabel", e);
 		}
 		// model = new TableModelUtil(data,col,remoteBO,remoteProduct);
 
@@ -1101,23 +1109,21 @@ public class TransferPanel extends BackOfficePanel {
 		}
 
 		public void setValueAt(Object value, int row, int col) {
-			System.out.println("Setting value at " + row + "," + col + " to "
-					+ value + " (an instance of " + value.getClass() + ")");
+			
 			if (value instanceof Transfer) {
 				data.set(row, (Transfer) value);
 				this.fireTableDataChanged();
-				System.out.println("New value of data:");
+			//	System.out.println("New value of data:");
 			}
 
 		}
 
 		public void setValueAt(Object value, int row) {
-			System.out.println("Setting value at " + row + "," + value
-					+ " (an instance of " + value.getClass() + ")");
+		
 			if (value instanceof Transfer) {
 				data.set(row, (Transfer) value);
 				this.fireTableDataChanged();
-				System.out.println("New value of data:");
+			//	System.out.println("New value of data:");
 			}
 
 		}
@@ -1177,6 +1183,7 @@ public class TransferPanel extends BackOfficePanel {
 
 	public synchronized void addtaskData(TaskEventProcessor task) {
 		// TODO Auto-generated method stub
+		try {
 		if(task == null)
 			return;
 		Transfer transfer = task.getTransfer();
@@ -1189,7 +1196,7 @@ public class TransferPanel extends BackOfficePanel {
 			return;
 		
 		trade = ntrade;
-		try {
+	
 			
 			Vector newdata = (Vector) remoteBO.queryWhere("Transfer",
 					"tradeId = " + trade.getId());
@@ -1206,31 +1213,34 @@ public class TransferPanel extends BackOfficePanel {
 						remoteBO, remoteProduct, true);
 				jTable2.setModel(settlementmodel);
 			}
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		// model = new TableModelUtil(data,col,remoteBO,remoteProduct);
 		if(transfer == null)
 			return ;
 		JTable dyTable = (JTable)dynTables.get(transfer.getDeliveryDate());
 	
 		Vector nettedTransfers = null;
-		try {
+		
 			nettedTransfers = (Vector) remoteBO
 					.getNettedTransfers(transfer.getNettedTransferID());
-		} catch (RemoteException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		
 		if(nettedTransfers != null) {
 		TableModelUtil mutil = new TableModelUtil(nettedTransfers, col,
 				remoteBO, remoteProduct, false);
-		
+		if(dyTable != null) {
 		dyTable.repaint();
 		dyTable.setModel(mutil);
 		}
+		}
+		if(dyTable != null)
 		dynTables.put(transfer.getDeliveryDate(),dyTable);
+		}catch (NullPointerException e) {
+			commonUTIL.displayError("TransferPanel", " addtaskData ", e);
+		
+	} catch (RemoteException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
          
           
 			 
