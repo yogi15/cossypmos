@@ -26,8 +26,10 @@ import com.jidesoft.combobox.TableExComboBoxSearchable;
 import com.jidesoft.grid.SortableTable;
 
 import constants.TradeConstants;
+
 import dsEventProcessor.TaskEventProcessor;
 import dsServices.RemoteTrade;
+
 import productPricing.Pricer;
 import productPricing.pricingUtil.CashFlow;
 import util.ClassInstantiateUtil;
@@ -70,6 +72,9 @@ public abstract class TradePanel extends CommonPanel  {
 	public abstract void setTradeTransfers(BackOfficePanel panel);
 	public abstract void setTradePostings(BackOfficePanel panel);
 	public abstract ArrayList<Component>  getFocusOrderList();
+	public void setFocusComp() {
+		
+	}
 	public abstract void setTrade(Trade trade);
 	public abstract Trade getTrade();
 	public abstract void saveASNew(Trade trade);
@@ -105,6 +110,7 @@ public abstract class TradePanel extends CommonPanel  {
 		}catch (RemoteException e) {
     				// TODO Auto-generated catch block
     				e.printStackTrace();
+    				commonUTIL.displayError( productType + " TradePanel "," proccssActionData", e);
     			}catch(Exception e) {
     				commonUTIL.displayError( productType + " TradePanel "," proccssActionData", e);
     			}
@@ -142,10 +148,10 @@ public abstract class TradePanel extends CommonPanel  {
 	public abstract void processTask(TaskEventProcessor taskEvent,Users WindowUser);
 		// TODO Auto-generated method stub
 	public abstract  void setLimitBreachMarkOnAction(int i);
-	public void setSDIPanelInstruction() {
+	public abstract void setSDIPanelInstruction();
 		// TODO Auto-generated method stub
 		
-	}
+	
 	public  void setFilterValue(FilterValues filterValues) {
 		this.filterValue = filterValues;
 		
@@ -203,7 +209,6 @@ public abstract class TradePanel extends CommonPanel  {
 	    		
 		
     }
-			
 	protected TableExComboBox getCounterPartyComboBox(Vector<LegalEntity> leData) {
 		return ComponentUtil.getCounterPartyComboBox(leData);
 	}
@@ -214,6 +219,21 @@ public abstract class TradePanel extends CommonPanel  {
 		return ComponentUtil.getBookComboBox(bookData);
 	}
 	
+	 
+	
+	protected TableBookModelUtil getBookModelUtil(Vector<Book> bookData) {
+		String cols[] = { "Bookid", "Name "  };
+		return new TableBookModelUtil(bookData,cols);
+	}
+	protected TableLegalEntityModelUtil getTraderModelUtil(Vector<LegalEntity> traderData) {
+		String traderCol[] = { "ID", "TraderName "  };
+		return new TableLegalEntityModelUtil(traderData,traderCol);
+	}
+	protected TableLegalEntityModelUtil getCPModelUtil(Vector<LegalEntity> traderData) {
+		String col[] = { "Id", "Name " };
+		return new TableLegalEntityModelUtil(traderData,col);
+	}
+
 	protected TableExComboBox getCounterPartyComboBox(Vector<LegalEntity> leData, String cols[]) {
 		return ComponentUtil.getCounterPartyComboBox(leData, cols);
 	}
@@ -224,6 +244,57 @@ public abstract class TradePanel extends CommonPanel  {
 		return ComponentUtil.getBookComboBox(bookData, cols);
 	}
 	
+	
+	/*protected TableExComboBox getCounterPartyComboBox(Vector<LegalEntity> leData) {
+		TableExComboBox counterParty =  new TableExComboBox(
+					getCPModelUtil(leData)) {
+				@Override
+				protected JTable createTable(TableModel model) {
+					return new SortableTable(model);
+				}
+				
+				
+			};
+			counterParty.setEditable(false);
+			counterParty.setBorder(null);
+			counterParty.setValueColumnIndex(1);
+			new TableExComboBoxSearchable(counterParty);
+			return counterParty;
+	}
+	protected TableExComboBox getTraderComboBox(Vector<LegalEntity> leData) {
+		TableExComboBox trader =  new TableExComboBox(
+					getCPModelUtil(leData)) {
+				@Override
+				protected JTable createTable(TableModel model) {
+					return new SortableTable(model);
+				}
+				
+				
+			};
+			 
+			trader.setEditable(false);
+			trader.setBorder(null);
+			trader.setValueColumnIndex(1);
+			new TableExComboBoxSearchable(trader);
+			return trader;
+	}
+	protected TableExComboBox getBookComboBox(Vector<Book> bookData) {
+		TableExComboBox book =  new TableExComboBox(
+				getBookModelUtil(bookData)) {
+				@Override
+				protected JTable createTable(TableModel model) {
+					return new SortableTable(model);
+				}
+				
+				
+			};
+			book.setEditable(false);
+			book.setBorder(null);
+			book.setValueColumnIndex(1);
+			new TableExComboBoxSearchable(book);
+			return book;
+	}
+	*/
 	protected void setBUYSELL(final JLabel buysellLabel,final JTextField buysellText) {
 		buysellLabel.addMouseListener(new MouseListener() {
 
