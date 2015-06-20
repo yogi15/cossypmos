@@ -13,6 +13,11 @@ public interface RemoteProduct  extends Remote {
 	
 	
 	public int saveProduct(Product product,Coupon coupon) throws RemoteException;
+	public int saveProduct(Product product) throws RemoteException;
+	public boolean updateProduct(Product product) throws RemoteException;
+	
+	
+	
 	public Product selectProduct(int productID)throws RemoteException;
 	public Collection  selectALLProducts() throws RemoteException;
 	public boolean removeProduct(Product product) throws RemoteException;
