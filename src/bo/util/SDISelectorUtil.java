@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import constants.SDIConstants;
 
+import util.ReferenceDataCache;
 import util.commonUTIL;
 
 import dbSQL.BookSQL;
@@ -98,6 +99,49 @@ public class SDISelectorUtil {
 		return tradeSDIs;
 		
 	}
+	
+	public static Sdi getSdi(String role,int leID,String currency,String productType,String messageType,int priority) {
+		Sdi s = null;
+		int priorityZero =priority;
+		int p = priority;
+		boolean found = false;
+		Vector<Sdi> sdidata =ReferenceDataCache.getSdisonLegelEntityRole(role,leID,currency,messageType,productType);
+		if(sdidata == null || sdidata.isEmpty())
+			return null;
+		s = setSdiValue(sdidata,priorityZero,s);
+		return s;
+	}
+
+ 
+public static Sdi getSdi(String role,int leID,String currency,String productType,int priority) {
+	Sdi s = null;
+	int priorityZero =priority;
+	int p = priority;
+	boolean found = false;
+	Vector<Sdi> sdidata =ReferenceDataCache.getSdisonLegelEntityRole(role,leID,currency,productType);
+	if(sdidata == null || sdidata.isEmpty())
+		return null;
+	s = setSdiValue(sdidata,priorityZero,s);
+	return s;
+}
+// this logic can be dangerous. this logic find the priority from zero to highest number,   zero is given highest priority. 
+
+private static Sdi setSdiValue(Vector<Sdi> sdidata,int priortiy,Sdi sd) {
+	 Sdi s  = sd;
+	boolean found = false;
+	for(int i=0;i<sdidata.size();i++) {
+		Sdi sdi = sdidata.elementAt(i);
+		if(sdi.getPriority() == priortiy)  {
+			s = sdi; // logic needs to be build, while inserting new SDI priority wise validation needs to be add
+			found = true;
+			break;
+		}  
+	}
+	if(!found) {
+		s = setSdiValue(sdidata,priortiy + 1,s);
+	}
+	return s;
+}
 	
 	private static Vector<Sdi> getLeastPrioritySDIs(Vector<Sdi> preferredSdis) {
 		int leastpriority = 0;
