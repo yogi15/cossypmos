@@ -207,10 +207,10 @@ public  class TransferRule implements Serializable,Cloneable {
 	public void set_extSDIVersion(int _extSDIVersion) {
 		this._extSDIVersion = _extSDIVersion;
 	}
-	public DateU get_settleDate() {
+	public String get_settleDate() {
 		return _settleDate;
 	}
-	public void set_settleDate(DateU _settleDate) {
+	public void set_settleDate(String _settleDate) {
 		this._settleDate = _settleDate;
 	}
 	public double get__transferAmount() {
@@ -316,7 +316,7 @@ public  class TransferRule implements Serializable,Cloneable {
 		}
 		protected int     _receiverAgentID;
 	    protected int     _payerAgentID;
-	    protected DateU   _settleDate; //NEVER PUT IT IN THE EQUALS METHOD
+	    protected String   _settleDate; //NEVER PUT IT IN THE EQUALS METHOD
 	    transient protected double __transferAmount;
 	    transient protected int __sdiSecurityId;    
 	    transient protected int __tradeCptyId;    

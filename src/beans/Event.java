@@ -4,6 +4,41 @@ public class Event {
 	
 
 	int eventID;
+	int objectID;
+	boolean publish = false;
+	
+	int objectVersion = 0;
+	
+	/**
+	 * @return the objectVersion
+	 */
+	public int getObjectVersion() {
+		return objectVersion;
+	}
+	/**
+	 * @param objectVersion the objectVersion to set
+	 */
+	public void setObjectVersion(int objectVersion) {
+		this.objectVersion = objectVersion;
+	}
+	/**
+	 * @return the publish
+	 */
+	public boolean isPublish() {
+		return publish;
+	}
+	/**
+	 * @param publish the publish to set
+	 */
+	public void setPublish(boolean publish) {
+		this.publish = publish;
+	}
+	public int getObjectID() {
+		return objectID;
+	}
+	public void setObjectID(int object) {
+		objectID =  object;
+	}
 	public int getEventID() {
 		return eventID;
 	}

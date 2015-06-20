@@ -16,6 +16,7 @@ public class Trade implements Serializable,Cloneable {
 	boolean isFXSwap = false;
 	boolean isMirrorTrade = false;
 	boolean isPositionBased = true;
+	boolean customTransferRule = false;
 	Vector<Trade> rountingTrades = new Vector<Trade>();
 	Product product = null;
 	public void setProduct(Product prod) {
@@ -506,30 +507,55 @@ public int getUserID() {
 	
 		try {
 		 values = "Id="+getId()+
-		                ";Currency="+getCurrency()+
-		                ";UserID="+getUserID()+
-		                ";version="+getVersion()+
-	                    ";price="+getPrice()+
-	                     ";action="+getAction().trim()+
-	                     ";quantity="+getQuantity()+
-	                     ";book="+getBookId()+
-	                     ";broker="+getBrokerID()+
-	                     ";effectivedate="+getEffectiveDate().trim()+
-	                     ";delieveryDate="+getDelivertyDate().trim()+
-	                     ";productID="+getProductId()+
-	                     ";tradedate="+getTradeDate().trim()+
-	                     ";Nominal="+getNominal() +
-	                     ";tradeamount= "+getTradeAmount() +
-	                      ";type="+getType().trim()+
-	                      ";FarAmt2="+getYield()+
-	                      ";status="+getStatus().trim()+
-		                  ";ProductName="+getTradedesc().trim()+
-		                  ";productSubType="+getTradedesc1().trim()+
-		                  ";productType="+getProductType().trim()+
-		                  ";CpID="+getCpID()+
-		                  ";Amoritization="+getAmoritizationData()+
-		                  ";FarRate="+getSecondPrice()+
-		                  ";TraderID="+getTraderID();
+	                ";Currency="+getCurrency()+
+	                ";UserID="+getUserID()+
+	                ";version="+getVersion()+
+                 ";price="+getPrice()+
+                  ";action="+getAction().trim()+
+                  ";quantity="+getQuantity()+
+                  ";book="+getBookId()+
+                  ";broker="+getBrokerID()+
+                  ";effectivedate="+getEffectiveDate().trim()+
+                  ";delieveryDate="+getDelivertyDate().trim()+
+                  ";productID="+getProductId()+
+                  ";tradedate="+getTradeDate().trim()+
+                  ";Nominal="+getNominal() +
+                  ";tradeamount= "+getTradeAmount() +
+                   ";type="+getType().trim()+
+                   ";FarAmt2="+getYield()+
+                   ";status="+getStatus().trim()+
+	                  ";ProductName="+getTradedesc().trim()+
+	                  ";productSubType="+getTradedesc1().trim()+
+	                  ";productType="+getProductType().trim()+
+	                  ";CpID="+getCpID()+
+	                  ";Amoritization="+getAmoritizationData()+
+	                  ";FarRate="+getSecondPrice()+
+	                  ";TraderID="+getTraderID()+
+			  ";isPositionBased="+isPositionBased()+
+			   ";isMirrorTrade="+isMirrorTrade()+
+			   ";isEconomicChanged="+isEconomicChanged()+
+			    ";isFXSwap="+isFXSwap()+
+			    ";isB2Bflag="+isB2Bflag()+
+			   ";Outstanding="+ getOutstanding()+
+			   ";isParitial="+ isParitial()+
+			  ";SecondTradePrice="+ getSecondTradePrice()+
+			  ";RollOverTo="+ getRollOverTo()+
+			  ";RollOverFrom="+ getRollOverFrom()+
+			  ";RollBackTo="+ getRollBackTo()+
+			  ";RollBackFrom="+ getRollBackFrom()+
+			  ";RollTo="+ getRollTo()+
+			  ";RollFrom="+ getRollFrom()+
+			  ";ParentID="+ getParentID()+
+			  ";XccySPlitid="+ getXccySPlitid()+
+			  ";Offsetid="+ getOffsetid()+
+			  ";MirrorID="+ getMirrorID()+
+			  ";AutoType="+ getAutoType()+
+			  ";B2bid="+ getB2bid()+
+			  ";Price="+ getPrice()+
+			  ";MirrorBookid="+ getMirrorBookid()+
+			  ";B2bConfig="+getB2bConfig()+
+			 ";AllocatedID="+ getAllocatedID()+
+			  ";isCustomRuleApply="+isCustomRuleApply();
 		}catch(Exception e) {
 			commonUTIL.displayError("Trade Object", "getValues  == " + values, e);
 			return values;
@@ -783,4 +809,30 @@ public void setAllocatedID(int allocatedID) {
 		return value;
 		
 	}
+Vector<TransferRule> customtransferRules = null;
+	/**
+ * @return the customtransferRules
+ */
+public Vector<TransferRule> getCustomtransferRules() {
+	return customtransferRules;
+}
+
+/**
+ * @param customtransferRules the customtransferRules to set
+ */
+public void setCustomtransferRules(Vector<TransferRule> customtransferRules) {
+	this.customtransferRules = customtransferRules;
+}
+
+	public void setCustomRuleApply(boolean b) {
+		// TODO Auto-generated method stub
+		customTransferRule = b;
+		
+	}
+	public boolean isCustomRuleApply() {
+		// TODO Auto-generated method stub
+		return customTransferRule  ;
+		
+	}
+	
 }
