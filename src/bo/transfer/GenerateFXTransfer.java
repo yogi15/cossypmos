@@ -41,10 +41,24 @@ public class GenerateFXTransfer extends BOTransfer {
 		
 	}
 	
-private Vector<TransferRule> generateRule(Trade trade) {
-	    
-    	return fxTransferRule.generateRules(trade);
-    	
+private Vector<TransferRule> generateRule(Trade trade,Vector<String> message) {
+	 Vector<TransferRule> rules = null;
+	 
+     if(!trade.isCustomRuleApply()) {
+ 	   rules =fxTransferRule.generateRules(trade,message);
+     }   else {
+		   try {
+			rules = (Vector<TransferRule>) boProcess.getCustomTransferRule(trade.getId());
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("GenerateFXTransfer", "generateRule get error on Trade id "+trade.getId(), e);
+			message.add(new String("GenerateFXTransfer generateRule get error on Trade id "+trade.getId()));
+			return null;
+		}
+		  
+  }
+	 
+     return rules;
     	
     }
 private void getCashFlows(Trade trade) {
@@ -62,16 +76,21 @@ private Fees getFee(int id) {
     
     return fee;
 }
+
 	@Override
 	public Vector<Transfer> generateTransfer(Trade trade,
-			Vector<String> feestype,NettingConfig netConfig) {
+			Vector<String> feestype,NettingConfig netConfig,Vector<String> message) {
 		// TODO Auto-generated method stub
+		Vector<TransferRule> rules = null;
 		if(trade.isFXSwap()) {
-			return generateTransferOnFXSwap(trade,feestype,netConfig);
+			return generateTransferOnFXSwap(trade,feestype,netConfig,message);
 		}
 		this.feesType = feestype;
 		Vector<Transfer> transfers = new Vector<Transfer>();
-		Vector<TransferRule> rules = generateRule(trade);
+		 
+		rules = generateRule(trade,message);
+		if(commonUTIL.isEmpty(rules))
+			return null;
 		try {
 			fees = (Vector)  remoteTrade.selectFeesonTrade(trade.getId());
 		} catch (RemoteException e) {
@@ -99,7 +118,7 @@ private Fees getFee(int id) {
 			    transfer.setEventType("RECEIPT");
 			    transfer.setTransferType(fxTransferRule.transerTYPEPRINCIPAL);
 			    transfer.addAttribues("PRINCIPAL", "RECEIVE");
-			    transfer.setDeliveryDate(commonUTIL.dateToString(rule.get_settleDate().getDate()));
+			    transfer.setDeliveryDate( rule.get_settleDate()  );
 				transfer.setTradeId(trade.getId());
 				if(rule.get_productId() == 0) 
 					transfer.setProductId(trade.getProductId());
@@ -126,8 +145,8 @@ private Fees getFee(int id) {
 				    transfer.setEventType("PAYMENT");
 				    transfer.setTransferType(fxTransferRule.transerTYPEPRINCIPAL);
 				    transfer.addAttribues("PRINCIPAL", "PAYMENT");
-				    transfer.setDeliveryDate(commonUTIL.dateToString(rule.get_settleDate().getDate()));
-					transfer.setTradeId(trade.getId());
+				    transfer.setDeliveryDate( rule.get_settleDate()  );
+						transfer.setTradeId(trade.getId());
 					if(rule.get_productId() == 0) 
 						transfer.setProductId(trade.getProductId());
 					else
@@ -139,7 +158,7 @@ private Fees getFee(int id) {
 					transfer.setPayerRole(rule.get_payerLegalEntityRole());
 					transfer.setReceiverCode(getLEName(rule.get_receiverLegalEntityId()));
 					transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
-					transfer.setMethod(rule.get__sMethod().getMessageType());
+					transfer.setMethod(rule.get_settlementMethod());
 					transfer.addAttribues("PRINCIPAL", "PAY");
 					transfer.setProductType(trade.getProductType());
 					transfer.setSettleAmount(transfer.getAmount());
@@ -160,7 +179,7 @@ private Fees getFee(int id) {
 				transfer.setReceiverCode(getLEName(rule.get_receiverLegalEntityId()));
 				  transfer.setTradeId(trade.getId());
 				transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
-				transfer.setMethod(rule.get__sMethod().getMessageType());
+				transfer.setMethod(rule.get_settlementMethod());
 				transfer.setProductType(trade.getProductType());
 				transfer.setSettleAmount(transfer.getAmount());
 			    transfer.addAttribues("FEE_"+fee.getId(), "PAY");
@@ -181,7 +200,7 @@ private Fees getFee(int id) {
 				transfer.setReceiverCode(getLEName(rule.get_receiverLegalEntityId()));
 				transfer.setProductType(trade.getProductType());
 				transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
-				transfer.setMethod(rule.get__sMethod().getMessageType());
+				transfer.setMethod(rule.get_settlementMethod());
 				 transfer.addAttribues("FEE_"+fee.getId(), "RECEIVE");
 				 transfer.setSettleAmount(transfer.getAmount());
 			  
@@ -194,11 +213,11 @@ private Fees getFee(int id) {
 	}
 
 	private Vector<Transfer> generateTransferOnFXSwap(Trade swaptrade,
-			Vector<String> feestype, NettingConfig netConfig) {
+			Vector<String> feestype, NettingConfig netConfig,Vector<String> message) {
 		// TODO Auto-generated method stub
 		this.feesType = feestype;
 		Vector<Transfer> transfers = new Vector<Transfer>();
-		Vector<TransferRule> rules = generateRule(swaptrade);
+		Vector<TransferRule> rules = generateRule(swaptrade,message);
 		try {
 			fees = (Vector)  remoteTrade.selectFeesonTrade(swaptrade.getId());
 		} catch (RemoteException e) {
@@ -226,7 +245,7 @@ private Fees getFee(int id) {
 			    transfer.setEventType("RECEIPT");
 			    transfer.setTransferType(fxTransferRule.transerTYPEPRINCIPAL);
 			    transfer.addAttribues("PRINCIPAL", "RECEIVE");
-			    transfer.setDeliveryDate(commonUTIL.dateToString(rule.get_settleDate().getDate()));
+			    transfer.setDeliveryDate( rule.get_settleDate()  );
 				transfer.setTradeId(trade.getId());
 				if(rule.get_productId() == 0) 
 					transfer.setProductId(trade.getProductId());
@@ -239,7 +258,7 @@ private Fees getFee(int id) {
 				transfer.setReceiverCode(getLEName(rule.get_receiverLegalEntityId()));
 				transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
 				transfer.setProductType(trade.getProductType());
-				transfer.setMethod(rule.get__sMethod().getMessageType());
+				transfer.setMethod(rule.get_settlementMethod());
 				transfer.setSettleAmount(transfer.getAmount());
 				transfer.addAttribues("PRINCIPAL", "RECEIVE");
 				if(swaptrade.getRollOverFrom() > 0 && trade.getFxSwapLeg().equalsIgnoreCase("SWAPLEG")) {
@@ -265,7 +284,7 @@ private Fees getFee(int id) {
 				    transfer.setEventType("PAYMENT");
 				    transfer.setTransferType(fxTransferRule.transerTYPEPRINCIPAL);
 				    transfer.addAttribues("PRINCIPAL", "PAYMENT");
-				    transfer.setDeliveryDate(commonUTIL.dateToString(rule.get_settleDate().getDate()));
+				    transfer.setDeliveryDate( rule.get_settleDate() );
 					transfer.setTradeId(trade.getId());
 					if(rule.get_productId() == 0) 
 						transfer.setProductId(trade.getProductId());
@@ -277,7 +296,7 @@ private Fees getFee(int id) {
 					transfer.setPayerRole(rule.get_payerLegalEntityRole());
 					transfer.setReceiverCode(getLEName(rule.get_receiverLegalEntityId()));
 					transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
-					transfer.setMethod(rule.get__sMethod().getMessageType());
+					transfer.setMethod(rule.get_settlementMethod());
 					transfer.addAttribues("PRINCIPAL", "PAY");
 					transfer.setSettleAmount(transfer.getAmount());
 					transfer.setProductType(trade.getProductType());
@@ -311,7 +330,7 @@ private Fees getFee(int id) {
 				  transfer.setTradeId(trade.getId());
 				transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
 				transfer.setProductType(trade.getProductType());
-				transfer.setMethod(rule.get__sMethod().getMessageType());
+				transfer.setMethod(rule.get_settlementMethod());
 				transfer.setSettleAmount(transfer.getAmount());
 			    transfer.addAttribues("FEE_"+fee.getId(), "PAY");
 				transfers.addElement(transfer);
@@ -332,7 +351,7 @@ private Fees getFee(int id) {
 				transfer.setProductType(trade.getProductType());
 				transfer.setReceiverRole(rule.get_receiverLegalEntityRole());
 				 transfer.addAttribues("FEE_"+fee.getId(), "RECEIVE");
-				 transfer.setMethod(rule.get__sMethod().getMessageType());
+				 transfer.setMethod(rule.get_settlementMethod());
 				 transfer.setSettleAmount(transfer.getAmount());
 			  
 				transfers.addElement(transfer);
@@ -354,5 +373,7 @@ private Fees getFee(int id) {
 		// TODO Auto-generated method stub
 		
 	}
+
+	 
 
 }

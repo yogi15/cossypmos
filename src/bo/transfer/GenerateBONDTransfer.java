@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
+import dsServices.RemoteBOProcess;
 import dsServices.RemoteTrade;
 import beans.Flows;
 
@@ -47,10 +48,23 @@ public class GenerateBONDTransfer extends BOTransfer {
 		
 	}
 	
-    private Vector<TransferRule> generateRule(Trade trade) {
-    
-    	return bondTransferRule.generateRules(trade);
-    	
+    private Vector<TransferRule> generateRule(Trade trade, Vector<String> message) {
+     
+    Vector<TransferRule> rules = null;
+        if(!trade.isCustomRuleApply()) {
+    	   rules = bondTransferRule.generateRules(trade,message);
+        }   else {
+    		   try {
+				rules = (Vector<TransferRule>) boProcess.getCustomTransferRule(trade.getId());
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				commonUTIL.displayError("GenerateBondTransfer", "generateRule get error on Trade id "+trade.getId(), e);
+				message.add(new String("GenerateBondTransf generateRule get error on Trade id "+trade.getId()));
+				return null;
+			}
+        }
+    	 
+    	return rules;
     	
     }
 	private void getCashFlows(Trade trade) {
@@ -109,11 +123,11 @@ public class GenerateBONDTransfer extends BOTransfer {
 
 
 	@Override
-	public Vector<Transfer> generateTransfer(Trade trade,Vector<String> feestype,NettingConfig netConfig) {
+	public Vector<Transfer> generateTransfer(Trade trade,Vector<String> feestype,NettingConfig netConfig,Vector<String> message) {
 		// TODO Auto-generated method stub
 	//	this.feesType = feestype;
 		Vector<Transfer> transfers = new Vector<Transfer>();
-		Vector<TransferRule> rules = generateRule(trade);
+		Vector<TransferRule> rules = generateRule(trade,message);
 		try {
 			fees = (Vector)  remoteTrade.selectFeesonTrade(trade.getId());
 		} catch (RemoteException e) {
@@ -135,7 +149,7 @@ public class GenerateBONDTransfer extends BOTransfer {
 			    transfer.setSettleAmount(Double.parseDouble(commonUTIL.doubleFormat(bondPricer.getCleanPrice())));
 			    transfer.setTransferType(bondTransferRule.transerTYPEPRINCIPAL);
 			    transfer.addAttribues("PRINCIPAL"+"_"+rule.get_settleDate(), "RECEIVE"); // imp unquinly identified each cashflow and transfer
-			    transfer.setDeliveryDate(commonUTIL.dateToString(rule.get_settleDate().getDate()));
+			    transfer.setDeliveryDate( rule.get_settleDate());
 				transfer.setTradeId(trade.getId());
 				if(rule.get_productId() == 0) 
 					transfer.setProductId(trade.getProductId());
@@ -156,7 +170,7 @@ public class GenerateBONDTransfer extends BOTransfer {
 			    transfer.setEventType("PAYMENT");
 			    transfer.setTransferType(bondTransferRule.transerTYPEPRINCIPAL);
 			    transfer.addAttribues("PRINCIPAL"+"_"+rule.get_settleDate(), "PAYMENT"); // imp unquinly identified each cashflow and transfer
-			    transfer.setDeliveryDate(commonUTIL.dateToString(rule.get_settleDate().getDate()));
+			    transfer.setDeliveryDate( rule.get_settleDate() );
 				transfer.setTradeId(trade.getId());
 				if(rule.get_productId() == 0) 
 					transfer.setProductId(trade.getProductId());
@@ -178,7 +192,7 @@ public class GenerateBONDTransfer extends BOTransfer {
 				transfer.setSettleAmount(Double.parseDouble(commonUTIL.doubleFormat(bondPricer.getCleanPrice())));
 				transfer.setEventType("SEC_RECEIPT");
 				transfer.setTransferType(bondTransferRule.transerTYPESECURITY);
-				transfer.setDeliveryDate(commonUTIL.dateToString(rule.get_settleDate().getDate()));
+				transfer.setDeliveryDate( rule.get_settleDate() );
 				transfer.setTradeId(trade.getId());
 				if(rule.get_productId() == 0) 
 					transfer.setProductId(trade.getProductId());
@@ -203,8 +217,8 @@ public class GenerateBONDTransfer extends BOTransfer {
 				transfer.setTransferType(bondTransferRule.transerTYPESECURITY);
 				//transfer.setAmount(Double.parseDouble(commonUTIL.doubleFormat(bondPricer.getPrincipal())));
 				transfer.setSettleAmount(Double.parseDouble(commonUTIL.doubleFormat(bondPricer.getCleanPrice())));
-				transfer.setDeliveryDate(commonUTIL.dateToString(rule.get_settleDate().getDate()));
-				transfer.setTradeId(trade.getId());
+				transfer.setDeliveryDate( rule.get_settleDate() );
+					transfer.setTradeId(trade.getId());
 				if(rule.get_productId() == 0) 
 					transfer.setProductId(trade.getProductId());
 				else

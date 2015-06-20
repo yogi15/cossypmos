@@ -47,9 +47,25 @@ public class GenerateMMTransfer extends BOTransfer {
 	}
 	
 	
-	private Vector<TransferRule> generateRule(Trade trade) {
-	    
-    	return mmTransferRule.generateRules(trade);
+	private Vector<TransferRule> generateRule(Trade trade,Vector<String> message) {
+		 Vector<TransferRule> rules = null;
+		 
+	     if(!trade.isCustomRuleApply()) {
+	 	   rules =mmTransferRule.generateRules(trade,message);
+	     }   else {
+			   try {
+				rules = (Vector<TransferRule>) boProcess.getCustomTransferRule(trade.getId());
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				commonUTIL.displayError("GenerateFXTransfer", "generateRule get error on Trade id "+trade.getId(), e);
+				message.add(new String("GenerateFXTransfer generateRule get error on Trade id "+trade.getId()));
+				return null;
+			}
+			  
+	  }
+		 
+	     return rules;
+    	 
     	
     	
     }
@@ -86,12 +102,12 @@ public class GenerateMMTransfer extends BOTransfer {
 	
 	@Override
 	public Vector<Transfer> generateTransfer(Trade trade,
-			Vector<String> feestype,NettingConfig netConfig) {
+			Vector<String> feestype,NettingConfig netConfig,Vector<String> message) {
 		// TODO Auto-generated method stub
 		
 		this.feesType = feestype;
 		Vector<Transfer> transfers = new Vector<Transfer>();
-		Vector<TransferRule> rules = generateRule(trade);
+		Vector<TransferRule> rules = generateRule(trade,message);
 		try {
 			fees = (Vector)  remoteTrade.selectFeesonTrade(trade.getId());
 		} catch (RemoteException e) {
@@ -113,7 +129,7 @@ public class GenerateMMTransfer extends BOTransfer {
 			    transfer.setEventType("RECEIPT");
 			    transfer.setTransferType(mmTransferRule.transerTYPEPRINCIPAL);
 			    transfer.addAttribues("PRINCIPAL"+"_"+rule.get_settleDate(), "RECEIVE"); // imp unquinly identified each cashflow and transfer
-			    transfer.setDeliveryDate(commonUTIL.dateToString(rule.get_settleDate().getDate()));
+			    transfer.setDeliveryDate( rule.get_settleDate() );
 				transfer.setTradeId(trade.getId());
 				if(rule.get_productId() == 0) 
 					transfer.setProductId(trade.getProductId());
@@ -134,7 +150,7 @@ public class GenerateMMTransfer extends BOTransfer {
 			    transfer.setEventType("PAYMENT");
 			    transfer.setTransferType(mmTransferRule.transerTYPEPRINCIPAL);
 			    transfer.addAttribues("PRINCIPAL"+"_"+rule.get_settleDate(), "PAYMENT"); // imp unquinly identified each cashflow and transfer
-			    transfer.setDeliveryDate(commonUTIL.dateToString(rule.get_settleDate().getDate()));
+			    transfer.setDeliveryDate( rule.get_settleDate() );
 				transfer.setTradeId(trade.getId());
 				if(rule.get_productId() == 0) 
 					transfer.setProductId(trade.getProductId());
@@ -155,7 +171,7 @@ public class GenerateMMTransfer extends BOTransfer {
 			    transfer.setEventType("PAYMENT");
 			    transfer.setTransferType(mmTransferRule.transerTYPEINTEREST);
 			    transfer.addAttribues(mmTransferRule.transerTYPEINTEREST+"_"+rule.get_settleDate(), "PAYMENT"); // imp unquinly identified each cashflow and transfer
-			    transfer.setDeliveryDate(commonUTIL.dateToString(rule.get_settleDate().getDate()));
+			    transfer.setDeliveryDate( rule.get_settleDate() );
 				transfer.setTradeId(trade.getId());
 				if(rule.get_productId() == 0) 
 					transfer.setProductId(trade.getProductId());
@@ -176,7 +192,7 @@ public class GenerateMMTransfer extends BOTransfer {
 			    transfer.setEventType("RECEIPT");
 			    transfer.setTransferType(mmTransferRule.transerTYPEINTEREST);
 			    transfer.addAttribues(mmTransferRule.transerTYPEINTEREST+"_"+rule.get_settleDate(), "RECEIPT");  // imp unquinly identified each cashflow and transfer
-			    transfer.setDeliveryDate(commonUTIL.dateToString(rule.get_settleDate().getDate()));
+			    transfer.setDeliveryDate( rule.get_settleDate() );
 				transfer.setTradeId(trade.getId());
 				if(rule.get_productId() == 0) 
 					transfer.setProductId(trade.getProductId());

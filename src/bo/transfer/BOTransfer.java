@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import util.RemoteServiceUtil;
 import util.commonUTIL;
 
 import dsServices.RemoteBOProcess;
@@ -57,9 +58,10 @@ public abstract class BOTransfer {
 	static final public String DFP = "DFP"; //(Delivery Free of Payment) 
 
 	
-	abstract public Vector<Transfer> generateTransfer(Trade trade,Vector<String> feestype,NettingConfig netConfig);
+	abstract public Vector<Transfer> generateTransfer(Trade trade,Vector<String> feestype,NettingConfig netConfig,Vector<String> errorMessage);
 	abstract public boolean updateTransfer(Trade trade,Product product);
 	abstract public void fillTransfer(Transfer transfer);
+	
 	public void filterTransfer(Vector<Transfer> oldTransfers,Vector<Transfer> newTransfers,Trade trade,Hashtable transferData,boolean isTerminated) {
 		
 		commonUTIL.display("TransferProcessor", "In filterTransfer method");
@@ -163,17 +165,14 @@ public abstract class BOTransfer {
 
 	public BOTransfer() {
 		
-		 de =ServerConnectionUtil.connect("localhost", 1099,commonUTIL.getServerIP());
-	   	 try {
-	   		remoteProduct = (RemoteProduct) de.getRMIService("Product");
-	   		remoteRef = (RemoteReferenceData) de.getRMIService("ReferenceData");
-	   		remoteTrade = (RemoteTrade) de.getRMIService("Trade");
-	   		boProcess = (RemoteBOProcess) de.getRMIService("BOProcess");
+		// de =ServerConnectionUtil.connect("localhost", 1099,commonUTIL.getServerIP());
+	 //  	 try {
+	   		remoteProduct = RemoteServiceUtil.getRemoteProductService();
+	   		remoteRef =RemoteServiceUtil.getRemoteReferenceDataService();
+	   		remoteTrade =RemoteServiceUtil.getRemoteTradeService();
+	   		boProcess = RemoteServiceUtil.getRemoteBOProcessService();
 				//System.out.println(remoteProduct);
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			 
 		
 		
 	}
