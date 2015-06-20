@@ -136,10 +136,11 @@ public class TransferProcessor extends Thread {
 		} else {
 			TransferServiceAppender.printLog("DEBUG", " TransferProcessor got NEttingConfig for Product  "+productType);
 		}
-		
-		Vector<Transfer> transfers =  transferHandler.generateTransfer(trade,FeeType,netConfig);
+		Vector<String> message = new Vector<String>();
+		Vector<Transfer> transfers =  transferHandler.generateTransfer(trade,FeeType,netConfig,message);
 		if(commonUTIL.isEmpty(transfers)) {
 			TransferServiceAppender.printLog("DEBUG", " TransferProcessor no Transfers found for Product  "+productType);
+			TransferServiceAppender.printLog("DEBUG",(String) message.elementAt(0));
 			return;
 		} else {
 			TransferServiceAppender.printLog("DEBUG", " TransferProcessor got "+ transfers.size() + " transfers for Product  "+productType);
@@ -230,7 +231,7 @@ public class TransferProcessor extends Thread {
 	public void run(){
 		  for( ; ; ) {
 			  try {
-				Thread.sleep(300);
+				Thread.sleep(400);
 				
 					 
 				
