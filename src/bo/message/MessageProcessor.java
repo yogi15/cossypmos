@@ -4,6 +4,8 @@ import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import constants.SDIConstants;
+
 import logAppender.MessageServiceAppender;
 import logAppender.TransferServiceAppender;
 
@@ -57,12 +59,20 @@ public class MessageProcessor extends Thread {
 	public Vector<Message> getPublishMessages() { // this method is access by MesssageManager
 		return publishMessages; 
 	}
-
+	public void clearPublishMessages() { // this method is access by MesssageManager
+		publishMessages.removeAllElements();
+		publishMessages.clear(); 
+	}
 	public void setPublishMessages(Vector<Message> publishMessages1) { // this method is access within Processor 
-		if((publishMessages1 != null) || (!commonUTIL.isEmpty(publishMessages1))) {
-			for(int i=0;i<publishMessages1.size();i++) 
-				publishMessages.add(publishMessages1.get(i)); 
+		synchronized (publishMessages) {
+			publishMessages.removeAllElements();
+			if((publishMessages1 != null) || (!commonUTIL.isEmpty(publishMessages1))) {
+				for(int i=0;i<publishMessages1.size();i++) 
+					publishMessages.add(publishMessages1.get(i)); 
+			}
 		}
+		 
+		
 	}
 
 	public void setRemoteBOProcess(RemoteBOProcess remoteBO) {
@@ -91,11 +101,11 @@ public class MessageProcessor extends Thread {
 		if(event instanceof TradeEventProcessor) {
 			
 			TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
-			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Entered in  processing of   ****** " +   tradeEvent.getTrade().getId() + " on "+ tradeEvent.getTrade().getStatus() + " status ");
 				
 			trade = tradeEvent.getTrade();
-			if(trade == null) {
+			if(trade == null && filteroutTrade(trade) ) {
 				try {
+					
 				trade = 	remoteTrade.getTradeOnVersion(tradeEvent.getObjectID(), tradeEvent.getObjectVersionID());
 				tradeEvent.setTrade(trade);
 					
@@ -123,10 +133,17 @@ public class MessageProcessor extends Thread {
 			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Received new event   *****************************************************" );
 
 			
-			trade = transferEvent.getTrade();
+			
 			transfer = transferEvent.getTransfer();
-			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Received new event   *****************");
-			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Entered in  processing of   ****** " +   transfer.getId() + " on "+ trade.getStatus() + " status ");
+			if(transfer == null) {
+				MessageServiceAppender.printLog("ERROR", "MessageProcessor Transfer is null on Event id  "+ transferEvent.getEventid());
+			}
+				
+			trade = transferEvent.getTrade();
+			if(transfer == null) {
+				MessageServiceAppender.printLog("ERROR", "MessageProcessor Trade is null on Event id  "+ transferEvent.getEventid());
+			}
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Entered in  processing of new Transfer ****** " +   transfer.getId() + " on trade id "+ trade.getId() + " trade status "+trade.getStatus());
 			
 			duplicateEventCheck.put(transfer.getId()+"_"+transfer.getStatus()+"_"+transfer.getVersion(),transferEvent.getEventid());
          }	catch (NullPointerException e) {
@@ -137,20 +154,22 @@ public class MessageProcessor extends Thread {
 			}
 		}
 		Vector<MessageConfig> messConfigs = getMessageConfig(event,trade);
-		MessageServiceAppender.printLog("DEBUG", "MessageProcessor found   ****** " +   messConfigs.size() + " MessageConfig  on "+ trade.getStatus() + " status ");
 		
-		Hashtable<String,Vector<Message>> filterMessages = new Hashtable<String,Vector<Message>>();
-		Vector<Message> messages = new Vector<Message>();
-		if(messConfigs == null || messConfigs.isEmpty() ) {
-			MessageServiceAppender.printLog("DEBUG",  "Message Configuration not Found on " + event.getEventType() + " for Proudct " + trade.getProductType() + " subType " + trade.getTradedesc1());
+		 
+		if(commonUTIL.isEmpty(messConfigs)) {
+			MessageServiceAppender.printLog("DEBUG",  "Message Configuration not Found on " + event.getEventType() + " for Product " + trade.getProductType() + " subType " + trade.getTradedesc1());
 			
-			commonUTIL.display("MessageProcessor" , "Message Configuration not Found on " + event.getEventType() + " for Proudct " + trade.getProductType() + " subType " + trade.getTradedesc1());
+			commonUTIL.display("MessageProcessor" , "Message Configuration not Found on " + event.getEventType() + " for Product " + trade.getProductType() + " subType " + trade.getTradedesc1());
 			manager.updateEventProcess(event);
 			return;
 		}
+		Hashtable<String,Vector<Message>> filterMessages = new Hashtable<String,Vector<Message>>();
+		
+		MessageServiceAppender.printLog("DEBUG", "MessageProcessor found   ****** " +   messConfigs.size() + " MessageConfig  on "+ trade.getStatus() + " status ");
+		
 		for(int i=0;i<messConfigs.size();i++) {
 			MessageConfig messConfig = messConfigs.get(i);
-			MessageServiceAppender.printLog("DEBUG", "MessageProcessor geneating MessageBOHandler for  productTYpe " + messConfig.getProductType() + " and subTYpe " +   trade.getTradedesc1());
+			MessageServiceAppender.printLog("DEBUG", "MessageProcessor generating MessageBOHandler for  productTYpe " + messConfig.getProductType() + " and subTYpe " +   trade.getTradedesc1());
 			
 			BOMessageHandler boHandler = BOMessageHandler.getBOHandler(messConfig.getProductType(), messConfig.getProductSubType());
 			MessageServiceAppender.printLog("DEBUG", "MessageProcessor Found MessageBOHandler for  productTYpe " + messConfig.getProductType() + " and subTYpe " +   trade.getTradedesc1());
@@ -159,7 +178,7 @@ public class MessageProcessor extends Thread {
 				commonUTIL.display("MessageProcessor" , "Message Handler not Found  for Product " + trade.getProductType() + " subType " + trade.getTradedesc1());
 				MessageServiceAppender.printLog("DEBUG", "Message Handler not Found  for Product " + trade.getProductType() + " subType " + trade.getTradedesc1());
 				
-				manager.updateEventProcess(event);
+				//manager.updateEventProcess(event);
 				return;
 			}
 			LegalEntity receiver = getLegalEntity(messConfig.getReceiverID());
@@ -176,27 +195,20 @@ public class MessageProcessor extends Thread {
 			MessageServiceAppender.printLog("DEBUG", "MessageProcessor get Receiver " + receiver.getName() + " for messConfig " +   messConfig.getId());
 			
 			LegalEntity sender = getLegalEntity(messConfig.getPoid());
-			sender.setRole("PO"); // messageConfig must know which is sender role , in config window we must provied
-			messConfig.setSenderRole("PO");
+			sender.setRole(SDIConstants.PO); // messageConfig must know which is sender role , in config window we must provied
+			messConfig.setSenderRole(SDIConstants.PO);
 			if(sender == null) {
 				MessageServiceAppender.printLog("DEBUG", "MessageProcessor sender null for messConfig " +   messConfig.getId());
-				manager.updateEventProcess(event);
+				//manager.updateEventProcess(event);
 				return;
 				
 			}
 			if(receiver == null) {
 				MessageServiceAppender.printLog("DEBUG", "MessageProcessor receiver getting  null for messConfig " +   messConfig.getId() + " selecting agent as receiver on the basis of sender role ");
 				
-				String poKey = messConfig.getSenderRole()+"|"+trade.getCurrency()+"|"+trade.getProductType()+"|"+sender.getId();
-				Sdi poPerferedSdi = SDISelectorUtil.getPreferredSdiOnly(poKey);
-				if(poPerferedSdi == null) {
-					 SDISelectorUtil.selectSdiOntrade(trade, refData);
-					 poPerferedSdi = SDISelectorUtil.getPreferredSdiOnly(poKey);
-					
-				}
+				 Sdi poPerferedSdi = SDISelectorUtil.getSdi(sender.getRole(),sender.getId() ,trade.getCurrency(),trade.getProductType(),messConfig.getFormatType(),0);
 				if( poPerferedSdi  == null) {
-					MessageServiceAppender.printLog("DEBUG", "MessageProcessor not able to trace  with receiver role as Agent ");
-					
+					MessageServiceAppender.printLog("DEBUG", "MessageProcessor not able Found SDI for sender   "+sender.getId() + " for product "+trade.getProductType());
 					return;
 					}
 				receiver = getLegalEntity(poPerferedSdi.getAgentId());
@@ -227,6 +239,7 @@ public class MessageProcessor extends Thread {
 					MessageServiceAppender.printLog("ERROR", "MessageProcessor  processMessage TradeEventProcessor "+e);
 
 				}
+				manager.publishMessage(trade,null);
 				
 			}
 			if(event instanceof TransferEventProcessor) {
@@ -241,6 +254,7 @@ public class MessageProcessor extends Thread {
 						MessageServiceAppender.printLog("ERROR", "MessageProcessor  processMessage TransferEventProcessor "+e);
 
 					}
+				manager.publishMessage(trade,transfer);
 			}
 			
 			  
@@ -250,6 +264,15 @@ public class MessageProcessor extends Thread {
 	
 	}
 	
+
+	private boolean filteroutTrade(Trade trade) {
+		// TODO Auto-generated method stub
+		if(trade == null)
+			return false;
+		if(commonUTIL.isEmpty(trade.getAutoType()) || trade.getAutoType().equalsIgnoreCase("Original"))
+		return true;
+		return false;
+	}
 
 	private LegalEntity getLegalEntity(int id) {
 		// TODO Auto-generated method stub
@@ -474,9 +497,9 @@ public class MessageProcessor extends Thread {
 			synchronized (messageConfigs) {
 				messConfigs = messageConfigs.get(messConfig);				
 			}
-			if(messConfigs == null || messConfigs.isEmpty()) {
-				messConfigs = (Vector<MessageConfig>) refData.getMessageConfig(trade.getProductType(), trade.getTradedesc1(), tradeEvent.getEventType(), getBook(trade.getBookId()).getLe_id());
-			   if(messConfigs != null)
+			if(commonUTIL.isEmpty(messConfigs)) {
+				messConfigs = (Vector<MessageConfig>) refData.getMessageConfig(trade.getProductType(), trade.getTradedesc1().toUpperCase(), tradeEvent.getEventType(), getBook(trade.getBookId()).getLe_id());
+			   if(!commonUTIL.isEmpty(messConfigs))
 				messageConfigs.put(messConfig, messConfigs);
 			}
 		} catch (RemoteException e) {
@@ -523,6 +546,7 @@ public class MessageProcessor extends Thread {
 			saveMessages(insertMessage,newpublishMessages,"insert",trade,transfer);
 			saveMessages(updateMessage,newpublishMessages,"update",trade,transfer);
 			//publishMessages.isEmpty();
+			
 			setPublishMessages(newpublishMessages);
 			manager.updateEventProcess(event);
 		}	catch(NullPointerException e) {
@@ -561,7 +585,7 @@ public class MessageProcessor extends Thread {
 	}
     }
 
-    public void run(){
+    public synchronized void run(){
 		  for( ; ; ) {
 			  try {
 				Thread.sleep(300);
@@ -571,7 +595,7 @@ public class MessageProcessor extends Thread {
 				
 				
 				if(manager.balance.size() > counter) {
-					 System.out.println(":pppp:"+  manager.balance.size() + " counter " + counter);
+					// System.out.println(":pppp:"+  manager.balance.size() + " counter " + counter);
 					
 						EventProcessor event = null;
 						
@@ -581,19 +605,23 @@ public class MessageProcessor extends Thread {
 							}
 							if(event == null)
 								return;
+							 
 							eventUnderProcess = false;
 							if(event instanceof TradeEventProcessor) {
 								TradeEventProcessor tradeEvent = (TradeEventProcessor) event;
-							      
+							     
+							     
 							      if(!isDuplicateEvent(tradeEvent.getTrade())) {
-							    	  manager.publishMessage(tradeEvent.getTrade(), null);
+							    	  processMessage(tradeEvent);
+							    	//  manager.publishMessage(tradeEvent.getTrade(), null);
 							      }
 							}
 							if(event instanceof TransferEventProcessor) {
 								TransferEventProcessor transferEvent = (TransferEventProcessor) event;
-							      
+								
 							      if(!isDuplicateEvent(transferEvent.getTransfer())) {
-							    	  manager.publishMessage(transferEvent.getTrade(), transferEvent.getTransfer());
+							    	  processMessage(transferEvent);
+							    	 // manager.publishMessage(transferEvent.getTrade(), transferEvent.getTransfer());
 							      }
 							}
 							 
@@ -619,7 +647,7 @@ public class MessageProcessor extends Thread {
     private boolean isDuplicateEvent(Trade trade) {
 		boolean flag = false;
 		String key = trade.getId()+"_"+trade.getStatus()+"_"+trade.getVersion();
-		System.out.println(" for key = " + key); 
+		//System.out.println(" for key Trade = " + key); 
 		if(duplicateEventCheck.containsKey(key))
 			flag = true;
 		return flag;
@@ -629,7 +657,7 @@ public class MessageProcessor extends Thread {
     private boolean isDuplicateEvent(Transfer transfer) {
 		boolean flag = false;
 		String key = transfer.getId()+"_"+transfer.getStatus()+"_"+transfer.getVersion();
-		System.out.println(" for key = " + key); 
+		//System.out.println(" for key Transfer = " + key); 
 		if(duplicateEventCheck.containsKey(key))
 			flag = true;
 		return flag;
