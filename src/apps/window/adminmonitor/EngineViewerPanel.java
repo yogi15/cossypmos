@@ -100,7 +100,7 @@ public class EngineViewerPanel extends JPanel {
 						user.setApplicationName(data[0]);
 						user.setClientID(data[1]);
 						user.setName(data[2]);
-						user.setHostName(data[4]);
+						user.setHostName(data[3]);
 						usersDataUsingApp.add(user);
 					}
 				
@@ -297,12 +297,15 @@ public class EngineViewerPanel extends JPanel {
 			
 			 int id = adminEvent.getClientID();
 			 boolean found = false;
+			// System.out.println("I am getting event for client id  ************** " + adminEvent.getClientID());
 			 int idToRemove = 0;
 			 for(int i=0;i<jTable1.getRowCount();i++) {
 				String idC = (String) model1.getValueAt(i, 0);
 				if(id == Integer.valueOf(idC).intValue()) {
 					if(siginal.equalsIgnoreCase("Stopped")){
+						
 						found = true;
+					//	System.out.println("I am going to remove event for client id  ************** " + adminEvent.getClientID());
 						idToRemove = i;
 						
 						break;
@@ -313,6 +316,8 @@ public class EngineViewerPanel extends JPanel {
 			 }
 			if(found) {
 			 model1.delRow(idToRemove);
+			// System.out.println("I  removed **** event for client id  ************** " + adminEvent.getClientID());
+				
 				//usersDataUsingApp.remove(idToRemove);
 			}
 			 if(!found) {

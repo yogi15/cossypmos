@@ -28,6 +28,7 @@ import beans.StartUPData;
 import dsEventListener.AdminEvtListener;
 import dsEventProcessor.AdminEventProcessor;
 import dsEventProcessor.DebugEventProcessor;
+import dsEventProcessor.EngineEventMonitorProcessor;
 import dsEventProcessor.EventProcessor;
 import dsServices.RemoteAdminManager;
 import dsServices.RemoteEvent;
@@ -107,7 +108,7 @@ public class AdminMonitorWindow extends JPanel {
 		listModel2 = new DefaultListModel();
 		
 		
-		adminListener = new AdminEvtListener("localhost",commonUTIL.getLocalHostName(),"");
+		adminListener = new AdminEvtListener("localhost",commonUTIL.getLocalHostName(),"","ADMIN");
 		adminListener.start(adminListener);
 		adminListener.setAdminEvtListener(this);
 		try {
@@ -311,9 +312,11 @@ public class AdminMonitorWindow extends JPanel {
 				engineViewerPanel.addtaskData(adminEvent);
 				
 			} else {
-			String value = taskEvent.getProcessName() + " published " + taskEvent.getEventid() + "  " + taskEvent.getEventType() + " " + taskEvent.getType() + " ID " + taskEvent.getObjectID() + " "+ taskEvent.getComments() + " " + taskEvent.getOccurrenceTime();
-			
-			listModel1.addElement(value);
+			String value = taskEvent.getProcessName() + " publishing Event " + taskEvent.getEventType() +"_"+taskEvent.getEventid()   + "  on "+ taskEvent.getComments() + "  " + taskEvent.getOccurrenceTime();
+			if(taskEvent instanceof EngineEventMonitorProcessor) {
+		     
+			} else {
+				 listModel1.addElement(value);
 			}
 			if(taskEvent instanceof DebugEventProcessor) {
 			errorLogsPanel.addtaskData(taskEvent);
@@ -323,5 +326,5 @@ public class AdminMonitorWindow extends JPanel {
 		
 	}
 
-
+	}
 }
