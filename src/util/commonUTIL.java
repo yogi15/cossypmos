@@ -525,6 +525,7 @@ public class commonUTIL {
 	 static public synchronized void display(String name,String message) {
 		// if(!name.contains("SQL"))
 	      LogPublishUtil.addMessage("Classname : " + name + " : MethodName : " +message + " :: ");
+	     // System.out.println("Classname : " + name + " : MethodName : " +message + " :: ");
 	   //  DebugEventProcessor deb = new DebugEventProcessor();
 	 //   deb.setComments("Classname : " + name + " : MethodName : " +message + " :: ");
 	   //    publishEvent(deb);
