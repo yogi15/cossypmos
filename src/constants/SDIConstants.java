@@ -3,6 +3,7 @@ package constants;
 public class SDIConstants {
 	
 	public static final String ROLE = "Roles";
+	public static final String ANY = "ANY";
 	public static final String BENEFICIARY = "Beneficiary";
 	public static final String CURRENCY = "Currency";
 	public static final String CONTACT = "LEContacts";
