@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import constants.SDIConstants;
 import dsServices.RemoteReferenceData;
 import dsServices.ServerConnectionUtil;
 import beans.Attribute;
@@ -14,6 +16,7 @@ import beans.Country;
 import beans.LeContacts;
 import beans.LegalEntity;
 import beans.Message;
+import beans.Sdi;
 import beans.StartUPData;
 import beans.Trade;
 import beans.Transfer;
@@ -28,6 +31,8 @@ public class ReferenceDataCache {
 	static public Hashtable <String,LegalEntity> leAliasCache = new Hashtable <String,LegalEntity>();
 	static public Hashtable <String,LegalEntity> exchangeAliasCache = new Hashtable <String,LegalEntity>();
 	static public Hashtable <Integer,Vector<Book>> POBookCache = new Hashtable <Integer,Vector<Book>>();
+
+	static Hashtable<Integer,Vector<Sdi>> LegalEntitySdis  = new Hashtable<Integer,Vector<Sdi>>();
 	public  static  ServerConnectionUtil de = null;
 	static RemoteReferenceData  remoteBORef;
 
@@ -129,6 +134,7 @@ static public  ReferenceDataCache singleTonInstance;
 		if(!commonUTIL.isEmpty(legalEntity)) {
 			for(int i =0;i<legalEntity.size();i++) {
 				LegalEntity le = (LegalEntity) legalEntity.get(i);
+				//le.setAttributes(attributes)
 				leCache.put(le.getId(), le);
 				if(le.getAlias() != null)
 				leAliasCache.put(le.getAlias(), le);
@@ -166,6 +172,118 @@ static public  ReferenceDataCache singleTonInstance;
 		
 		Book book = bookCache.get(bookID);
 		return  getLegalEntity(book.getLe_id());
+		
+	}
+	public static Vector<Sdi> getSdi(int leid) {
+		if(singleTonInstance == null) 
+			   singleTonInstance = getSingleInstatnce();
+		 Vector<Sdi> sdis = null;
+		 sdis = LegalEntitySdis.get(leid);
+		 if(sdis == null) {
+			 try {
+				sdis =  remoteBORef.getSDIONLegalEntity(leid);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				commonUTIL.displayError("StaticDataCache", "getSdi", e);
+			}
+			 LegalEntitySdis.put(leid, sdis);
+		 }
+		return sdis;
+		
+	}
+	public static Vector<Sdi> getSdisonLegelEntityRole(String role,int leID,String currency,String productType) {
+		Vector<Sdi> sdis = getSdi(leID);
+		Vector<Sdi> sdifound = new Vector<Sdi>();
+		  
+		boolean pType = false;
+		boolean curr = false;
+		if(sdis == null)
+			return null;
+		for(int i=0;i<sdis.size();i++) {
+			Sdi sdi = sdis.elementAt(i);
+			if(sdi.getRole().equalsIgnoreCase(role)) {
+				if(sdi.getProducts().contains(productType)) {
+					pType = true;
+				}
+				if(sdi.getCurrency().contains(currency)) {
+					curr = true;
+				}
+				if(pType && curr) {
+					sdifound.add(sdi);
+					pType = false;
+					curr = false;
+					continue;
+					 
+				} else if (pType && sdi.getCurrency().equalsIgnoreCase(SDIConstants.ANY)) {
+					sdifound.add(sdi);
+					pType = false;
+					curr = false;
+					continue;
+					 
+				}else if (curr && sdi.getProducts().equalsIgnoreCase(SDIConstants.ANY)) {
+					sdifound.add(sdi);
+					pType = false;
+					curr = false;
+					continue;
+					 
+				}else if (sdi.getCurrency().equalsIgnoreCase(SDIConstants.ANY) && sdi.getProducts().equalsIgnoreCase(SDIConstants.ANY)) {
+					sdifound.add(sdi);
+					 
+				}
+			}
+		}
+		return sdifound;
+		
+	}
+	public static Vector<Sdi> getSdisonLegelEntityRole(String role,int leID,String currency,String messageType,String productType) {
+		Vector<Sdi> sdis = getSdi(leID);
+		Vector<Sdi> sdifound = new Vector<Sdi>();
+		  
+		boolean pType = false;
+		boolean curr = false;
+		boolean mess = false;
+		if(sdis == null)
+			return null;
+		for(int i=0;i<sdis.size();i++) {
+			Sdi sdi = sdis.elementAt(i);
+			if(sdi.getRole().equalsIgnoreCase(role)) {
+				if(sdi.getProducts().contains(productType)) {
+					pType = true;
+				}
+				if(sdi.getCurrency().contains(currency)) {
+					curr = true;
+				}
+				if(sdi.getMessageType().equalsIgnoreCase(messageType)) {
+					mess = true;
+				}
+				if(pType && curr && mess) {
+					sdifound.add(sdi);
+					pType = false;
+					curr = false;
+					mess = false;
+					continue;
+					 
+				} else if (pType && sdi.getCurrency().equalsIgnoreCase(SDIConstants.ANY) && mess) {
+					sdifound.add(sdi);
+					pType = false;
+					curr = false;
+					mess = false;
+					continue;
+					 
+				}else if (curr && sdi.getProducts().equalsIgnoreCase(SDIConstants.ANY) && mess) {
+					sdifound.add(sdi);
+					pType = false;
+					curr = false;
+					mess = false;
+					continue;
+					 
+				}else if (mess && sdi.getCurrency().equalsIgnoreCase(SDIConstants.ANY) && sdi.getProducts().equalsIgnoreCase(SDIConstants.ANY)) {
+					sdifound.add(sdi);
+					 
+				}
+			}
+		}
+		return sdifound;
 		
 	}
 	public static Vector<StartUPData>  getStarupData(String name) {
