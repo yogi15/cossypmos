@@ -143,7 +143,7 @@ public class EventSQL implements Serializable {
 			 }
 			 stmt = dsSQL.newPreparedStatement(con, sql);
 	            
-			
+			 
 	           
 	            
 	       //     stmt.setString(1, updateEvent.getType());
@@ -324,6 +324,7 @@ public static Collection selectWhere(String sqlw,Connection con ) {
 	        	 evt.setOccrrenceDate(rs.getString(10));
 	        	 evt.setOccurrenceTime(rs.getString(11));
 	        	 evt.setSubscribableList(rs.getString(12));
+	        	 
 	        values.add(evt);
 	        
 	      

@@ -27,29 +27,29 @@ public class TradeSQL {
  final static private String DELETE =
   "update  " + tableName + " set version = -1  where id =? ";
  final static private String INSERT =
-  "INSERT into " + tableName + "(id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,deliverydate ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased,currencypair,amount1,amount2) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  "INSERT into " + tableName + "(id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,deliverydate ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased,currencypair,amount1,amount2,iscustomRuleApply) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
  final static private String UPDATE =
   "UPDATE " + tableName + " set productId=?,cpID=?,status=?,type=?,tradeDate=?,brokerID=?,TradeAmount=?,effectiveDate=?,deliverydate=?,bookId=?,quantity=?  where id = ? ";
   
  final static private String SELECT_MAX =
   "SELECT TRADE_SEQ.NEXTVAL  DESC_ID FROM  dual";
  final static private String SELECTALL =
-  "SELECT id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate, to_char(deliverydate, 'DD/MM/YYYY'),bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID ,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased FROM " + tableName + " where  version >= 0 ";
+  "SELECT id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate, to_char(deliverydate, 'DD/MM/YYYY'),bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID ,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased,iscustomRuleApply FROM " + tableName + " where  version >= 0 ";
  final static private String SELECT =
-  "SELECT id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,to_char(deliverydate, 'DD/MM/YYYY') ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID ,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom ,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased  FROM " + tableName + " where  version >= 0  and id =  ?";
+  "SELECT id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,to_char(deliverydate, 'DD/MM/YYYY') ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID ,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom ,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased,iscustomRuleApply  FROM " + tableName + " where  version >= 0  and id =  ?";
   static private String SELECTONE =
-  "SELECT id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,to_char(deliverydate, 'DD/MM/YYYY') ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID,nominal ,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid ,mirrorBookid,b2bid,ispositionbased  FROM " + tableName + " where  version >= 0 and id =  ";
+  "SELECT id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,to_char(deliverydate, 'DD/MM/YYYY') ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID,nominal ,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid ,mirrorBookid,b2bid,ispositionbased,iscustomRuleApply  FROM " + tableName + " where  version >= 0 and id =  ";
 
   final static private String ROLLOVERHIERARCHIES =
-   "select id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,to_char(deliverydate, 'DD/MM/YYYY') ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID,nominal ,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased  from trade start with id = ";
+   "select id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,to_char(deliverydate, 'DD/MM/YYYY') ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID,nominal ,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased,iscustomRuleApply  from trade start with id = ";
   final static private String ROLLBACKHIERARCHIES =
-		   "select id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,deliverydate ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID,nominal ,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased  from trade start with id = ? connect by nocycle prior   id = rollbackfrom ";
+		   "select id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,deliverydate ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc,traderID,nominal ,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased,iscustomRuleApply  from trade start with id = ? connect by nocycle prior   id = rollbackfrom ";
 
   
   final static private String SELECTWHERE =
-	  "SELECT id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,to_char(deliverydate, 'DD/MM/YYYY') ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc ,traderID,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid ,mirrorBookid,b2bid,ispositionbased  FROM " + tableName + " where version >= 0 and ";
+	  "SELECT id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,to_char(deliverydate, 'DD/MM/YYYY') ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc ,traderID,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid ,mirrorBookid,b2bid,ispositionbased,iscustomRuleApply  FROM " + tableName + " where version >= 0 and ";
   final static private String SELECTXCCYSPLIT =
-		  "SELECT id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,to_char(deliverydate, 'DD/MM/YYYY') ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc ,traderID,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased   FROM " + tableName + " where version >= 0 and ";
+		  "SELECT id,productId,cpID,status,type,tradeDate,brokerID,TradeAmount,effectiveDate,to_char(deliverydate, 'DD/MM/YYYY') ,bookId,quantity,price,userid,version,currency,yield,attributes,tradedesc ,traderID,nominal,action,tradedesc1,productType,amortization,mirrorID,parentid,autotype,secondeTradeprice,rollOverTo,rollOverFrom,rollBackTo,rollBackFrom,outstanding,isparitial,offsetid,xccySPlitid,mirrorBookid,b2bid,ispositionbased ,iscustomRuleApply  FROM " + tableName + " where version >= 0 and ";
 	 
   final static private String SELECTOPEN = 
 	 "select id,producttype,tradedesc1  from trade  " ;
@@ -173,6 +173,10 @@ public class TradeSQL {
     	 updateSQL = updateSQL + "  ,currencyPair='"+ trade.getTradedesc() +"' , amount1 = "+ trade.getQuantity() + " , amount2 = " + trade.getNominal();
     	
     }
+     if(trade.isCustomRuleApply())
+    	 updateSQL = updateSQL + "  ,iscustomRuleApply = 1 ";
+     else    
+    	 updateSQL = updateSQL + "  ,iscustomRuleApply = 0 ";
      updateSQL = updateSQL + "  where id = "+ trade.getId();
       return updateSQL;
      }
@@ -421,7 +425,11 @@ protected static int selectMax(Connection con ) {
    	 stmt.setDouble(43, 0);
 
     }
-
+    if(inserTrade.isCustomRuleApply()) {
+    	stmt.setInt(44, 1);
+    }else {
+    	stmt.setInt(44, 0);
+    }
              stmt.executeUpdate();
              commonUTIL.display("TradeSQL ::  insert", INSERT);
              System.out.println(" trade " + tradeId + " status " + inserTrade.getStatus());
@@ -507,6 +515,9 @@ protected static int selectMax(Connection con ) {
           if(rs.getString(40).equalsIgnoreCase("N")) {
         	  Trade.setPositionBased(false);
          }
+          if(rs.getInt(41) == 1) {
+        	  Trade.setCustomRuleApply(true);
+         }
            Trades.add(Trade);
          
           }
@@ -588,6 +599,9 @@ protected static int selectMax(Connection con ) {
           Trade.setB2bid(rs.getInt(39));
           if(rs.getString(40).equalsIgnoreCase("N")) {
         	  Trade.setPositionBased(false);
+         }
+          if(rs.getInt(41) == 1) {
+        	  Trade.setCustomRuleApply(true);
          }
           Trades.add(Trade);
       
@@ -673,6 +687,9 @@ protected static int selectMax(Connection con ) {
            if(rs.getString(40).trim().equalsIgnoreCase("N")) {
         	   trade.setPositionBased(false);
           }
+           if(rs.getInt(41) == 1) {
+        	   trade.setCustomRuleApply(true);
+          }
          // Trades.add(Trade);
       
        }
@@ -756,6 +773,9 @@ protected static int selectMax(Connection con ) {
 	           if(rs.getString(40).trim().equalsIgnoreCase("N")) {
 	        	   trade.setPositionBased(false);
 	          }
+	           if(rs.getInt(41) == 1) {
+	        	   trade.setCustomRuleApply(true);
+	          }
 	         Trades.add(trade);
 	        
 	       }
@@ -836,6 +856,9 @@ protected static int selectMax(Connection con ) {
 	           trade.setB2bid(rs.getInt(39));
 	           if(rs.getString(40).trim().equalsIgnoreCase("N")) {
 	        	   trade.setPositionBased(false);
+	          }
+	           if(rs.getInt(41) == 1) {
+	        	   trade.setCustomRuleApply(true);
 	          }
 	         Trades.add(trade);
 	        
@@ -919,6 +942,9 @@ public static Vector getXccySplitOnOffset(int tradeid, Connection con) {
          if(rs.getString(40).trim().equalsIgnoreCase("N")) {
       	   trade.setPositionBased(false);
         }
+         if(rs.getInt(41) == 1) {
+      	   trade.setCustomRuleApply(true);
+        }
        Trades.add(trade);
       
      }
@@ -1000,6 +1026,9 @@ public static Vector getXccySplitOnChild(int tradeID, Connection con) {
           trade.setB2bid(rs.getInt(39));
           if(rs.getString(40).trim().equalsIgnoreCase("N")) {
        	   trade.setPositionBased(false);
+         }
+          if(rs.getInt(41) == 1) {
+       	   trade.setCustomRuleApply(true);
          }
         Trades.add(trade);
        
@@ -1083,6 +1112,9 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 	           if(rs.getString(40).trim().equalsIgnoreCase("N")) {
 	           	   trade.setPositionBased(false);
 	             }
+	           if(rs.getInt(41) == 1) {
+	        	   trade.setCustomRuleApply(true);
+	          }
 	         Trades.add(trade);
 	        
 	       }
@@ -1164,6 +1196,9 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 	           if(rs.getString(40).trim().equalsIgnoreCase("N")) {
 	           	   trade.setPositionBased(false);
 	             }
+	           if(rs.getInt(41) == 1) {
+	        	   trade.setCustomRuleApply(true);
+	          }
 	         Trades.add(trade);
 	        
 	       }
@@ -1245,6 +1280,9 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 	           if(rs.getString(40).trim().equalsIgnoreCase("N")) {
 	           	   trade.setPositionBased(false);
 	             }
+	           if(rs.getInt(41) == 1) {
+	        	   trade.setCustomRuleApply(true);
+	          }
 	         Trades.add(trade);
 	        
 	       }
@@ -1266,7 +1304,91 @@ public static Collection getXccySplitOnParentID(int tradeID,Connection con ) {
 	  }
   
   
-  
+  public static Trade getSingleTradeOnly(String wsql,Connection con ) {
+	  
+      PreparedStatement stmt = null;
+      Trade trade = new Trade();
+      String sql = "";
+   try {
+    con.setAutoCommit(false);
+   
+  sql = SELECTWHERE + wsql + "  ";
+    stmt = dsSQL.newPreparedStatement(con, sql);
+      
+       ResultSet rs = stmt.executeQuery();
+      
+       while(rs.next()) {
+    	   
+    	   trade.setId(rs.getInt(1));
+           
+           trade.setProductId(rs.getInt(2));
+           trade.setCpID(rs.getInt(3));
+           trade.setStatus(rs.getString(4));
+           trade.setType(rs.getString(5));
+         
+           trade.setTradeDate(commonUTIL.convertSQLDatetoString(rs.getTimestamp((6))));
+           trade.setBrokerID(rs.getInt(7))   ;
+           trade.setTradeAmount(rs.getDouble(8))  ;
+           trade.setEffectiveDate(rs.getString(9))  ;
+           trade.setDelivertyDate(rs.getString(10)) ;
+          
+           trade.setBookId(rs.getInt(11))  ;
+           trade.setQuantity(rs.getDouble(12))  ;
+           trade.setPrice(rs.getDouble(13))  ;
+           trade.setUserID(rs.getInt(14))  ;
+           trade.setVersionID(rs.getInt(15))  ;
+           trade.setCurrency(rs.getString(16));
+           trade.setYield(rs.getDouble(17));
+           trade.setAttributes(rs.getString(18));
+           trade.setTradedesc(rs.getString(19));
+           trade.setTraderID(rs.getInt(20))  ;
+           trade.setNominal(rs.getDouble(21));
+           trade.setAction(rs.getString(22));
+           trade.setTradedesc1(rs.getString(23));
+           trade.setProductType(rs.getString(24));
+           trade.setAmoritizationData(rs.getString(25));
+           trade.setMirrorID(rs.getInt(26));
+           trade.setParentID(rs.getInt(27));
+           trade.setAutoType(rs.getString(28));
+           trade.setSecondPrice(rs.getDouble(29));
+           trade.setRollOverTo(rs.getInt(30));
+           trade.setRollOverFrom(rs.getInt(31));
+           trade.setRollBackTo(rs.getInt(32));
+           trade.setRollBackFrom(rs.getInt(33));
+           trade.setOutstanding(rs.getDouble(34));
+           if( rs.getInt( 35) == 1)
+        	   trade.setParitial(true);
+           trade.setOffsetid(rs.getInt(36));
+           trade.setXccySPlitid(rs.getInt(37));
+           trade.setMirrorBookid(rs.getInt(38));
+           trade.setB2bid(rs.getInt(39));
+           if(rs.getString(40).trim().equalsIgnoreCase("N")) {
+           	   trade.setPositionBased(false);
+             }
+           if(rs.getInt(41) == 1) {
+        	   trade.setCustomRuleApply(true);
+          }
+          
+        
+       }
+       commonUTIL.display("TradeSQL",sql);
+   } catch (Exception e) {
+    commonUTIL.displayError("TradeSQL","getSingleTradeOnly " + sql,e);
+    return null;
+        
+      }
+      finally {
+         try {
+    stmt.close();
+   } catch (SQLException e) {
+    
+    commonUTIL.displayError("TradeSQL"," getSingleTradeOnly " + sql,e);
+   }
+      }
+      return trade;
+  }
+
+
   public static Trade getOutStandingBalanceonFWDOption(int FWDOptionID, Connection con) {
 	  String sql = " select  sum(quantity) primaryCurr, sum(nominal)  quotingCurr from trade where parentid =" +  FWDOptionID + "  group by parentid ";
 	  PreparedStatement stmt = null;
