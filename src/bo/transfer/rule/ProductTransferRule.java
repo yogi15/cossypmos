@@ -1,7 +1,12 @@
 package bo.transfer.rule;
 
 import java.rmi.RemoteException;
+import java.util.Hashtable;
 import java.util.Vector;
+
+import constants.SDIConstants;
+
+import util.ReferenceDataCache;
 
 import dsServices.RemoteBOProcess;
 import dsServices.RemoteProduct;
@@ -18,7 +23,7 @@ public abstract class ProductTransferRule {
 	
 	public RemoteTrade remoteTrade = null;
 	public RemoteProduct remoteProduct = null;
-	
+	 
 	
 	public RemoteBOProcess remoteBOProcess = null;
 	public RemoteReferenceData refData = null;
@@ -50,10 +55,48 @@ public abstract class ProductTransferRule {
 	 public Vector<Sdi> getSdis() {
 		return sdis;
 	}
+	 public Sdi getSdi(String role,int leID,String currency,String productType,String messageType,int priority) {
+			Sdi s = null;
+			int priorityZero =priority;
+			int p = priority;
+			boolean found = false;
+			Vector<Sdi> sdidata =ReferenceDataCache.getSdisonLegelEntityRole(role,leID,currency,messageType,productType);
+			if(sdidata == null || sdidata.isEmpty())
+				return null;
+			s = setSdiValue(sdidata,priorityZero,s);
+			return s;
+		}
+ 
 	 
+	public Sdi getSdi(String role,int leID,String currency,String productType,int priority) {
+		Sdi s = null;
+		int priorityZero =priority;
+		int p = priority;
+		boolean found = false;
+		Vector<Sdi> sdidata =ReferenceDataCache.getSdisonLegelEntityRole(role,leID,currency,productType);
+		if(sdidata == null || sdidata.isEmpty())
+			return null;
+		s = setSdiValue(sdidata,priorityZero,s);
+		return s;
+	}
+	// this logic can be dangerous. this logic find the priority from zero to highest number,   zero is given highest priority. 
 	
-	 
-	 
+	private Sdi setSdiValue(Vector<Sdi> sdidata,int priortiy,Sdi sd) {
+		 Sdi s  = sd;
+		boolean found = false;
+		for(int i=0;i<sdidata.size();i++) {
+			Sdi sdi = sdidata.elementAt(i);
+			if(sdi.getPriority() == priortiy)  {
+				s = sdi; // logic needs to be build, while inserting new SDI priority wise validation needs to be add
+				found = true;
+				break;
+			}  
+		}
+		if(!found) {
+			s = setSdiValue(sdidata,priortiy + 1,s);
+		}
+		return s;
+	}
 	public void setSdis(Vector<Sdi> sdis) {
 		this.sdis = sdis;
 	}
@@ -118,7 +161,7 @@ public abstract class ProductTransferRule {
 	
 	 public  abstract String getProductType();
 	 public abstract Vector<TransferRule> getTransferRules(Vector v1);
-	 public abstract Vector<TransferRule>  generateRules(Trade trade);
+	 public abstract Vector<TransferRule>  generateRules(Trade trade,Vector<String> message);
 	 
 	 
 	 public RemoteProduct getRemoteProduct() {
