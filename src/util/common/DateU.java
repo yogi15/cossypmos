@@ -617,7 +617,7 @@ public class DateU {
 	    * @return True or False
 	    */
 	    final public boolean lte(DateU date) {
-	        return this._nbJulian <= date._nbJulian;
+	        return this._nbJulian < date._nbJulian;
 	    }
 
 	        /**
@@ -627,7 +627,7 @@ public class DateU {
 	    * @return True or False
 	    */
 	    final public boolean gte(DateU date) {
-	        return this._nbJulian >= date._nbJulian;
+	        return this._nbJulian > date._nbJulian;
 	    }
 	
 }
