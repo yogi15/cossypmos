@@ -77,6 +77,7 @@ public class EventProcessor implements Serializable,Cloneable {
 	 */
 	public void setType(String type) {
 		this.type = type;
+		 
 	}
 	String type = "";
 	
@@ -270,6 +271,14 @@ public class EventProcessor implements Serializable,Cloneable {
 		String subStr = className.substring(className.lastIndexOf('.')+1);
 		return subStr;
 	    }
+	String queueName = "";
+	public String getQueueName() {
+		return queueName;
+	}
+	public void setQueueName(String queueN) {
+	 this.queueName = queueN;
+		
+	}
 	String subscribeList = "";
 	public String getSubscribeList() {
 		return subscribeList;
