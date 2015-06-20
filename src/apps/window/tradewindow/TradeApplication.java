@@ -232,6 +232,7 @@ public class TradeApplication extends DefaultDockableHolder {
 		frameT.setTabTitle(frameT.getName());
 		frameT.setPreferredSize(new Dimension(200, 200));
 		frameT.setMinimumSize(new Dimension(100, 100));
+		 
 		//frameT.s
 	///	tempalteframe.getContext().setInitMode(DockContext.DOCK_SIDE_ALL_AND_CENTER);
 	//	tempalteframe.getContext().setInitSide(DockContext.DOCK_SIDE_WEST);
@@ -261,6 +262,7 @@ public class TradeApplication extends DefaultDockableHolder {
 		getDockingManager().beginLoadLayoutData();
 		getDockingManager().addFrame(getTempalteframe(name));
 		getDockingManager().loadLayoutData();
+		getDockingManager().setResizable(false);
 	//	setLayout(new GroupLayout());
 		toFront();
 		setVisible(true);
@@ -1064,25 +1066,7 @@ public class TradeApplication extends DefaultDockableHolder {
 		return jPanel1;
 	}
 
-	private JToolBar getJToolBar1() {
-		if (jToolBar1 == null) {
-			jToolBar1 = new JToolBar();
-			jToolBar1.setOrientation(SwingConstants.VERTICAL);
-			jToolBar1.setAlignmentX(0.0f);
-			jToolBar1.add(getJButton0());
-			jToolBar1.add(getJButton3());
-			jToolBar1.add(getJButton4());
-			jToolBar1.add(getJButton9());
-			jToolBar1.addComponentListener(new ComponentAdapter() {
-
-				public void componentResized(ComponentEvent event) {
-					jToolBar1ComponentComponentResized(event);
-				}
-			});
-		}
-		commonUTIL.setLabelFont(jToolBar1);
-		return jToolBar1;
-	}
+	
 
 	private static void installLnF() {
 		try {
@@ -1182,12 +1166,14 @@ public class TradeApplication extends DefaultDockableHolder {
 		        }
 		    });
 		}
-		CustomFocusTraversalPolicy focusPolicy =  new CustomFocusTraversalPolicy(tradeP.getFocusOrderList());
+		tradeP.setFocusTraversalKeysEnabled(false);
+		 focusPolicy =  new CustomFocusTraversalPolicy(tradeP.getFocusOrderList());
 		tradeP.setFocusCycleRoot(true);
 		tradeP.setFocusTraversalPolicy(focusPolicy);
+		tradeP.setFocusComp();
 		// taskManager.setTradWIndow(tradePanel);
 	}
-
+	CustomFocusTraversalPolicy focusPolicy = null;
 	private void initLimitPanel(String name, Users user) {
 		// TODO Auto-generated method stub
 		limitPanel = (apps.window.tradewindow.panelWindow.LimitPanel) makeBOOperationPanel("Limit");
@@ -1265,7 +1251,7 @@ public class TradeApplication extends DefaultDockableHolder {
 	}
 
 	public void setOpenTrade(Trade newTrade) {
-
+		    
 		tradeP.openTrade(newTrade);
 		tradeP.setTrade(newTrade);
 		 
