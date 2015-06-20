@@ -2787,7 +2787,7 @@ final static String EMPTYSTRING = "";
 			return null;
 		for(int i=0;i<rules.size();i++) {
 			TransferRule rule = rules.get(i);
-			String settleDates = commonUTIL.dateToString(rule.get_settleDate().getDate());
+			String settleDates =  rule.get_settleDate();
 			String settleD = commonUTIL.getOnlyDate(settleDate);
 			if((rule.get_transferType().equalsIgnoreCase(type)) && (rule.get_payReceive().equalsIgnoreCase(payOrReceive)) && (rule.get_settlementCurrency().equalsIgnoreCase(ccy)) && (settleDates.trim().equalsIgnoreCase(settleD.trim()))) {
 				ruler = rule;
