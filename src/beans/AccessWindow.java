@@ -1,7 +1,10 @@
 package beans;
 
-public class AccessWindow {
+import java.io.Serializable;
 
+public class AccessWindow implements Serializable{
+
+	private static final long serialVersionUID = 4700046137771510706L;
 	private String groupname;
 	private String windowName;
 	int isAccessable;
