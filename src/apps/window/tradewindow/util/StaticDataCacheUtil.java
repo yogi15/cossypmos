@@ -16,6 +16,7 @@ import dsServices.RemoteTrade;
 
 import apps.window.operationwindow.jobpanl.FilterValues;
 import beans.Book;
+import beans.CurrencyDefault;
 import beans.Favorities;
 import beans.LegalEntity;
 import beans.Product;
@@ -29,6 +30,7 @@ public class StaticDataCacheUtil {
    public static final String DELETE_PRODUCT = "DELETE";
 	static Hashtable<String, Vector>  traderValues = new Hashtable<String, Vector>();
 	static Hashtable<String, String>  currency = new Hashtable<String, String>();
+	static Hashtable<String, CurrencyDefault>  currencyDefault = new Hashtable<String, CurrencyDefault>();
 	static Hashtable<String, Vector> dataValues = new Hashtable<String, Vector>();
 	static Hashtable<String,Vector> productDefinationData  = new Hashtable<String, Vector>();
 
@@ -65,6 +67,23 @@ public class StaticDataCacheUtil {
 			return null;
 		}
 		return productD;
+	}
+	public static CurrencyDefault getCurrencyDefault(String currency) {
+		CurrencyDefault currecyD = null;
+		try {
+			currecyD = currencyDefault.get(currency);
+			if(currecyD == null) {
+			currecyD = remoteReference.selectCurrencyDefault(currency);
+			 
+			 if(currecyD != null)
+			currencyDefault.put(currency,currecyD);
+			}
+			
+		}catch(RemoteException e) {
+			commonUTIL.displayError("StaticDataCacheUtil", "getCurrencyDefault", e);
+			return null;
+		}
+		return currecyD ;
 	}
 	public static synchronized void addProductToCache(Product product,String type) {
 		if(!commonUTIL.isEmpty(productDefinationData)) {
