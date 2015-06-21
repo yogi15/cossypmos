@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
@@ -35,6 +36,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.PopupMenuEvent;
 import javax.swing.plaf.ActionMapUIResource;
 import javax.swing.table.DefaultTableModel;
 
@@ -66,6 +68,7 @@ import beans.Trade;
 import beans.Users;
 
 import com.jidesoft.combobox.TableExComboBox;
+import com.jidesoft.popup.JidePopup;
 
 import constants.CommonConstants;
 import constants.ProductConstants;
@@ -215,7 +218,17 @@ Hashtable productIDs = new Hashtable();
 	    	
 	    }
 		
-	
+	private int getProductIndex(int id) {
+		int indexAT = 0;
+		for(int i=0;i<productIDs.size();i++) {
+			Product pr = (Product) productIDs.get(i);
+			if(id == pr.getId()) {
+				indexAT = i;
+				break;
+			}
+		}
+		return indexAT;
+	}
 
 	private void initComponents() {
 		
@@ -1019,12 +1032,21 @@ Hashtable productIDs = new Hashtable();
         	if(trade == null) 
         		trade = new Trade();
         		try {
+        			if(trade.getId() == 0) {
+        			trade.setProductType(ProductConstants.PRODUCTTYPEBOND);
+
+        			 
+        			trade.setCpID(commonUTIL.converStringToInteger(counterParty.getName()));
+        			trade.setBookId(commonUTIL.converStringToInteger(book.getName()));
+        			trade.setCurrency(currency.getSelectedItem().toString());
 					trade.setPrice(priceText.getDoubleValue());
 					trade.setTradeAmount(amount.getDoubleValue());
 					trade.setNominal(amount.getDoubleValue());
 					trade.setTradeDate(commonUTIL.convertDateTOString(tradeDate.getDate()));
 					trade.setDelivertyDate(commonUTIL.convertDateTOString(settleDate.getDate()));
 					trade.setQuantity(quantity.getDoubleValue());
+					trade.setType(buySelltext.getText());
+					trade.setProduct(product);
 					DateU mdate = DateU.valueOf(commonUTIL.stringToDate(product.getMarturityDate(), false));
 			        DateU settdate = DateU.valueOf(commonUTIL.stringToDate(trade.getDelivertyDate(), false));
 			        DateU tdate =  DateU.valueOf(commonUTIL.stringToDate(trade.getTradeDate(), false));
@@ -1036,7 +1058,7 @@ Hashtable productIDs = new Hashtable();
 			        	commonUTIL.showAlertMessage(" Trade Date greater then Settlement Date ");
 			        	return;
 			        }
-					 
+        			}
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					commonUTIL.displayError("BONDTradePanel", "setTableValues", e);
@@ -1050,12 +1072,19 @@ Hashtable productIDs = new Hashtable();
         	if(trade == null) 
         		trade = new Trade();
         		try {
+        			if(trade.getId() == 0) {
+        			trade.setProductType(ProductConstants.PRODUCTTYPEBOND);
+        			trade.setCpID(commonUTIL.converStringToInteger(counterParty.getName()));
+        			trade.setBookId(commonUTIL.converStringToInteger(book.getName()));
+        			trade.setCurrency(currency.getSelectedItem().toString());
 					trade.setPrice(priceText.getDoubleValue());
 					trade.setTradeAmount(amount.getDoubleValue());
 					trade.setTradeDate(commonUTIL.convertDateTOString(tradeDate.getDate()));
 					trade.setDelivertyDate(commonUTIL.convertDateTOString(settleDate.getDate()));
 					trade.setQuantity(quantity.getDoubleValue());
 					trade.setNominal(amount.getDoubleValue());
+					trade.setType(buySelltext.getText());
+					trade.setProduct(product);
 					DateU mdate = DateU.valueOf(commonUTIL.stringToDate(product.getMarturityDate(), false));
 			        DateU settdate = DateU.valueOf(commonUTIL.stringToDate(trade.getDelivertyDate(), false));
 			        DateU tdate =  DateU.valueOf(commonUTIL.stringToDate(trade.getTradeDate(), false));
@@ -1067,6 +1096,7 @@ Hashtable productIDs = new Hashtable();
 			        	commonUTIL.showAlertMessage(" Trade Date greater then Settlement Date ");
 			        	return;
 			        }
+        			}
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					commonUTIL.displayError("BONDTradePanel", "setTableValues", e);
@@ -1239,32 +1269,30 @@ Hashtable productIDs = new Hashtable();
 			Calendar currentDate = Calendar.getInstance();
 			settleDate.setDate(currentDate.getTime());
 			settleDate.setName("settleDate");
+			 settleDate.setEditable(false);
+				//event
+				
+			
 			settleDate.addKeyListener(new KeyAdapter() {
-				@Override
-	            public void keyTyped(KeyEvent e) {
-	            	  
-	                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-	                	setTableValues(product);
-	                }
-	            	 }
-			 
-        });
-			settleDate.addFocusListener(new FocusListener() {
-				
-				@Override
-				public void focusLost(FocusEvent e) {
-					// TODO Auto-generated method stub
-					//commonUTIL.showAlertMessage("COming");
-					settleDate.hidePopup();
-				}
-				
-				@Override
-				public void focusGained(FocusEvent e) {
-					// TODO Auto-generated method stub
-					settleDate.showPopup();
-					
-				}
-			});
+					@Override
+		            public void keyTyped(KeyEvent e) {
+		            	  
+		                if (e.getKeyChar() == KeyEvent.VK_SPACE) {
+		                	settleDate.showPopup();
+		                	settleDate.getPopupPanel().setFocusable(true);
+		                	// System.out.println("Core button VK_SPACE"); 
+		                	
+		                }
+		                if (e.getKeyChar() == KeyEvent.VK_TAB) {
+		                	settleDate.hidePopup();
+		                	
+		                	settleDate.setFocusable(false);
+		                	 priceText.setFocusable(true);
+		                	 //System.out.println("Core button VK_TAB"); 
+		                }
+		            	 }
+				 
+	        });
 				
 			
 		}
@@ -1274,12 +1302,47 @@ Hashtable productIDs = new Hashtable();
 	private com.jidesoft.combobox.DateComboBox getTradeDate() {
 		if (tradeDate == null) {
 			tradeDate = new com.jidesoft.combobox.DateComboBox();
+			
 			tradeDate = new com.jidesoft.combobox.DateComboBox();
 			tradeDate.setFormat(new SimpleDateFormat("dd/MM/yyyy"));
 			Calendar currentDate = Calendar.getInstance();
 			tradeDate.setDate(currentDate.getTime());
 			tradeDate.setName("tradeDate");
+		tradeDate.setEditable(false);
+			 tradeDate.addFocusListener(new FocusAdapter() {
+				 @Override 
+				 public void focusGained(FocusEvent e) { 
+			//	 System.out.println("Core button gained focus"); 
+				 } 
+
+				 @Override 
+				 public void focusLost(FocusEvent e) { 
+				// System.out.println("Core button lost focus"); 
+				 } 
+			});
+			 tradeDate.addKeyListener(new KeyAdapter() {
+					@Override
+		            public void keyTyped(KeyEvent e) {
+		            	  
+		                if (e.getKeyChar() == KeyEvent.VK_SPACE) {
+		                	tradeDate.showPopup();
+		                	tradeDate.getPopupPanel().setFocusable(true);
+		                	// System.out.println("Core button VK_SPACE"); 
+		                	
+		                }
+		                if (e.getKeyChar() == KeyEvent.VK_TAB) {
+		                	tradeDate.hidePopup();
+		                	
+		                	 tradeDate.setFocusable(false);
+		                	 settleDate.setFocusable(true);
+		                	 System.out.println("Core button VK_TAB"); 
+		                }
+		            	 }
+				 
+	        });
 		}
+			
+		
 		return tradeDate;
 	}
 
@@ -1506,16 +1569,24 @@ Hashtable productIDs = new Hashtable();
 			setNewAction(trade);
 		}
 		if(actionType.equalsIgnoreCase("saveAsNew")) {
-			 
+			 actionC.removeAllItems();
+			 actionC.addItem("NEW");
 			actionC.setSelectedItem("NEW");
 			actionC.getModel().setSelectedItem("NEW");
+			actionC.setSelectedIndex(0);
 			if( validateTradeData()) {
+				trade = new Trade();
 				setSaveAsNew(trade);
 			}
 		}
 		if(actionType.equalsIgnoreCase("save")) {
 			if(  validateTradeData()) {
 				setSave(trade);
+			}
+		}
+		if(actionType.equalsIgnoreCase("Dummy")) {
+			if(  validateTradeData()) {
+			setDummyTrade(trade);
 			}
 		}
 		
@@ -1527,13 +1598,14 @@ Hashtable productIDs = new Hashtable();
 			commonUTIL.showAlertMessage("Select Underlying Product");
 			return flag;
 		}
+		 
 		//String act = actionC.getSelectedItem().toString();
-		if(!actionC.getSelectedItem().toString().equalsIgnoreCase("NEW")) {
+	 
 			if(actionC.getSelectedIndex() ==  -1) {
 				commonUTIL.showAlertMessage("Select Action");
 				return flag;
 			}
-		}
+	 
 if (tradeDate.equals(CommonConstants.BLANKSTRING)) {
         	
         	commonUTIL.showAlertMessage("Please Enter Trade Date");
@@ -1575,15 +1647,15 @@ if (settleDate.equals(CommonConstants.BLANKSTRING)) {
 		//trade = new Trade();
 		trade2.setProductId(product.getId());
 		trade2.setTradedesc(product.getProdcutShortName());
-		trade2.setTradedesc1(product.getProductType());
+		trade2.setTradedesc1(product.getProdcutShortName());
 		trade2.setProductType(product.getProductType());
 		trade2.setType(buySelltext.getText());
 		trade2.setCurrency(currency.getSelectedItem().toString());
 		trade2.setCpID(commonUTIL.converStringToInteger(counterParty.getName()));
 		trade2.setBookId(commonUTIL.converStringToInteger(book.getName()));
 		trade2.setTraderID(commonUTIL.converStringToInteger(trader.getName()));
-		trade.setAction(actionC.getSelectedItem().toString());
-		trade.setStatus(status.getText());
+		trade2.setAction(actionC.getSelectedItem().toString());
+		trade2.setStatus(status.getText());
 		trade2.setAttributes(getAttributeValue(attributes));
        	trade2.setFees(feesPanel.getFeesDataV());
        	trade2.setUserID(usr.getId());
@@ -1599,15 +1671,68 @@ if (settleDate.equals(CommonConstants.BLANKSTRING)) {
        
         trade2.setQuantity(trade2.getTradeAmount()/product.getFaceValue());
         trade2.setNominal(trade2.getTradeAmount());
-		
+        if(sdiPanel.customChangeApply) {
+   	     setCustomFlagOnTrade(trade2);
+   	}
+        Vector<String> message = new Vector<String>();
+    	trade = saveTrade(message,trade2);
+       	if(trade  != null) {
+       		commonUTIL.showAlertMessage("Trade Saved with ID " + trade.getId());
+       		openTrade(trade);
+       	}
 		
 			} 
 		
 	private void setSaveAsNew(Trade trade2) {
 		// TODO Auto-generated method stub
+		
 		trade2.setProductId(product.getId());
 		trade2.setTradedesc(product.getProdcutShortName());
-		trade2.setTradedesc1(product.getProductType());
+		trade2.setTradedesc1(product.getProdcutShortName());
+		trade2.setProductType(product.getProductType());
+		trade2.setType(buySelltext.getText());
+		trade2.setCurrency(currency.getSelectedItem().toString());
+		trade2.setCpID(commonUTIL.converStringToInteger(counterParty.getName()));
+		trade2.setBookId(commonUTIL.converStringToInteger(book.getName()));
+		trade2.setTraderID(commonUTIL.converStringToInteger(trader.getName()));
+		trade2.setAction(TradeConstants.TRADEACTIONNEW);
+		trade2.setStatus(TradeConstants.TRADESTATUSNONE);
+		trade2.setAttributes(getAttributeValue(attributes));
+       	trade2.setFees(feesPanel.getFeesDataV());
+       	trade2.setUserID(usr.getId());
+		trade2.setDelivertyDate(commonUTIL.convertDateTOString(tradeDate.getDate()));
+        trade2.setEffectiveDate(commonUTIL.convertDateTOString(settleDate.getDate()));
+        try {
+			trade2.setTradeAmount(amount.getDoubleValue());
+			 trade2.setPrice(priceText.getDoubleValue());
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			commonUTIL.displayError("BONDTradePanel", "setSaveAsNew", e);
+		}
+        
+        trade2.setQuantity(trade2.getTradeAmount()/product.getFaceValue());
+        trade2.setNominal(trade2.getTradeAmount());
+        	 
+        Vector<String> message = new Vector<String>();
+    	trade = saveTrade(message,trade2);
+       	if(trade  != null) {
+       		commonUTIL.showAlertMessage("Trade Saved with ID " + trade.getId());
+       		openTrade(trade);
+       		sdiPanel.setTrade(trade);
+       	}
+			} 
+		
+	private void setCustomFlagOnTrade(Trade trade2) {
+		// TODO Auto-generated method stub
+		trade2.setCustomRuleApply(true);
+		trade2.setCustomtransferRules(sdiPanel.getRules());
+	}
+
+	private void setDummyTrade(Trade trade2) {
+		// TODO Auto-generated method stub
+		trade2.setProductId(product.getId());
+		trade2.setTradedesc(product.getProdcutShortName());
+		trade2.setTradedesc1(product.getProdcutShortName());
 		trade2.setProductType(product.getProductType());
 		trade2.setType(buySelltext.getText());
 		trade2.setCurrency(currency.getSelectedItem().toString());
@@ -1639,7 +1764,6 @@ if (settleDate.equals(CommonConstants.BLANKSTRING)) {
        	}
 			} 
 		
-		
 	//	trade.sett
 		
 	
@@ -1655,9 +1779,11 @@ if (settleDate.equals(CommonConstants.BLANKSTRING)) {
 		trader.setSelectedIndex(-1);
 		tradeDate.setDate(commonUTIL.getCurrentDate());
 		settleDate.setDate(commonUTIL.getCurrentDate());
+		actionC.removeAllItems();
+		actionC.addItem(TradeConstants.TRADEACTIONNEW);
 		actionC.setSelectedIndex(0);
 		status.setText(TradeConstants.TRADESTATUSNONE);
-		Amount1.setValue(0.0);
+		amount.setValue(0.0);
 		priceText.setValue(0.0);
 		underlying.setSelectedIndex(-1);
 		previousCoupon.setText(TradeConstants.BLANK);
@@ -1693,6 +1819,8 @@ if (settleDate.equals(CommonConstants.BLANKSTRING)) {
 		BUYSELLJLabel6.setText("BUY/SELL");
 		buySelltext.setBackground(Color.green);
 		setCashFlow(getCashFlowTable(), null, ProductConstants.PRODUCTTYPEBOND);
+		clearCashFlows(getCashFlowTable());
+		sdiPanel.clearALL();
 		
 		
 		
@@ -1714,7 +1842,8 @@ if (settleDate.equals(CommonConstants.BLANKSTRING)) {
 				 commonUTIL.showAlertMessage("Trade Type is not BOND");
 				 return;
 			 }
-			 underlying.setSelectedItem(product.getProdcutShortName());
+			 
+			 underlying.setSelectedIndex( getProductIndex(trade.getProductId()));
 			 setTrade(trade);
 			 CashFlowTable.removeAll();
 			 attributeDataValue.clear();
@@ -1740,7 +1869,9 @@ if (settleDate.equals(CommonConstants.BLANKSTRING)) {
 			settleDate.setDate(commonUTIL.stringToDate(trade.getTradeDate(), false));
 		    priceText.setValue(trade.getPrice());
 		    amount.setValue(trade.getNominal());
-		    
+		    status.setText(trade.getStatus());
+		    processActionData(actionstatus,productType,trade.getTradedesc(),trade.getStatus(),RemoteServiceUtil.getRemoteTradeService());
+			 
 			setTableValues(product);
 		}
 		    
@@ -1824,9 +1955,10 @@ public ArrayList<Component> getFocusOrderList() {
 	list.add(counterParty);
 	list.add(trader);
 	list.add(tradeDate);
-	list.add(settleDate);
+//	list.add(settleDate);
 	list.add(priceText);
-	list.add(buySelltext);
+//	
+	list.add(BUYSELLJLabel6);
 	list.add(currency);
 	list.add(amount);
 	list.add(underlying);
@@ -1835,6 +1967,32 @@ public ArrayList<Component> getFocusOrderList() {
 	
 	//list.add(e)
 	return list;
+}
+public void setFocusComp() {
+	tradeDate.setFocusTraversalPolicy(app.focusPolicy);
+	//tradeDate.setFocusCycleRoot(true);
+//	tradeDate.setFocusTraversalPolicyProvider(true);
+	tradeDate.setFocusTraversalKeysEnabled(false);
+}
+
+@Override
+public void setSDIPanelInstruction() {
+	// TODO Auto-generated method stub
+	if(trade != null) {
+		sdiPanel.clearALL();
+		sdiPanel.setTrade(trade);				 
+	} else {
+		Trade dummy = new Trade();
+		dummy.setId(0);
+		buildTrade(dummy,"Dummy");
+		//if(isTradeProper)  {
+			sdiPanel.clearALL();
+			//@yogesh 07/02/2015
+			// below is commented as dummy trade cause null pointer in setTrade which calls generate transfer rule.
+			sdiPanel.setTrade(dummy);
+		//}
+		//isTradeProper = false;				
+	}
 }
 
 }

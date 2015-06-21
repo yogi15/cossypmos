@@ -1327,9 +1327,52 @@ Users usr = null;
 				buildCashFlow();
 			}
 		}
+		if(actionType.equalsIgnoreCase("Dummy")) {
+			product = new Product();
+			coupon = new Coupon();
+			actionC.setSelectedItem("NEW");
+			actionC.getModel().setSelectedItem("NEW");
+			 if(validateProductData() && validateTradeData())  {
+			setDummyTrade(trade);
+			}
+		}
 		
 	}
 	
+	private void setDummyTrade(Trade trade2) {
+		// TODO Auto-generated method stub
+		trade2 = new Trade();
+		trade2.setQuantity(product.getQuantity());
+		trade2.setNominal(0);
+		if(buyselltext.getText().equalsIgnoreCase("Loan")) {
+			trade2.setType("SELL");
+		}else  {
+			trade2.setType("BUY");
+		}
+		  product.setId(0);
+			  
+				 
+				 Vector<String> message = new Vector<String>();
+				 trade2.setProductId(product.getId());
+				 trade2.setTradedesc(product.getProdcutShortName());
+				 trade2.setTradedesc1(product.getProductType());
+				 trade2.setCurrency(Currency.getSelectedItem().toString());
+				 trade2.setCpID(commonUTIL.converStringToInteger(counterParty.getName()));
+						trade2.setBookId(commonUTIL.converStringToInteger(book.getName()));
+						trade2.setTraderID(commonUTIL.converStringToInteger(trader.getName()));
+						trade2.setAction("NEW");
+						trade2.setStatus("NONE");
+						trade2.setPrice(coupon.getFixedRate());
+						trade2.setUserID(usr.getId());
+						trade2.setProductType("MM");
+						trade2.setAttributes(getAttributeValue(attributes));
+						trade2.setFees(feesPanel.getFeesDataV());
+		               	trade2.setEffectiveDate(product.getIssueDate());
+		               	trade2.setDelivertyDate(product.getMarturityDate());
+			
+		
+	}
+
 	private void clearCashflows() {
 		getCashFlowTable().clearSelection();
 	}
@@ -1489,15 +1532,13 @@ Users usr = null;
 		compFreq.setSelectedIndex(0);
 		compMethod.setSelectedIndex(0);
 		//setCashFlow(getCashFlowTable(), null, "MM");
-		clearCashFlows();
+		clearCashFlows(getCashFlowTable());
+		 
+		sdiPanel.clearALL();
 		
 		
 	}
-	 private void clearCashFlows() {
-		 DefaultTableModel dm = ((DefaultTableModel) CashFlowTable.getModel());
-		 dm.getDataVector().removeAllElements();
-		 dm.fireTableDataChanged();		 
-	 }
+	 
 	
 
 	@Override
@@ -1637,6 +1678,27 @@ public JPanel getHotKeysPanel() {
 @Override
 public ArrayList<Component> getFocusOrderList() {
 	// TODO Auto-generated method stub
-	return null;
+	ArrayList<Component> list = new ArrayList<Component>();
+	return list;
+}
+
+@Override
+public void setSDIPanelInstruction() {
+	// TODO Auto-generated method stub
+	if(trade != null) {
+		sdiPanel.clearALL();
+		sdiPanel.setTrade(trade);				 
+	} else {
+		Trade dummy = new Trade();
+		dummy.setId(0);
+		buildTrade(dummy,"Dummy");
+		//if(isTradeProper)  {
+			sdiPanel.clearALL();
+			//@yogesh 07/02/2015
+			// below is commented as dummy trade cause null pointer in setTrade which calls generate transfer rule.
+			sdiPanel.setTrade(dummy);
+		//}
+		//isTradeProper = false;				
+	}
 }
 }
