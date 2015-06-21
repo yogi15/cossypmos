@@ -43,6 +43,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import apps.newDealInvoker;
+import apps.window.tradewindow.util.StaticDataCacheUtil;
+import beans.CurrencyDefault;
 import beans.StartUPData;
 import beans.TransferRule;
 import util.common.DateU;
@@ -252,18 +254,43 @@ public class commonUTIL {
 		return dateF.toString();
 	} 
 	
-	
-	
-    static public String getStringFromDoubleExp(double amount) {
-    	double dd = NumberRoundingMethod.round(amount, 2, NumberRoundingMethod.RM_NEAREST);
+	static public String getStringFromDoubleExp(double amount ) {
+    	double dd = NumberRoundingMethod.round(amount,2, NumberRoundingMethod.RM_NEAREST);
     	String value = BigDecimal.valueOf(dd).toPlainString();
     	int len = value.length() -  value.indexOf(".") ;
-    	if(value.contains(".")) {
+    	/*if(value.contains(".")) {
     		if(len == 2)
     		value = value.substring(0, value.indexOf(".")+2);
     		if(len >= 3)
     			value = value.substring(0, value.indexOf(".")+3);
-    	} 
+    	} */
+    	return value;
+    }
+	
+    static public String getStringFromDoubleExp(double amount,int decimal ) {
+    	double dd = NumberRoundingMethod.round(amount,decimal, NumberRoundingMethod.RM_NEAREST);
+    	String value = BigDecimal.valueOf(dd).toPlainString();
+    	int len = value.length() -  value.indexOf(".") ;
+    	/*if(value.contains(".")) {
+    		if(len == 2)
+    		value = value.substring(0, value.indexOf(".")+2);
+    		if(len >= 3)
+    			value = value.substring(0, value.indexOf(".")+3);
+    	} */
+    	return value;
+    }
+    static public String getStringFromDoubleExp(double amount,String currency) {
+    	CurrencyDefault currencyD = StaticDataCacheUtil.getCurrencyDefault(currency);
+    	int decimal = currencyD.getDecimal();
+    	double dd = NumberRoundingMethod.round(amount,decimal, NumberRoundingMethod.RM_NEAREST);
+    	String value = BigDecimal.valueOf(dd).toPlainString();
+    	int len = value.length() -  value.indexOf(".") ;
+    	/*if(value.contains(".")) {
+    		if(len == 2)
+    		value = value.substring(0, value.indexOf(".")+2);
+    		if(len >= 3)
+    			value = value.substring(0, value.indexOf(".")+3);
+    	} */
     	return value;
     }
 	// this is requred for Rate columns only. 
@@ -1505,9 +1532,18 @@ public class commonUTIL {
 			
 		 }
 		 
-	public static Object convertToFinanceFormate(double quantity) {
+	public static Object convertToFinanceFormate(double quantity,int dec) {
 		// TODO Auto-generated method stub
-		String value = getStringFromDoubleExp(quantity);
+		String value = getStringFromDoubleExp(quantity,dec);
+		if(value.contains("-")) {
+		 value = 	value.replace("-", "(") + ")";
+		}
+			
+		return value ;
+	}
+	public static Object convertToFinanceFormate(double quantity ) {
+		// TODO Auto-generated method stub
+		String value = getStringFromDoubleExp(quantity );
 		if(value.contains("-")) {
 		 value = 	value.replace("-", "(") + ")";
 		}
