@@ -493,6 +493,11 @@ public abstract class TradePanel extends CommonPanel  {
 	}
 		// TODO Auto-generated method stub
 		
+	protected void clearCashFlows(JTable cashFlowTable) {
+		 DefaultTableModel dm = ((DefaultTableModel) cashFlowTable.getModel());
+		 dm.getDataVector().removeAllElements();
+		 dm.fireTableDataChanged();		 
+	 }
 	
 		protected void setCashFlow(JTable table,Collection cashFlows,String productType) {
 			table.removeAll();
