@@ -1,7 +1,13 @@
 package beans;
 
-public class AccessFunction {
+import java.io.Serializable;
+
+public class AccessFunction implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3964639051779326025L;
 	private String groupname;
 	private String windowName;
 	private String functionName;
