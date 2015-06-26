@@ -1,12 +1,19 @@
 package apps.window.operationwindow.jobpanl;
 
+import swingUtils.XTableColumnModel;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -21,7 +28,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+
+import com.jidesoft.grid.SortableTable;
 
 import util.commonUTIL;
 import util.common.DateU;
@@ -34,6 +45,8 @@ import dsServices.RemoteTrade;
 
 import apps.window.tradewindow.JFrameTradeWindowApplication;
 import apps.window.tradewindow.TradeApplication;
+import apps.window.utilwindow.JDialogBoxForChoice;
+import apps.window.utilwindow.JDialogBoxForDualChoice;
 import beans.FilterBean;
 import beans.Task;
 import beans.Trade;
@@ -45,7 +58,7 @@ public class DataPanel extends JPanel {
 	
 	JPanel jPanel6 = null;
 	JScrollPane jScrollPane2 = null;
-	JTable  jTable2 = null;
+	SortableTable  jTable2 = null;
 	JPopupMenu  jPopupMenu0 = null;
 	JMenuItem jMenuItem0  = null;
 	JMenuItem subTaskJMenuItem2 = null;
@@ -62,10 +75,11 @@ public class DataPanel extends JPanel {
 	RemoteTrade remoteTrade = null;
 	RemoteBOProcess remoteTranfer = null;
 	RemoteTask remoteTask = null;
-
+Vector<String> leftSideColumn = null;
 	DateU endDate = null;
 	Vector<FilterBean> jobdetails = null;
-	
+	 final XTableColumnModel columnModel    = new XTableColumnModel();
+     
 	TableModelUtil model = null;
 	String name = "";
 	boolean lock = false;                           
@@ -77,13 +91,27 @@ public class DataPanel extends JPanel {
 		this.filter = filter;
 		this.myData = myData; 
 		jPopupMenu0 = getJPopupMenu0();
-		
+		leftSideColumn = new Vector<String>();
 	//	this.remoteTrade = remoteTrade;
 	//	this.
 		//setFilter(filter);
 		//setMyData(myData);
 	}
 	
+	/**
+	 * @return the leftSideColumn
+	 */
+	public Vector<String> getLeftSideColumn() {
+		return leftSideColumn;
+	}
+
+	/**
+	 * @param leftSideColumn the leftSideColumn to set
+	 */
+	public void setLeftSideColumn(Vector<String> leftSideColumn) {
+		this.leftSideColumn = leftSideColumn;
+	}
+
 	public JPanel getJPanel6() {
 		if (jPanel6 == null) {
 			
@@ -106,7 +134,7 @@ public class DataPanel extends JPanel {
 	private JTable getJTable2() {
 		
 		if (jTable2 == null) {
-			jTable2 = new JTable(){
+			jTable2 = new SortableTable(){
 				public Component prepareRenderer(TableCellRenderer renderer, int row, int column)
 				{
 					Component c = super.prepareRenderer(renderer, row, column);
@@ -128,14 +156,22 @@ public class DataPanel extends JPanel {
 				}
 			};
 
+		//	final swingUtils.XTableColumnModel columnModel = new swingUtils.XTableColumnModel();
+	        
+			jTable2.setColumnModel(columnModel);
+			jTable2.createDefaultColumnsFromModel();
 
 			jTable2.getTableHeader().setReorderingAllowed(false);
 			jTable2.getTableHeader().setResizingAllowed(true);
 			model = new TableModelUtil(myData, col, filter);
 			
 			jTable2.setModel(model);
+			JTableHeader header = jTable2.getTableHeader();
+			header.addMouseListener(new TableHeaderMouseListener(jTable2,col));
 		//	jTable2.setComponentPopupMenu(getJPopupMenu0());
-		}jTable2.addMouseListener(new java.awt.event.MouseAdapter() {
+		}  
+		
+		jTable2.addMouseListener(new java.awt.event.MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -187,6 +223,7 @@ public class DataPanel extends JPanel {
 				}
 				
 			}
+			
 		});
 		return jTable2;
 	}
@@ -408,9 +445,10 @@ protected void fillActioninPopupMenu(JMenuItem menuItem,Vector onlyAction, final
 protected void updateTradeOnAction(Trade trade, int userID,int row) {
 	// TODO Auto-generated method stub
 	
-		int i = filter.updateTraderAndPublissh(trade,userID);
-		if(i == -4) {
- 			commonUTIL.showAlertMessage("Trade is Lock by another User ");
+		Vector<String> mess = filter.updateTraderAndPublissh(trade,userID);
+		if(!commonUTIL.isEmpty(mess) && mess.size() == 1) {
+			
+ 			commonUTIL.showAlertMessage(mess.elementAt(0));
     			return ;
     		 }
 		model.delRow(row);
@@ -520,8 +558,8 @@ private JMenuItem getSubTaskJMenuItem3() {
    
 	public boolean checkTaskforDisplay(Vector<FilterBean> jobdetails,Task task,DateU startDate,DateU endDate) {
 		// TODO Auto-generated method stub
-		if(!name.toUpperCase().contains(task.getType().trim())) 
-			return false;
+		//if(!name.toUpperCase().contains(task.getType().trim())) 
+		//	return false;
 		boolean flag = false;
 		String where  ="";
 		Task sqlWhere = new Task();
@@ -537,8 +575,9 @@ private JMenuItem getSubTaskJMenuItem3() {
 	private boolean checkTaskExistForSQLCriertia(Task task,Vector<FilterBean> jobdetails) {
 		boolean flag = true;
 		DateU taskDate = DateU.valueOf(commonUTIL.stringToDate(task.getTaskDate(), true));
-		if(!name.toUpperCase().contains(task.getType())) 
-			return false;
+	//	if(!name.toUpperCase().contains(task.getType())) 
+	//		return false;
+		try {
 		for(int i=0;i<jobdetails.size();i++) {
 			
 			
@@ -590,7 +629,11 @@ if(bean.getColumnName().equalsIgnoreCase("TaskDate")) {
 				   }
 			   
 		}
-		
+	}catch(ArrayIndexOutOfBoundsException  e) {
+		System.out.println("DataPanel checkExistsTask "+e);
+		return flag;
+	
+	}
 		return flag;
 	}
 	
@@ -843,22 +886,23 @@ public void setDBDataCreteria(Vector<Task> data, FilterValues filtersValues) {
 
 public synchronized void addtaskData(TaskEventProcessor task) {
 	// TODO Auto-generated method stub
-	if(!name.equalsIgnoreCase(task.getTask().getType())) 
-		return;
+	//if(!name.equalsIgnoreCase(task.getTask().getType())) 
+	//	return;
 	Task t1 = task.getTask();
-	 int id = checkExistsTask(t1);
+	 int id = checkExistsTask(t1); // check if task
 	// System.out.println(myData.size());
-	 System.out.println(id);
-	 if(t1.getTaskstatus().equalsIgnoreCase("2"))  {
+	// System.out.println(id);
+	/* if(t1.getTaskstatus().equalsIgnoreCase("2"))  {
 		
 			 model.delRow(id);
 			 model.fireTableDataChanged();
 				jTable2.repaint();
 		 return;
-	 }
+	 }*/
+	 try {
 	 boolean flag = checkTaskforDisplay(getJobdetails(),t1,startDate,endDate);
 	if(flag) {		 
-		if(id  == 0) {
+		if(id  >0) {
 			
 				model.setValueAt(t1, id);
 				model.fireTableDataChanged();
@@ -870,30 +914,51 @@ public synchronized void addtaskData(TaskEventProcessor task) {
 			     t1.setTransfer(task.getTransfer());
 		           model.addRow(t1);
 		           model.fireTableDataChanged();
+		           jTable2.repaint();
 		}
-		  jTable2.repaint();
+		
 	} 
 	if(!flag)  {
 		
-		if(id != -1) {
-			model.delRow(0);
+		if(  id >= 0) {
+			model.delRow(id);
 			model.fireTableDataChanged();
 			jTable2.repaint();
 	}
 	}
-	
+	 }catch(ArrayIndexOutOfBoundsException  e) {
+			System.out.println("DataPanel addtaskData "+e);
+			 
+		
+		}
 	
 }
 
+   // this code need to changed when any new Processor is added. 
 private int checkExistsTask(Task task) {
 	int checkID = -1;
+	try {
 	for(int i=0;i<model.data.size();i++) {
 		Task t = model.data.get(i);
-		System.out.println(t.getId());
-		if(t.getId() == task.getId()) {
+		//System.out.println(t.getId());
+		if(t.getType().equalsIgnoreCase(task.getType() )) {
+			if(t.getType().equalsIgnoreCase("TRADE") && t.getTradeID() == task.getTradeID()) {
 			checkID = i;
 			break;
+			}
+			if(t.getType().equalsIgnoreCase("TRANSFER")  && t.getTransfer() == task.getTransfer()) {
+				checkID = i;
+				break;
+				}
+			if(t.getType().equalsIgnoreCase("MESSAGE") && t.getMessageID() == task.getMessageID() ) {
+				checkID = i;
+				break;
+				}
 		}
+	}
+	}catch(ArrayIndexOutOfBoundsException  e) {
+		System.out.println("DataPanel checkExistsTask "+e);
+	
 	}
 	return checkID;
 }
@@ -908,5 +973,119 @@ public Users getUser() {
 	// TODO Auto-generated method stub
 	
 }
+public class TableHeaderMouseListener extends MouseAdapter { 
+	Vector<String> RvectorI = null; 
+	/**
+	 * @return the rvectorI
+	 */
+	public Vector<String> getRvectorI() {
+		return RvectorI;
+	}
+
+	/**
+	 * @param rvectorI the rvectorI to set
+	 */
+	public void setRvectorI(Vector<String> rvectorI) {
+		this.RvectorI = rvectorI;
+	}
+
+	/**
+	 * @return the lvectorI
+	 */
+	public Vector<String> getLvectorI() {
+		return lvectorI;
+	}
+
+	/**
+	 * @param lvectorI the lvectorI to set
+	 */
+	public void setLvectorI(Vector<String> lvectorI) {
+		this.lvectorI = lvectorI;
+	}
+
+	Vector<String> lvectorI = null;
+	public TableHeaderMouseListener(JTable jTable2,String []cols) {
+		// TODO Auto-generated constructor stub
+		RvectorI = new Vector<String>(Arrays.asList(cols));
+		lvectorI = new Vector<String>();
+	 
+		columnModel.setLTableColumns(lvectorI);
+	}
+
+	public void mouseClicked(MouseEvent event) {         // do something when mouse clicked...     }
+		String[] cols = col;
+		if(event.getClickCount() == 2) {
+			 
+			Vector<String> Rvector =new Vector<String>(Arrays.asList(cols));
+				if(!commonUTIL.isEmpty(columnModel.getUnVisibleColumn())) {
+					
+					Vector<String> unV = columnModel.getUnVisibleColumn();
+					for(int i=0;i<unV.size();i++) {
+						if(RvectorI.contains(unV.get(i))) 
+							Rvector.remove(unV.get(i));
+					}
+					
+					
+					lvectorI =columnModel.getUnVisibleColumn();
+				}
+				lvectorI.add(0, "Hidden Columns");
+		 
+		Vector<String> lvector = lvectorI;
+		final JDialogBoxForDualChoice choice12 = new JDialogBoxForDualChoice(lvector,Rvector);
+		choice12.setLocationRelativeTo(choice12);
+		//choice12.setSize(200,200);
+	//	choice12.jList3.setModel(templates);
+		choice12.setVisible(true);
+		 
+		choice12.addWindowListener(new WindowAdapter() {            
+            public void windowClosing(WindowEvent e) {
+				// TODO Auto-generated method stub
+            	 Vector<String> lvector = choice12.getLeftObj();
+            	 Vector<String> rerangeIndex = choice12.getRightObj();
+            	 if(!commonUTIL.isEmpty(lvector)) {
+            		 columnModel.setAllColumnsVisible();
+            		 columnModel.clearUnVisableColumns();
+            		 for(int i=0;i<lvector.size();i++) {
+            			 int index = columnModel.getColumnIndexOnName(lvector.get(i));
+            		if( index >= 0){
+            			
+            			TableColumn column  = columnModel.getColumnByModelIndex(index);
+            			 
+            			boolean     visible = columnModel.isColumnVisible(column);
+            			if(visible)
+            			columnModel.setColumnVisible(column, !visible);
+            			 
+            		 }
+            		 }
+            		 for(int i=rerangeIndex.size()-1;i>0;i--) {
+            			 int index = columnModel.getColumnIndexOnName(rerangeIndex.get(i));
+            			 if( index >= 0){
+            				 TableColumn column  = columnModel.getColumnByModelIndex(index);
+            				 columnModel.moveColumn(columnModel.getColumnCount() -1 , i);
+            			 }
+            			 
+            		 }
+            		 
+            		 
+            		 if(lvector.size() == 1) {
+            			 columnModel.clearUnVisableColumns();
+            		 }
+            		 
+            	 }
+                 
+				 choice12.ClearALL();
+				choice12.dispose();
+			}  
+
+			
+		});
+		choice12.setLocationRelativeTo(choice12);
+		choice12.setVisible(true);
+		
+		
+		}  
+	}
+	}
+
 
 }

@@ -34,9 +34,11 @@ import javax.swing.event.UndoableEditListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.TreePath;
 
+import util.RemoteServiceUtil;
 import util.commonUTIL;
 
 import apps.window.reportwindow.JFrameNewReport;
+import apps.window.tradewindow.util.StaticDataCacheUtil;
 import beans.StartUPData;
 import beans.Task;
 import beans.UserJob;
@@ -69,7 +71,10 @@ import dsServices.ServerConnectionUtil;
 public class JFrameNewJobPanel extends DefaultDockableHolder {
 //	public LocationCustomizationPanel _locationPanel;
 	private static final String PROFILE_NAME = "CosmosJobStation";
-	 private static JideTabbedPane _tabbedPane;
+	private static final String  signTOremoveNode = "DeleteNode";
+	private static final String  signTOremoveAllNode = "DeleteAllNode";
+	
+	 private  JideTabbedPane _tabbedPane;
 	    private static boolean _allowDuplicateTabNames = false;
 	private static JFrameNewJobPanel frame;
 	private static JideSplitPane _jideSplitPane;
@@ -80,7 +85,7 @@ public class JFrameNewJobPanel extends DefaultDockableHolder {
 	private UserJob job=null;
 	String name = "";
 	
-	Hashtable<String,JInternalReportFrame> childs = new Hashtable<String,JInternalReportFrame>();
+	Hashtable<String,JInternalJobReportFrame> childs = new Hashtable<String,JInternalJobReportFrame>();
 	DefaultListModel<String> listModel = new DefaultListModel<String> ();
 	public static void main(String args[]) {
 		Users user = new Users();
@@ -90,7 +95,7 @@ public class JFrameNewJobPanel extends DefaultDockableHolder {
 		job.setVisible(true);
 		job.setSize(500,500);
 	}
-	JInternalJobFrame internalFrame = null;
+	JInternalJobFrame internalTreeJobFrame = null;
 	/**
 	 * @return the name
 	 */
@@ -195,22 +200,19 @@ public class JFrameNewJobPanel extends DefaultDockableHolder {
 	//	Users user = new Users();
 	//	user.setId(1);
 	
-		de = ServerConnectionUtil.connect("localhost", 1099,
-				commonUTIL.getServerIP());
-
+		 
 		try {
-			taskManager = new TaskManager("localhost",commonUTIL.getLocalHostName(),"TaskManager");
+			taskManager = new TaskManager("localhost",commonUTIL.getLocalHostName(),"TaskManager","TASK");
 		    
 			taskManager.start(taskManager);
 			taskManager.setNewJobPanel(this);
-			remoteBORef = (RemoteReferenceData) de
-					.getRMIService("ReferenceData");
-			remoteTask = (RemoteTask) de.getRMIService("Task");
-			remoteTrade = (RemoteTrade) de.getRMIService("Trade");
-			remoteBo = (RemoteBOProcess) de.getRMIService("BOProcess");
-			searchCriteria = (Vector) remoteBORef.getStartUPData("SearchCriteria");
+			remoteBORef = RemoteServiceUtil.getRemoteReferenceDataService();
+			remoteTask =  RemoteServiceUtil.getRemoteTaskService();
+			remoteTrade =  RemoteServiceUtil.getRemoteTradeService( );
+			remoteBo =  RemoteServiceUtil.getRemoteBOProcessService();
+			searchCriteria = StaticDataCacheUtil.getDomainValues("SearchCriteria"); 
 			filterValues = new FilterValues(remoteBORef, remoteTrade,remoteTask, remoteBo);
-			 searchColumn = (Vector)  remoteBORef.getStartUPData("TaskColumn");
+			 searchColumn = StaticDataCacheUtil.getDomainValues("TaskColumn");  
 			Vector<UserJob> userjobs = remoteTask.getUserJob(getUser().getId(),"Report"+reportType.toUpperCase());
 			processTeamplates(listModel, userjobs);
 			reportPanel = new JJobPanel();
@@ -280,7 +282,7 @@ public class JFrameNewJobPanel extends DefaultDockableHolder {
 	        DataPanel jobdata = new DataPanel(job.getTreeNodeName(),tasks,filterValues);
 	        jobdata.setUser(getUser());
 	        jobdata.setName(job.getTreeNodeName());
-	        JInternalReportFrame reportFrame = new JInternalReportFrame(filterValues, searchCriteria, searchColumn,reportType);
+	        JInternalJobReportFrame reportFrame = new JInternalJobReportFrame(filterValues, searchCriteria, searchColumn,reportType);
 	        
 	        reportFrame.setUserJob(job);
 	        
@@ -325,93 +327,126 @@ public class JFrameNewJobPanel extends DefaultDockableHolder {
 		tempalteframe.getContext().setInitMode(DockContext.STATE_AUTOHIDE);
 		tempalteframe.getContext().setInitSide(DockContext.DOCK_SIDE_WEST);
 		tempalteframe.getContext().setInitIndex(0);
-		 internalFrame =  new JInternalJobFrame(filterValues, searchCriteria, searchColumn,reportType,user);
-		internalFrame.setTemplateFrame(tempalteframe);
-		internalFrame.setReportPanel(reportPanel);
+		internalTreeJobFrame =  new JInternalJobFrame(filterValues, searchCriteria, searchColumn,reportType,user);
+		internalTreeJobFrame.setTemplateFrame(tempalteframe);
+		internalTreeJobFrame.setReportPanel(reportPanel);
 		
 		//internalFrame.setUser(getUser());
-		tempalteframe.add(createScrollPane(internalFrame));
+		tempalteframe.add(createScrollPane(internalTreeJobFrame));
 		
 		tempalteframe.setToolTipText("Job Station ");
-		internalFrame.searchPanel.jTree1.addTreeSelectionListener(new TreeSelectionListener() {
+		internalTreeJobFrame.searchTreeJobPanel.jTree1.addTreeSelectionListener(new TreeSelectionListener() {
 
 			@Override
 			public void valueChanged(TreeSelectionEvent e){
-				TreePath selPath =internalFrame.searchPanel.jTree1.getSelectionPath();
-			
-				JScrollPane scrollPane = new JScrollPane(new JTextArea());
-	            scrollPane.setPreferredSize(new Dimension(530, 530));
-	            ImageIcon icon = new ImageIcon(  this.getClass().getResource("/resources/icon/hide12.png"));
-			   
-			  if( internalFrame.searchPanel.jTree1.getSelectionPath().getParentPath() == null)
-				  return;
-			    if(selPath == null)
-			    	return;
-			    if(setFocusonJTabbedPane(selPath.toString(),_tabbedPane)) 
-			    	return;
-			    UserJob job = getJobByName(selPath.getLastPathComponent().toString());
-			    if(job != null ) {
-				    Vector detailsJob = job.getDetailsJobs();
-					if((detailsJob != null) && (! detailsJob.isEmpty())) {
-							if(_tabbedPane == null)  {
-									_tabbedPane = createTabbedPane();							
-									_tabbedPane.addTab(selPath.toString(), createSplitPane(job,selPath.toString()));
-									_panel.add(_tabbedPane, BorderLayout.CENTER);
-									_tabbedPane.setFocusable(false);
-									tabCounter = tabCounter+1;
-									_tabbedPane.setSelectedIndex(_tabbedPane.getTabCount()-1);
-							}
+				 removeTabonDelete( internalTreeJobFrame.getSignalTOremoveNode());
+				  if(internalTreeJobFrame.searchTreeJobPanel.jTree1.isSelectionEmpty())
+		        	   return;
+				  TreePath selPath =internalTreeJobFrame.searchTreeJobPanel.jTree1.getSelectionPath();
+					
+				 
+				  if( internalTreeJobFrame.searchTreeJobPanel.jTree1.getSelectionPath().getParentPath() == null)
+					  return;
+				    if(selPath == null)
+				    	return;
+				    if(setFocusonJTabbedPane(selPath.toString(),_tabbedPane)) 
+				    	return;
+				    UserJob job = getJobByName(selPath.getLastPathComponent().toString());
+				    if(job != null ) {
+					    Vector detailsJob = job.getDetailsJobs();
+						if((detailsJob != null) && (! detailsJob.isEmpty())) {
+								if(_tabbedPane == null)  {
+										_tabbedPane = createTabbedPane();							
+										_tabbedPane.addTab(selPath.toString(), createSplitPane(job,selPath.toString()));
+										_panel.add(_tabbedPane, BorderLayout.CENTER);
+										_tabbedPane.setFocusable(false);
+										tabCounter = tabCounter+1;
+										_tabbedPane.setSelectedIndex(_tabbedPane.getTabCount()-1);
+								} else {
+									tabCounter =tabCounter+1;
+									_tabbedPane.addTab(selPath.toString(), createSplitPane(job,selPath.toString()));						  
+									   _tabbedPane.setFocusable(false);
+									   _tabbedPane.setSelectedIndex(_tabbedPane.getTabCount()-1);
+								}
 
-					      // 
-					} else {
-						tabCounter =tabCounter+1;
-						if(_tabbedPane == null)  {
-							_tabbedPane= createTabbedPane();
+						      // 
+						} else {
+							//tabCounter =tabCounter+1;
+							if(_tabbedPane == null)  {
+								_tabbedPane= createTabbedPane();
+								_panel.add(_tabbedPane, BorderLayout.CENTER);
+							}						 
+							   _tabbedPane.addTab(selPath.toString(), createSplitPane(job,selPath.toString()));						  
+							   _tabbedPane.setFocusable(false);
+							//  jTabbedRightSidePane.setIconAt(jTabbedRightSidePane.getTabCount()-1 , icon );
+							   tabCounter = tabCounter+1;
+							   _tabbedPane.setSelectedIndex(_tabbedPane.getTabCount()-1);
+						}					
+					}
+				    if(tabCounter == 0) { 
+						  if(job == null) {
+								  job = new UserJob();
+							      job.setTreeNodeName(selPath.getLastPathComponent().toString());
+							      job.setTreeid(internalTreeJobFrame.searchTreeJobPanel.jTree1.getSelectionCount());
+							      job.setTabid(tabCounter);
+						  }
+						  	_tabbedPane= createTabbedPane();
 							_panel.add(_tabbedPane, BorderLayout.CENTER);
-						}						 
-						   _tabbedPane.addTab(selPath.toString(), createSplitPane(job,selPath.toString()));						  
-						   _tabbedPane.setFocusable(false);
+							tabCounter =tabCounter+1;
+							   job.setTabid(tabCounter);
+							   _tabbedPane.addTab(selPath.toString(), createSplitPane(job,selPath.toString()));
+				    }
+				    if(job == null)  {
+						  job = new UserJob();
+					      job.setTreeNodeName(selPath.toString());
+					      job.setTreeid(internalTreeJobFrame.searchTreeJobPanel.jTree1.getSelectionCount());
+					      job.setTabid(tabCounter);
+						  
+					      _tabbedPane.addTab(selPath.toString(), createSplitPane(job,selPath.toString()));
 						//  jTabbedRightSidePane.setIconAt(jTabbedRightSidePane.getTabCount()-1 , icon );
-						   tabCounter = tabCounter+1;
-						   _tabbedPane.setSelectedIndex(_tabbedPane.getTabCount()-1);
-					}					
-				}
-			    if(tabCounter == 0) { 
-					  if(job == null) {
-							  job = new UserJob();
-						      job.setTreeNodeName(selPath.getLastPathComponent().toString());
-						      job.setTreeid(internalFrame.searchPanel.jTree1.getSelectionCount());
-						      job.setTabid(tabCounter);
+						 
+					      _tabbedPane.setFocusable(false);
+					      tabCounter =tabCounter+1;
+					      _tabbedPane.setSelectedIndex(_tabbedPane.getTabCount()-1);
 					  }
-					  	_tabbedPane= createTabbedPane();
-						_panel.add(_tabbedPane, BorderLayout.CENTER);
-						tabCounter =tabCounter+1;
-						   job.setTabid(tabCounter);
-						   _tabbedPane.addTab(selPath.toString(), createSplitPane(job,selPath.toString()));
-			    }
-			    if(job == null)  {
-					  job = new UserJob();
-				      job.setTreeNodeName(selPath.toString());
-				      job.setTreeid(internalFrame.searchPanel.jTree1.getSelectionCount());
-				      job.setTabid(tabCounter);
-					  
-				      _tabbedPane.addTab(selPath.toString(), createSplitPane(job,selPath.toString()));
-					//  jTabbedRightSidePane.setIconAt(jTabbedRightSidePane.getTabCount()-1 , icon );
-					 
-				      _tabbedPane.setFocusable(false);
-				      tabCounter =tabCounter+1;
-				      _tabbedPane.setSelectedIndex(_tabbedPane.getTabCount()-1);
-				  }
-	           
-	            
-	         // _tabbedPane.setMnemonicAt(i, mnemonics[i]);
-			}
-		});
-		return tempalteframe;
+		           
+		            
+		         // _tabbedPane.setMnemonicAt(i, mnemonics[i]);
+				}
+			});
+			return tempalteframe;
 	}
 
 	
 	
+	protected void removeTabonDelete(  String signremoveNode) {
+		// TODO Auto-generated method stub
+		if(commonUTIL.isEmpty(signremoveNode))
+			return;
+		int tabTobeRemoved  = 0;
+		String tabName = signremoveNode.substring(0, signremoveNode.indexOf("_"));
+		String deleteSignal = signremoveNode.substring( signremoveNode.indexOf("_")+1,signremoveNode.length());
+		if(signTOremoveNode.equalsIgnoreCase(deleteSignal))  {
+		if(_tabbedPane != null) {
+			for(int i=0;i < _tabbedPane.getTabCount();i++) {
+				String tabTitle = _tabbedPane.getTitleAt(i);
+				if(tabTitle.equalsIgnoreCase(tabName)) {
+					tabTobeRemoved = i;
+					break;
+				}
+			}
+		}
+		
+		_tabbedPane.removeTabAt(tabTobeRemoved);
+		tabCounter =tabCounter-1;
+		internalTreeJobFrame.setSignalTOremoveNode("");
+		if(tabCounter == 0) {
+			
+			_panel.remove(_tabbedPane);
+			_tabbedPane = null;
+		}
+		}
+	}
 	protected DockableFrame createDockableFrame(String key, Icon icon) {
 		DockableFrame frame = new DockableFrame(key, icon);
 		frame.setPreferredSize(new Dimension(200, 200));
@@ -488,7 +523,7 @@ Users user = null;
 	 */
 	private Vector<UserJob> getJobs() {
 		if(jobs == null) {
-			jobs = internalFrame.searchPanel.getJobs();
+			jobs = internalTreeJobFrame.searchTreeJobPanel.getJobs();
 			setJobs(jobs);
 		}
 		return jobs;
@@ -576,11 +611,22 @@ Users user = null;
 	        });
 	        return tabbedPane;
 	    }
+	 public void clearALL() {
+		 if(_tabbedPane != null) {
+			 _tabbedPane.removeAll();
+			 _tabbedPane = null;
+			 internalTreeJobFrame.searchTreeJobPanel.jTree1.removeAll();
+			 internalTreeJobFrame.searchTreeJobPanel.jTree1 = null;
+			 internalTreeJobFrame.searchTreeJobPanel = null;
+			 	
+			 
+		 }
+	 }
 	public void processTasks(TaskEventProcessor taskEvent) {
 		// TODO Auto-generated method stub
-		Enumeration<JInternalReportFrame> panels = childs.elements();
+		Enumeration<JInternalJobReportFrame> panels = childs.elements();
 		while(panels.hasMoreElements()) {
-			JInternalReportFrame panel = panels.nextElement();
+			JInternalJobReportFrame panel = panels.nextElement();
 			
 			panel.getJobdataPanel().addtaskData(taskEvent);
 		

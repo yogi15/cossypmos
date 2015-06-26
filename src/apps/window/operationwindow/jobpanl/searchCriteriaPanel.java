@@ -1,9 +1,18 @@
 package apps.window.operationwindow.jobpanl;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.EventObject;
 import java.util.Hashtable;
@@ -11,6 +20,7 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,27 +29,47 @@ import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 
 import util.commonUTIL;
 
 
+import apps.window.utilwindow.DialogBoxForNumberOnly;
+import apps.window.utilwindow.JDialogBoxForChoice;
+import apps.window.utilwindow.JDialogBoxForDualChoice;
 import beans.FilterBean;
 
 import com.jidesoft.combobox.MultiSelectListExComboBox;
 import com.jidesoft.grid.DateCellEditor;
+import com.jidesoft.grid.SortableTable;
+import com.jidesoft.grid.TextFieldCellEditor;
+import com.jidesoft.hints.ListDataIntelliHints;
 
 public class searchCriteriaPanel extends JPanel {
 	Vector<FilterBean> data = new Vector<FilterBean>();
 	 TableModelUtil mod;
 	 String col[] = { "Name", "Criteria", "Values", "And/Or" };
 	 public EachRowEditor rowEditor;
-
-	 public Vector<FilterBean> getFilterBeanData() {
+  FilterValues fvalues = null;
+  
+	 /**
+ * @return the fvalues
+ */
+public FilterValues getFvalues() {
+	return fvalues;
+}
+/**
+ * @param fvalues the fvalues to set
+ */
+public void setFvalues(FilterValues fvalues) {
+	this.fvalues = fvalues;
+}
+	public Vector<FilterBean> getFilterBeanData() {
 		 return data;
 	 }
 
-	public JTable table; 
+	 SortableTable table = null;
 		private JScrollPane jScrollPane1;
 		
 
@@ -71,20 +101,207 @@ public class searchCriteriaPanel extends JPanel {
 		setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 		 mod = new TableModelUtil(data,col);
 		 FilterBean bean = new FilterBean();
-		 table  = new JTable() ;
+		 
+		 table  =new SortableTable(mod);
 		 rowEditor = new EachRowEditor(table);
-		 bean.setAnd_or("AND");
-		 bean.setColumnName("ProductType");
-		 bean.setSearchCriteria("=");
-		 bean.setColumnValues("Bond");
+		 
 		// mod.addRow(bean);
-		 table.setModel(mod);
+		 
 		 jScrollPane1 = new JScrollPane();
 		 jScrollPane1.setViewportView(table);
 		 add(jScrollPane1,BorderLayout.CENTER);
+		 table.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				if(table.getSelectedRow() != -1) {
+					int row = table.getSelectedRow();
+					 int column = table.getSelectedColumn();
+					String value = (String) table.getModel().getValueAt(  row,0);
+					String selectedValues = (String) table.getModel().getValueAt(  row,2);
+					String firstColumnValue = (String) table.getModel().getValueAt(  row,1);
+					if(column == 2)
+					addDialogBox(value,selectedValues,row,firstColumnValue);
+					
+					
+				}
+				
+			}
+		});
 	     
 	        
 	}
+	 private void getVectorforSelectedValues( String [] values,String selectedValues) {
+		 if(!commonUTIL.isEmpty(values)) {
+			 
+		    		 
+		        	int i =0;
+		        for(int s=0;s< values.length;s++)
+		        		 
+		        	 
+		        		i++;
+		    	}	
+		 }
+	 private void setdataForDiaglog(Vector<String> criteria1,Vector<String> selectedValueData,String [] cvalues,String selectedValues) {
+		 if(!commonUTIL.isEmpty(cvalues)) {
+			 String sValues [] = null;
+			  
+			 if(!commonUTIL.isEmpty(selectedValues) && selectedValues.contains(",")) {
+				 sValues = selectedValues.split(",");
+				 
+			 } else {
+				 
+			 }
+		    		 
+		        	int i =0;
+		        for(int s=0;s< cvalues.length;s++) {
+		        	if(commonUTIL.isEmpty(sValues))	  {
+		        		if(!isValueExist(cvalues[s],selectedValues))
+		        			criteria1.addElement(cvalues[s]);
+		        		else 
+		        			selectedValueData.addElement(selectedValues);
+		        		
+		        	} else {
+		        		if(!isValueExist(sValues,cvalues[s]))
+		        			criteria1.addElement(cvalues[s]);
+		        		else 
+		        			selectedValueData.addElement(cvalues[s]);
+		        	}
+		        }
+		    	}	
+		 }
+	 
+	 
+	 
+	 private boolean isValueExist(String [] selValues, String creiteriaValue) {
+		 boolean flag = false;
+		 if(!commonUTIL.isEmpty(selValues) ) {
+			 for(int i=0;i<selValues.length;i++) {
+				 if(selValues[i].equalsIgnoreCase(creiteriaValue)) {
+					 flag = true;
+					 break;
+				 }
+			 }
+		 }
+			 return flag;
+	 }
+	 private boolean isValueExist(String   selValues, String creiteriaValue) {
+		 boolean flag = false;
+		 if(!commonUTIL.isEmpty(selValues) ) {
+			 
+				 if(selValues.equalsIgnoreCase(creiteriaValue)) {
+					 flag = true;
+					  
+				 
+			 }
+		 }
+			 return flag;
+	 }
+	 private void addDialogBox( String fieldName,String selectedValues,final int rowID,final String firstColumValue) {
+		 if(fieldName.endsWith("ID")) {
+			  
+			 if(commonUTIL.isEmpty(firstColumValue))  {
+				  commonUTIL.showAlertMessage("Select Criertia for Selected Row");
+				  return;
+			 }
+					 
+			 final DialogBoxForNumberOnly choice12 = new DialogBoxForNumberOnly("Enter " + fieldName,firstColumValue,fieldName); 
+             
+				choice12.jButton0.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						// TODO Auto-generated method stub
+						String text1Value = choice12.jTextField0.getText();//criteriaC.getText();
+						if(!commonUTIL.isEmpty(text1Value)) {
+							text1Value = text1Value.substring(0, text1Value.indexOf("."));
+						}
+						if(firstColumValue.equalsIgnoreCase("between")) {
+							String text2Value = choice12.jTextField1.getText();//criteriaC.getText();
+							if(!commonUTIL.isEmpty(text2Value)) {
+								text2Value = text2Value.substring(0, text2Value.indexOf("."));
+								text1Value = text1Value +","+text2Value;
+							}
+						}
+						int i = rowID;
+						FilterBean filler =  getFilterBeanAtRow(i);
+						//textField.setText(attributeName);
+						//table.getModel().setValueAt(arg0, arg1, arg2)
+						//table.getCellEditor(table.getSelectedColumn(), table.getSelectedRow()).
+						filler.setColumnValues(text1Value);
+						 removeFilterBeanAtRow(i);
+						 addFilterBeanAt(i, filler);
+						choice12.dispose();
+					}
+				});
+				choice12.setLocationRelativeTo(choice12);
+				choice12.setVisible(true);
+				
+		
+		 } else {
+			 Vector dataValues = getFvalues().getValuesonColumn(fieldName,	null);
+			 	String mvalues[] = getFvalues().convertVectortoSringArray(dataValues, fieldName, 0);
+			  Vector<String> selectData = new Vector<String>();
+			  Vector<String> crieteriaData = new Vector<String>();
+			  setdataForDiaglog(crieteriaData,selectData,mvalues,selectedValues);
+				final JDialogBoxForDualChoice choice12 = new JDialogBoxForDualChoice( crieteriaData, selectData);
+				choice12.setLocationRelativeTo(choice12);
+				//choice12.setSize(200,200);
+			//	choice12.jList3.setModel(templates);
+				choice12.setVisible(true);
+				choice12.addWindowListener(new WindowAdapter() {            
+		            public void windowClosing(WindowEvent e) {
+						// TODO Auto-generated method stub
+		            	Vector<String> vec =  choice12.getObj();
+		            	String attributeName = "";
+		                  
+		                  if(!commonUTIL.isEmpty(vec)) {
+		                	  for(int i=0;i<vec.size();i++)
+		                		  attributeName =attributeName + (String) vec.get(i) + ",";
+		                  }
+		                  if(!commonUTIL.isEmpty(attributeName)) {
+		                	  attributeName = attributeName.substring(0, attributeName.length()-1);
+		                  }
+		               //   textField.setText(attributeName);
+					//	String attributeName = choice12.jTextField0.getText();//criteriaC.getText();
+						int i =  rowID;
+						FilterBean filler = getFilterBeanAtRow(i);
+						filler.setColumnValues(attributeName);
+						 removeFilterBeanAtRow(i);
+						 addFilterBeanAt(i, filler);
+						 choice12.ClearALL();
+						choice12.dispose();
+					}
+				});
+				choice12.setLocationRelativeTo(choice12);
+				choice12.setVisible(true);
+		 }
+	 }
 	 /**
 	 * @return the rowEditor
 	 */
@@ -96,6 +313,7 @@ public class searchCriteriaPanel extends JPanel {
 	
 	
 	public FilterBean getFilterBeanAtRow(int row) {
+		System.out.println("getFilterBeanAtRow "+row);
 		return ( FilterBean) data.get(row);
 	}
 	public void removeFilterBeanAtRow(int row) {
@@ -134,6 +352,63 @@ public class searchCriteriaPanel extends JPanel {
 		rowEditor.setEditorForRowCol(row,col,ed);
 		 table.getColumn(columnName).setCellEditor(rowEditor);
 	}
+	public void addRowEditor(int row,int col,JTextField textField,String columnName) {
+		DefaultCellEditor ed = new DefaultCellEditor(textField);
+		rowEditor.setEditorForRowCol(row,col,ed);
+		 table.getColumn(columnName).setCellEditor(rowEditor);
+	}
+	public void addIntellIHintColumn(int column,final String [] values) {
+		table.getColumnModel().getColumn(column)
+		.setCellEditor(new TextFieldCellEditor(String.class) {
+			private static final long serialVersionUID = 2023654568542192380L;
+
+			@Override
+			protected JTextField createTextField() {
+				JTextField cellEditorTextField = new JTextField();
+				final ListDataIntelliHints fontIntellihints = new ListDataIntelliHints<String>(
+						cellEditorTextField, values);
+				fontIntellihints.setCaseSensitive(false);
+				cellEditorTextField.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						// TODO Auto-generated method stub
+						String attributeName = fontIntellihints.getSelectedHint().toString();
+						int i =  table.getSelectedRow();
+						FilterBean filler = getFilterBeanAtRow(i);
+						filler.setSearchCriteria(attributeName);
+						 removeFilterBeanAtRow(i);
+						 addFilterBeanAt(i, filler);
+						
+					}
+				});
+					cellEditorTextField.addFocusListener(new FocusListener() {
+	
+						@Override
+						public void focusLost(FocusEvent arg0) {
+		// TODO Auto-generated method stub
+							String attributeName = fontIntellihints.getSelectedHint().toString();
+							int i =  table.getSelectedRow();
+							FilterBean filler = getFilterBeanAtRow(i);
+							filler.setSearchCriteria(attributeName);
+							 removeFilterBeanAtRow(i);
+							 addFilterBeanAt(i, filler);
+							
+						}
+	
+						@Override
+						public void focusGained(FocusEvent arg0) {
+		// TODO Auto-generated method stub
+		
+						}
+					}); 
+					
+				 
+			 
+				return cellEditorTextField;
+			}
+		});
+	}
 	private EachRowEditor getRowEditor() {
 		return rowEditor;
 	}
@@ -152,7 +427,7 @@ public class searchCriteriaPanel extends JPanel {
 	/**
 	 * @param table the table to set
 	 */
-	private void setTable(JTable table) {
+	private void setTable(SortableTable table) {
 		this.table = table;
 	}
 	class TableModelUtil extends AbstractTableModel {
@@ -359,6 +634,9 @@ public class searchCriteriaPanel extends JPanel {
 		}
 
 		public boolean isCellEditable(EventObject anEvent) {
+			if(anEvent instanceof KeyEvent) 
+				selectEditor((KeyEvent) anEvent);
+			if(anEvent instanceof MouseEvent)
 			selectEditor((MouseEvent) anEvent);
 			if(editor == null)
 				return false;
@@ -398,6 +676,37 @@ public class searchCriteriaPanel extends JPanel {
 			} else {
 			
 			Vector cols = (Vector) editors.get(new Integer(row));
+			if(cols == null)
+				return;
+			editor = (TableCellEditor) cols.get(col-1);
+			}
+			
+			if (editor == null) {
+				editor = defaultEditor;
+			}
+		}
+		protected void selectEditor(KeyEvent e) {
+			int row =0;
+			int col =0;
+			
+			if (e == null) {
+				row = table.getSelectionModel().getAnchorSelectionIndex();
+				col = table.getSelectedColumn();
+			} else {
+				//row = table.get
+				//col = table.columnAtPoint(e.getPoint());
+			}
+			System.out.println("From selectEditor row == " + row + " col == " + col);
+			if(col == -1) {
+				editor = defaultEditor;
+			} else 
+			if(col == 0) {
+				editor = defaultEditor;
+			} else {
+			
+			Vector cols = (Vector) editors.get(new Integer(row));
+			if(cols == null)
+				return;
 			editor = (TableCellEditor) cols.get(col-1);
 			}
 			
@@ -408,6 +717,11 @@ public class searchCriteriaPanel extends JPanel {
 	}
 
 	class MultiSelectionRenderer extends DefaultCellEditor {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 
 		public MultiSelectionRenderer(final MultiSelectListExComboBox comboBox,
 				CellEditorListener listener) {
