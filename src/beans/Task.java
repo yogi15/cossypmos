@@ -216,4 +216,17 @@ public int getMessageVersionID(int version) {
 	// TODO Auto-generated method stub
 	return messageVersionID;
 }
+int messageID = 0;
+public void setMessageID(int id2) {
+	// TODO Auto-generated method stub
+	messageID = id2;
+	
+	
+}
+
+public int getMessageID() {
+	// TODO Auto-generated method stub
+	 return messageID;
+	
+}
 }

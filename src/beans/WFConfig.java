@@ -16,7 +16,32 @@ public class WFConfig implements Serializable {
 	int usid;
 	String type;
 	String groupName;
+	int diffUser = 0;
 	
+	/**
+	 * @return the usid
+	 */
+	public int getUsid() {
+		return usid;
+	}
+	/**
+	 * @param usid the usid to set
+	 */
+	public void setUsid(int usid) {
+		this.usid = usid;
+	}
+	/**
+	 * @return the diffUser
+	 */
+	public int getDiffUser() {
+		return diffUser;
+	}
+	/**
+	 * @param diffUser the diffUser to set
+	 */
+	public void setDiffUser(int diffUser) {
+		this.diffUser = diffUser;
+	}
 	boolean task=false;
 	public String getGroupName() {
 		return groupName;
