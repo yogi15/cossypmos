@@ -191,7 +191,7 @@ public void startProducingMessage() {
 				 trs.setId(id);
 				 trs.setVersion(1);  // not sure how this will work but need to tested properly temperary soultion.
 				 Task task =  processTask(trs,trade,userID,wfs);
-				// publishTask(task,trade,trs);
+			     publishTask(task,trade,trs);
 				 newTransfer.addElement(trs);
 				 
 				}
@@ -209,8 +209,8 @@ public void startProducingMessage() {
 			     trs.setUserid(userID);
 					updateTransfer(trs);
 				//	 publishTaskOnOldTransfer(oldTransfer,trade,userID);
-				//	Task task =  processTask(trs,trade,userID,wfs);
-					// publishTask(task,trade,trs);
+					Task task =  processTask(trs,trade,userID,wfs);
+					 publishTask(task,trade,trs);
 				 newTransfer.addElement(trs);
 				 
 				}
@@ -226,7 +226,7 @@ public void startProducingMessage() {
 			     trs.setStatus(wfs.getOrgStatus());
 			     updateTransfer(trs);
 			     Task task =  processTask(trs,trade,userID,wfs);
-				// publishTask(task,trade,trs);
+				publishTask(task,trade,trs);
 				 
 				}
 			}
@@ -416,6 +416,8 @@ public void startProducingMessage() {
 			task.setUserid(userID);
 			task.setMessageVersionID(message.getVersion());
 			task.setTradeVersionID(trade.getVersion());
+			task.setTransferVersionID(message.getTransferVersion());
+			task.setTransferID(message.getTransferId());
 			task.setId(0);
 			task.setProductID(message.getproductID());
 			return task;
@@ -425,7 +427,8 @@ public void startProducingMessage() {
 		 task = new Task();
 			task.setProductID(message.getproductID());
 		task.setTradeID(message.getTradeId());
-		
+		task.setTransferVersionID(message.getTransferVersion());
+		task.setTransferID(message.getTransferId());
 		task.setTransferID(message.getTransferId());
 		//task.setType(trade.getStatus());
 		task.setAction(message.getAction());
@@ -434,10 +437,11 @@ public void startProducingMessage() {
 		task.setTradeDate(trade.getTradeDate());
 	//	task.setTransferDate(message.get.getValueDate()); // this need to understand. 
 		task.setTaskstatus("0");
-		//task.setCurrency(transfer.getSettlecurrency());
+		//task.setCurrency(message.get);
 	//	task.setBookid(transfer.getBookId());
 		task.setEvent_type(message.getEventType());
 		task.setType("MESSAGE");
+		task.setMessageID(message.getId());
 		task.setProductType(message.getProductType());
 		task.setUserid(userID);
 		task.setTransferVersionID(message.getTransferVersion());
@@ -984,7 +988,7 @@ return status;
 				         trs.setId(id);
 				         trs.setVersion(1);  // not sure how this will work but need to tested properly temperary soultion.
 				    	 Task task =  processTask(trs,trade,trade.getUserID(),wfs);
-				 	    // publishTask(task,trade,trs);
+				 	    publishTask(task,trade,trs);
 				 	     newTransfer.addElement(trs);
 			     	 
 				 
@@ -1030,8 +1034,8 @@ return status;
 				     			}
 					
 				//	 publishTaskOnOldTransfer(oldTransfer,trade,trade.getUserID()); // userid need to be checked. 
-				//	 Task task =  processTask(trs,trade,trade.getUserID(),wfs);
-					// publishTask(task,trade,trs);
+					 Task task =  processTask(trs,trade,trade.getUserID(),wfs);
+					 publishTask(task,trade,trs);
 				    newTransfer.addElement(trs);
 			     }
 				 
@@ -1053,7 +1057,7 @@ return status;
 			    	 trs.setNettedTransferID(0);
 			    //  nettedTransfer.setSettleAmount(nettedTransfer.getSettleAmount() - trs.getAmount());
 			     }
-			   //  publishTaskOnOldTransfer(oldTransfer,trade,trade.getUserID()); // userid need to be checked. 
+			    publishTaskOnOldTransfer(oldTransfer,trade,trade.getUserID()); // userid need to be checked. 
 			     updateTransfer(trs);
 				 
 				}
@@ -1416,7 +1420,7 @@ return status;
 					if(savemess.getTaskID() == 1) {
 						
 						Task task =  processTask(savemess, transfer, trade, savemess.getUserID(), savemess.getTaskID());
-						//publishTask(task, trade, savemess, transfer);
+						publishTask(task, trade, savemess, transfer);
 					}
 					
 				}
@@ -1547,7 +1551,8 @@ return status;
 			   }
 			   if(wfFlag) {
 			   if(wf.isTask())
-			   message.setTaskID(1);  // this will publish task for task Station.
+			     message.setTaskID(1);  // this will publish task for task Station.
+			   
 			   message.setStatus(wf.getOrgStatus());
 			   if(message.getStatus().equalsIgnoreCase("CANCELLED")) {
 				   message.setSubAction("CANCEL");
