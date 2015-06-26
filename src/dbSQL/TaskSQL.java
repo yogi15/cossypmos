@@ -20,19 +20,19 @@ public class TaskSQL {
 	final static private String DELETE =
 		"DELETE FROM " + tableName + "   where id =? ";
 	final static private String INSERT =
-		"INSERT into " + tableName + "(id,tradeid,productId,tasktype,action,taskDate,status,statusDone,currency,bookno,eventtype,user_name,user_id,task_status,producttype,WFType,transferID,transferVersion,tradeVersion,cpid,nettedConfigid) values(TASK_SEQ.NEXTVAL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		"INSERT into " + tableName + "(id,tradeid,productId,tasktype,action,taskDate,status,statusDone,currency,bookno,eventtype,user_name,user_id,task_status,producttype,WFType,transferID,transferVersion,tradeVersion,cpid,nettedConfigid,messageid) values(TASK_SEQ.NEXTVAL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	final static private String UPDATE =
 		"UPDATE " + tableName + " set name=?,role=?,status=?  where id = ? ";
 	final static private String SELECT_MAX =
 		"SELECT MAX(id) DESC_ID FROM " + tableName + " ";
 	final static private String SELECTALL =
-		"SELECT id,tradeid,productId,tasktype,action,taskDate,status,statusDone,currency,bookno,eventtype,user_name,user_id,task_status,producttype,WFType,transferID,transferVersion,tradeVersion,cpid,nettedConfigid  FROM " + tableName + " order by id ";
+		"SELECT id,tradeid,productId,tasktype,action,taskDate,status,statusDone,currency,bookno,eventtype,user_name,user_id,task_status,producttype,WFType,transferID,transferVersion,tradeVersion,cpid,nettedConfigid,messageid  FROM " + tableName + " order by id ";
 	final static private String SELECT =
-		"SELECT id,tradeid,productId,tasktype,action,taskDate,status,statusDone.currency,bookno,eventtype,user_name,user_id,task_status,producttype,WFType,transferID,transferVersion,tradeVersion,cpid,nettedConfigid FROM " + tableName + " where id =  ?";
+		"SELECT id,tradeid,productId,tasktype,action,taskDate,status,statusDone.currency,bookno,eventtype,user_name,user_id,task_status,producttype,WFType,transferID,transferVersion,tradeVersion,cpid,nettedConfigid,messageid FROM " + tableName + " where id =  ?";
 	 static private String SELECTONE =
-		"SELECT id,tradeid,productId,tasktype,action,taskDate,status,statusDone.currency,bookno,eventtype,user_name,user_id,task_status,producttype,WFType,transferID,transferVersion,tradeVersion,cpid,nettedConfigid FROM " + tableName + " where id =  ";
+		"SELECT id,tradeid,productId,tasktype,action,taskDate,status,statusDone.currency,bookno,eventtype,user_name,user_id,task_status,producttype,WFType,transferID,transferVersion,tradeVersion,cpid,nettedConfigid,messageid FROM " + tableName + " where id =  ";
 	 private static String whereClause =
-		 "SELECT id,tradeid,productId,tasktype,action,taskDate,status,statusDone,currency,bookno,eventtype,user_name,user_id,task_status,producttype,WFType,transferID,transferVersion,tradeVersion,cpid,nettedConfigid   FROM " + tableName + " where ";
+		 "SELECT id,tradeid,productId,tasktype,action,taskDate,status,statusDone,currency,bookno,eventtype,user_name,user_id,task_status,producttype,WFType,transferID,transferVersion,tradeVersion,cpid,nettedConfigid,messageid   FROM " + tableName + " where ";
 	 private static String checkStatus = " select id from task where ";
 	 
 	 private static String getUpdateSQL(Task task) {
@@ -57,6 +57,7 @@ public class TaskSQL {
 	      					",tradeVersion = " +task.getTradeVersionID() + 
 	      					",cpid = " +task.getCpid() +
 	      					",nettedConfigid = " +task.getNettedConfigID() +
+	      					",messageid  = " +task.getMessageID() +
 	      		"  where id= " + task.getId();
 	      return updateSQL;
 	     }
@@ -395,6 +396,7 @@ protected static int selectMax(Connection con ) {
 	            stmt.setInt(18, inserTask.getTradeVersionID());
 	            stmt.setInt(19, inserTask.getCpid());
 	            stmt.setInt(20, inserTask.getNettedConfigID());
+	            stmt.setInt(21, inserTask.getMessageID());
 				if (stmt.executeUpdate() > 0) {
 
 					con.commit();
@@ -459,6 +461,7 @@ protected static int selectMax(Connection con ) {
 			       		task.setTradeVersionID(rs.getInt(19))    ;    
 			       		task.setCpid(rs.getInt(20)) ;
 			       		task.setNettedConfigID(rs.getInt(21)) ;
+			       		task.setMessageID(rs.getInt(22)) ;
 			        Tasks.add(task);
 	         
 	         }
@@ -547,6 +550,7 @@ protected static int selectMax(Connection con ) {
 	       		task.setTradeVersionID(rs.getInt(19))    ;  
 	    		task.setCpid(rs.getInt(20)) ;
 	    		task.setNettedConfigID(rs.getInt(21)) ;
+	    		task.setMessageID(rs.getInt(22)) ;
 		        Tasks.add(task);
 		     
 	      
@@ -604,6 +608,7 @@ protected static int selectMax(Connection con ) {
 	       		task.setTradeVersionID(rs.getInt(19))    ;  
 	    		task.setCpid(rs.getInt(20)) ;
 	    		task.setNettedConfigID(rs.getInt(21)) ;
+	    		task.setMessageID(rs.getInt(22)) ;
 		        Tasks.add(task);
 	      
 	      }
@@ -658,6 +663,7 @@ protected static int selectMax(Connection con ) {
 	       		task.setTradeVersionID(rs.getInt(19))    ;  
 	    		task.setCpid(rs.getInt(20)) ;
 	    		task.setNettedConfigID(rs.getInt(21)) ;
+	    		task.setMessageID(rs.getInt(22)) ;
 		        Tasks.add(task);
 	      
 	      }
@@ -712,6 +718,7 @@ protected static int selectMax(Connection con ) {
 	       		task.setTradeVersionID(rs.getInt(19))    ;  
 	    		task.setCpid(rs.getInt(20)) ;
 	    		task.setNettedConfigID(rs.getInt(21)) ;
+	    		task.setMessageID(rs.getInt(22)) ;
 		        Tasks.add(task);
 	      
 	      }
@@ -769,6 +776,7 @@ protected static int selectMax(Connection con ) {
 	       		task.setTradeVersionID(rs.getInt(19))    ;  
 	    		task.setCpid(rs.getInt(20)) ;
 	    		task.setNettedConfigID(rs.getInt(21)) ;
+	    		task.setMessageID(rs.getInt(22)) ;
 		       
 	      
 	      }
