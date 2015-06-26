@@ -42,6 +42,7 @@ import apps.window.staticwindow.JFrameStaticWindow;
 import apps.window.utilwindow.Login;
 import util.ClassInstantiateUtil;
 import util.commonUTIL;
+import util.cacheUtil.AccessDataCacheUtil;
 
 public class JFrameMainApplication extends JFrame {
 
@@ -51,7 +52,7 @@ public class JFrameMainApplication extends JFrame {
 			new JMenu("Accounting"), new JMenuItem("LiquidationConfig"),
 			new JMenuItem("LimitConfiguration"), new JMenu("Settlements"),
 			new JMenuItem("MarketQuote"), new JMenu("FXAutoConfig"),new JMenuItem("DateRule"),new JMenu("Listed Derivatives") };
-	private static JMenuItem[] menuStaticdata = { new JMenuItem("AccessPermission"),new JMenuItem("StartDataUP"),
+	private static JMenuItem[] menuStaticdata = { new JMenuItem("AccessPermission"),new JMenuItem("StartUPData"),
 			new JMenuItem("WorkFlowSetup"), new JMenuItem("CurrencyDefault"),
 			new JMenuItem("Holiday"), new JMenuItem("Folder"),
 			new JMenu("Favorities"), new JMenuItem("MessageConfig") };
@@ -133,6 +134,10 @@ public class JFrameMainApplication extends JFrame {
 				menuitemTrade[i].addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						String productName = arg0.getActionCommand().toString();
+						 if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, arg0.getActionCommand())) {
+								commonUTIL.showAlertMessage("User Access Denied to open "+arg0.getActionCommand()+ " Window ");
+								return;
+							}
 						if (productName.equalsIgnoreCase("MoneyMarket"))
 							productName = "MM";
 						TradeApplication tradeWindow = new TradeApplication(
@@ -149,7 +154,7 @@ public class JFrameMainApplication extends JFrame {
 						tradeWindow.setVisible(true);
 						if (productName.toString().equalsIgnoreCase("FX")) {
 							tradeWindow.setTitle("CosMos FX Trade Window  "
-									+ name.getUser_name() + " :" + name.getId());
+									+ name.getUser_name() +":"+name.getId());
 							tradeWindow.setSize(1340, 740);
 							tradeWindow.setLocation(5, 5);
 							// tradeWindow.setResizable(false);
@@ -186,12 +191,15 @@ public class JFrameMainApplication extends JFrame {
 			jobs[i].setFont(Font.decode("SansSerif-12"));
 			jobs[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
+					 if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, arg0.getActionCommand())) {
+							commonUTIL.showAlertMessage("User Access Denied to open "+arg0.getActionCommand()+ " Window ");
+							return;
+						}
 					if (arg0.getActionCommand().equalsIgnoreCase("Jobs")) {
-						JFrameNewJobPanel jobs = (JFrameNewJobPanel) singleInstance
-								.get("Jobs");
+					final	JFrameNewJobPanel jobs =   new JFrameNewJobPanel("Jobs", name);;
 
-						if (jobs == null) {
-							jobs = new JFrameNewJobPanel("Jobs", name);
+						 
+							
 
 							jobs.setIconImage(Toolkit.getDefaultToolkit()
 									.getImage(imgURL));
@@ -200,28 +208,17 @@ public class JFrameMainApplication extends JFrame {
 							jobs.setIconImage(Toolkit.getDefaultToolkit()
 									.getImage(imgURL));
 							jobs.setTitle("Jobs Station " + name.getUser_name());
+							jobs.setFocusableWindowState(true);
 							jobs.setUser(name);
 							jobs.addWindowListener(new WindowAdapter() {
 								public void WindowClosed(final ActionEvent act) {
-									singleInstance.remove("Jobs");
+									//singleInstance.remove("Jobs");
+									jobs.clearALL();
 
 								}
 							});
-							singleInstance.put("Jobs", jobs);
-						} else {
-							jobs.setIconImage(Toolkit.getDefaultToolkit()
-									.getImage(imgURL));
-							jobs.setSize(900, 750);
-							jobs.setVisible(true);
-							jobs.setIconImage(Toolkit.getDefaultToolkit()
-									.getImage(imgURL));
-							jobs.setTitle("Jobs Station " + name.getUser_name());
-							jobs.setUser(name);
-							// jobs.setAlwaysOnTop(true);
-							// jobs.setFocusCycleRoot(true);
-							jobs.setFocusableWindowState(true);
-
-						}
+							 
+						 
 
 					} else if (arg0.getActionCommand().equalsIgnoreCase(
 							"Quick Look Up")) {
@@ -311,6 +308,10 @@ public class JFrameMainApplication extends JFrame {
 					// NewJFrame2 reports = new NewJFrame2();
 					// JFrameReportsApplication reports = new
 					// JFrameReportsApplication("Report",name);
+					 if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, arg0.getActionCommand())) {
+							commonUTIL.showAlertMessage("User Access Denied to open "+arg0.getActionCommand()+ " Window ");
+							return;
+						}
 					JFrameNewReport reports = new JFrameNewReport(arg0
 							.getActionCommand(), name);
 					reports.setIconImage(Toolkit.getDefaultToolkit().getImage(
@@ -347,7 +348,10 @@ public class JFrameMainApplication extends JFrame {
 			commonUTIL.setBackGroundColor(favItems[i]);
 			favItems[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-
+					 if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, arg0.getActionCommand())) {
+							commonUTIL.showAlertMessage("User Access Denied to open "+arg0.getActionCommand()+ " Window ");
+							return;
+						}
 					FavoritiesWindow favoritiesWindow = new FavoritiesWindow(
 							arg0.getActionCommand(), us1);
 					favoritiesWindow.setTitle(arg0.getActionCommand()
@@ -370,6 +374,10 @@ public class JFrameMainApplication extends JFrame {
 			adminUtilmenu[i].setFont(Font.decode("SansSerif-12"));
 			adminUtilmenu[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
+					 if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "AdminMonitor")) {
+							commonUTIL.showAlertMessage("User Access Denied to open "+"AdminMonitor"+ " Window ");
+							return;
+						}
 					JFrameAdminMonitorWindow pm = new JFrameAdminMonitorWindow("AdminMonitor", name);
 					pm.setSize(900, 750);
 					pm.setVisible(true);
@@ -390,6 +398,10 @@ public class JFrameMainApplication extends JFrame {
 
 					 if (arg0.getActionCommand().equalsIgnoreCase(
 								"PositionManager")) {
+						 if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "Position")) {
+								commonUTIL.showAlertMessage("User Access Denied to open "+"Position"+ " Window ");
+								return;
+							}
 							JFramePosition pm = new JFramePosition("Position", name);
 							pm.setSize(900, 750);
 							pm.setVisible(true);
@@ -403,6 +415,10 @@ public class JFrameMainApplication extends JFrame {
 							// Thread startPm = new Thread(pm);
 							// startPm.start();
 						} else {
+							 if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "ManualLiquidation")) {
+									commonUTIL.showAlertMessage("User Access Denied to open "+"ManualLiquidation"+ " Window ");
+									return;
+								}
 							JFrameManulPositionLiquidation manualPostion = new JFrameManulPositionLiquidation("ManualLiquidation", name);
 							manualPostion.setSize(900, 750);
 							manualPostion.setVisible(true);
@@ -427,6 +443,10 @@ public class JFrameMainApplication extends JFrame {
 			fxitems[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					String productName = arg0.getActionCommand().toString();
+					if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, productName)) {
+						commonUTIL.showAlertMessage("User Access Denied to open "+productName+ " Window ");
+						return;
+					}
 					TradeApplication tradeWindow = new TradeApplication(
 							productName, name);
 					// JFrameTradeWindowApplication tradeWindow = new
@@ -454,7 +474,12 @@ public class JFrameMainApplication extends JFrame {
 			commonUTIL.setBackGroundColor(favItems[i]);
 			accountItems[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-
+					if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, arg0
+							.getActionCommand())) {
+						commonUTIL.showAlertMessage("User Access Denied to open "+arg0
+								.getActionCommand()+ " Window ");
+						return;
+					}
 					JFrameAccountingWindow accountingWindow = new JFrameAccountingWindow(
 							arg0.getActionCommand(), us1);
 					accountingWindow.setTitle(arg0.getActionCommand()
@@ -477,6 +502,12 @@ public class JFrameMainApplication extends JFrame {
 			commonUTIL.setBackGroundColor(settlements[s]);
 			settlements[s].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
+					if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, arg0
+							.getActionCommand())) {
+						commonUTIL.showAlertMessage("User Access Denied to open "+arg0
+								.getActionCommand()+ " Window ");
+						return;
+					}
 					JFrameReferenceWindow refWindow = new JFrameReferenceWindow(
 							arg0.getActionCommand());
 					refWindow.setIconImage(Toolkit.getDefaultToolkit()
@@ -501,6 +532,12 @@ public class JFrameMainApplication extends JFrame {
 			commonUTIL.setBackGroundColor(fxConfigItems[s]);
 			fxConfigItems[s].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
+					if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, arg0
+							.getActionCommand())) {
+						commonUTIL.showAlertMessage("User Access Denied to open "+arg0
+								.getActionCommand()+ " Window ");
+						return;
+					}
 					JFrameReferenceWindow refWindow = new JFrameReferenceWindow(
 							arg0.getActionCommand());
 					refWindow.setIconImage(Toolkit.getDefaultToolkit()
@@ -520,6 +557,7 @@ public class JFrameMainApplication extends JFrame {
 			commonUTIL.setBackGroundColor(derivativeItems[s]);
 			derivativeItems[s].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
+					
 					FutureProductWindow refWindow = new FutureProductWindow();
 					refWindow.setIconImage(Toolkit.getDefaultToolkit()
 							.getImage(imgURL));
@@ -538,6 +576,12 @@ public class JFrameMainApplication extends JFrame {
 			commonUTIL.setBackGroundColor(RBIReport[r]);
 			RBIReport[r].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
+					if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, arg0
+							.getActionCommand())) {
+						commonUTIL.showAlertMessage("User Access Denied to open "+arg0
+								.getActionCommand()+ " Window ");
+						return;
+					}
 					JFrameNewReport reports = new JFrameNewReport(arg0
 							.getActionCommand(), name);
 					reports.setIconImage(Toolkit.getDefaultToolkit().getImage(
@@ -557,6 +601,10 @@ public class JFrameMainApplication extends JFrame {
 			fixedIncome[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					String productName = arg0.getActionCommand().toString();
+					if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, productName)) {
+						commonUTIL.showAlertMessage("User Access Denied to open "+productName+ " Window ");
+						return;
+					}
 					TradeApplication tradeWindow = new TradeApplication(
 							productName, name);
 					// JFrameTradeWindowApplication tradeWindow = new
@@ -589,41 +637,89 @@ public class JFrameMainApplication extends JFrame {
 				menuStaticdata[i].setFont(Font.decode("SansSerif-12"));
 				menuStaticdata[i].addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						JFrameStaticWindow staticwindow = new JFrameStaticWindow(
-								arg0.getActionCommand());
-						staticwindow.setIconImage(Toolkit.getDefaultToolkit()
-								.getImage(imgURL));
+						JFrameStaticWindow staticwindow = null;
 						if (arg0.getActionCommand().toString()
 								.equalsIgnoreCase("Folder")) {
+							if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "Folder")) {
+								commonUTIL.showAlertMessage("User Access Denied to open Folder Window ");
+								return;
+							}
+							staticwindow = new JFrameStaticWindow(
+									arg0.getActionCommand());
+							staticwindow.setIconImage(Toolkit.getDefaultToolkit()
+									.getImage(imgURL));
 							staticwindow.setSize(505, 550);
 							staticwindow.setLocation(200, 150);
 						}
 						if (arg0.getActionCommand().toString()
-								.equalsIgnoreCase("StartDataUP")) {
+								.equalsIgnoreCase("StartUPData")) {
+							if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "StartUPData")) {
+								commonUTIL.showAlertMessage("User Access Denied to open StartUPData Window ");
+								return;
+							}
+							staticwindow =new JFrameStaticWindow("StartDataUP");
+							staticwindow.setIconImage(Toolkit.getDefaultToolkit()
+									.getImage(imgURL));
 							staticwindow.setLocation(100, 100);
 							staticwindow.setSize(875, 575);
 						}
 						if (arg0.getActionCommand().toString()
 								.equalsIgnoreCase("WorkFlowSetup")) {
+							if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "WorkFlowSetup")) {
+								commonUTIL.showAlertMessage("User Access Denied to open WorkFlowSetup Window ");
+								return;
+							}
+							staticwindow =new JFrameStaticWindow(
+									arg0.getActionCommand());
+							staticwindow.setIconImage(Toolkit.getDefaultToolkit()
+									.getImage(imgURL));
 							staticwindow.setLocation(50, 100);
 							staticwindow.setSize(1150, 575);
 						}
 						if (arg0.getActionCommand().toString()
 								.equalsIgnoreCase("CurrencyDefault")) {
+							if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "CurrencyDefault")) {
+								commonUTIL.showAlertMessage("User Access Denied to open CurrencyDefault Window ");
+								return;
+							}
+							staticwindow =new JFrameStaticWindow(
+									arg0.getActionCommand());
+							staticwindow.setIconImage(Toolkit.getDefaultToolkit()
+									.getImage(imgURL));
 							staticwindow.setLocation(50, 100);
 							staticwindow.setSize(765, 585);
 						}
 						if (arg0.getActionCommand().toString()
 								.equalsIgnoreCase("Holiday")) {
+							if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "Holiday")) {
+								commonUTIL.showAlertMessage("User Access Denied to open Holiday Window ");
+								return;
+							}
+							staticwindow =new JFrameStaticWindow(
+									arg0.getActionCommand());
+							staticwindow.setIconImage(Toolkit.getDefaultToolkit()
+									.getImage(imgURL));
 							staticwindow.setLocation(150, 100);
 							staticwindow.setSize(565, 450);
 						} else if (arg0.getActionCommand().toString()
 								.equalsIgnoreCase("MessageConfig")) {
+							if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "MessageConfig")) {
+								commonUTIL.showAlertMessage("User Access Denied to open MessageConfig Window ");
+								return;
+							}
+							staticwindow =new JFrameStaticWindow(
+									arg0.getActionCommand());
+							staticwindow.setIconImage(Toolkit.getDefaultToolkit()
+									.getImage(imgURL));
 							staticwindow.setLocation(100, 100);
 							staticwindow.setSize(1350, 675);
 
 						}else if (arg0.getActionCommand().toString()
 								.equalsIgnoreCase("AccessPermission"))  {
+							staticwindow =new JFrameStaticWindow(
+									arg0.getActionCommand());
+							staticwindow.setIconImage(Toolkit.getDefaultToolkit()
+									.getImage(imgURL));
 							staticwindow.setLocation(100, 100);
 							staticwindow.setSize(1220, 480);
 
@@ -664,7 +760,7 @@ public class JFrameMainApplication extends JFrame {
 			if (submenu1 != null)
 				for (int s = 0; s < submenu1.length; s++) {
 					menuReferencedata[i].add(submenu1[s]);
-					commonUTIL.setBackGroundColor(menuReferencedata[i]);
+					//commonUTIL.setBackGroundColor(menuReferencedata[i]);
 				}
 			menu[1].add(menuReferencedata[i]);
 			commonUTIL.setBackGroundColor(menu[1]);
@@ -672,33 +768,63 @@ public class JFrameMainApplication extends JFrame {
 			menu[1].setFont(Font.decode("SansSerif-12"));
 			menuReferencedata[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					JFrameReferenceWindow refWindow = new JFrameReferenceWindow(
-							arg0.getActionCommand());
-					refWindow.setIconImage(Toolkit.getDefaultToolkit()
-							.getImage(imgURL));
+				 	JFrameReferenceWindow refWindow = null;
+					
 
 					if (arg0.getActionCommand().toString()
 							.equalsIgnoreCase("MarketQuote")) {
-						refWindow.setSize(1150, 600);
+						if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "MarketQuote")) {
+							commonUTIL.showAlertMessage("User Access Denied to open MarketQuote Window ");
+							return;
+						}
+						refWindow = new JFrameReferenceWindow(
+								arg0.getActionCommand());
+					 	refWindow.setSize(1150, 600);
 
 					} else if (arg0.getActionCommand().toString()
 							.equalsIgnoreCase("SDI1")) {
-						refWindow.setSize(900, 500);
+						if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "SDI1")) {
+							commonUTIL.showAlertMessage("User Access Denied to open SDI1 Window ");
+							return;
+						}
+						 refWindow.setSize(900, 500);
 					} else if (arg0.getActionCommand().toString()
 							.equalsIgnoreCase("Book")) {
-						refWindow.setSize(750, 560);
+						if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "Book")) {
+							commonUTIL.showAlertMessage("User Access Denied to open Book Window ");
+							return;
+						}
+						refWindow = new JFrameReferenceWindow(
+								arg0.getActionCommand());
+					 	refWindow.setSize(750, 560);
 					} else if (arg0.getActionCommand().toString()
 							.equalsIgnoreCase("LimitConfiguration")) {
+						if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, "LimitConfiguration")) {
+							commonUTIL.showAlertMessage("User Access Denied to open LimitConfiguration Window ");
+							return;
+						}
+						refWindow = new JFrameReferenceWindow(
+								arg0.getActionCommand());
+						 
 						refWindow.setSize(1250, 580);
 					} else {
+						if(!AccessDataCacheUtil.getAccessData().isAccessToWindow(name, arg0.getActionCommand())) {
+							commonUTIL.showAlertMessage("User Access Denied to open "+arg0.getActionCommand() +"Window ");
+							return;
+						}
+						refWindow = new JFrameReferenceWindow(
+								arg0.getActionCommand());
 						refWindow.setSize(1000, 720);
+						 
 						
 						 
 					}
+					refWindow.setIconImage(Toolkit.getDefaultToolkit()
+							.getImage(imgURL));
 					refWindow.setResizable(false);
 					refWindow.setLocationRelativeTo(j);
 					refWindow.setVisible(true);
-					refWindow.setLocation(150, 100);
+					refWindow.setLocation(150, 100); 
 				}
 
 			});
