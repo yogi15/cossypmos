@@ -126,12 +126,12 @@ public class TradeImp implements RemoteTrade {
 				
 				
 			}
-			/*if(!isAuthorisedUserAction(trade)) {
+			if(!isAuthorisedUserAction(trade)) {
 				returnStatus.add(new String("Not an authorised User to changed Action on Trade "));
 				returnStatus.add(new Integer(-6));
 				return returnStatus;
 				
-			}*/
+			}
 			/*if(trade.getMirrorBookid() > 0) {
 				originalTrade = (Trade) trade.clone();
            		generateMirrorTrade(trade,false);
@@ -152,6 +152,15 @@ public class TradeImp implements RemoteTrade {
 						returnStatus.add(new String(" Action "+ trade.getAction() + " not Valid on status "+ trade.getStatus()));
 						
 						return returnStatus;
+					}
+					if(wf.getDiffUser() == 1) {
+						if(trade.getId() > 0)
+							if(isDifferentUser(trade)) {
+							 returnStatus.add(new Integer(-9));
+							 	returnStatus.add(new String("Same User not allowed to perfomed " + trade.getAction() + " Action  on Trade "));
+								
+								return returnStatus;
+						 }
 					}
 					if(returnStatus.size() > 0) {
 						returnStatus.add(new Integer(-10));
@@ -176,12 +185,12 @@ public class TradeImp implements RemoteTrade {
 						
 						
 					//	trade.setId(i);
-						/*Task task = checkTask(trade,wf,oldTrade);
+						Task task = checkTask(trade,wf,oldTrade);
 						if(task  != null) {
 						    int taskID = TaskSQL.save(task,dsSQL.getConn());
 						    if(taskID >0 )
 						    	task.setId(taskID);
-						}*/
+						}
 						//} else {
 							//TaskSQL.update(task, dsSQL.getConn());	
 							//TaskSQL.save(processTask(trade),dsSQL.getConn());
@@ -199,8 +208,8 @@ public class TradeImp implements RemoteTrade {
 					   //publishnewTrade("NEWTRADE","Text",null);
 						
 					   publishnewTrade("POS_NEWTRADE","Object",getTradeEvent(trade));
-					   //if(task != null)
-						//	 publishnewTrade("POS_NEWTRADE","Object",getTaskEvent(task, trade));
+					   if(task != null)
+							 publishnewTrade("POS_NEWTRADE","Object",getTaskEvent(task, trade));
 							
 					   if(originalTrade != null) {
 						 //  originalTrade.setAttribute("B2BID",  Integer.valueOf(i).toString());
@@ -408,8 +417,12 @@ public class TradeImp implements RemoteTrade {
 						prcessAudit(trade);
 						//processTask(trade,wf);
 					   //publishnewTrade("NEWTRADE","Text",null);
-						if(task != null)
+						if(task != null) {
+							System.out.println("task  ************** " +task.getId() );
 						 publishnewTrade("POS_NEWTRADE","Object",getTaskEvent(task, trade));
+						}
+						
+							
 						//System.out.println("Publishing %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^    neew Event on TRADE_"+trade.getStatus() +  " for trade id " + trade.getId());
 					   publishnewTrade("POS_NEWTRADE","Object",getTradeEvent(trade));
 					  
@@ -679,6 +692,10 @@ public class TradeImp implements RemoteTrade {
 		}
 		
 	}
+	
+	// 1. Get new Task from NewTrade.
+	// 2. Check any old task which is existing in task station or db on oldtrade version.
+	// 3. Mark old task on oldtrade version as 2 so that it will not process by task station. 
 
 	private Task checkTask(Trade newTrade,WFConfig wf,Trade oldTrade) {
 		
@@ -690,27 +707,8 @@ public class TradeImp implements RemoteTrade {
 				 t = processTask(newTrade,wf.getId());
 			} 
 			if(oldTrade.getId() != 0 ) {
-				int i = TaskSQL.updateCompletedTradeTask(oldTrade.getId(),oldTrade.getVersion(),dsSQL.getConn());  //need to pass system user TOBE done later
-				if(i > 0) {
-					String sql = "tradeid = "+oldTrade.getId()+" and tradeVersion = "+oldTrade.getVersion()+" and task_status ='2' and wftype = 'TRADE'";
-					
-					Vector v1 = (Vector) TaskSQL.selectTaskWhere(sql, dsSQL.getConn());
-					if(v1 != null && (!v1.isEmpty())) {
-						for(int p =0;p<v1.size();p++) {
-							Task task = (Task) v1.get(p);
-							if(task != null) {
-								 try {
-									publishnewTrade("POS_NEWTRADE","Object",getTaskEvent(task,oldTrade));
-								} catch (RemoteException e) {
-									// TODO Auto-generated catch block
-									commonUTIL.displayError("TradeImpl", "checkTask Fired on Update of Task", e);
-								}
-							}
-							
-							
-						}
-					}
-				}
+				  TaskSQL.updateCompletedTradeTask(oldTrade.getId(),oldTrade.getVersion(),dsSQL.getConn());  //need to pass system user TOBE done later
+				 
 			}
 		}
 		return t;
@@ -1017,17 +1015,17 @@ return status;
 			@Override
 			public Trade getTradeOnVersion(int tradeID,int version) throws RemoteException {
 				
-				Trade trade = new Trade();
+				Trade audittrade = new Trade();
 				String sql = " id = " + tradeID + " and version = " + version;
 				Vector v1 = (Vector) AuditSQL.selectwhere(sql,  dsSQL.getConn());
 				if(v1 != null || v1.size() > 0) {
-					trade = new Trade();
+					audittrade = new Trade();
 					String oldTradeValues = ((Audit)v1.elementAt(0)).getValues();
-					fillTradeObject(oldTradeValues,trade);
-					trade.setAttributes(((Audit)v1.elementAt(0)).getTattribue());
+					fillTradeObject(oldTradeValues,audittrade);
+					audittrade.setAttributes(((Audit)v1.elementAt(0)).getTattribue());
 				
 				}
-				return trade;
+				return audittrade;
 			}
 // this issue can be solved through procedure or joins (temporary solution)
 
@@ -1667,6 +1665,20 @@ return status;
 
 
 
+			}
+
+
+
+			@Override
+			public boolean isDifferentUser(Trade trade) throws RemoteException {
+				// TODO Auto-generated method stub
+				if(trade != null && trade.getId() > 0) {
+					Trade auditTrade = getTradeOnVersion(trade.getId(), trade.getVersion());
+					 if(auditTrade.getUserID() == trade.getUserID()) {
+						 return true;
+					 }
+				}
+				return false;
 			}
 
 		

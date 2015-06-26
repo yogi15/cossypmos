@@ -4,24 +4,32 @@ import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.util.Collection;
 
+import util.cacheUtil.AccessDataCacheUtil;
+
 import dbSQL.AccessSQL;
 import dbSQL.dsSQL;
 import beans.AccessFunction;
 import beans.AccessWindow;
+import beans.Users;
 
 public class AccessDataImp implements RemoteAccessData {
 
 	@Override
 	public int saveAccessFuntion(Collection<AccessFunction> accessFunctionvec)
 			throws RemoteException {
-		Connection con = dsSQL.getConn();		
+		Connection con = dsSQL.getConn();
+		Collection<AccessFunction> accessFunction = null;
 		boolean isDeleted = AccessSQL.deleteAccessFunction(accessFunctionvec, con);
 		
 		if (isDeleted) {
-			return AccessSQL.saveAccessFunction(accessFunctionvec, con);
+			 if(AccessSQL.saveAccessFunction(accessFunctionvec, con) == 1)  {
+				 //AccessDataCacheUtil.getAccessData().addNewAccesFunctionToGroup(accessFunctionvec);
+				 return 1;
+			 }
 		} else {
 			return 0;
 		}
+		return 0;
 				
 	}
 
@@ -126,5 +134,22 @@ public class AccessDataImp implements RemoteAccessData {
 		Connection con = dsSQL.getConn();
 		return AccessSQL.selectAccessWindow(accessWindow, con);
 	}
+
+	@Override
+	public Collection<AccessFunction> getALLFunctionOfGroup(Users user
+			 ) throws RemoteException {
+		// TODO Auto-generated method stub
+		String sql = " Groupname = '"+user.getUser_groups()+"'";
+		return AccessSQL.selectAccessFunction(sql, dsSQL.getConn());
+	}
+	@Override
+	public Collection<AccessFunction> getALLFunctionOfGroup(String groupName
+			 ) throws RemoteException {
+		// TODO Auto-generated method stub
+		String sql = " Groupname = '"+groupName+"'";
+		return AccessSQL.selectAccessFunction(sql, dsSQL.getConn());
+	}
+
+	 
 
 }

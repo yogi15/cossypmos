@@ -18,6 +18,7 @@ public interface RemoteTrade extends Remote {
 	public Vector getTradeRollBackHierarchies(int tradeID) throws RemoteException;
 	public Vector saveTrade(Trade trade,Vector<String> message)throws RemoteException;
 	public Trade getTradeOldVersion(int tradeID,int tradeVersion)throws RemoteException;
+	public boolean isDifferentUser(Trade trade)throws RemoteException;
 	public void isEventExceuted(EventProcessor event) throws RemoteException;
 	
 	public boolean checkLimitOnTrade(Trade trade,String type) throws RemoteException;
