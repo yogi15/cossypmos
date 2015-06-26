@@ -1,7 +1,5 @@
 package apps.window.staticwindow;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -30,7 +28,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-import javax.swing.border.TitledBorder;
+import javax.swing.border.EtchedBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -74,7 +72,7 @@ public class WorkFlowSetupWindow extends JPanel {
 	 //   DefaultTableModel tmodel;
 		 RemoteReferenceData remoteBORef;
 		 TableModelUtil model;
-		 String col[] = {"Id","Current status", "Action ", "New Status","Group","Auto","Rules","Type","Task"};
+		 String col[] = {"Id","Current status", "Action ", "New Status","Group","Auto","Rules","Type","Task","Diff User"};
 		 String type = ""; 
 		 Vector data = null;
 		 Vector tradeRules = new Vector();
@@ -118,6 +116,7 @@ public class WorkFlowSetupWindow extends JPanel {
  	DefaultListModel transferRuleemodel = new DefaultListModel();
 	private JCheckBox jCheckBox1;
 	JDialogBoxForChoice choice12 = null;
+	private JCheckBox diffUser;
 	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 	public WorkFlowSetupWindow() {
 		init();
@@ -133,11 +132,19 @@ public class WorkFlowSetupWindow extends JPanel {
 		setSize(1109, 526);
 	}
 
+	private JCheckBox getJCheckBox2() {
+		if (diffUser == null) {
+			diffUser = new JCheckBox();
+			diffUser.setSelected(false);
+			diffUser.setText("Diff User");
+		}
+		return diffUser;
+	}
+
 	private JCheckBox getJCheckBox1() {
 		if (jCheckBox1 == null) {
 			jCheckBox1 = new JCheckBox();
 			jCheckBox1.setText("Create Task");
-			jCheckBox1.setSelected(false);
 		}
 		return jCheckBox1;
 	}
@@ -168,7 +175,7 @@ public class WorkFlowSetupWindow extends JPanel {
 	  				jComboBox0.setSelectedItem(jTable0.getValueAt(i, 1).toString()); // for org status combox
 	  				jComboBox1.setSelectedItem(jTable0.getValueAt(i, 2).toString()); // for action combox
 		  			jComboBox2.setSelectedItem(jTable0.getValueAt(i, 3).toString()); // for newStatus combox
-		  			//jComboBox3.setSelectedItem(jTable0.getValueAt(i, 4).toString()); // for Group 
+		  			jComboBox3.setSelectedItem(jTable0.getValueAt(i, 4).toString()); // for Group 
 		  			jComboBox4.setSelectedItem(jTable0.getValueAt(i, 7).toString()); // Type
 		  			
 		  			if(jTable0.getValueAt(i, 6) != null)
@@ -192,6 +199,13 @@ public class WorkFlowSetupWindow extends JPanel {
 	                	    jCheckBox1.setSelected(false);
 	                 	}
 		  			}
+	  			if(jTable0.getValueAt(i, 9).toString().equalsIgnoreCase("1")) {
+	  				diffUser.setSelected(true);
+		        } else {
+                	if(diffUser.isSelected()) 
+                		diffUser.setSelected(false);
+                 	}
+	  			
 	  		//	if(jTable0.getValueAt(i, 8).toString())
 	  		}
 
@@ -202,24 +216,24 @@ public class WorkFlowSetupWindow extends JPanel {
 	private JPanel getJPanel1() {
 		if (jPanel1 == null) {
 			jPanel1 = new JPanel();
-			jPanel1.setBorder(BorderFactory.createTitledBorder(null, "SetUp", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, new Font("Tahoma", Font.PLAIN,
-					11), Color.black));
+			jPanel1.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel1.setLayout(new GroupLayout());
-			jPanel1.add(getJCheckBox0(), new Constraints(new Leading(-2, 10, 10), new Leading(48, 8, 8)));
-			jPanel1.add(getJButton4(), new Constraints(new Leading(279, 32, 10, 10), new Leading(48, 12, 12)));
-			jPanel1.add(getJComboBox1(), new Constraints(new Leading(378, 176, 10, 10), new Leading(2, 28, 12, 12)));
-			jPanel1.add(getJLabel2(), new Constraints(new Leading(323, 47, 10, 10), new Leading(12, 12, 12, 12)));
 			jPanel1.add(getJLabel5(), new Constraints(new Leading(323, 42, 12, 12), new Leading(54, 12, 12)));
-			jPanel1.add(getJLabel1(), new Constraints(new Leading(55, 30, 10, 10), new Leading(51, 12, 12)));
-			jPanel1.add(getJComboBox2(), new Constraints(new Trailing(12, 176, 670, 682), new Leading(0, 28, 12, 12)));
-			jPanel1.add(getJTextField0(), new Constraints(new Leading(99, 176, 10, 10), new Leading(44, 28, 11, 11)));
-			jPanel1.add(getJLabel3(), new Constraints(new Leading(585, 97, 10, 10), new Leading(11, 12, 12)));
-			jPanel1.add(getJLabel4(), new Constraints(new Leading(648, 29, 10, 10), new Leading(51, 11, 11)));
-			jPanel1.add(getJComboBox4(), new Constraints(new Trailing(12, 176, 682, 687), new Leading(37, 28, 11, 11)));
 			jPanel1.add(getJCheckBox1(), new Constraints(new Leading(494, 10, 10), new Leading(51, 7, 7)));
 			jPanel1.add(getJComboBox3(), new Constraints(new Leading(377, 107, 10, 10), new Leading(45, 28, 12, 12)));
-			jPanel1.add(getJComboBox0(), new Constraints(new Leading(98, 176, 126, 200), new Leading(3, 28, 12, 12)));
-			jPanel1.add(getJLabel0(), new Constraints(new Leading(0, 92, 126, 200), new Leading(12, 12, 12)));
+			jPanel1.add(getJComboBox4(), new Constraints(new Trailing(12, 176, 689, 689), new Leading(51, 28, 12, 12)));
+			jPanel1.add(getJComboBox2(), new Constraints(new Leading(732, 176, 10, 10), new Leading(8, 28, 12, 12)));
+			jPanel1.add(getJLabel3(), new Constraints(new Leading(609, 12, 12), new Leading(12, 12, 12)));
+			jPanel1.add(getJLabel4(), new Constraints(new Trailing(197, 603, 603), new Leading(54, 12, 12)));
+			jPanel1.add(getJComboBox1(), new Constraints(new Leading(411, 176, 10, 10), new Leading(8, 28, 12, 12)));
+			jPanel1.add(getJLabel2(), new Constraints(new Leading(337, 47, 10, 10), new Leading(14, 12, 12, 12)));
+			jPanel1.add(getJLabel0(), new Constraints(new Leading(0, 107, 10, 10), new Leading(12, 12, 12)));
+			jPanel1.add(getJComboBox0(), new Constraints(new Leading(110, 176, 10, 10), new Leading(6, 28, 12, 12)));
+			jPanel1.add(getJButton4(), new Constraints(new Leading(289, 32, 10, 10), new Leading(48, 12, 12)));
+			jPanel1.add(getJTextField0(), new Constraints(new Leading(107, 176, 238, 238), new Leading(46, 28, 12, 12)));
+			jPanel1.add(getJCheckBox0(), new Constraints(new Leading(-2, 10, 10), new Leading(48, 8, 8)));
+			jPanel1.add(getJLabel1(), new Constraints(new Leading(71, 30, 238, 238), new Leading(51, 12, 12)));
+			jPanel1.add(getJCheckBox2(), new Constraints(new Leading(601, 97, 10, 10), new Leading(51, 12, 12)));
 		}
 		return jPanel1;
 	}
@@ -279,7 +293,7 @@ public class WorkFlowSetupWindow extends JPanel {
     				choice12.setLocationRelativeTo(choice12);
     				//choice12.setSize(200,200);
     				choice12.setVisible(true);
-				} else
+				} 
             	if(type.equalsIgnoreCase("MESSAGE")) {
                 	choice12 =	new JDialogBoxForChoice(messageRuleemodel);
                 		choice12.jList3.setModel(messageRuleemodel);
@@ -434,7 +448,8 @@ public class WorkFlowSetupWindow extends JPanel {
             	   config.setAuto(0);
                if( jCheckBox1.isSelected())
                    config.setTask(true);
-                 
+               if( diffUser.isSelected())
+                   config.setDiffUser(1);
                if(jComboBox0.getSelectedItem() == null) {
                	commonUTIL.showAlertMessage("Select Orginal Status on Transition");
                	return;
@@ -537,6 +552,10 @@ public class WorkFlowSetupWindow extends JPanel {
                 				config.setTask(true);
                 		else 
                 			config.setTask(false);
+                    		if( diffUser.isSelected())
+                				config.setDiffUser(1);
+                		else 
+                			config.setDiffUser(0);
                     		if(jComboBox0.getSelectedItem() == null) {
                     				commonUTIL.showAlertMessage("Select Orginal Status on Transition");
                     				return;
@@ -774,6 +793,7 @@ public class WorkFlowSetupWindow extends JPanel {
 	private JPanel getJPanel2() {
 		if (jPanel2 == null) {
 			jPanel2 = new JPanel();
+			jPanel2.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel2.setLayout(new GroupLayout());
 			jPanel2.add(getJButton0(), new Constraints(new Leading(20, 10, 10), new Leading(22, 10, 10)));
 			jPanel2.add(getJButton1(), new Constraints(new Leading(89, 73, 10, 10), new Leading(22, 10, 10)));
@@ -786,8 +806,7 @@ public class WorkFlowSetupWindow extends JPanel {
 	private JPanel getJPanel3() {
 		if (jPanel3 == null) {
 			jPanel3 = new JPanel();
-			jPanel3.setBorder(BorderFactory.createTitledBorder(null, "WorkFlow Entries", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, new Font("Tahoma",
-					Font.PLAIN, 11), Color.black));
+			jPanel3.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel3.setLayout(new GroupLayout());
 			jPanel3.add(getJScrollPane1(), new Constraints(new Bilateral(2, 0, 23), new Leading(4, 268, 10, 10)));
 		}
@@ -797,8 +816,7 @@ public class WorkFlowSetupWindow extends JPanel {
 	private JPanel getJPanel0() {
 		if (jPanel0 == null) {
 			jPanel0 = new JPanel();
-			jPanel0.setBorder(BorderFactory.createTitledBorder(null, "WorkFlow", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, new Font("Tahoma",
-					Font.PLAIN, 11), Color.black));
+			jPanel0.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel0.setLayout(new GroupLayout());
 			jPanel0.add(getJScrollPane0(), new Constraints(new Leading(1, 136, 10, 10), new Leading(0, 459, 12, 12)));
 		}
@@ -1072,7 +1090,13 @@ public void selectProductWF(String productType,String productSubType,String type
 	   	         else 
 	   	        	value = "0";
 	   	         break;
-	   		 }
+	   		 
+	   	 case 9:
+   	         
+   	        	value =wfconfig.getDiffUser();
+   	   
+   	         break;
+   		 }
 	   	     return value;
 	   	 }   
 	   	   
