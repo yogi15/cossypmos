@@ -16,24 +16,25 @@ public class WFConfigSQL {
 	final static private String DELETE_FROM_WFConfig =
 		"DELETE FROM WFConfig where id =? ";
 	final static private String INSERT_FROM_WFConfig =
-		"INSERT into WFConfig(id,productType,productSubType,Action,orgStatus,currentStatus,Auto,rule,le,users,type,task) values(?,?,?,?,?,?,?,?,?,?,?,?)";
+		"INSERT into WFConfig(id,productType,productSubType,Action,orgStatus,currentStatus,Auto,rule,le,users,type,task,groupname,diffUser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	final static private String UPDATE_FROM_WFConfig =
-		"UPDATE WFConfig set productType=?,productSubType=?,Action=?,orgStatus=?,currentStatus=?,Auto=?,rule=?,le=?,users=?,type=?,task=? where id = ? ";
+		"UPDATE WFConfig set productType=?,productSubType=?,Action=?,orgStatus=?,currentStatus=?,Auto=?,rule=?,le=?,users=?,type=?,task=?,groupname=? where id = ? ";
 	final static private String SELECT_MAX =
 		"SELECT MAX(id) DESC_ID FROM WFConfig ";
 	final static private String SELECTALL =
-		"SELECT id,productType,productSubType,Action,orgStatus,currentStatus,Auto,rule,le,users,type,task FROM WFConfig order by id";
+		"SELECT id,productType,productSubType,Action,orgStatus,currentStatus,Auto,rule,le,users,type,task,groupname,diffUser FROM WFConfig order by id";
 	final static private String SELECT =
 		"SELECT title FROM WFConfig where id =  ?";
 	 static private String SELECTONE =
-		"SELECT id,productType,productSubType,Action,orgStatus,currentStatus,Auto,rule,le,users,type,task FROM WFConfig where id =  " ;
+		"SELECT id,productType,productSubType,Action,orgStatus,currentStatus,Auto,rule,le,users,type,task,groupname,diffUser FROM WFConfig where id =  " ;
 	 private static String whereClause =
-		 "Select id,productType,productSubType,Action,orgStatus,currentStatus,Auto,rule,le,users,type,task  FROM WFConfig where ";
+		 "Select id,productType,productSubType,Action,orgStatus,currentStatus,Auto,rule,le,users,type,task,groupname,diffUser  FROM WFConfig where ";
 	 
 	private static String  getUpdateSQL(WFConfig updateWFConfig) {
 		 
 		 String sql = 	  " update wfconfig set  " + 
 		  " id= "+  updateWFConfig.getId() + 
+		   ", diffUser= "+  updateWFConfig.getDiffUser() + 
 		  ",  productType = '"+ updateWFConfig.getProductType()+ 
 		   "', productSubType = '"+ updateWFConfig.getProductSubType()+ 
 		   "', Action  = '"+updateWFConfig.getAction() + 
@@ -43,7 +44,8 @@ public class WFConfigSQL {
 		   ", rule  = '"+ updateWFConfig.getRule()+ 
 		   "', le = "+ updateWFConfig.getLe()+ 
 		   " ,users = "+ updateWFConfig.getUsers()+ 
-		   ", type   = '"+  updateWFConfig.getType() + "',";
+		   ", type   = '"+  updateWFConfig.getType() + "' " +
+		 ", groupname   = '"+  updateWFConfig.getGroupName() + "',";
           if(updateWFConfig.isTask())
         	  sql = sql +  "  task = '1'";
           else
@@ -227,11 +229,13 @@ protected static int selectMax(Connection con ) {
 	            stmt.setInt(9, inserWFConfig.getLe());
 	            stmt.setInt(10, inserWFConfig.getUsers());
 	            stmt.setString(11, inserWFConfig.getType());
+	           
 	            if(inserWFConfig.isTask())
 		               stmt.setInt(12, 1);
 		            else
 		            	stmt.setInt(12, 0);
-		            
+	            stmt.setString(13, inserWFConfig.getGroupName());
+	            stmt.setInt(14, inserWFConfig.getDiffUser());
 	            stmt.execute();
 			 con.commit();
 			 return id;
@@ -276,10 +280,12 @@ protected static int selectMax(Connection con ) {
 	        	 wfConfig.setLe(rs.getInt(9));
 	        	 wfConfig.setUsers(rs.getInt(10));
 	        	 wfConfig.setType(rs.getString(11));
+	        	
 	         int t = rs.getInt(12);
 	         if(t == 1)
 	        	 wfConfig.setTask(true);
-	      
+	         wfConfig.setGroupName(rs.getString(13));
+	         wfConfig.setDiffUser(rs.getInt(14));
 	       return wfConfig;
 	         
 	         }
@@ -324,9 +330,13 @@ protected static int selectMax(Connection con ) {
 	        	 wfConfig.setLe(rs.getInt(9));
 	        	 wfConfig.setUsers(rs.getInt(10));
 	        	 wfConfig.setType(rs.getString(11));
+	        	 wfConfig.setGroupName(rs.getString(12));
 	        	 int t = rs.getInt(12);
 		         if(t == 1)
 		        	 wfConfig.setTask(true);
+
+		         wfConfig.setGroupName(rs.getString(13));
+		         wfConfig.setDiffUser(rs.getInt(14));
 	        wfConfigs.add(wfConfig);
 	      
 	      }
@@ -340,7 +350,7 @@ protected static int selectMax(Connection con ) {
 				stmt.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				commonUTIL.displayError("bookSQL",SELECTALL,e);
+				commonUTIL.displayError("WfConfigSQL",SELECTALL,e);
 			}
 	     }
 	     return wfConfigs;
@@ -373,6 +383,9 @@ protected static int selectMax(Connection con ) {
 	        	 int t = rs.getInt(12);
 		         if(t == 1)
 		        	 wfConfig.setTask(true);
+
+		         wfConfig.setGroupName(rs.getString(13));
+		         wfConfig.setDiffUser(rs.getInt(14));
 		        wfConfigs.add(wfConfig);
 	      
 	      }
@@ -421,6 +434,9 @@ protected static int selectMax(Connection con ) {
 	        	 int t = rs.getInt(12);
 		         if(t == 1)
 		        	 wfConfig.setTask(true);
+
+		         wfConfig.setGroupName(rs.getString(13));
+		         wfConfig.setDiffUser(rs.getInt(14));
 		        wfConfigs.add(wfConfig);
 	      
 	      }

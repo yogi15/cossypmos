@@ -320,7 +320,9 @@ public class MessageSQL {
 	//	con.setTransactionIsolation(arg0)
 		for(int i=0;i<mess.size();i++) {
 			Message newMess = mess.get(i);
+			int taskID = newMess.getTaskID();  // i don't want to save task in db. 
 			newMess = insert(newMess,con);
+			newMess.setTaskID(taskID); 
 			if(newMess != null)
 			messages.add(newMess);
 		}
