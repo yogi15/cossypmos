@@ -37,7 +37,7 @@ public class FilterValues {
 			"TradeAttribute", "QuotingCurr", "PrimaryCurr", "LEAttributes",
 			"BookAttributes" };
 	String referenceData[] = { "Book" };
-	String datesSearch[] = { "between", ">=", ">", "<=", "<", "=" };
+	String datesSearch[] = { "Select Values","between", ">=", ">", "<=", "<", "=" };
 	Hashtable<Integer, Book> bookValues = new Hashtable<Integer, Book>();
 	static Hashtable<String, String> attributesTableName = new Hashtable<String, String>();
 	static Hashtable<String, String> attributesTableWhereClause = new Hashtable<String, String>();
@@ -1043,16 +1043,17 @@ public class FilterValues {
 		}
 	}
 
-	public int updateTraderAndPublissh(Trade trade, int userID) {
+	public Vector<String> updateTraderAndPublissh(Trade trade, int userID) {
 		
 		try {
 			trade.setUserID(userID);
-			return remoteTrade.saveTrade(trade);
+			Vector<String> message = new Vector<String>();
+			return remoteTrade.saveTrade(trade,message);
 
 		} catch (RemoteException e) {
 			
 			e.printStackTrace();
-			return -1;
+			return null;
 		}
 
 	}
@@ -1397,5 +1398,8 @@ public class FilterValues {
 		String attributeFun = " getAttributeValueOnTrade(Trade.id,'"+	attributeName+"') "+attributeName;
 		return attributeFun;
 	}
+	
+	
+	
 
 }

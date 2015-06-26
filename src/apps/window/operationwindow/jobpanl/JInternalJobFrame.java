@@ -71,12 +71,27 @@ import com.jidesoft.popup.JidePopup;
 
 public class JInternalJobFrame extends JInternalFrame {
 
-	public JobTreeViewPanel searchPanel = null;
+	public JobTreeViewPanel searchTreeJobPanel = null;
 	FilterValues filterValues = null;
 	ReportPanel reportPanel = null;
 	Vector data = new Vector();
 	private UserJob job=null;
 	Vector<UserJob> jobs = null;
+	public   String signalTOremoveNode = "";
+	/**
+	 * @return the signTOremoveNode
+	 */
+	public String getSignalTOremoveNode() {
+		return signalTOremoveNode;
+	}
+
+	/**
+	 * @param signTOremoveNode the signTOremoveNode to set
+	 */
+	public void setSignalTOremoveNode(String signTOremoveNode) {
+		this.signalTOremoveNode = signTOremoveNode;
+	}
+
 	private Vector<UserJobsDetails> jobdetails;
 	/**
 	 * @return the reportPanel
@@ -148,30 +163,30 @@ public class JInternalJobFrame extends JInternalFrame {
 		if (jToolBar1 == null) {
 			jToolBar1 = new JToolBar();
 			jToolBar1.setFloatable(false);
-			jToolBar1.add(getJButton0());
+		//	jToolBar1.add(getExecute()); // execute 
 			jToolBar1.addSeparator();
 
-			jToolBar1.add(getJButton1());
+			jToolBar1.add(getSave()); // save 
 			jToolBar1.addSeparator();
 			//jToolBar1.add(getJButton2());
 		//	jToolBar1.addSeparator();
-			jToolBar1.add(getJButton3());
+			jToolBar1.add(getAddJob()); // ADD
 			jToolBar1.addSeparator();
-			jToolBar1.add(getJButton4());
+			jToolBar1.add(getClearALL()); // clearALL
 			jToolBar1.addSeparator();
-			jToolBar1.add(getJButton5());
+			jToolBar1.add(getDelete()); // Delete
 		}
 		return jToolBar1;
 	}
 
 	private JPanel getJPanel1() {
 		// TODO Auto-generated method stub
-		searchPanel = new JobTreeViewPanel();
-		searchPanel.setFilterValues(filterValues);
-		searchPanel.setUser(getUser());
-		return searchPanel.getJPanel1();
+		searchTreeJobPanel = new JobTreeViewPanel();
+		searchTreeJobPanel.setFilterValues(filterValues);
+		searchTreeJobPanel.setUser(getUser());
+		return searchTreeJobPanel.getJPanel1();
 	}
-	private JButton getJButton4() {
+	private JButton getClearALL() {
 		if (jButton4 == null) {
 			jButton4 = new JButton();
 			jButton4.setMaximumSize(new Dimension(20, 18));
@@ -191,7 +206,7 @@ public class JInternalJobFrame extends JInternalFrame {
 		}
 		return jButton4;
 	}
-	private JButton getJButton5() {
+	private JButton getDelete() {
 		if (jButton5 == null) {
 			jButton5 = new JButton();
 			jButton5.setMaximumSize(new Dimension(20, 18));
@@ -203,36 +218,21 @@ public class JInternalJobFrame extends JInternalFrame {
 			jButton5.setToolTipText("Delete Criteria");
 			jButton5.addActionListener(new ActionListener() {
 	            public void actionPerformed(ActionEvent arg0) {
-	            /*	if(searchPanel.table.getSelectedRow() != -1)  {
-	            		searchPanel.deleteRowCriteria(searchPanel.table.getSelectedRow());
-	            		filters.remove(searchPanel.table.getSelectedRow());
-	            		Vector<UserJobsDetails> jobdets = new Vector<UserJobsDetails>();
-	            		for(int i=0;i<filters.size();i++) {
-	            			FilterBean filterBean = filters.get(i);
-	            			UserJobsDetails ud = new UserJobsDetails();
-	            			ud.setJobId(job.getId());
-	            			ud.setColumnName(filterBean.getColumnName());
-	            			ud.setCriteria(filterBean.getSearchCriteria());
-	            			ud.setValues(filterBean.getColumnValues() );
-	            			ud.setFilterValues(filterBean.getIdSelected());
-	            			ud.setRowid(i);
-	            			jobdets.add(ud);
-	            			
-	            		}
-	            		try {
-	            			if(job !=null )
-	    					reportPanel.getRemoteTask().saveUserJobsDetails(jobdets,job.getId());
-	    				} catch (RemoteException e) {
-	    					// 	
-	    					e.printStackTrace();
-	    				}
-	            	}*/
+	            	if(!searchTreeJobPanel.jTree1.isSelectionEmpty())  {
+	            		TreePath selPath = 	searchTreeJobPanel.jTree1.getSelectionPath();
+	            		MutableTreeNode mNode = (MutableTreeNode) selPath.getLastPathComponent();
+	            		setSignalTOremoveNode(selPath.toString()+"_DeleteNode");
+	            				DefaultTreeModel _treeModel = (DefaultTreeModel) searchTreeJobPanel.jTree1.getModel();
+	            		_treeModel.removeNodeFromParent(mNode);
+	            		searchTreeJobPanel.jTree1.setModel(_treeModel);
+	            		
+	            	}
 	            }
 			});
 		}
 		return jButton5;
 	}
-	private JButton getJButton0() {
+	private JButton getExecute() {
 		if (jButton0 == null) {
 			jButton0 = new JButton();
 			jButton0.setMaximumSize(new Dimension(20, 18));
@@ -302,7 +302,7 @@ public class JInternalJobFrame extends JInternalFrame {
 	 * 8.  when combox box of that editor is clicked the jcombox mouse event is called. 
 	 * 7.  in mouse event of combox, bean assign to the Table  model  is mapped and displayed in table
 	 */
-	private JButton getJButton3() {
+	private JButton getAddJob() {
 
 		if (jButton3 == null) {
 			jButton3 = new JButton();
@@ -320,16 +320,16 @@ public class JInternalJobFrame extends JInternalFrame {
                         ,"Enter Name text:");
             	if(commonUTIL.isEmpty(input))
             		return;
-            	if(checkNameAlreadyExists(input,searchPanel.root)) {
+            	if(checkNameAlreadyExists(input,searchTreeJobPanel.root)) {
             		commonUTIL.showAlertMessage("Duplicate Name");
             		return;
             	}
-            	addJobNode(input,searchPanel.treeModel.getChildCount(searchPanel.root));
+            	addJobNode(input,searchTreeJobPanel.treeModel.getChildCount(searchTreeJobPanel.root));
             	if(input != null && (!input.isEmpty())) {
             		DefaultMutableTreeNode node = new DefaultMutableTreeNode(input);
-            		searchPanel.root.add(node);
-            		searchPanel. treeModel.reload();
-            		searchPanel. jTree1.repaint();
+            		searchTreeJobPanel.root.add(node);
+            		searchTreeJobPanel. treeModel.reload();
+            		searchTreeJobPanel. jTree1.repaint();
             	}
             }
 			
@@ -350,8 +350,8 @@ public class JInternalJobFrame extends JInternalFrame {
 			jButton2.setToolTipText("Load Template");
 		}jButton2.addActionListener(new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				TreePath[] paths = searchPanel.jTree1.getSelectionPaths();
-	       	      DefaultTreeModel model = (DefaultTreeModel)searchPanel. jTree1.getModel();
+				TreePath[] paths = searchTreeJobPanel.jTree1.getSelectionPaths();
+	       	      DefaultTreeModel model = (DefaultTreeModel)searchTreeJobPanel. jTree1.getModel();
 	       	      for (int i = 0; i < paths.length; i++)
 	       	      {
 	       	    	  String name = paths[i].toString();
@@ -388,7 +388,7 @@ public class JInternalJobFrame extends JInternalFrame {
 			e.printStackTrace();
 		}
 	}
-	private JButton getJButton1() {
+	private JButton getSave() {
 		if (jButton1 == null) {
 			jButton1 = new JButton();
 			//jButton1.setText("B1");
@@ -446,7 +446,7 @@ public class JInternalJobFrame extends JInternalFrame {
 	 *            the searchPanel to set
 	 */
 	public void setSearchPanel(JobTreeViewPanel searchPanel) {
-		this.searchPanel = searchPanel;
+		this.searchTreeJobPanel = searchPanel;
 	}
 
 	/**
@@ -539,7 +539,7 @@ public class JInternalJobFrame extends JInternalFrame {
 		newJob.setType("TASK");
 		try {
 		newJob =	filterValues.remoteTask.saveUserJob(newJob);
-			searchPanel.getJobs().add(searchPanel.getJobs().size(),newJob);
+		searchTreeJobPanel.getJobs().add(searchTreeJobPanel.getJobs().size(),newJob);
 			//System.out.println(jobs.size());
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
