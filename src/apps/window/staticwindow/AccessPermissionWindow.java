@@ -42,6 +42,7 @@ import org.dyno.visual.swing.layouts.Leading;
 
 import util.RemoteServiceUtil;
 import util.commonUTIL;
+import util.cacheUtil.AccessDataCacheUtil;
 import apps.window.referencewindow.staticReferencePanel;
 import beans.AccessFunction;
 import beans.AccessWindow;
@@ -104,11 +105,11 @@ public class AccessPermissionWindow extends staticReferencePanel {
 	
 	private void initData() {		
 		referenceData = RemoteServiceUtil.getRemoteReferenceDataService();
-		remoteAccessData = RemoteServiceUtil.getRemoteAccess();
+		remoteAccessData = RemoteServiceUtil.getRemoteAccessDataService();
 		try {
 			groupNames = referenceData.getStartUPData("UserGroup");
 			windowNames = referenceData.getStartUPData("WindowName");
-			functionNames = referenceData.getStartUPData("FunctionName");	
+			functionNames = referenceData.getStartUPData("WindowFunctionName");	
 			
 			extractStartUpData(groupNames, groupNamesVec);
 			extractStartUpData(windowNames, windowNamesVec);
@@ -177,12 +178,13 @@ public class AccessPermissionWindow extends staticReferencePanel {
 				try {							
 					if (!functionList.isSelectionEmpty()) {
 						save = remoteAccessData.saveAccessFuntion(accessFunctionsVec);
-					} else {
+					 
 						save = remoteAccessData.saveAccessWindow(accessWindowVec);
 					}
 				
 					if (save == 1) {
 						commonUTIL.showAlertMessage("Saved");
+						AccessDataCacheUtil.addNewAccesFunctionToGroup(accessFunctionsVec);
 					} else {
 						commonUTIL.showAlertMessage("Not Saved");
 					}
@@ -739,6 +741,10 @@ public class AccessPermissionWindow extends staticReferencePanel {
 			
 		if (!functionTable.containsKey(windowName)) {
 			DefaultListModel<String>  listModel = new DefaultListModel<String>();
+			listModel.addElement(windowName+"_Save");
+			listModel.addElement(windowName+"_SaveAsNew");
+			listModel.addElement(windowName+"_Delete");
+			listModel.addElement(windowName+"_Open");
 						
 			Iterator<StartUPData> itr = functionNames.iterator();
 			while(itr.hasNext()) {
@@ -748,6 +754,7 @@ public class AccessPermissionWindow extends staticReferencePanel {
 					listModel.addElement(fucntion);
 				}
 			}
+			
 			
 			functionTable.put(windowName, listModel);
 		}
