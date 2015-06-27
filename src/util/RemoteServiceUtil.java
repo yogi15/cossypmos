@@ -6,6 +6,7 @@ import java.util.Date;
 
 import dsEventProcessor.EventProcessor;
 import dsServices.Remote;
+import dsServices.RemoteAccessData;
 import dsServices.RemoteAccount;
 import dsServices.RemoteAdminManager;
 import dsServices.RemoteBOProcess;
@@ -40,6 +41,25 @@ public class RemoteServiceUtil {
 		}
 
 		return referenceData;
+
+	}
+	public static RemoteAccessData getRemoteAccessDataService() {
+
+		RemoteAccessData dataAccess = null;
+
+		try {
+
+			ServerConnectionUtil de = getServerConnection();
+
+			dataAccess = (RemoteAccessData) de.getRMIService("AccessData");
+
+		} catch (RemoteException e) {
+
+			e.printStackTrace();
+
+		}
+
+		return dataAccess;
 
 	}
 	public static RemoteEvent getRemoteEventService() {
