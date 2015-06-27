@@ -687,7 +687,7 @@ public class JFrameMainApplication extends JFrame {
 							staticwindow.setIconImage(Toolkit.getDefaultToolkit()
 									.getImage(imgURL));
 							staticwindow.setLocation(50, 100);
-							staticwindow.setSize(765, 585);
+							staticwindow.setSize(1035, 555);
 						}
 						if (arg0.getActionCommand().toString()
 								.equalsIgnoreCase("Holiday")) {
