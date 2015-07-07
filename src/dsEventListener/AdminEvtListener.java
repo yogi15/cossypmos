@@ -15,6 +15,10 @@ public class AdminEvtListener extends ControllerManager {
 		super(host, hostName, managerName);
 		// TODO Auto-generated constructor stub
 	}
+	public  AdminEvtListener(String host, String hostName, String managerName,String queueName) {
+		super(host, hostName, managerName,queueName);
+		// TODO Auto-generated constructor stub
+	}
 	public void setAdminEvtListener(apps.window.adminmonitor.AdminMonitorWindow transferEvtConsumer) {
 		this.adminEvntConsumer = transferEvtConsumer;
 	
