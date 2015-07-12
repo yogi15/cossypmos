@@ -44,16 +44,18 @@ public void setTradWIndow(TradeApplication tradePanel) {
 	}
 	
 	
-	public TaskManager(String host, String hostName, String managerName) {
-		super(host, hostName, managerName);
+	public TaskManager(String host, String hostName, String managerName,String queueName) {
+		super(host, hostName, managerName,queueName);
 		// TODO Auto-generated constructor stub
 	}
 	
 	
 	public void handleEvent(EventProcessor event)	 {
 		if(event instanceof TaskEventProcessor ) {
+			
 			TaskEventProcessor taskEvent = (TaskEventProcessor) event;
-			System.out.println("From TaskManager "+ taskEvent.getTaskID());
+			
+			System.out.println("From TaskManager "+ taskEvent.getTaskID() + " *     **** " + taskEvent.getTradeID());
 			if(jobPanels != null) {
 				jobPanels.processTasks(taskEvent);
 			}
@@ -98,7 +100,7 @@ public void setTradWIndow(TradeApplication tradePanel) {
 		return taskManagerThread;
 	}
 	public static void main(String args[]) {
-		TaskManager amanager = new TaskManager("localhost",commonUTIL.getLocalHostName(),"TaskManager");
+		TaskManager amanager = new TaskManager("localhost",commonUTIL.getLocalHostName(),"TaskManager","TASK");
 	    
 		amanager.start(amanager);
 	}
